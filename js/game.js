@@ -607,6 +607,20 @@
     ctx.fillStyle = border; ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
     ctx.fillStyle = fill; ctx.fillRect(x, y, w, h);
   }
+  function logoPlate(cx, y, big) {
+    const L0 = C.LOGO, w = big ? 170 : 122, h = big ? 40 : 22, x = Math.round(cx - w / 2);
+    ctx.fillStyle = B.dark; ctx.fillRect(x - 2, y - 2, w + 4, h + 4);
+    ctx.fillStyle = L0.border; ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
+    ctx.fillStyle = L0.background; ctx.fillRect(x, y, w, h);
+    Font.draw(ctx, L0.text, x + w / 2 + 6, y + (big ? 14 : 4), { align: 'center', color: L0.foreground, scale: 2 });
+    if (big) {
+      Font.draw(ctx, L0.tagTop, x + w / 2 + 6, y + 4, { align: 'center', color: L0.foreground });
+      Font.draw(ctx, L0.tagBottom, x + w / 2 + 6, y + 31, { align: 'center', color: L0.foreground });
+    }
+    const s = big ? 4 : 3, iy = y + (big ? 11 : 3);
+    ctx.fillStyle = L0.foreground;
+    for (let i = 0; i < 4; i++) for (let k = 0; k < 2; k++) ctx.fillRect(x + 8 + k * (s + 1), iy + i * (s + 1), s, s);
+  }
   function button(label, x, y, w, h, action, sel) {
     G.buttons.push({ x, y, w, h, action });
     ctx.fillStyle = B.dark; ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
@@ -874,6 +888,7 @@
     ctx.fillStyle = 'rgba(20,28,50,0.65)'; for (let i = 0; i < 5; i++) { const x = (i * 130 - G.t * 8) % 560 - 60; ctx.fillRect(x, 6 + (i % 2) * 8, 150, 26); ctx.fillRect(x + 30, 0, 90, 18); }
     Art.drawHouse(ctx, 24, VH - 28, 1.7, 2 + (Math.floor(G.t / 1.5) % 4), G.t, false);
     ctx.fillStyle = '#6b6b6b'; ctx.fillRect(0, VH - 28, VW, 28);
+    logoPlate(70, 8, false);
     const bx = 236, by = 40;
     panel(bx, by, 228, 170, 'rgba(30,16,8,0.9)');
     txt('LA HISTORIA', bx + 114, by + 10, B.secondary, { align: 'center', scale: 2 });
@@ -885,7 +900,8 @@
   function drawSelect() {
     Art.drawBackground(ctx, 0, G.t * 10, 0, G.t, VW, VH, 0);
     ctx.fillStyle = 'rgba(30,16,8,0.45)'; ctx.fillRect(0, 0, VW, VH);
-    txt('ELIGE LA ETAPA DE LA OBRA', VW / 2, 12, B.secondary, { align: 'center', scale: 2 });
+    logoPlate(70, 6, false);
+    txt('ELIGE LA ETAPA DE LA OBRA', VW / 2 + 20, 8, B.secondary, { align: 'center' });
     const cw = 84, gap = 8, x0 = (VW - (cw * 5 + gap * 4)) / 2, y0 = 40, ch = 112;
     for (let i = 0; i < LEVELS.length; i++) {
       const lv = LEVELS[i], x = x0 + i * (cw + gap), unlocked = i < Save.data.unlocked, sel = i === G.cursor, sv = Save.data.levels[i];
@@ -910,12 +926,13 @@
     Art.drawHouse(ctx, VW / 2 - 70, VH - 12, 1.15, Math.min(5, cleared), G.t, true);
     txt('LA CASA DE LA FAMILIA: ' + cleared + ' / ' + LEVELS.length + ' ETAPAS', VW / 2, 164, B.light, { align: 'center' });
     txt('← → ELEGIR   ENTER JUGAR   ESC VOLVER', VW / 2, 180, B.secondaryLight, { align: 'center' });
-    txt('RÉCORD ' + pad(Save.data.hi, 6), 10, 6, B.secondaryLight);
+    txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2 + 20, 22, B.secondaryLight, { align: 'center' });
     button(mutedLabel(), VW - 86, 6, 80, 14, 'mute', false);
     button('VOLVER', 6, VH - 22, 60, 16, 'back', false);
   }
   function drawIntro() {
     drawWorld();
+    logoPlate(VW / 2, 36, false);
     ctx.fillStyle = 'rgba(20,10,5,0.78)'; ctx.fillRect(0, 70, VW, 120);
     ctx.fillStyle = B.secondary; ctx.fillRect(0, 70, VW, 2); ctx.fillRect(0, 188, VW, 2);
     txt('NIVEL ' + (L.idx + 1), VW / 2, 82, B.secondaryLight, { align: 'center', scale: 2 });
@@ -927,9 +944,10 @@
   function drawPause() {
     drawWorld();
     ctx.fillStyle = 'rgba(15,8,4,0.78)'; ctx.fillRect(0, 0, VW, VH);
-    txt('PAUSA', VW / 2, 34, B.secondary, { align: 'center', scale: 4 });
+    logoPlate(VW / 2, 8, true);
+    txt('PAUSA', VW / 2, 56, B.secondary, { align: 'center', scale: 3 });
     const lines = ['← → / A D: MOVERSE', 'ESPACIO / ↑ / W: SALTAR (MANTÉN PARA SALTAR MÁS ALTO)', '↓ / S / X: APILAR UN LADRILLO BAJO LOS PIES', 'C / SHIFT: MURO INSTANTÁNEO (SI TIENES)', 'P / ESC: PAUSA   ·   M: SONIDO'];
-    lines.forEach((s, i) => txt(s, VW / 2, 78 + i * 13, B.light, { align: 'center' }));
+    lines.forEach((s, i) => txt(s, VW / 2, 86 + i * 12, B.light, { align: 'center' }));
     button('CONTINUAR', VW / 2 - 70, 156, 140, 18, 'confirm', true);
     button(mutedLabel(), VW / 2 - 70, 180, 140, 18, 'mute', false);
     button('SALIR AL MENÚ', VW / 2 - 70, 204, 140, 18, 'quit', false);
@@ -938,6 +956,7 @@
     drawWorld();
     ctx.fillStyle = 'rgba(15,8,4,0.8)'; ctx.fillRect(0, 0, VW, VH);
     const ci = G.clearInfo;
+    logoPlate(VW / 2, 6, false);
     panel(110, 36, 260, 190);
     txt('¡NIVEL COMPLETADO!', VW / 2, 48, B.secondary, { align: 'center', scale: 2 });
     txt(L.def.name.toUpperCase(), VW / 2, 70, B.light, { align: 'center' });
@@ -954,6 +973,7 @@
   function drawOver() {
     drawWorld();
     ctx.fillStyle = 'rgba(10,5,10,0.82)'; ctx.fillRect(0, 0, VW, VH);
+    logoPlate(VW / 2, 16, false);
     txt('FIN DEL JUEGO', VW / 2, 56, B.danger, { align: 'center', scale: 4 });
     txt(L.deathReason === 'aplastado' || L.def.theme === 4 ? 'LA TORMENTA GANÓ ESTA VEZ...' : 'LA OBRA SIGUE ESPERANDO...', VW / 2, 100, B.light, { align: 'center' });
     txt('PUNTAJE ' + pad(G.score, 6) + '   ·   RÉCORD ' + pad(Save.data.hi, 6), VW / 2, 120, B.secondaryLight, { align: 'center' });
@@ -988,6 +1008,7 @@
     txt('LADRI Y LA FAMILIA AGRADECEN A INCERPAZ', VW / 2, 46, B.light, { align: 'center' });
     txt('PUNTAJE FINAL ' + pad(G.score, 6) + (G.newRecord ? '  ¡NUEVO RÉCORD!' : '   RÉCORD ' + pad(Save.data.hi, 6)), VW / 2, 66, B.secondaryLight, { align: 'center' });
     button('VOLVER AL MENÚ', VW / 2 - 70, 90, 140, 18, 'confirm', true);
+    logoPlate(VW - 70, VH - 30, false);
   }
 
   function render() {
