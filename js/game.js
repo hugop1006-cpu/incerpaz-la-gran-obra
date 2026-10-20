@@ -9,15 +9,22 @@
   ctx.imageSmoothingEnabled = false;
 
   // Formato móvil vertical: vista más angosta y alta que se ve más grande en pantalla
-  const VIEW_PORT = [288, 400];
+  const PORT_W = 288, PORT_W_PLAY = 240; // ancho de la vista vertical (menús / partida, en px de juego); el alto se calcula según la pantalla
   function setView(w, h) {
     if (w === VW && h === VH) return;
     VW = w; VH = h; canvas.width = w; canvas.height = h; ctx.imageSmoothingEnabled = false;
-    document.documentElement.style.setProperty('--cw', w); document.documentElement.style.setProperty('--ch', h);
   }
   const portraitMobile = () => document.body.classList.contains('touch') && window.innerHeight > window.innerWidth * 1.1;
-  const PORT_STATES = ['play', 'pause', 'intro', 'clear', 'over'];
-  function syncView() { const want = (PORT_STATES.includes(G.state) && portraitMobile()) ? VIEW_PORT : [C.VIEW_W, C.VIEW_H]; setView(want[0], want[1]); }
+  function syncView() {
+    document.body.dataset.state = G.state;
+    let want = [C.VIEW_W, C.VIEW_H];
+    if (portraitMobile()) {
+      const st = document.getElementById('stage'), w = st.clientWidth || window.innerWidth, h = st.clientHeight || window.innerHeight;
+      const pw = G.state === 'play' ? PORT_W_PLAY : PORT_W;
+      want = [pw, clamp(Math.round(pw * h / w), 272, 720)];
+    }
+    setView(want[0], want[1]);
+  }
   const initCamY = () => (L.h * T <= VH ? L.h * T - VH : clamp(L.player.y - VH * 0.55, 0, L.h * T - VH));
 
   const PW = 10, PH = 14;                       // tamaño de la caja de colisión de Ladri
@@ -57,6 +64,18 @@
     Snd.unlock();
   });
   window.addEventListener('keyup', e => keysDown.delete(e.code));
+  // Android/Chrome: pantalla completa al primer toque (iPhone: se instala con "Añadir a inicio")
+  let fsTried = false;
+  window.addEventListener('pointerdown', () => {
+    if (fsTried || !document.body.classList.contains('touch')) return;
+    fsTried = true;
+    try {
+      const el = document.documentElement;
+      if (!document.fullscreenElement && el.requestFullscreen) {
+        Promise.resolve(el.requestFullscreen({ navigationUI: 'hide' })).then(() => { try { screen.orientation.lock('portrait').catch(() => {}); } catch (e) {} }).catch(() => {});
+      }
+    } catch (e) {}
+  }, { passive: true });
   window.addEventListener('blur', () => { keysDown.clear(); touchHeld.clear(); if (G.state === 'play') setPause(true); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { if (G.state === 'play') setPause(true); Snd.suspend(); } else Snd.resume(); });
 
@@ -830,7 +849,7 @@
       ctx.fillStyle = B.dark; ctx.fillRect(56, 17, 11, 9); ctx.fillStyle = B.primary; ctx.fillRect(57, 18, 9, 7); ctx.fillStyle = B.primaryLight; ctx.fillRect(57, 18, 9, 1);
       Font.draw(ctx, 'x' + L.bricks, 70, 18, { color: L.bricks > 0 ? B.light : B.danger });
       drawPowerIcons(p, 100, 12, false);
-      Font.draw(ctx, 'N' + (L.idx + 1) + ' ' + TH_NAME(), VW - 4, 18, { align: 'right', color: B.secondaryLight });
+      Font.draw(ctx, VW < 260 ? 'NIVEL ' + (L.idx + 1) : 'N' + (L.idx + 1) + ' ' + TH_NAME(), VW - 4, 18, { align: 'right', color: B.secondaryLight });
     } else {
       const lab = (s, x) => Font.draw(ctx, s, x, 3, { color: B.secondaryLight });
       lab('VIDAS', 6); Font.draw(ctx, '♥', 6, 13, { color: B.danger }); txt('x' + G.lives, 14, 13, B.light, { shadow: null });
@@ -887,6 +906,7 @@
   /* ----- Pantallas ----- */
   function mutedLabel() { return 'SONIDO: ' + (Snd.muted ? 'NO' : 'SÍ'); }
   function drawTitle() {
+    if (VW < 400) return drawTitleN();
     Art.drawBackground(ctx, 0, G.t * 28, 0, G.t, VW, VH, 0);
     const off = Math.floor(G.t * 60);
     for (let c = -1; c < VW / T + 2; c++) {
@@ -916,12 +936,99 @@
     txt('INCERPAZ · CERÁMICA Y MATERIALES DE CONSTRUCCIÓN · BOLIVIA', VW / 2, VH - 12, B.light, { align: 'center' });
     button(mutedLabel(), VW - 86, 6, 80, 14, 'mute', false);
   }
+  const lerpHex = (a, b, k) => { const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16); const ch = s => Math.round(((pa >> s) & 255) * (1 - k) + ((pb >> s) & 255) * k); return `rgb(${ch(16)},${ch(8)},${ch(0)})`; };
+  const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone;
+  function titleGround() {
+    const off = Math.floor(G.t * 60);
+    for (let c = -1; c < VW / T + 2; c++) {
+      const wc = c + Math.floor(off / T);
+      ctx.drawImage(Art.tile(0, '#', 4 + tvar(wc, 0)), c * T - (off % T), VH - 3 * T);
+      ctx.drawImage(Art.tile(0, '#', tvar(wc, 1)), c * T - (off % T), VH - 2 * T);
+      ctx.drawImage(Art.tile(0, '#', tvar(wc, 2)), c * T - (off % T), VH - T);
+    }
+  }
+  function titlePlate(y, w) {
+    const x = VW / 2 - w / 2, L0 = C.LOGO;
+    ctx.fillStyle = B.dark; ctx.fillRect(x - 4, y - 4, w + 8, 74);
+    ctx.fillStyle = L0.border; ctx.fillRect(x - 2, y - 2, w + 4, 70);
+    ctx.fillStyle = L0.background; ctx.fillRect(x, y, w, 66);
+    Font.draw(ctx, L0.tagTop, VW / 2 + 12, y + 6, { align: 'center', color: L0.foreground });
+    Font.draw(ctx, L0.tagBottom, VW / 2 + 12, y + 54, { align: 'center', color: L0.foreground });
+    Font.draw(ctx, L0.text, VW / 2 + 12, y + 19, { align: 'center', color: L0.foreground, scale: 4 });
+    ctx.fillStyle = L0.foreground; // icono de baldosas del logo
+    for (let i = 0; i < 3; i++) for (let k = 0; k < 2; k++) ctx.fillRect(x + 12 + k * 13, y + 17 + i * 13, 10, 10);
+  }
+  function drawTitleN() { // formato vertical
+    Art.drawBackground(ctx, 0, G.t * 28, 0, G.t, VW, VH, 0);
+    titleGround();
+    ctx.drawImage(Art.ladri(Math.floor(G.t * 7) % 2 ? 'runA' : 'runB', 1), VW / 2 - 28, VH - 3 * T - 64, 56, 64);
+    const y0 = Math.round(VH * 0.12);
+    titlePlate(y0, VW - 24);
+    Font.draw(ctx, C.SUBTITLE, VW / 2, y0 + 88, { align: 'center', color: B.secondary, shadow: B.dark, scale: 3 });
+    G.buttons.push({ x: 0, y: 0, w: VW, h: VH - 20, action: 'confirm' });
+    const my = Math.round(VH * 0.5);
+    if (Math.floor(G.t * 2) % 2 === 0) txt('TOCA LA PANTALLA PARA JUGAR', VW / 2, my, B.light, { align: 'center' });
+    txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2, my + 16, B.secondaryLight, { align: 'center' });
+    if (isIOS()) { txt('PANTALLA COMPLETA: COMPARTIR', VW / 2, my + 40, B.secondary, { align: 'center' }); txt('Y LUEGO "AÑADIR A INICIO"', VW / 2, my + 52, B.secondary, { align: 'center' }); }
+    txt('INCERPAZ · CERÁMICA INDUSTRIAL', VW / 2, VH - 28, B.light, { align: 'center' });
+    txt('CALIDAD TOTAL · BOLIVIA', VW / 2, VH - 14, B.light, { align: 'center' });
+    button(mutedLabel(), VW - 86, 4, 80, 14, 'mute', false);
+  }
+  function drawStoryN() {
+    Art.drawBackground(ctx, 0, 0, 0, G.t, VW, VH, 0);
+    ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(0, 0, VW, VH);
+    ctx.fillStyle = 'rgba(20,28,50,0.65)'; for (let i = 0; i < 4; i++) { const x = (i * 110 - G.t * 8) % 420 - 60; ctx.fillRect(x, 6 + (i % 2) * 8, 130, 24); }
+    Art.drawHouse(ctx, VW / 2 - 100, VH - 28, 1.7, 2 + (Math.floor(G.t / 1.5) % 4), G.t, false);
+    ctx.fillStyle = '#6b6b6b'; ctx.fillRect(0, VH - 28, VW, 28);
+    logoPlate(VW / 2, 12, true);
+    const bx = 8, by = 66, bw = VW - 16;
+    panel(bx, by, bw, 186, 'rgba(30,16,8,0.9)');
+    txt('LA HISTORIA', VW / 2, by + 10, B.secondary, { align: 'center', scale: 2 });
+    const story = 'Una familia necesita su casa terminada antes de que llegue la tormenta. Ladri, el ladrillo de casco amarillo, recorre la obra juntando materiales para levantarla a tiempo. ¡Ayúdalo a terminar LA GRAN OBRA!';
+    wrap(story, 41).forEach((ln, i) => txt(ln, bx + 10, by + 36 + i * 13, B.light));
+    ctx.drawImage(Art.ladri('idle', -1), bx + bw - 40, by + 148, 28, 32);
+    button('SIGUIENTE', bx + 10, by + 158, 110, 18, 'confirm', true);
+  }
+  function drawSelectN() {
+    Art.drawBackground(ctx, 0, G.t * 10, 0, G.t, VW, VH, 0);
+    ctx.fillStyle = 'rgba(30,16,8,0.45)'; ctx.fillRect(0, 0, VW, VH);
+    logoPlate(VW / 2, 26, true);
+    button(mutedLabel(), VW - 86, 4, 80, 14, 'mute', false);
+    txt('ELIGE LA ETAPA DE LA OBRA', VW / 2, 76, B.secondary, { align: 'center' });
+    txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2, 90, B.secondaryLight, { align: 'center' });
+    const y0 = 106, rh = 44, x = 8, w = VW - 16;
+    for (let i = 0; i < LEVELS.length; i++) {
+      const lv = LEVELS[i], unlocked = i < Save.data.unlocked, sel = i === G.cursor, sv = Save.data.levels[i];
+      const y = y0 + i * (rh + 4) + (sel ? Math.round(Math.sin(G.t * 6)) : 0);
+      G.buttons.push({ x, y: y0 + i * (rh + 4), w, h: rh, action: 'card' + i });
+      ctx.fillStyle = B.dark; ctx.fillRect(x - 2, y - 2, w + 4, rh + 4);
+      ctx.fillStyle = sel ? B.secondary : '#5a4a3a'; ctx.fillRect(x - 1, y - 1, w + 2, rh + 2);
+      ctx.fillStyle = 'rgba(30,16,8,0.92)'; ctx.fillRect(x, y, w, rh);
+      const th = CONFIG.THEMES[lv.theme], gr = ctx.createLinearGradient(0, y, 0, y + rh);
+      gr.addColorStop(0, th.skyTop); gr.addColorStop(1, th.skyBottom);
+      ctx.fillStyle = unlocked ? gr : '#555'; ctx.fillRect(x, y, 40, rh);
+      ctx.fillStyle = unlocked ? th.groundTop : '#444'; ctx.fillRect(x, y + rh - 12, 40, 4); ctx.fillStyle = unlocked ? th.ground : '#333'; ctx.fillRect(x, y + rh - 8, 40, 8);
+      txt(String(i + 1), x + 20, y + 10, unlocked ? '#fff' : '#999', { align: 'center', scale: 3 });
+      txt(lv.name.toUpperCase(), x + 50, y + 8, unlocked ? B.light : '#888');
+      if (unlocked) {
+        for (let k = 0; k < 3; k++) { ctx.globalAlpha = sv && sv.tejas[k] ? 1 : 0.3; ctx.drawImage(Art.teja(0, !(sv && sv.tejas[k])), x + 50 + k * 15, y + 24, 12, 10); ctx.globalAlpha = 1; }
+        txt(sv && sv.best ? pad(sv.best, 6) : 'NUEVO', x + w - 6, y + 26, B.secondaryLight, { align: 'right' });
+      } else txt('BLOQUEADO', x + 50, y + 26, '#aa6a5a');
+    }
+    const cleared = Object.values(Save.data.levels).filter(v => v && v.clear).length, by = y0 + LEVELS.length * (rh + 4) + 6;
+    if (VH > by + 110) {
+      txt('LA CASA DE LA FAMILIA: ' + cleared + ' / ' + LEVELS.length, VW / 2, by, B.light, { align: 'center' });
+      Art.drawHouse(ctx, VW / 2 - 48, VH - 40, 0.8, Math.min(5, cleared), G.t, true);
+    }
+    button('VOLVER', 6, VH - 22, 60, 16, 'back', false);
+  }
   function wrap(text, maxChars) {
     const words = text.split(' '), lines = []; let cur = '';
     for (const w of words) { if ((cur + ' ' + w).trim().length > maxChars) { lines.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); }
     if (cur) lines.push(cur); return lines;
   }
   function drawStory() {
+    if (VW < 400) return drawStoryN();
     Art.drawBackground(ctx, 0, 0, 0, G.t, VW, VH, 0);
     ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(0, 0, VW, VH);
     // tormenta que se acerca
@@ -938,6 +1045,7 @@
     button('SIGUIENTE', bx + 10, by + 146, 100, 16, 'confirm', true);
   }
   function drawSelect() {
+    if (VW < 400) return drawSelectN();
     Art.drawBackground(ctx, 0, G.t * 10, 0, G.t, VW, VH, 0);
     ctx.fillStyle = 'rgba(30,16,8,0.45)'; ctx.fillRect(0, 0, VW, VH);
     logoPlate(70, 6, false);
@@ -1054,7 +1162,16 @@
     ctx.fillStyle = '#c8903c'; ctx.fillRect(x - 9, y - 11 + Math.round(Math.sin(t * 20) * 2), 3, 2);
   }
   function drawEnding() {
-    const t = G.stateT, gy = VH - 40;
+    const t = G.stateT;
+    let sv = null;
+    if (VW < 400) { // formato vertical: la escena se dibuja a 0,6x en la parte superior
+      sv = [VW, VH];
+      const k = ease((t - 1.2) / 3), lxv = -30 + 292 * ease((t - 3) / 8.5), pan = clamp(lxv - 100, 0, 160);
+      ctx.fillStyle = lerpHex(CONFIG.THEMES[4].skyTop, CONFIG.THEMES[0].skyTop, k); ctx.fillRect(0, 0, VW, 50);
+      ctx.fillStyle = '#6fa83a'; ctx.fillRect(0, 50 + 245, VW, VH);
+      ctx.save(); ctx.translate(0, 50); ctx.scale(0.9, 0.9); ctx.translate(-pan, 0); VW = 480; VH = 272;
+    }
+    const gy = VH - 40;
     // cielo: de tormenta a amanecer
     Art.drawBackground(ctx, 4, 300 + t * 6, 0, t, VW, VH, 0);
     const clear = ease((t - 1.2) / 3);
@@ -1106,7 +1223,19 @@
     say('LA TORMENTA SE ALEJA...', 0.4, 3.4, 40, 2, B.light);
     say('LADRI VUELVE A CASA', 3.8, 10.8, 40, 2, B.secondaryLight);
     say('¡BIENVENIDO, LADRI!', 11, 13.6, 40, 3, B.secondary);
-    if (t >= END_T) {
+    if (sv) { ctx.restore(); VW = sv[0]; VH = sv[1]; }
+    if (sv) {
+      if (t >= END_T) {
+        const a = ease((t - END_T) / 1), py = 312;
+        ctx.globalAlpha = a; panel(8, py, VW - 16, 134, 'rgba(30,16,8,0.88)');
+        logoPlate(VW / 2, py + 8, false);
+        txt('¡LA CASA ESTÁ LISTA!', VW / 2, py + 40, B.secondary, { align: 'center', scale: 2 });
+        txt('PUNTAJE FINAL ' + pad(G.score, 6), VW / 2, py + 64, B.secondaryLight, { align: 'center' });
+        txt(G.newRecord ? '¡NUEVO RÉCORD!' : 'RÉCORD ' + pad(Save.data.hi, 6), VW / 2, py + 78, B.secondaryLight, { align: 'center' });
+        ctx.globalAlpha = 1;
+        button('VOLVER AL MENÚ', VW / 2 - 70, py + 100, 140, 18, 'confirm', true);
+      } else { G.buttons.push({ x: 0, y: 0, w: VW, h: VH, action: 'confirm' }); txt('TOCA PARA SALTAR', VW / 2, VH - 14, '#fff', { align: 'center' }); }
+    } else if (t >= END_T) {
       const a = ease((t - END_T) / 1);
       ctx.globalAlpha = a; panel(70, 14, 340, 62, 'rgba(30,16,8,0.86)');
       logoPlate(VW / 2, 20, false);
@@ -1211,8 +1340,8 @@
         if (G.state === 'ending') { if (G.stateT > 11 && !G.e1) { G.e1 = true; Snd.play('oneup'); } if (G.stateT > 13 && !G.e2) { G.e2 = true; Snd.play('clear'); } }
         break;
       case 'select':
-        if (pressed('left')) { G.cursor = Math.max(0, G.cursor - 1); Snd.play('select'); }
-        if (pressed('right')) { G.cursor = Math.min(LEVELS.length - 1, G.cursor + 1); Snd.play('select'); }
+        if (pressed('left') || pressed('up')) { G.cursor = Math.max(0, G.cursor - 1); Snd.play('select'); }
+        if (pressed('right') || pressed('down')) { G.cursor = Math.min(LEVELS.length - 1, G.cursor + 1); Snd.play('select'); }
         if (pressed('confirm')) confirm();
         if (pressed('back')) back();
         break;

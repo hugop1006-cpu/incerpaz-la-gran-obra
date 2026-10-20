@@ -25,10 +25,19 @@ Abre `index.html` en el navegador (doble clic). No necesita servidor.
 - **Nivel 5, La Tormenta**: la cámara avanza sola y la lluvia te empuja. Al final, **La Grieta** parte el suelo: párate junto a cada grieta abierta y pulsa *apilar* para sellarla con un ladrillo. Con 6 sellos la vences.
 - El progreso (niveles desbloqueados, récord, tejas) se guarda en `localStorage`. Para borrarlo, limpia los datos del sitio en el navegador.
 
+## En el celular (vertical y pantalla completa)
+
+- Se juega en **vertical**: el juego ocupa toda la pantalla y los botones (◀ ▶, SALTO, APILAR, MURO) quedan abajo durante la partida. En horizontal también funciona.
+- **Android (Chrome):** pasa a pantalla completa al primer toque.
+- **iPhone (Safari):** no permite pantalla completa desde una página web. Para tenerla: botón Compartir → **Añadir a pantalla de inicio**, y abre el juego desde ese ícono.
+- Para sacar el ícono con el logo, edita `icons/` (192 y 512 px) y `manifest.json`.
+
 ## Estructura
 
 ```
 index.html      página del juego (canvas + botones táctiles)
+manifest.json   datos para instalarlo en el celular (pantalla completa, ícono)
+icons/          íconos de la app
 style.css       diseño responsive
 config.js       COLORES DE MARCA, logo, física y reglas
 levels.js       los 5 niveles (mapas de texto)

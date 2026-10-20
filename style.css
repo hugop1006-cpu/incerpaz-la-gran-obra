@@ -16,7 +16,7 @@ canvas#game {
 
 /* Controles táctiles: solo en pantallas táctiles */
 #touch { display: none; }
-body.touch #touch { display: block; }
+body.touch[data-state=play] #touch { display: block; }
 #touch button {
   font: 700 13px system-ui, sans-serif; color: var(--light); background: rgba(43,26,18,.55);
   border: 2px solid rgba(255,246,232,.55); border-radius: 14px; touch-action: none;
@@ -37,17 +37,17 @@ body.touch #touch { display: block; }
   body.touch .pad-right { right: max(14px, env(safe-area-inset-right)); }
   body.touch .act.big { margin-bottom: 4px; }
 }
-/* Vertical: el juego arriba, los botones abajo */
+/* Vertical (celular): pantalla completa. El juego ocupa todo el ancho y alto; los botones van debajo durante la partida */
 @media (orientation: portrait) {
-  body.touch { --ctl-h: 210px; }
-  body.touch #stage { align-items: center; padding-top: max(4px, env(safe-area-inset-top)); }
-  body.touch #touch { position: relative; flex: 0 0 var(--ctl-h); height: var(--ctl-h); }
-  body.touch .pad { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); }
+  body.touch #stage { position: relative; align-items: stretch; justify-content: stretch; padding: 0; }
+  body.touch canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; aspect-ratio: auto; box-shadow: none; }
+  body.touch[data-state=play] #touch { position: relative; flex: 0 0 210px; height: 210px; padding-bottom: env(safe-area-inset-bottom); background: linear-gradient(#2b1a12, #1a0f0a); border-top: 3px solid #a31621; }
+  body.touch .pad { position: absolute; bottom: calc(14px + env(safe-area-inset-bottom)); }
   body.touch .pad-left { left: 12px; }
   body.touch .pad-right { right: 12px; display: grid; grid-template-columns: auto auto; gap: 8px; align-items: end; }
   body.touch .act.small { grid-column: 1; grid-row: 1; width: 62px; height: 52px; }
   body.touch .act.mid { grid-column: 1; grid-row: 2; width: 62px; height: 66px; }
   body.touch .act.big { grid-column: 2; grid-row: 1 / span 2; align-self: end; width: 96px; height: 96px; }
   body.touch .dir { width: 74px; height: 74px; }
-  body.touch #btn-pause { top: 4px; }
+  body.touch #btn-pause { top: 8px; right: 8px; }
 }
