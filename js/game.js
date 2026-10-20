@@ -617,9 +617,9 @@
       Font.draw(ctx, L0.tagTop, x + w / 2 + 6, y + 4, { align: 'center', color: L0.foreground });
       Font.draw(ctx, L0.tagBottom, x + w / 2 + 6, y + 31, { align: 'center', color: L0.foreground });
     }
-    const s = big ? 4 : 3, iy = y + (big ? 11 : 3);
+    const s = big ? 6 : 4, iy = y + (big ? 10 : 4);
     ctx.fillStyle = L0.foreground;
-    for (let i = 0; i < 4; i++) for (let k = 0; k < 2; k++) ctx.fillRect(x + 8 + k * (s + 1), iy + i * (s + 1), s, s);
+    for (let i = 0; i < 3; i++) for (let k = 0; k < 2; k++) ctx.fillRect(x + 8 + k * (s + 1), iy + i * (s + 1), s, s);
   }
   function button(label, x, y, w, h, action, sel) {
     G.buttons.push({ x, y, w, h, action });
@@ -868,7 +868,7 @@
     Font.draw(ctx, L0.tagBottom, VW / 2 + 12, y + 54, { align: 'center', color: L0.foreground });
     Font.draw(ctx, L0.text, VW / 2 + 12, y + 19, { align: 'center', color: L0.foreground, scale: 4 });
     ctx.fillStyle = L0.foreground; // icono de baldosas del logo
-    for (let i = 0; i < 4; i++) for (let k = 0; k < 2; k++) ctx.fillRect(x + 12 + k * 9, y + 19 + i * 9, 7, 7);
+    for (let i = 0; i < 3; i++) for (let k = 0; k < 2; k++) ctx.fillRect(x + 12 + k * 13, y + 17 + i * 13, 10, 10);
     Font.draw(ctx, C.SUBTITLE, VW / 2, y + 82, { align: 'center', color: B.secondary, shadow: B.dark, scale: 3 });
     G.buttons.push({ x: 0, y: 0, w: VW, h: VH - 20, action: 'confirm' });
     if (Math.floor(G.t * 2) % 2 === 0) txt(document.body.classList.contains('touch') ? 'TOCA LA PANTALLA PARA JUGAR' : 'PRESIONA ENTER PARA JUGAR', VW / 2, 138, B.light, { align: 'center' });

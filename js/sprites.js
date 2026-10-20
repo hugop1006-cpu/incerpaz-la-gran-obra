@@ -311,10 +311,14 @@
     g.fillStyle = B.dark; g.fillRect(x + 5, y - 32, 3, 32);
     g.fillStyle = '#888'; g.fillRect(x + 3, y - 2, 7, 2);
     const wave = Math.round(Math.sin(t * 6) * (active ? 1 : 0));
-    g.fillStyle = B.dark; g.fillRect(x + 8, y - 31, 15, 11);
-    g.fillStyle = active ? B.secondary : '#9aa0a8'; g.fillRect(x + 8, y - 30 + wave, 14, 9);
-    g.fillStyle = active ? B.primary : '#6b7078'; g.fillRect(x + 11, y - 28 + wave, 8, 2); g.fillRect(x + 11, y - 25 + wave, 8, 2);
-    if (active) { g.fillStyle = B.secondaryLight; g.fillRect(x + 8, y - 30 + wave, 14, 1); }
+    g.fillStyle = B.dark; g.fillRect(x + 8, y - 32, 18, 14);
+    g.fillStyle = active ? B.secondary : '#9aa0a8'; g.fillRect(x + 9, y - 31 + wave, 16, 12);
+    if (active) { g.fillStyle = B.secondaryLight; g.fillRect(x + 9, y - 31 + wave, 16, 1); }
+    g.fillStyle = active ? B.primary : '#6b7078'; // isotipo de INCERPAZ: 2 x 3 baldosas
+    for (let i = 0; i < 3; i++) for (let k = 0; k < 2; k++) {
+      const sx = x + 12 + k * 5, sy = y - 30 + wave + i * 4;
+      g.fillRect(sx, sy, 4, 3);
+    }
   }
   function drawGoal(g, x, y, t) { // arco de entrega: 2 pilares de ladrillo + cartel "META"
     for (const dx of [0, 24]) { g.fillStyle = B.dark; g.fillRect(x + dx, y - 48, 10, 48); g.fillStyle = B.primary; g.fillRect(x + dx + 1, y - 47, 8, 46); g.fillStyle = B.primaryDark; for (let k = 6; k < 46; k += 8) g.fillRect(x + dx + 1, y - 47 + k, 8, 1); g.fillStyle = B.primaryLight; g.fillRect(x + dx + 1, y - 47, 1, 46); }
