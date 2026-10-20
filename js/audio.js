@@ -84,6 +84,8 @@
       lead: '9 - 7 - 5 - 7 - 9 - - - 10 - 9 - 7 - 5 - 4 - 5 - 7 - - - - 4 - 5 - 7 - 9 - 7 - 5 - 4 - 2 - 4 - - - 0 - - -'.split(' ') },
     l5: { root: 57, scale: SC_MIN, bpm: 140, wave: 'sawtooth', prog: [0, 0, 3, 4], bassWave: 'square',
       lead: '7 - 7 - 5 7 - - 8 - 7 - 5 - 3 - 7 - 7 - 10 8 7 - - 5 - 3 - 2 - - - 3 5 7 - 5 3 - 5 7 - 8 7 - 5 - 3 5 3 2 - 0 - - -'.split(' ') },
+    fin: { root: 60, scale: SC_MAJ, bpm: 92, wave: 'triangle', prog: [0, 3, 4, 0], bassWave: 'sine',
+      lead: '4 - - - 7 - 9 - 10 - - - 9 - 7 - 5 - - - 7 - 9 - 7 - - - 4 - - - 7 - 9 - 10 - 12 - 10 - 9 - 7 - 9 - 10 - - - 14 - - -'.split(' ') },
     boss: { root: 52, scale: SC_MIN, bpm: 152, wave: 'sawtooth', prog: [0, 3, 0, 4], bassWave: 'square',
       lead: '7 7 - 5 7 7 - 3 5 5 - 3 5 7 8 - 7 7 - 10 8 7 - 5 3 5 - 3 2 - 0 - 7 - 8 - 7 - 5 - 3 - 5 - 3 - 2 - 3 - 0 - -'.split(' ') }
   };

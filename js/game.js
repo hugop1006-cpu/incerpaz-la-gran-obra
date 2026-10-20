@@ -980,35 +980,96 @@
     button('REINTENTAR ETAPA', VW / 2 - 80, 150, 160, 18, 'confirm', true);
     button('MENÚ DE ETAPAS', VW / 2 - 80, 176, 160, 18, 'quit', false);
   }
+  /* ----- Final: Ladri vuelve a casa ----- */
+  const END_T = 14; // segundo en que aparece el resumen
+  const ease = x => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  function person(x, base, h, shirt, hair, phase, joy, wave) {
+    const t = G.stateT, hop = joy ? -Math.abs(Math.sin(t * 9 + phase)) * 7 : 0, y = Math.round(base + hop);
+    x = Math.round(x);
+    const r = Math.max(3, Math.round(h * 0.17));
+    ctx.fillStyle = B.dark; ctx.fillRect(x - 5, y - Math.round(h * 0.66) - 1, 10, Math.round(h * 0.4) + 2); ctx.fillRect(x - 4, y - Math.round(h * 0.3), 3, Math.round(h * 0.3)); ctx.fillRect(x + 1, y - Math.round(h * 0.3), 3, Math.round(h * 0.3));
+    ctx.fillStyle = '#4a5a7a'; ctx.fillRect(x - 3, y - Math.round(h * 0.3), 2, Math.round(h * 0.3) - 1); ctx.fillRect(x + 1, y - Math.round(h * 0.3), 2, Math.round(h * 0.3) - 1);
+    ctx.fillStyle = shirt; ctx.fillRect(x - 4, y - Math.round(h * 0.66), 8, Math.round(h * 0.38));
+    const up = joy || wave ? (Math.sin(t * 10 + phase) > 0 ? 6 : 3) : 0;
+    ctx.fillStyle = '#f0c8a0'; ctx.fillRect(x - 6, y - Math.round(h * 0.62) - up, 2, 6 + up); ctx.fillRect(x + 4, y - Math.round(h * 0.62) - up, 2, 6 + up);
+    const hy = y - Math.round(h * 0.8);
+    Art.disc(ctx, x, hy, r + 1, B.dark); Art.disc(ctx, x, hy, r, '#f0c8a0');
+    ctx.fillStyle = hair; ctx.fillRect(x - r, hy - r, r * 2 + 1, 2); ctx.fillRect(x - r, hy - r, 1, r);
+    ctx.fillStyle = B.dark; ctx.fillRect(x - 2, hy, 1, 1); ctx.fillRect(x + 1, hy, 1, 1); ctx.fillRect(x - 1, hy + 2, 2, 1);
+  }
+  function dog(x, base, joy) {
+    const t = G.stateT, y = Math.round(base - (joy ? Math.abs(Math.sin(t * 12)) * 5 : 0)); x = Math.round(x);
+    ctx.fillStyle = B.dark; ctx.fillRect(x - 7, y - 10, 15, 10);
+    ctx.fillStyle = '#c8903c'; ctx.fillRect(x - 6, y - 9, 11, 6); ctx.fillRect(x + 3, y - 12, 6, 6);
+    ctx.fillStyle = '#7a5020'; ctx.fillRect(x + 7, y - 12, 2, 3); ctx.fillRect(x - 5, y - 4, 2, 4); ctx.fillRect(x + 2, y - 4, 2, 4);
+    ctx.fillStyle = B.dark; ctx.fillRect(x + 6, y - 10, 1, 1); ctx.fillRect(x + 9, y - 8, 1, 1);
+    ctx.fillStyle = '#c8903c'; ctx.fillRect(x - 9, y - 11 + Math.round(Math.sin(t * 20) * 2), 3, 2);
+  }
   function drawEnding() {
-    const t = G.stateT;
-    Art.drawBackground(ctx, 0, 120 + t * 10, 0, G.t, VW, VH, 0);
-    ctx.fillStyle = '#6fa83a'; ctx.fillRect(0, VH - 40, VW, 40); ctx.fillStyle = '#4f8a2a'; ctx.fillRect(0, VH - 40, VW, 3);
-    ctx.fillStyle = '#d9c9a0'; ctx.fillRect(110, VH - 40, 70, 40);
-    Art.drawHouse(ctx, 96, VH - 40, 2.4, 5, G.t, true);
-    // familia saludando
-    const fam = [[340, 30, '#3a6ea5'], [362, 24, '#c0504d'], [382, 17, '#e0a030'], [398, 13, '#5aa05a']];
-    fam.forEach(([x, h, col], i) => {
-      const y = VH - 40;
-      ctx.fillStyle = B.dark; ctx.fillRect(x - 1, y - h - 1, 9, h + 1);
-      ctx.fillStyle = col; ctx.fillRect(x, y - h * 0.65, 7, h * 0.65);
-      ctx.fillStyle = '#f0c8a0'; ctx.fillRect(x + 1, y - h, 5, h * 0.35);
-      const w = Math.sin(G.t * 8 + i) > 0 ? 5 : 2;
-      ctx.fillStyle = '#f0c8a0'; ctx.fillRect(x - 2, y - h * 0.65 - w + 2, 2, 5);
-    });
-    ctx.drawImage(Art.ladri(Math.sin(G.t * 6) > 0.6 ? 'jump' : 'idle', -1), 300, VH - 40 - 16 - Math.max(0, Math.sin(G.t * 6)) * 6, 28, 32);
-    // sol y confeti
-    ctx.fillStyle = '#fff6c8'; Art.disc(ctx, 420, 56, 20, '#fff6c8');
-    for (let i = 0; i < 40; i++) {
-      const x = (i * 47 + Math.sin(G.t + i) * 20) % VW, y = (i * 31 + G.t * 60) % VH;
-      ctx.fillStyle = [B.primary, B.secondary, B.accent, B.good][i % 4]; ctx.fillRect(Math.round(x), Math.round(y), 3, 3);
+    const t = G.stateT, gy = VH - 40;
+    // cielo: de tormenta a amanecer
+    Art.drawBackground(ctx, 4, 300 + t * 6, 0, t, VW, VH, 0);
+    const clear = ease((t - 1.2) / 3);
+    ctx.globalAlpha = clear; Art.drawBackground(ctx, 0, 120 + t * 6, 0, t, VW, VH, 0); ctx.globalAlpha = 1;
+    if (t < 3.5) { ctx.globalAlpha = 1 - clear; ctx.strokeStyle = 'rgba(190,215,255,0.5)'; ctx.beginPath(); for (let i = 0; i < 60; i++) { const x = (i * 53 + t * 90) % (VW + 40) - 20, y = (i * 97 + t * 460) % (VH + 40) - 20; ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 9); } ctx.stroke(); ctx.globalAlpha = 1; }
+    // sol saliendo
+    const sy = 250 - 190 * ease((t - 1.5) / 5);
+    Art.disc(ctx, 392, Math.round(sy), 34, 'rgba(255,240,170,0.35)'); Art.disc(ctx, 392, Math.round(sy), 24, '#fff6c8');
+    // fuegos artificiales
+    for (let k = 0; k < 9; k++) {
+      const t0 = 13 + k * 0.9, d = t - t0;
+      if (d < 0 || d > 1.6) continue;
+      const cx = 60 + Art.h2(k, 1, 5) * 360, cy = 50 + Art.h2(k, 2, 5) * 60, col = [B.secondary, B.primaryLight, '#7fd0ff', '#9af58a'][k % 4];
+      if (d < 0.35) { ctx.fillStyle = '#fff'; ctx.fillRect(Math.round(cx), Math.round(cy + 130 - d / 0.35 * 130), 2, 6); continue; }
+      const e = d - 0.35;
+      for (let i = 0; i < 26; i++) { const a = i / 26 * 6.283, sp = 55 + (i % 3) * 14; ctx.globalAlpha = Math.max(0, 1 - e / 1.2); ctx.fillStyle = col; ctx.fillRect(Math.round(cx + Math.cos(a) * sp * e), Math.round(cy + Math.sin(a) * sp * e + 40 * e * e), 2, 2); }
+      ctx.globalAlpha = 1;
     }
-    panel(60, 14, 360, 44, 'rgba(30,16,8,0.85)');
-    txt('¡LA CASA ESTÁ LISTA!', VW / 2, 22, B.secondary, { align: 'center', scale: 3 });
-    txt('LADRI Y LA FAMILIA AGRADECEN A INCERPAZ', VW / 2, 46, B.light, { align: 'center' });
-    txt('PUNTAJE FINAL ' + pad(G.score, 6) + (G.newRecord ? '  ¡NUEVO RÉCORD!' : '   RÉCORD ' + pad(Save.data.hi, 6)), VW / 2, 66, B.secondaryLight, { align: 'center' });
-    button('VOLVER AL MENÚ', VW / 2 - 70, 90, 140, 18, 'confirm', true);
-    logoPlate(VW - 70, VH - 30, false);
+    // suelo, camino y cerca
+    ctx.fillStyle = '#6fa83a'; ctx.fillRect(0, gy, VW, 40); ctx.fillStyle = '#4f8a2a'; ctx.fillRect(0, gy, VW, 3);
+    ctx.fillStyle = '#d9c9a0'; ctx.fillRect(0, gy + 8, VW, 14); ctx.fillStyle = '#b8a67a'; for (let i = 0; i < VW; i += 24) ctx.fillRect(i, gy + 14, 10, 2);
+    // casa con luces encendidas
+    const hx = 232, s = 1.9;
+    Art.drawHouse(ctx, hx, gy + 8, s, 5, t, true);
+    const lit = ease((t - 3) / 2);
+    ctx.fillStyle = `rgba(255,214,110,${0.55 * lit})`;
+    for (const wx of [20, 80]) ctx.fillRect(Math.round(hx + wx * s), Math.round(gy + 8 - 40 * s - 0), Math.round(20 * s), Math.round(16 * s));
+    // flores y farol
+    for (let i = 0; i < 9; i++) { const fx = 14 + i * 22 + (i % 2) * 6; ctx.fillStyle = '#3f7a24'; ctx.fillRect(fx, gy + 26, 1, 4); ctx.fillStyle = [B.secondary, '#fff', B.primaryLight][i % 3]; ctx.fillRect(fx - 1, gy + 24, 3, 3); }
+    // familia
+    const meet = ease((t - 11) / 2.2), joyT = t > 11.5;
+    const fam = [[352, 34, '#8a6aa8', '#d8d8d8', 0.3], [374, 38, '#3a6ea5', '#3a2a1a', 1.1], [396, 36, '#c0504d', '#2a1a10', 2.2], [418, 26, '#e0a030', '#3a2a1a', 3.3], [436, 22, '#5aa05a', '#6a3a1a', 4.1]];
+    fam.forEach(([x, h, c, hair, ph], i) => {
+      const tx = 292 + (i - 2) * 11 + 24 * (i % 2);
+      person(x + (tx - x) * meet, gy + 12 + (i % 2) * 3, Math.round(h * 1.4), c, hair, ph, joyT, t > 3.5);
+    });
+    dog(312 + (-8) * meet, gy + 18, joyT);
+    // Ladri
+    const walk = ease((t - 3) / 8.5);
+    const lx = -30 + (262 + 30) * walk, moving = t > 3 && t < 11.5;
+    const spr = Art.ladri(moving ? (Math.floor(t * 8) % 2 ? 'runA' : 'runB') : (joyT ? 'jump' : 'idle'), 1);
+    const ly = gy + 6 - 32 + (joyT ? -Math.abs(Math.sin(t * 9)) * 8 : 0);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(Math.round(lx + 2), gy + 8, 24, 3);
+    ctx.drawImage(spr, Math.round(lx), Math.round(ly), 28, 32);
+    // corazones al abrazarse
+    if (joyT) for (let i = 0; i < 7; i++) { const d = (t * 0.7 + i * 0.37) % 1.4; ctx.globalAlpha = Math.max(0, 1 - d / 1.4); Font.draw(ctx, '♥', 280 + i * 16 + Math.sin(t * 3 + i) * 5, gy - 30 - d * 70, { color: i % 2 ? B.danger : B.primaryLight }); } ctx.globalAlpha = 1;
+    // textos de la historia
+    const say = (txtS, a, b, y, sc, col) => { if (t >= a && t < b) { ctx.globalAlpha = Math.min(1, (t - a) * 3, (b - t) * 3); txt(txtS, VW / 2, y, col, { align: 'center', scale: sc }); ctx.globalAlpha = 1; } };
+    say('LA TORMENTA SE ALEJA...', 0.4, 3.4, 40, 2, B.light);
+    say('LADRI VUELVE A CASA', 3.8, 10.8, 40, 2, B.secondaryLight);
+    say('¡BIENVENIDO, LADRI!', 11, 13.6, 40, 3, B.secondary);
+    if (t >= END_T) {
+      const a = ease((t - END_T) / 1);
+      ctx.globalAlpha = a; panel(70, 14, 340, 62, 'rgba(30,16,8,0.86)');
+      logoPlate(VW / 2, 20, false);
+      txt('¡LA CASA ESTÁ LISTA!', VW / 2, 48, B.secondary, { align: 'center', scale: 2 });
+      txt('PUNTAJE FINAL ' + pad(G.score, 6) + (G.newRecord ? '  ¡NUEVO RÉCORD!' : '   RÉCORD ' + pad(Save.data.hi, 6)), VW / 2, 66, B.secondaryLight, { align: 'center' });
+      ctx.globalAlpha = 1;
+      button('VOLVER AL MENÚ', VW / 2 - 70, 86, 140, 18, 'confirm', true);
+    } else {
+      G.buttons.push({ x: 0, y: 0, w: VW, h: VH, action: 'confirm' });
+      txt(document.body.classList.contains('touch') ? 'TOCA PARA SALTAR' : 'ENTER: SALTAR', VW - 8, VH - 12, '#fff', { align: 'right' });
+    }
   }
 
   function render() {
@@ -1033,6 +1094,7 @@
     G.state = s; G.stateT = 0;
     if (s === 'title' || s === 'story' || s === 'select') Snd.music('title');
     if (s === 'intro' || s === 'clear' || s === 'over' || s === 'ending') { Snd.music(null); Snd.hurry(false); }
+    if (s === 'ending') { Snd.music('fin'); G.e1 = G.e2 = false; }
     if (s === 'play') Snd.music(musicFor());
   }
   function setPause(on) {
@@ -1070,7 +1132,7 @@
       case 'pause': setPause(false); break;
       case 'clear': Snd.play('ok'); nextLevel(); break;
       case 'over': Snd.play('ok'); startRun(G.levelIndex); break;
-      case 'ending': Snd.play('ok'); toSelect(); break;
+      case 'ending': if (G.stateT < END_T) G.stateT = END_T; else { Snd.play('ok'); toSelect(); } break;
     }
   }
   function back() {
@@ -1096,6 +1158,7 @@
         if (pressed('confirm') || (G.state === 'title' && pressed('pause'))) confirm();
         if (G.state === 'over' && pressed('back')) toSelect();
         if (G.state === 'intro' && G.stateT > 3.2) setState('play');
+        if (G.state === 'ending') { if (G.stateT > 11 && !G.e1) { G.e1 = true; Snd.play('oneup'); } if (G.stateT > 13 && !G.e2) { G.e2 = true; Snd.play('clear'); } }
         break;
       case 'select':
         if (pressed('left')) { G.cursor = Math.max(0, G.cursor - 1); Snd.play('select'); }
