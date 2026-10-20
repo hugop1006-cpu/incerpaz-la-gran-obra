@@ -325,7 +325,7 @@
     g.fillStyle = B.danger; g.fillRect(x + 12 + sw, y - 40, 3, 40 - 6 + 6); g.fillStyle = 'rgba(255,255,255,0.0)';
   }
   function drawCrane(g, m, t) { // plataforma de grúa
-    const x = Math.round(m.x), y = Math.round(m.y), w = m.w * T;
+    const x = Math.round(m.x), y = Math.round(m.y), w = m.w;
     // cable
     g.fillStyle = '#555'; g.fillRect(x + (w >> 1) - 1, 0, 2, y - 2 < 0 ? 0 : y - 2 + 0);
     g.fillStyle = B.dark; g.fillRect(x + 3, y, w - 6, 1);
