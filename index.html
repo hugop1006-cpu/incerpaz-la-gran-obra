@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#2b1a12">
+  <title>INCERPAZ: La Gran Obra</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="game" width="480" height="272" aria-label="INCERPAZ: La Gran Obra"></canvas>
+      <noscript>Este juego necesita JavaScript.</noscript>
+    </div>
+    <div id="touch" aria-hidden="true">
+      <button id="btn-pause" data-act="pause" tabindex="-1">II</button>
+      <div class="pad pad-left">
+        <button data-act="left" class="dir" tabindex="-1">&#9664;</button>
+        <button data-act="right" class="dir" tabindex="-1">&#9654;</button>
+      </div>
+      <div class="pad pad-right">
+        <button data-act="wall" class="act small" tabindex="-1">MURO</button>
+        <button data-act="brick" class="act mid" tabindex="-1">APILAR</button>
+        <button data-act="jump" class="act big" tabindex="-1">SALTO</button>
+      </div>
+    </div>
+  </div>
+  <script src="config.js"></script>
+  <script src="js/font.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="levels.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

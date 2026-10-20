@@ -1,0 +1,50 @@
+:root { --dark: #2b1a12; --accent: #c8501e; --gold: #facc15; --light: #fff6e8; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--dark); overflow: hidden; overscroll-behavior: none; }
+body { font-family: system-ui, sans-serif; color: var(--light); user-select: none; -webkit-user-select: none; touch-action: none; }
+#app { position: fixed; inset: 0; display: flex; flex-direction: column; }
+#stage { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
+canvas#game {
+  display: block; image-rendering: pixelated; image-rendering: crisp-edges;
+  width: min(100vw, calc((100vh - var(--ctl-h, 0px)) * 480 / 272));
+  max-width: 100vw; aspect-ratio: 480 / 272; background: #000;
+  box-shadow: 0 0 0 2px #000, 0 0 30px rgba(0,0,0,.6);
+}
+@supports (height: 100dvh) {
+  canvas#game { width: min(100vw, calc((100dvh - var(--ctl-h, 0px)) * 480 / 272)); }
+}
+
+/* Controles táctiles: solo en pantallas táctiles */
+#touch { display: none; }
+body.touch #touch { display: block; }
+#touch button {
+  font: 700 13px system-ui, sans-serif; color: var(--light); background: rgba(43,26,18,.55);
+  border: 2px solid rgba(255,246,232,.55); border-radius: 14px; touch-action: none;
+  display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;
+}
+#touch button.on { background: rgba(250,204,21,.75); color: var(--dark); transform: scale(.96); }
+.pad { display: flex; align-items: flex-end; gap: 12px; }
+.dir { width: 72px; height: 72px; font-size: 26px !important; }
+.act.big { width: 86px; height: 86px; background: rgba(200,80,30,.6) !important; font-size: 14px !important; }
+.act.mid { width: 66px; height: 66px; }
+.act.small { width: 52px; height: 52px; font-size: 11px !important; }
+#btn-pause { position: absolute; top: 8px; right: 8px; width: 40px; height: 34px; border-radius: 8px !important; z-index: 3; }
+
+/* Horizontal: los botones flotan sobre el juego */
+@media (orientation: landscape) {
+  body.touch .pad { position: absolute; bottom: max(10px, env(safe-area-inset-bottom)); }
+  body.touch .pad-left { left: max(14px, env(safe-area-inset-left)); }
+  body.touch .pad-right { right: max(14px, env(safe-area-inset-right)); }
+  body.touch .act.big { margin-bottom: 4px; }
+}
+/* Vertical: el juego arriba, los botones abajo */
+@media (orientation: portrait) {
+  body.touch { --ctl-h: 210px; }
+  body.touch #stage { align-items: flex-start; padding-top: max(8px, env(safe-area-inset-top)); }
+  body.touch #touch { position: relative; flex: 0 0 var(--ctl-h); height: var(--ctl-h); }
+  body.touch .pad { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); }
+  body.touch .pad-left { left: 12px; }
+  body.touch .pad-right { right: 12px; gap: 8px; }
+  body.touch .dir { width: 78px; height: 78px; }
+  body.touch #btn-pause { top: 4px; }
+}
