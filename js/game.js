@@ -24,6 +24,7 @@
       want = [pw, clamp(Math.round(pw * h / w), 272, 720)];
     }
     setView(want[0], want[1]);
+    Font.mult = VW < 260 ? 1.25 : (VW < 400 ? 1.5 : 1); // en la partida (vista más cercana) el aumento es menor
   }
   const initCamY = () => (L.h * T <= VH ? L.h * T - VH : clamp(L.player.y - VH * 0.55, 0, L.h * T - VH));
 
@@ -650,8 +651,8 @@
     ctx.fillStyle = L0.background; ctx.fillRect(x, y, w, h);
     Font.draw(ctx, L0.text, x + w / 2 + 6, y + (big ? 14 : 4), { align: 'center', color: L0.foreground, scale: 2 });
     if (big) {
-      Font.draw(ctx, L0.tagTop, x + w / 2 + 6, y + 4, { align: 'center', color: L0.foreground });
-      Font.draw(ctx, L0.tagBottom, x + w / 2 + 6, y + 31, { align: 'center', color: L0.foreground });
+      Font.draw(ctx, L0.tagTop, x + w / 2 + 6, y + 4, { align: 'center', color: L0.foreground, scale: 1 });
+      Font.draw(ctx, L0.tagBottom, x + w / 2 + 6, y + 31, { align: 'center', color: L0.foreground, scale: 1 });
     }
     const s = big ? 6 : 4, iy = y + (big ? 10 : 4);
     ctx.fillStyle = L0.foreground;
@@ -666,7 +667,7 @@
     ctx.fillStyle = sel ? B.secondary : B.primary; ctx.fillRect(x, y, w, h);
     ctx.fillStyle = sel ? B.secondaryLight : B.primaryLight; ctx.fillRect(x, y, w, 1);
     ctx.fillStyle = sel ? B.secondaryDark : B.primaryDark; ctx.fillRect(x, y + h - 2, w, 2);
-    Font.draw(ctx, label, x + w / 2, y + Math.floor((h - 7) / 2), { align: 'center', color: sel ? B.dark : B.light });
+    Font.draw(ctx, label, x + w / 2, y + Math.floor((h - 7 * Font.mult) / 2), { align: 'center', color: sel ? B.dark : B.light });
   }
 
   function drawTiles(cx, cy) {
@@ -803,7 +804,12 @@
     drawPlayer();
     for (const q of L.particles) { ctx.globalAlpha = Math.max(0, 1 - q.t / q.life); ctx.fillStyle = q.color; ctx.fillRect(Math.round(q.x), Math.round(q.y), q.size, q.size); }
     ctx.globalAlpha = 1;
-    for (const tx of L.texts) { ctx.globalAlpha = Math.min(1, (1.4 - tx.t) * 3); Font.draw(ctx, tx.text, Math.round(tx.x), Math.round(tx.y), { color: tx.color, shadow: B.dark }); }
+    for (const tx of L.texts) {
+      ctx.globalAlpha = Math.min(1, (1.4 - tx.t) * 3);
+      const hw = Font.width(tx.text) / 2, cxw = tx.x + Font.width(tx.text, 1) / 2; // x original = borde izquierdo a escala 1
+      const sxp = clamp(cxw, cx + hw + 3, cx + VW - hw - 3);
+      Font.draw(ctx, tx.text, Math.round(sxp), Math.round(tx.y), { color: tx.color, shadow: B.dark, align: 'center' });
+    }
     ctx.globalAlpha = 1;
   }
 
@@ -831,25 +837,24 @@
   function drawPowerIcons(p, x0, y, narrow) {
     let sx = x0;
     if (p.helmet) { ctx.drawImage(Art.powerup('H', 0), sx - 3, y, 16, 16); sx += 18; }
-    if (p.barrow > 0) { ctx.drawImage(Art.powerup('W', 0), sx - 3, y, 16, 16); Font.draw(ctx, String(Math.ceil(p.barrow)), sx + 14, y + 5, { color: B.light }); sx += 26; }
+    if (p.barrow > 0) { ctx.drawImage(Art.powerup('W', 0), sx - 3, y, 16, 16); Font.draw(ctx, String(Math.ceil(p.barrow)), sx + 14, y + 4, { color: B.light }); sx += 28; }
     if (L.wallCharges > 0) { ctx.drawImage(Art.powerup('M', 0), sx - 3, y, 16, 16); Font.draw(ctx, 'x' + L.wallCharges, sx + 14, y + 5, { color: B.light }); sx += 28; }
-    if (sx === x0) Font.draw(ctx, narrow ? 'PODERES: -' : '-', x0, y + 5, { color: '#8a7a6a' });
+    if (sx === x0 && !narrow) Font.draw(ctx, '-', x0, y + 5, { color: '#8a7a6a' });
   }
   function drawHUD() {
-    const p = L.player, narrow = VW < 400, hudH = narrow ? 30 : 24;
+    const p = L.player, narrow = VW < 400, hudH = narrow ? 36 : 24;
     ctx.fillStyle = 'rgba(30,16,8,0.7)'; ctx.fillRect(0, 0, VW, hudH);
     ctx.fillStyle = B.primary; ctx.fillRect(0, hudH, VW, 1);
     const tl = Math.ceil(L.time), tcol = L.time < 30 ? (Math.floor(L.t * 4) % 2 ? B.danger : B.light) : B.light;
-    if (narrow) { // formato móvil: dos filas compactas
-      Font.draw(ctx, '♥', 4, 4, { color: B.danger }); Font.draw(ctx, 'x' + G.lives, 12, 4, { color: B.light });
-      Font.draw(ctx, pad(G.score, 6), 36, 4, { color: B.light });
-      ctx.drawImage(Art.coin(0), 90, 3); Font.draw(ctx, 'x' + L.coinsGot, 102, 4, { color: B.light });
-      Font.draw(ctx, 'TIEMPO ' + pad(tl, 3), VW - 4, 4, { align: 'right', color: tcol });
-      for (let i = 0; i < 3; i++) { ctx.globalAlpha = L.tejasGot[i] ? 1 : 0.35; ctx.drawImage(Art.teja(0, !L.tejasGot[i]), 4 + i * 15, 17, 12, 10); ctx.globalAlpha = 1; }
-      ctx.fillStyle = B.dark; ctx.fillRect(56, 17, 11, 9); ctx.fillStyle = B.primary; ctx.fillRect(57, 18, 9, 7); ctx.fillStyle = B.primaryLight; ctx.fillRect(57, 18, 9, 1);
-      Font.draw(ctx, 'x' + L.bricks, 70, 18, { color: L.bricks > 0 ? B.light : B.danger });
-      drawPowerIcons(p, 100, 12, false);
-      Font.draw(ctx, VW < 260 ? 'NIVEL ' + (L.idx + 1) : 'N' + (L.idx + 1) + ' ' + TH_NAME(), VW - 4, 18, { align: 'right', color: B.secondaryLight });
+    if (narrow) { // formato móvil: dos filas compactas, con textos ampliados
+      Font.draw(ctx, '♥', 4, 5, { color: B.danger }); Font.draw(ctx, 'x' + G.lives, 14, 5, { color: B.light });
+      Font.draw(ctx, pad(G.score, 6), 46, 5, { color: B.light });
+      Font.draw(ctx, 'TIEMPO ' + pad(tl, 3), VW - 4, 5, { align: 'right', color: tcol });
+      for (let i = 0; i < 3; i++) { ctx.globalAlpha = L.tejasGot[i] ? 1 : 0.35; ctx.drawImage(Art.teja(0, !L.tejasGot[i]), 4 + i * 16, 21, 14, 12); ctx.globalAlpha = 1; }
+      ctx.fillStyle = B.dark; ctx.fillRect(56, 21, 12, 11); ctx.fillStyle = B.primary; ctx.fillRect(57, 22, 10, 9); ctx.fillStyle = B.primaryLight; ctx.fillRect(57, 22, 10, 1);
+      Font.draw(ctx, 'x' + L.bricks, 71, 22, { color: L.bricks > 0 ? B.light : B.danger });
+      ctx.drawImage(Art.coin(0), 98, 22); Font.draw(ctx, 'x' + L.coinsGot, 111, 22, { color: B.light });
+      drawPowerIcons(p, 154, 17, true);
     } else {
       const lab = (s, x) => Font.draw(ctx, s, x, 3, { color: B.secondaryLight });
       lab('VIDAS', 6); Font.draw(ctx, '♥', 6, 13, { color: B.danger }); txt('x' + G.lives, 14, 13, B.light, { shadow: null });
@@ -866,24 +871,25 @@
     }
     const hy = hudH + 5;
     if (L.hint && G.state === 'play') { // pista (en varias líneas si no cabe)
-      const lines = wrap(L.hint, Math.floor((VW - 24) / 6)), w = Math.max(...lines.map(l => Font.width(l))) + 14, h = 8 + lines.length * 10;
+      const lines = wrap(L.hint, Math.floor((VW - 24) / (6 * Font.mult))), lh = 10 * Font.mult, w = Math.max(...lines.map(l => Font.width(l))) + 14, h = 8 + lines.length * lh;
       panel(Math.round(VW / 2 - w / 2), hy, w, h, 'rgba(30,16,8,0.82)', B.secondaryDark);
-      lines.forEach((l, i) => Font.draw(ctx, l, VW / 2, hy + 5 + i * 10, { align: 'center', color: B.secondaryLight }));
+      lines.forEach((l, i) => Font.draw(ctx, l, VW / 2, hy + 5 + i * lh, { align: 'center', color: B.secondaryLight }));
     }
     if (L.banner) {
       const b = L.banner, a = Math.min(1, b.t * 3, (b.max - b.t) * 6);
       ctx.globalAlpha = Math.max(0, a);
       let sc = 3; while (sc > 1 && Font.width(b.text, sc) > VW - 12) sc--;
       Font.draw(ctx, b.text, VW / 2, Math.round(VH * 0.3), { align: 'center', color: B.secondaryLight, shadow: B.dark, scale: sc });
-      if (b.sub) wrap(b.sub, Math.floor((VW - 16) / 6)).forEach((l, i) => Font.draw(ctx, l, VW / 2, Math.round(VH * 0.3) + 12 + sc * 9 + i * 10, { align: 'center', color: B.light, shadow: B.dark }));
+      if (b.sub) wrap(b.sub, Math.floor((VW - 16) / (6 * Font.mult))).forEach((l, i) => Font.draw(ctx, l, VW / 2, Math.round(VH * 0.3) + 12 + sc * 9 + i * 10 * Font.mult, { align: 'center', color: B.light, shadow: B.dark }));
       ctx.globalAlpha = 1;
     }
     if (L.boss && (L.boss.state === 'fight' || L.boss.state === 'dying')) {
       const bs = L.boss, w = 150, x = VW / 2 - w / 2, by = hudH + 6;
+      const bo = Math.round(10 * Font.mult);
       txt('LA GRIETA', VW / 2, by, B.light, { align: 'center' });
-      ctx.fillStyle = B.dark; ctx.fillRect(x - 2, by + 10, w + 4, 9);
-      ctx.fillStyle = '#4a1a18'; ctx.fillRect(x, by + 12, w, 5);
-      ctx.fillStyle = bs.flash > 0 ? '#fff' : B.danger; ctx.fillRect(x, by + 12, Math.max(0, w * bs.hp / bs.maxHp), 5);
+      ctx.fillStyle = B.dark; ctx.fillRect(x - 2, by + bo, w + 4, 9);
+      ctx.fillStyle = '#4a1a18'; ctx.fillRect(x, by + bo + 2, w, 5);
+      ctx.fillStyle = bs.flash > 0 ? '#fff' : B.danger; ctx.fillRect(x, by + bo + 2, Math.max(0, w * bs.hp / bs.maxHp), 5);
     }
   }
   const TH_NAME = () => L.def.name.toUpperCase();
@@ -923,8 +929,8 @@
     ctx.fillStyle = B.dark; ctx.fillRect(x - 4, y - 4, w + 8, 74);
     ctx.fillStyle = L0.border; ctx.fillRect(x - 2, y - 2, w + 4, 70);
     ctx.fillStyle = L0.background; ctx.fillRect(x, y, w, 66);
-    Font.draw(ctx, L0.tagTop, VW / 2 + 12, y + 6, { align: 'center', color: L0.foreground });
-    Font.draw(ctx, L0.tagBottom, VW / 2 + 12, y + 54, { align: 'center', color: L0.foreground });
+    Font.draw(ctx, L0.tagTop, VW / 2 + 12, y + 6, { align: 'center', color: L0.foreground, scale: 1 });
+    Font.draw(ctx, L0.tagBottom, VW / 2 + 12, y + 54, { align: 'center', color: L0.foreground, scale: 1 });
     Font.draw(ctx, L0.text, VW / 2 + 12, y + 19, { align: 'center', color: L0.foreground, scale: 4 });
     ctx.fillStyle = L0.foreground; // icono de baldosas del logo
     for (let i = 0; i < 3; i++) for (let k = 0; k < 2; k++) ctx.fillRect(x + 12 + k * 13, y + 17 + i * 13, 10, 10);
@@ -968,11 +974,11 @@
     G.buttons.push({ x: 0, y: 0, w: VW, h: VH - 20, action: 'confirm' });
     const my = Math.round(VH * 0.5);
     if (Math.floor(G.t * 2) % 2 === 0) txt('TOCA LA PANTALLA PARA JUGAR', VW / 2, my, B.light, { align: 'center' });
-    txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2, my + 16, B.secondaryLight, { align: 'center' });
-    if (isIOS()) { txt('PANTALLA COMPLETA: COMPARTIR', VW / 2, my + 40, B.secondary, { align: 'center' }); txt('Y LUEGO "AÑADIR A INICIO"', VW / 2, my + 52, B.secondary, { align: 'center' }); }
-    txt('INCERPAZ · CERÁMICA INDUSTRIAL', VW / 2, VH - 28, B.light, { align: 'center' });
-    txt('CALIDAD TOTAL · BOLIVIA', VW / 2, VH - 14, B.light, { align: 'center' });
-    button(mutedLabel(), VW - 86, 4, 80, 14, 'mute', false);
+    txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2, my + 18, B.secondaryLight, { align: 'center' });
+    if (isIOS()) { txt('PANTALLA COMPLETA: COMPARTIR', VW / 2, my + 44, B.secondary, { align: 'center' }); txt('Y LUEGO "AÑADIR A INICIO"', VW / 2, my + 60, B.secondary, { align: 'center' }); }
+    txt('INCERPAZ · CERÁMICA INDUSTRIAL', VW / 2, VH - 34, B.light, { align: 'center' });
+    txt('CALIDAD TOTAL · BOLIVIA', VW / 2, VH - 17, B.light, { align: 'center' });
+    button(mutedLabel(), VW - 114, 4, 110, 20, 'mute', false);
   }
   function drawStoryN() {
     Art.drawBackground(ctx, 0, 0, 0, G.t, VW, VH, 0);
@@ -982,21 +988,21 @@
     ctx.fillStyle = '#6b6b6b'; ctx.fillRect(0, VH - 28, VW, 28);
     logoPlate(VW / 2, 12, true);
     const bx = 8, by = 66, bw = VW - 16;
-    panel(bx, by, bw, 186, 'rgba(30,16,8,0.9)');
+    panel(bx, by, bw, 250, 'rgba(30,16,8,0.9)');
     txt('LA HISTORIA', VW / 2, by + 10, B.secondary, { align: 'center', scale: 2 });
     const story = 'Una familia necesita su casa terminada antes de que llegue la tormenta. Ladri, el ladrillo de casco amarillo, recorre la obra juntando materiales para levantarla a tiempo. ¡Ayúdalo a terminar LA GRAN OBRA!';
-    wrap(story, 41).forEach((ln, i) => txt(ln, bx + 10, by + 36 + i * 13, B.light));
-    ctx.drawImage(Art.ladri('idle', -1), bx + bw - 40, by + 148, 28, 32);
-    button('SIGUIENTE', bx + 10, by + 158, 110, 18, 'confirm', true);
+    wrap(story, 29).forEach((ln, i) => txt(ln, bx + 10, by + 36 + i * 15, B.light));
+    ctx.drawImage(Art.ladri('idle', -1), bx + bw - 44, by + 208, 28, 32);
+    button('SIGUIENTE', bx + 10, by + 216, 130, 22, 'confirm', true);
   }
   function drawSelectN() {
     Art.drawBackground(ctx, 0, G.t * 10, 0, G.t, VW, VH, 0);
     ctx.fillStyle = 'rgba(30,16,8,0.45)'; ctx.fillRect(0, 0, VW, VH);
-    logoPlate(VW / 2, 26, true);
-    button(mutedLabel(), VW - 86, 4, 80, 14, 'mute', false);
-    txt('ELIGE LA ETAPA DE LA OBRA', VW / 2, 76, B.secondary, { align: 'center' });
-    txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2, 90, B.secondaryLight, { align: 'center' });
-    const y0 = 106, rh = 44, x = 8, w = VW - 16;
+    logoPlate(VW / 2, 32, true);
+    button(mutedLabel(), VW - 114, 4, 110, 20, 'mute', false);
+    txt('ELIGE LA ETAPA DE LA OBRA', VW / 2, 80, B.secondary, { align: 'center' });
+    txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2, 97, B.secondaryLight, { align: 'center' });
+    const y0 = 116, rh = 44, x = 8, w = VW - 16;
     for (let i = 0; i < LEVELS.length; i++) {
       const lv = LEVELS[i], unlocked = i < Save.data.unlocked, sel = i === G.cursor, sv = Save.data.levels[i];
       const y = y0 + i * (rh + 4) + (sel ? Math.round(Math.sin(G.t * 6)) : 0);
@@ -1020,7 +1026,7 @@
       txt('LA CASA DE LA FAMILIA: ' + cleared + ' / ' + LEVELS.length, VW / 2, by, B.light, { align: 'center' });
       Art.drawHouse(ctx, VW / 2 - 48, VH - 40, 0.8, Math.min(5, cleared), G.t, true);
     }
-    button('VOLVER', 6, VH - 22, 60, 16, 'back', false);
+    button('VOLVER', 6, VH - 26, 76, 20, 'back', false);
   }
   function wrap(text, maxChars) {
     const words = text.split(' '), lines = []; let cur = '';
@@ -1080,28 +1086,38 @@
   }
   function drawIntro() {
     drawWorld();
-    logoPlate(VW / 2, 36, false);
-    ctx.fillStyle = 'rgba(20,10,5,0.78)'; ctx.fillRect(0, 70, VW, 120);
-    ctx.fillStyle = B.secondary; ctx.fillRect(0, 70, VW, 2); ctx.fillRect(0, 188, VW, 2);
-    txt('NIVEL ' + (L.idx + 1), VW / 2, 82, B.secondaryLight, { align: 'center', scale: 2 });
-    txt(L.def.name.toUpperCase(), VW / 2, 104, B.light, { align: 'center', scale: 4 });
-    wrap(L.def.intro, VW < 400 ? 44 : 60).forEach((s, i) => txt(s, VW / 2, 140 + i * 12, B.light, { align: 'center' }));
-    if (VW < 400) { txt('LADRILLOS PARA APILAR: ' + L.bricks, VW / 2, 166, B.secondaryLight, { align: 'center' }); txt('TEJAS DORADAS ESCONDIDAS: 3', VW / 2, 178, B.secondaryLight, { align: 'center' }); }
+    const narrow = VW < 400;
+    if (narrow) uiBegin();
+    logoPlate(VW / 2, narrow ? 20 : 36, false);
+    const top = narrow ? 56 : 70, bh = narrow ? 190 : 120;
+    ctx.fillStyle = 'rgba(20,10,5,0.78)'; ctx.fillRect(0, top, VW, bh);
+    ctx.fillStyle = B.secondary; ctx.fillRect(0, top, VW, 2); ctx.fillRect(0, top + bh - 2, VW, 2);
+    txt('NIVEL ' + (L.idx + 1), VW / 2, top + 12, B.secondaryLight, { align: 'center', scale: 2 });
+    const nm = L.def.name.toUpperCase(); let sc = 4; while (sc > 1 && Font.width(nm, sc) > VW - 16) sc--;
+    txt(nm, VW / 2, top + 34, B.light, { align: 'center', scale: sc });
+    const lines = wrap(L.def.intro, narrow ? Math.floor((VW - 16) / (6 * Font.mult)) : 60), ly = top + 34 + sc * 9 + 12;
+    lines.forEach((s, i) => txt(s, VW / 2, ly + i * (narrow ? 14 : 12), B.light, { align: 'center' }));
+    if (narrow) { const y2 = ly + lines.length * 14 + 8; txt('LADRILLOS PARA APILAR: ' + L.bricks, VW / 2, y2, B.secondaryLight, { align: 'center' }); txt('TEJAS DORADAS: 3', VW / 2, y2 + 15, B.secondaryLight, { align: 'center' }); }
     else txt('LADRILLOS PARA APILAR: ' + L.bricks + '   ·   TEJAS DORADAS ESCONDIDAS: 3', VW / 2, 172, B.secondaryLight, { align: 'center' });
+    if (narrow) uiEnd();
     G.buttons.push({ x: 0, y: 0, w: VW, h: VH, action: 'confirm' });
   }
   function drawPause() {
     drawWorld();
     ctx.fillStyle = 'rgba(15,8,4,0.78)'; ctx.fillRect(0, 0, VW, VH);
     uiBegin();
+    const narrow = VW < 400, touch = document.body.classList.contains('touch');
     logoPlate(VW / 2, 8, true);
     txt('PAUSA', VW / 2, 56, B.secondary, { align: 'center', scale: 3 });
-    const lines = ['← → / A D: MOVERSE', 'ESPACIO / ↑ / W: SALTAR (MANTÉN PARA SALTAR MÁS ALTO)', '↓ / S / X: APILAR UN LADRILLO BAJO LOS PIES', 'C / SHIFT: MURO INSTANTÁNEO (SI TIENES)', 'P / ESC: PAUSA   ·   M: SONIDO'];
-    if (document.body.classList.contains('touch')) lines.splice(0, lines.length, '← →: MOVERSE', 'SALTO: MANTÉN PARA SALTAR MÁS ALTO', 'APILAR: UN LADRILLO BAJO LOS PIES', 'MURO: PLATAFORMA TEMPORAL (SI TIENES)', 'TOCA CONTINUAR PARA SEGUIR');
-    lines.forEach((s, i) => txt(s, VW / 2, 86 + i * 12, B.light, { align: 'center' }));
-    button('CONTINUAR', VW / 2 - 70, 156, 140, 18, 'confirm', true);
-    button(mutedLabel(), VW / 2 - 70, 180, 140, 18, 'mute', false);
-    button('SALIR AL MENÚ', VW / 2 - 70, 204, 140, 18, 'quit', false);
+    let lines = ['← → / A D: MOVERSE', 'ESPACIO / ↑ / W: SALTAR (MANTÉN PARA SALTAR MÁS ALTO)', '↓ / S / X: APILAR UN LADRILLO BAJO LOS PIES', 'C / SHIFT: MURO INSTANTÁNEO (SI TIENES)', 'P / ESC: PAUSA   ·   M: SONIDO'];
+    if (touch) lines = ['← →: MOVERSE', 'SALTO (MANTÉN: MÁS ALTO)', 'APILAR: LADRILLO BAJO LOS PIES', 'MURO: PLATAFORMA TEMPORAL'];
+    if (narrow) lines = lines.flatMap(l => wrap(l, Math.floor((VW - 16) / (6 * Font.mult))));
+    const lh = narrow ? 14 : 12;
+    lines.forEach((s, i) => txt(s, VW / 2, 86 + i * lh, B.light, { align: 'center' }));
+    const by = narrow ? 86 + lines.length * lh + 10 : 156, bw = narrow ? 180 : 140, bh = narrow ? 24 : 18, bs = narrow ? 30 : 24;
+    button('CONTINUAR', VW / 2 - bw / 2, by, bw, bh, 'confirm', true);
+    button(mutedLabel(), VW / 2 - bw / 2, by + bs, bw, bh, 'mute', false);
+    button('SALIR AL MENÚ', VW / 2 - bw / 2, by + bs * 2, bw, bh, 'quit', false);
     uiEnd();
   }
   function drawClear() {
@@ -1121,7 +1137,7 @@
     for (let i = 0; i < 3; i++) { ctx.globalAlpha = L.tejasGot[i] ? 1 : 0.3; ctx.drawImage(Art.teja(0, !L.tejasGot[i]), px + 186 + i * 18, 133, 14, 12); ctx.globalAlpha = 1; }
     row('PUNTAJE', pad(G.score, 6), 154);
     if (G.newRecord) txt('¡NUEVO RÉCORD!', VW / 2, 172, Math.floor(G.t * 4) % 2 ? B.secondary : B.light, { align: 'center' });
-    button('SIGUIENTE ETAPA', VW / 2 - 70, 192, 140, 18, 'confirm', true);
+    button('SIGUIENTE ETAPA', VW / 2 - 85, 190, 170, VW < 400 ? 22 : 18, 'confirm', true);
     uiEnd();
   }
   function drawOver() {
@@ -1131,9 +1147,11 @@
     logoPlate(VW / 2, 16, false);
     txt('FIN DEL JUEGO', VW / 2, 56, B.danger, { align: 'center', scale: VW < 400 ? 3 : 4 });
     txt(L.deathReason === 'aplastado' || L.def.theme === 4 ? 'LA TORMENTA GANÓ ESTA VEZ...' : 'LA OBRA SIGUE ESPERANDO...', VW / 2, 100, B.light, { align: 'center' });
-    txt('PUNTAJE ' + pad(G.score, 6) + '   ·   RÉCORD ' + pad(Save.data.hi, 6), VW / 2, 120, B.secondaryLight, { align: 'center' });
-    button('REINTENTAR ETAPA', VW / 2 - 80, 150, 160, 18, 'confirm', true);
-    button('MENÚ DE ETAPAS', VW / 2 - 80, 176, 160, 18, 'quit', false);
+    if (VW < 400) { txt('PUNTAJE ' + pad(G.score, 6), VW / 2, 122, B.secondaryLight, { align: 'center' }); txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2, 138, B.secondaryLight, { align: 'center' }); }
+    else txt('PUNTAJE ' + pad(G.score, 6) + '   ·   RÉCORD ' + pad(Save.data.hi, 6), VW / 2, 120, B.secondaryLight, { align: 'center' });
+    const nb = VW < 400;
+    button('REINTENTAR ETAPA', VW / 2 - 90, nb ? 168 : 150, 180, nb ? 24 : 18, 'confirm', true);
+    button('MENÚ DE ETAPAS', VW / 2 - 90, nb ? 200 : 176, 180, nb ? 24 : 18, 'quit', false);
     uiEnd();
   }
   /* ----- Final: Ladri vuelve a casa ----- */

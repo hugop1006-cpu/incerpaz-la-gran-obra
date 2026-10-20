@@ -70,9 +70,10 @@
 
   const Font = {
     height: 7,
-    width(text, scale = 1) { return Math.max(0, parse(text).length * ADV - 1) * scale; },
+    mult: 1, // aumento de los textos sin escala explícita (se sube en el formato vertical del celular)
+    width(text, scale) { if (scale === undefined) scale = Font.mult; return Math.max(0, parse(text).length * ADV - 1) * scale; },
     draw(ctx, text, x, y, o = {}) {
-      const scale = o.scale || 1, color = o.color || '#fff', align = o.align || 'left';
+      const scale = o.scale === undefined ? Font.mult : o.scale, color = o.color || '#fff', align = o.align || 'left';
       const chars = parse(text);
       let w = (chars.length * ADV - 1) * scale;
       if (align === 'center') x -= w / 2; else if (align === 'right') x -= w;
