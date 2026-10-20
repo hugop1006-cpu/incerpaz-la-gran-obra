@@ -6,12 +6,12 @@ body { font-family: system-ui, sans-serif; color: var(--light); user-select: non
 #stage { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
 canvas#game {
   display: block; image-rendering: pixelated; image-rendering: crisp-edges;
-  width: min(100vw, calc((100vh - var(--ctl-h, 0px)) * 480 / 272));
-  max-width: 100vw; aspect-ratio: 480 / 272; background: #000;
+  width: min(100vw, calc((100vh - var(--ctl-h, 0px)) * var(--cw, 480) / var(--ch, 272)));
+  max-width: 100vw; aspect-ratio: var(--cw, 480) / var(--ch, 272); background: #000;
   box-shadow: 0 0 0 2px #000, 0 0 30px rgba(0,0,0,.6);
 }
 @supports (height: 100dvh) {
-  canvas#game { width: min(100vw, calc((100dvh - var(--ctl-h, 0px)) * 480 / 272)); }
+  canvas#game { width: min(100vw, calc((100dvh - var(--ctl-h, 0px)) * var(--cw, 480) / var(--ch, 272))); }
 }
 
 /* Controles táctiles: solo en pantallas táctiles */

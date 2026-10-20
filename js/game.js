@@ -1,11 +1,24 @@
 /* INCERPAZ: La Gran Obra — motor del juego (Canvas 2D, sin dependencias). */
 (() => {
   'use strict';
-  const C = CONFIG, T = C.TILE, VW = C.VIEW_W, VH = C.VIEW_H, P = C.PHYS, B = C.BRAND;
+  const C = CONFIG, T = C.TILE, P = C.PHYS, B = C.BRAND;
+  let VW = C.VIEW_W, VH = C.VIEW_H; // tamaño de la vista actual (cambia en formato móvil vertical)
   const canvas = document.getElementById('game');
   canvas.width = VW; canvas.height = VH;
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
+
+  // Formato móvil vertical: vista más angosta y alta que se ve más grande en pantalla
+  const VIEW_PORT = [288, 400];
+  function setView(w, h) {
+    if (w === VW && h === VH) return;
+    VW = w; VH = h; canvas.width = w; canvas.height = h; ctx.imageSmoothingEnabled = false;
+    document.documentElement.style.setProperty('--cw', w); document.documentElement.style.setProperty('--ch', h);
+  }
+  const portraitMobile = () => document.body.classList.contains('touch') && window.innerHeight > window.innerWidth * 1.1;
+  const PORT_STATES = ['play', 'pause', 'intro', 'clear', 'over'];
+  function syncView() { const want = (PORT_STATES.includes(G.state) && portraitMobile()) ? VIEW_PORT : [C.VIEW_W, C.VIEW_H]; setView(want[0], want[1]); }
+  const initCamY = () => (L.h * T <= VH ? L.h * T - VH : clamp(L.player.y - VH * 0.55, 0, L.h * T - VH));
 
   const PW = 10, PH = 14;                       // tamaño de la caja de colisión de Ladri
   const SOLID_CH = new Set(['#', 'B', 'R', 'S', 'T', 'W']);
@@ -109,11 +122,11 @@
       L.movers.push({ x: m.x * T, y: m.y * T, x0: m.x * T, y0: m.y * T, x1: (m.x + (m.dx || 0)) * T, y1: (m.y + (m.dy || 0)) * T,
         w: m.w * T, speed: (m.speed || 2) * T, s: 0, dirn: 1, pause: 0, dx: 0, dy: 0, len: Math.hypot((m.dx || 0) * T, (m.dy || 0) * T) });
     });
-    if (def.scroll) L.scroll = { speed: def.scroll.speed, max: def.scroll.stopCol * T, delay: 3.2, active: false };
+    if (def.scroll) L.scroll = { speed: def.scroll.speed, max: def.scroll.stopCol * T, delay: 3.2, active: false, x: 0 };
     if (def.boss) L.boss = { state: 'sleep', hp: def.boss.hp, maxHp: def.boss.hp, cracks: [], timer: 2, shake: 0, flash: 0, eye: 0, deadT: 0, rockT: 3 };
     spawnPlayer(L.spawn.x, L.spawn.y);
     L.camX = L.scroll ? 0 : clamp(L.player.x - VW / 2, 0, Math.max(0, w * T - VW));
-    L.camY = clamp(L.player.y - VH * 0.55, 0, Math.max(0, h * T - VH));
+    L.camY = initCamY();
     Snd.music(null);
   }
   function spawnPlayer(x, y) {
@@ -139,9 +152,9 @@
     L.enemies.forEach(e => { if (e.type === 'drip' && !e.dead) { e.state = 'wait'; e.y = e.hy + 6; e.vy = 0; } });
     L.rocks.length = 0;
     spawnPlayer(sp.x, sp.y);
-    if (L.scroll) { L.camX = cp ? cp.camX : 0; L.scroll.delay = 2.2; L.scroll.active = false; }
+    if (L.scroll) { L.scroll.x = cp ? cp.camX : 0; L.camX = L.scroll.x; L.scroll.delay = 2.2; L.scroll.active = false; }
     else L.camX = clamp(L.player.x - VW / 2, 0, Math.max(0, L.w * T - VW));
-    L.camY = clamp(L.player.y - VH * 0.55, 0, Math.max(0, L.h * T - VH));
+    L.camY = initCamY();
     L.hurry = false; Snd.hurry(false);
     Snd.music(musicFor());
   }
@@ -475,7 +488,7 @@
       if (u.kind === 'r') { L.bricks += 3; addText(u.x - 26, u.y - 14, '+3 LADRILLOS', B.primaryLight); }
     }
     for (const cp of L.checkpoints) if (!cp.active && p.x + p.w > cp.x && p.x < cp.x + T && p.y + p.h > cp.y - 36 && p.y < cp.y) {
-      cp.active = true; cp.camX = L.camX; Snd.play('check'); addText(cp.x - 30, cp.y - 40, 'PUNTO DE CONTROL', B.secondaryLight);
+      cp.active = true; cp.camX = L.scroll ? L.scroll.x : L.camX; Snd.play('check'); addText(cp.x - 30, cp.y - 40, 'PUNTO DE CONTROL', B.secondaryLight);
       burst(cp.x + 12, cp.y - 24, B.secondary, 12, 90, 0.6);
     }
     const c0 = Math.floor((p.x + 2) / T), c1 = Math.floor((p.x + p.w - 2) / T), r = Math.floor((p.y + p.h - 2) / T);
@@ -562,25 +575,29 @@
 
   function updateCamera(dt) {
     const p = L.player;
-    const maxX = Math.max(0, L.w * T - VW), maxY = Math.max(0, L.h * T - VH);
+    const maxX = Math.max(0, L.w * T - VW);
     if (L.scroll) {
       const s = L.scroll;
       if (!p.dead) {
         if (s.delay > 0) { s.delay -= dt; if (s.delay <= 0) { s.active = true; banner('¡CORRE! LA LLUVIA AVANZA', 2); } }
-        else if (L.camX < s.max) L.camX = Math.min(s.max, L.camX + s.speed * (1 + Math.min(0.35, L.camX / s.max * 0.4)) * dt);
-        if (L.camX < s.max && p.x < L.camX + 1) {
-          p.x = L.camX + 1;
+        else if (s.x < s.max) s.x = Math.min(s.max, s.x + s.speed * (1 + Math.min(0.35, s.x / s.max * 0.4)) * dt);
+        // la lluvia empuja a Ladri
+        if (s.x < s.max && p.x < s.x + 1) {
+          p.x = s.x + 1;
           if (overlapsSolid(p)) killPlayer('aplastado');
         }
-        if (L.camX >= s.max - 0.5) p.x = clamp(p.x, L.camX + 2, L.camX + VW - p.w - 2);
+        if (s.x >= s.max - 0.5) p.x = clamp(p.x, s.max + 2, L.w * T - p.w - 2); // arena del jefe
       }
+      // la cámara nunca va detrás de la lluvia y sigue a Ladri si se adelanta
+      const want = Math.max(s.x, clamp(p.x + p.w / 2 - VW * 0.55, 0, maxX));
+      L.camX = clamp(Math.max(s.x, L.camX + (want - L.camX) * (1 - Math.exp(-8 * dt))), 0, maxX);
     } else {
       const target = clamp(p.x + p.w / 2 - VW / 2 + p.facing * 22, 0, maxX);
       L.camX += (target - L.camX) * (1 - Math.exp(-7 * dt));
+      L.camX = clamp(L.camX, 0, maxX);
     }
-    const ty = clamp(p.y + p.h / 2 - VH * 0.55, 0, maxY);
-    L.camY += (ty - L.camY) * (1 - Math.exp(-6 * dt));
-    L.camX = clamp(L.camX, 0, maxX);
+    if (L.h * T <= VH) L.camY = L.h * T - VH;
+    else { const ty = clamp(p.y + p.h / 2 - VH * 0.55, 0, L.h * T - VH); L.camY += (ty - L.camY) * (1 - Math.exp(-6 * dt)); }
   }
 
   function updateFx(dt) {
@@ -621,8 +638,11 @@
     ctx.fillStyle = L0.foreground;
     for (let i = 0; i < 3; i++) for (let k = 0; k < 2; k++) ctx.fillRect(x + 8 + k * (s + 1), iy + i * (s + 1), s, s);
   }
+  let uiOffY = 0;
+  function uiBegin() { uiOffY = Math.max(0, Math.round((VH - 272) / 2)); ctx.save(); ctx.translate(0, uiOffY); }
+  function uiEnd() { ctx.restore(); uiOffY = 0; }
   function button(label, x, y, w, h, action, sel) {
-    G.buttons.push({ x, y, w, h, action });
+    G.buttons.push({ x, y: y + uiOffY, w, h, action });
     ctx.fillStyle = B.dark; ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
     ctx.fillStyle = sel ? B.secondary : B.primary; ctx.fillRect(x, y, w, h);
     ctx.fillStyle = sel ? B.secondaryLight : B.primaryLight; ctx.fillRect(x, y, w, 1);
@@ -776,56 +796,75 @@
       ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 9);
     }
     ctx.stroke();
-    if (L.scroll && L.camX < L.scroll.max - 4) { // pared de lluvia que avanza
-      const g = ctx.createLinearGradient(0, 0, 36, 0);
-      g.addColorStop(0, 'rgba(120,160,230,0.9)'); g.addColorStop(1, 'rgba(120,160,230,0)');
-      ctx.fillStyle = g; ctx.fillRect(0, 0, 36, VH);
-      ctx.fillStyle = 'rgba(220,235,255,0.7)';
-      for (let i = 0; i < 24; i++) { const y = (i * 41 + L.t * 300) % VH; ctx.fillRect((i * 7) % 14, y, 1, 10); }
+    if (L.scroll && L.scroll.x < L.scroll.max - 4) { // pared de lluvia que avanza
+      const rx = Math.round(L.scroll.x - L.camX);
+      if (rx > -40) {
+        if (rx > 0) { ctx.fillStyle = 'rgba(120,160,230,0.9)'; ctx.fillRect(0, 0, rx, VH); }
+        const g2 = ctx.createLinearGradient(rx, 0, rx + 36, 0);
+        g2.addColorStop(0, 'rgba(120,160,230,0.9)'); g2.addColorStop(1, 'rgba(120,160,230,0)');
+        ctx.fillStyle = g2; ctx.fillRect(rx, 0, 36, VH);
+        ctx.fillStyle = 'rgba(220,235,255,0.7)';
+        for (let i = 0; i < 24; i++) { const y = (i * 41 + L.t * 300) % VH; ctx.fillRect(rx + (i * 7) % 14, y, 1, 10); }
+      }
     }
   }
 
+  function drawPowerIcons(p, x0, y, narrow) {
+    let sx = x0;
+    if (p.helmet) { ctx.drawImage(Art.powerup('H', 0), sx - 3, y, 16, 16); sx += 18; }
+    if (p.barrow > 0) { ctx.drawImage(Art.powerup('W', 0), sx - 3, y, 16, 16); Font.draw(ctx, String(Math.ceil(p.barrow)), sx + 14, y + 5, { color: B.light }); sx += 26; }
+    if (L.wallCharges > 0) { ctx.drawImage(Art.powerup('M', 0), sx - 3, y, 16, 16); Font.draw(ctx, 'x' + L.wallCharges, sx + 14, y + 5, { color: B.light }); sx += 28; }
+    if (sx === x0) Font.draw(ctx, narrow ? 'PODERES: -' : '-', x0, y + 5, { color: '#8a7a6a' });
+  }
   function drawHUD() {
-    const p = L.player;
-    ctx.fillStyle = 'rgba(30,16,8,0.7)'; ctx.fillRect(0, 0, VW, 24);
-    ctx.fillStyle = B.primary; ctx.fillRect(0, 24, VW, 1);
-    const lab = (s, x) => Font.draw(ctx, s, x, 3, { color: B.secondaryLight });
-    lab('VIDAS', 6); Font.draw(ctx, '♥', 6, 13, { color: B.danger }); txt('x' + G.lives, 14, 13, B.light, { shadow: null });
-    lab('PUNTOS', 52); Font.draw(ctx, pad(G.score, 6), 52, 13, { color: B.light });
-    lab('LADRILLITOS', 104); ctx.drawImage(Art.coin(0), 103, 11); Font.draw(ctx, 'x' + L.coinsGot, 116, 13, { color: B.light });
-    lab('TEJAS', 178);
-    for (let i = 0; i < 3; i++) { ctx.globalAlpha = L.tejasGot[i] ? 1 : 0.35; ctx.drawImage(Art.teja(0, !L.tejasGot[i]), 178 + i * 15, 12, 12, 10); ctx.globalAlpha = 1; }
-    lab('APILAR', 232); ctx.fillStyle = B.dark; ctx.fillRect(231, 12, 11, 9); ctx.fillStyle = B.primary; ctx.fillRect(232, 13, 9, 7); ctx.fillStyle = B.primaryLight; ctx.fillRect(232, 13, 9, 1);
-    Font.draw(ctx, 'x' + L.bricks, 245, 13, { color: L.bricks > 0 ? B.light : B.danger });
-    lab('PODERES', 290);
-    let sx = 290;
-    if (p.helmet) { ctx.drawImage(Art.powerup('H', 0), sx - 3, 8, 16, 16); sx += 18; }
-    if (p.barrow > 0) { ctx.drawImage(Art.powerup('W', 0), sx - 3, 8, 16, 16); Font.draw(ctx, String(Math.ceil(p.barrow)), sx + 14, 13, { color: B.light }); sx += 26; }
-    if (L.wallCharges > 0) { ctx.drawImage(Art.powerup('M', 0), sx - 3, 8, 16, 16); Font.draw(ctx, 'x' + L.wallCharges, sx + 14, 13, { color: B.light }); sx += 28; }
-    if (sx === 290) Font.draw(ctx, '-', 290, 13, { color: '#8a7a6a' });
-    lab('NIVEL ' + (L.idx + 1), 364);
-    Font.draw(ctx, TH_NAME(), 364, 13, { color: B.light });
-    const tl = Math.ceil(L.time);
-    lab('TIEMPO', 443); Font.draw(ctx, pad(tl, 3), 443, 13, { color: L.time < 30 ? (Math.floor(L.t * 4) % 2 ? B.danger : B.light) : B.light });
-    // pista
-    if (L.hint && G.state === 'play') {
-      const w = Font.width(L.hint) + 14;
-      panel(Math.round(VW / 2 - w / 2), 30, w, 15, 'rgba(30,16,8,0.82)', B.secondaryDark);
-      Font.draw(ctx, L.hint, VW / 2, 34, { align: 'center', color: B.secondaryLight });
+    const p = L.player, narrow = VW < 400, hudH = narrow ? 30 : 24;
+    ctx.fillStyle = 'rgba(30,16,8,0.7)'; ctx.fillRect(0, 0, VW, hudH);
+    ctx.fillStyle = B.primary; ctx.fillRect(0, hudH, VW, 1);
+    const tl = Math.ceil(L.time), tcol = L.time < 30 ? (Math.floor(L.t * 4) % 2 ? B.danger : B.light) : B.light;
+    if (narrow) { // formato móvil: dos filas compactas
+      Font.draw(ctx, '♥', 4, 4, { color: B.danger }); Font.draw(ctx, 'x' + G.lives, 12, 4, { color: B.light });
+      Font.draw(ctx, pad(G.score, 6), 36, 4, { color: B.light });
+      ctx.drawImage(Art.coin(0), 90, 3); Font.draw(ctx, 'x' + L.coinsGot, 102, 4, { color: B.light });
+      Font.draw(ctx, 'TIEMPO ' + pad(tl, 3), VW - 4, 4, { align: 'right', color: tcol });
+      for (let i = 0; i < 3; i++) { ctx.globalAlpha = L.tejasGot[i] ? 1 : 0.35; ctx.drawImage(Art.teja(0, !L.tejasGot[i]), 4 + i * 15, 17, 12, 10); ctx.globalAlpha = 1; }
+      ctx.fillStyle = B.dark; ctx.fillRect(56, 17, 11, 9); ctx.fillStyle = B.primary; ctx.fillRect(57, 18, 9, 7); ctx.fillStyle = B.primaryLight; ctx.fillRect(57, 18, 9, 1);
+      Font.draw(ctx, 'x' + L.bricks, 70, 18, { color: L.bricks > 0 ? B.light : B.danger });
+      drawPowerIcons(p, 100, 12, false);
+      Font.draw(ctx, 'N' + (L.idx + 1) + ' ' + TH_NAME(), VW - 4, 18, { align: 'right', color: B.secondaryLight });
+    } else {
+      const lab = (s, x) => Font.draw(ctx, s, x, 3, { color: B.secondaryLight });
+      lab('VIDAS', 6); Font.draw(ctx, '♥', 6, 13, { color: B.danger }); txt('x' + G.lives, 14, 13, B.light, { shadow: null });
+      lab('PUNTOS', 52); Font.draw(ctx, pad(G.score, 6), 52, 13, { color: B.light });
+      lab('LADRILLITOS', 104); ctx.drawImage(Art.coin(0), 103, 11); Font.draw(ctx, 'x' + L.coinsGot, 116, 13, { color: B.light });
+      lab('TEJAS', 178);
+      for (let i = 0; i < 3; i++) { ctx.globalAlpha = L.tejasGot[i] ? 1 : 0.35; ctx.drawImage(Art.teja(0, !L.tejasGot[i]), 178 + i * 15, 12, 12, 10); ctx.globalAlpha = 1; }
+      lab('APILAR', 232); ctx.fillStyle = B.dark; ctx.fillRect(231, 12, 11, 9); ctx.fillStyle = B.primary; ctx.fillRect(232, 13, 9, 7); ctx.fillStyle = B.primaryLight; ctx.fillRect(232, 13, 9, 1);
+      Font.draw(ctx, 'x' + L.bricks, 245, 13, { color: L.bricks > 0 ? B.light : B.danger });
+      lab('PODERES', 290); drawPowerIcons(p, 290, 8, false);
+      lab('NIVEL ' + (L.idx + 1), 364);
+      Font.draw(ctx, TH_NAME(), 364, 13, { color: B.light });
+      lab('TIEMPO', 443); Font.draw(ctx, pad(tl, 3), 443, 13, { color: tcol });
+    }
+    const hy = hudH + 5;
+    if (L.hint && G.state === 'play') { // pista (en varias líneas si no cabe)
+      const lines = wrap(L.hint, Math.floor((VW - 24) / 6)), w = Math.max(...lines.map(l => Font.width(l))) + 14, h = 8 + lines.length * 10;
+      panel(Math.round(VW / 2 - w / 2), hy, w, h, 'rgba(30,16,8,0.82)', B.secondaryDark);
+      lines.forEach((l, i) => Font.draw(ctx, l, VW / 2, hy + 5 + i * 10, { align: 'center', color: B.secondaryLight }));
     }
     if (L.banner) {
       const b = L.banner, a = Math.min(1, b.t * 3, (b.max - b.t) * 6);
       ctx.globalAlpha = Math.max(0, a);
-      Font.draw(ctx, b.text, VW / 2, 82, { align: 'center', color: B.secondaryLight, shadow: B.dark, scale: 3 });
-      if (b.sub) Font.draw(ctx, b.sub, VW / 2, 112, { align: 'center', color: B.light, shadow: B.dark });
+      let sc = 3; while (sc > 1 && Font.width(b.text, sc) > VW - 12) sc--;
+      Font.draw(ctx, b.text, VW / 2, Math.round(VH * 0.3), { align: 'center', color: B.secondaryLight, shadow: B.dark, scale: sc });
+      if (b.sub) wrap(b.sub, Math.floor((VW - 16) / 6)).forEach((l, i) => Font.draw(ctx, l, VW / 2, Math.round(VH * 0.3) + 12 + sc * 9 + i * 10, { align: 'center', color: B.light, shadow: B.dark }));
       ctx.globalAlpha = 1;
     }
     if (L.boss && (L.boss.state === 'fight' || L.boss.state === 'dying')) {
-      const bs = L.boss, w = 150, x = VW / 2 - w / 2;
-      txt('LA GRIETA', VW / 2, 30, B.light, { align: 'center' });
-      ctx.fillStyle = B.dark; ctx.fillRect(x - 2, 40, w + 4, 9);
-      ctx.fillStyle = '#4a1a18'; ctx.fillRect(x, 42, w, 5);
-      ctx.fillStyle = bs.flash > 0 ? '#fff' : B.danger; ctx.fillRect(x, 42, Math.max(0, w * bs.hp / bs.maxHp), 5);
+      const bs = L.boss, w = 150, x = VW / 2 - w / 2, by = hudH + 6;
+      txt('LA GRIETA', VW / 2, by, B.light, { align: 'center' });
+      ctx.fillStyle = B.dark; ctx.fillRect(x - 2, by + 10, w + 4, 9);
+      ctx.fillStyle = '#4a1a18'; ctx.fillRect(x, by + 12, w, 5);
+      ctx.fillStyle = bs.flash > 0 ? '#fff' : B.danger; ctx.fillRect(x, by + 12, Math.max(0, w * bs.hp / bs.maxHp), 5);
     }
   }
   const TH_NAME = () => L.def.name.toUpperCase();
@@ -938,48 +977,56 @@
     ctx.fillStyle = B.secondary; ctx.fillRect(0, 70, VW, 2); ctx.fillRect(0, 188, VW, 2);
     txt('NIVEL ' + (L.idx + 1), VW / 2, 82, B.secondaryLight, { align: 'center', scale: 2 });
     txt(L.def.name.toUpperCase(), VW / 2, 104, B.light, { align: 'center', scale: 4 });
-    wrap(L.def.intro, 60).forEach((s, i) => txt(s, VW / 2, 140 + i * 12, B.light, { align: 'center' }));
-    txt('LADRILLOS PARA APILAR: ' + L.bricks + '   ·   TEJAS DORADAS ESCONDIDAS: 3', VW / 2, 172, B.secondaryLight, { align: 'center' });
+    wrap(L.def.intro, VW < 400 ? 44 : 60).forEach((s, i) => txt(s, VW / 2, 140 + i * 12, B.light, { align: 'center' }));
+    if (VW < 400) { txt('LADRILLOS PARA APILAR: ' + L.bricks, VW / 2, 166, B.secondaryLight, { align: 'center' }); txt('TEJAS DORADAS ESCONDIDAS: 3', VW / 2, 178, B.secondaryLight, { align: 'center' }); }
+    else txt('LADRILLOS PARA APILAR: ' + L.bricks + '   ·   TEJAS DORADAS ESCONDIDAS: 3', VW / 2, 172, B.secondaryLight, { align: 'center' });
     G.buttons.push({ x: 0, y: 0, w: VW, h: VH, action: 'confirm' });
   }
   function drawPause() {
     drawWorld();
     ctx.fillStyle = 'rgba(15,8,4,0.78)'; ctx.fillRect(0, 0, VW, VH);
+    uiBegin();
     logoPlate(VW / 2, 8, true);
     txt('PAUSA', VW / 2, 56, B.secondary, { align: 'center', scale: 3 });
     const lines = ['← → / A D: MOVERSE', 'ESPACIO / ↑ / W: SALTAR (MANTÉN PARA SALTAR MÁS ALTO)', '↓ / S / X: APILAR UN LADRILLO BAJO LOS PIES', 'C / SHIFT: MURO INSTANTÁNEO (SI TIENES)', 'P / ESC: PAUSA   ·   M: SONIDO'];
+    if (document.body.classList.contains('touch')) lines.splice(0, lines.length, '← →: MOVERSE', 'SALTO: MANTÉN PARA SALTAR MÁS ALTO', 'APILAR: UN LADRILLO BAJO LOS PIES', 'MURO: PLATAFORMA TEMPORAL (SI TIENES)', 'TOCA CONTINUAR PARA SEGUIR');
     lines.forEach((s, i) => txt(s, VW / 2, 86 + i * 12, B.light, { align: 'center' }));
     button('CONTINUAR', VW / 2 - 70, 156, 140, 18, 'confirm', true);
     button(mutedLabel(), VW / 2 - 70, 180, 140, 18, 'mute', false);
     button('SALIR AL MENÚ', VW / 2 - 70, 204, 140, 18, 'quit', false);
+    uiEnd();
   }
   function drawClear() {
     drawWorld();
     ctx.fillStyle = 'rgba(15,8,4,0.8)'; ctx.fillRect(0, 0, VW, VH);
-    const ci = G.clearInfo;
+    uiBegin();
+    const ci = G.clearInfo, px = Math.round((VW - 260) / 2);
     logoPlate(VW / 2, 6, false);
-    panel(110, 36, 260, 190);
+    panel(px, 36, 260, 190);
     txt('¡NIVEL COMPLETADO!', VW / 2, 48, B.secondary, { align: 'center', scale: 2 });
     txt(L.def.name.toUpperCase(), VW / 2, 70, B.light, { align: 'center' });
-    const row = (a, b, y) => { txt(a, 130, y, B.light); txt(b, 350, y, B.secondaryLight, { align: 'right' }); };
+    const row = (a, b, y) => { txt(a, px + 20, y, B.light); txt(b, px + 240, y, B.secondaryLight, { align: 'right' }); };
     row('BONO DE TIEMPO', '+' + ci.timeBonus, 92);
     row('BONO DE NIVEL', '+' + C.SCORE.levelClear, 106);
     row('LADRILLITOS', ci.coins + ' / ' + ci.coinsTotal, 120);
-    txt('TEJAS DORADAS', 130, 134, B.light);
-    for (let i = 0; i < 3; i++) { ctx.globalAlpha = L.tejasGot[i] ? 1 : 0.3; ctx.drawImage(Art.teja(0, !L.tejasGot[i]), 296 + i * 18, 133, 14, 12); ctx.globalAlpha = 1; }
+    txt('TEJAS DORADAS', px + 20, 134, B.light);
+    for (let i = 0; i < 3; i++) { ctx.globalAlpha = L.tejasGot[i] ? 1 : 0.3; ctx.drawImage(Art.teja(0, !L.tejasGot[i]), px + 186 + i * 18, 133, 14, 12); ctx.globalAlpha = 1; }
     row('PUNTAJE', pad(G.score, 6), 154);
     if (G.newRecord) txt('¡NUEVO RÉCORD!', VW / 2, 172, Math.floor(G.t * 4) % 2 ? B.secondary : B.light, { align: 'center' });
     button('SIGUIENTE ETAPA', VW / 2 - 70, 192, 140, 18, 'confirm', true);
+    uiEnd();
   }
   function drawOver() {
     drawWorld();
     ctx.fillStyle = 'rgba(10,5,10,0.82)'; ctx.fillRect(0, 0, VW, VH);
+    uiBegin();
     logoPlate(VW / 2, 16, false);
-    txt('FIN DEL JUEGO', VW / 2, 56, B.danger, { align: 'center', scale: 4 });
+    txt('FIN DEL JUEGO', VW / 2, 56, B.danger, { align: 'center', scale: VW < 400 ? 3 : 4 });
     txt(L.deathReason === 'aplastado' || L.def.theme === 4 ? 'LA TORMENTA GANÓ ESTA VEZ...' : 'LA OBRA SIGUE ESPERANDO...', VW / 2, 100, B.light, { align: 'center' });
     txt('PUNTAJE ' + pad(G.score, 6) + '   ·   RÉCORD ' + pad(Save.data.hi, 6), VW / 2, 120, B.secondaryLight, { align: 'center' });
     button('REINTENTAR ETAPA', VW / 2 - 80, 150, 160, 18, 'confirm', true);
     button('MENÚ DE ETAPAS', VW / 2 - 80, 176, 160, 18, 'quit', false);
+    uiEnd();
   }
   /* ----- Final: Ladri vuelve a casa ----- */
   const END_T = 14; // segundo en que aparece el resumen
@@ -1074,6 +1121,7 @@
   }
 
   function render() {
+    syncView();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.imageSmoothingEnabled = false;
     G.buttons = [];
@@ -1153,6 +1201,7 @@
 
   function update(dt) {
     G.t += dt; G.stateT += dt;
+    syncView();
     if (pressed('mute')) Snd.toggleMute();
     switch (G.state) {
       case 'title': case 'story': case 'intro': case 'clear': case 'over': case 'ending':

@@ -269,6 +269,7 @@
   function drawBackground(g, theme, camX, camY, t, W, H, flash) {
     const th = TH[theme], id = th.id;
     g.drawImage(sky(theme, W, H), 0, 0, W, H);
+    const off = Math.max(0, H - 272); g.save(); g.translate(0, off); // vista alta (móvil): el horizonte queda abajo
     const px = (f) => -Math.round(camX * f);
     const wrap = (x, span) => ((x % span) + span) % span;
     if (id === 'cimientos') {
@@ -291,7 +292,7 @@
       g.fillStyle = 'rgba(80,40,40,0.5)'; for (let i = 0; i < 6; i++) { const x = wrap(i * 120 + px(0.1) - t * 6, 720) - 80, y = 24 + (i * 31) % 70; g.fillRect(x, y, 70, 6); g.fillRect(x + 10, y - 4, 40, 5); }
     } else if (id === 'acabados') {
       // pared interior con zócalo cerámico y ventanas
-      g.fillStyle = th.far; g.fillRect(0, 0, W, H);
+      g.fillStyle = th.far; g.fillRect(0, -off, W, H);
       g.fillStyle = th.mid; const o = wrap(px(0.5), 48);
       for (let x = -48 + o; x < W + 48; x += 48) { g.fillRect(x, 0, 2, 215); }
       g.fillStyle = th.skyBottom; g.fillRect(0, 150, W, 70);
@@ -302,8 +303,9 @@
       g.fillStyle = 'rgba(10,14,26,0.6)'; for (let i = 0; i < 6; i++) { const x = wrap(i * 150 + px(0.1) + t * 14, 900) - 150, y = 8 + (i * 29) % 70; g.fillRect(x, y, 160, 22); g.fillRect(x + 20, y - 12, 100, 16); g.fillRect(x + 40, y + 20, 90, 12); }
       g.fillStyle = th.far; for (let i = 0; i < 9; i++) { const x = wrap(i * 150 + px(0.2), 1350) - 150, hh = 40 + (i * 29) % 36; g.beginPath(); g.moveTo(x, 200); g.lineTo(x + 75, 200 - hh); g.lineTo(x + 150, 200); g.fill(); }
       g.fillStyle = th.mid; for (let i = 0; i < 12; i++) { const x = wrap(i * 120 + px(0.35), 1440) - 120, hh = 24 + (i * 17) % 22; g.beginPath(); g.moveTo(x - 20, 215); g.lineTo(x + 50, 215 - hh); g.lineTo(x + 130, 215); g.fill(); }
-      if (flash > 0) { g.fillStyle = `rgba(230,240,255,${Math.min(0.7, flash)})`; g.fillRect(0, 0, W, H); }
+      if (flash > 0) { g.fillStyle = `rgba(230,240,255,${Math.min(0.7, flash)})`; g.fillRect(0, -off, W, H); }
     }
+    g.restore();
   }
 
   /* ---------------- Objetos del mundo ---------------- */
