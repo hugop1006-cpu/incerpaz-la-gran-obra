@@ -34,11 +34,11 @@ window.LEVELS = [
     bricks: 4,
     intro: "Todo empieza en el terreno: zanjas, arena y mucho ladrillo por juntar. ¡Prepara los cimientos de la casa!",
     hints: [
-      { col:4, text:"MUÉVETE CON ← → O A D" },
-      { col:12, text:"ESPACIO SALTA · MANTÉN PARA SALTAR MÁS ALTO" },
+      { col:4, text:"MUÉVETE CON ← → O A D", touch:"MUÉVETE CON LOS BOTONES DE ABAJO" },
+      { col:12, text:"ESPACIO SALTA · MANTÉN PARA SALTAR MÁS ALTO", touch:"SALTO: MANTÉN PRESIONADO PARA SALTAR MÁS ALTO" },
       { col:29, text:"LAS ZANJAS SE SALTAN... Y SE ESCALAN", r:5 },
       { col:40, text:"PISA A LAS TERMITAS PARA VENCERLAS", r:5 },
-      { col:58, text:"PARED ALTA: ↓ O X APILA UN LADRILLO BAJO TUS PIES", r:5 },
+      { col:58, text:"PARED ALTA: ↓ O X APILA UN LADRILLO BAJO TUS PIES", touch:"PARED ALTA: EL BOTÓN APILAR PONE UN LADRILLO", r:5 },
       { col:80, text:"LA ARENA TE FRENA", r:5 },
       { col:93, text:"¡CUIDADO CON EL VACÍO!", r:3 },
       { col:135, text:"¡LA META! ENTREGA EL TERRENO LISTO", r:4 }
@@ -75,7 +75,7 @@ window.LEVELS = [
     hints: [
       { col:5, text:"LOS ANDAMIOS SE ATRAVIESAN POR DEBAJO" },
       { col:24, text:"SÚBETE A LA GRÚA PARA CRUZAR", r:4 },
-      { col:43, text:"RECOGE EL MURO: C O SHIFT LO COLOCA", r:4 },
+      { col:43, text:"RECOGE EL MURO: C O SHIFT LO COLOCA", touch:"RECOGE EL MURO: EL BOTÓN MURO LO COLOCA", r:4 },
       { col:62, text:"PARED DE 5: ¡APILA DOS LADRILLOS!", r:4 },
       { col:80, text:"EL ASCENSOR DE LA GRÚA SUBE A LA TERRAZA", r:4 },
       { col:97, text:"LAS GOTERAS CAEN CUANDO PASAS DEBAJO", r:5 },
@@ -190,7 +190,7 @@ window.LEVELS = [
       { col:8, text:"¡NO TE QUEDES ATRÁS! LA LLUVIA AVANZA", r:4 },
       { col:33, text:"CAMINO ALTO: TEJA DORADA", r:3 },
       { col:140, text:"FALTA POCO: ¡LA GRIETA TE ESPERA!", r:5 },
-      { col:156, text:"SELLA LAS GRIETAS CON LADRILLOS: ↓ / X", r:6 }
+      { col:156, text:"SELLA LAS GRIETAS CON LADRILLOS: ↓ / X", touch:"SELLA LAS GRIETAS CON EL BOTÓN APILAR", r:6 }
     ],
     movers: [],
     map: [

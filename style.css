@@ -40,11 +40,14 @@ body.touch #touch { display: block; }
 /* Vertical: el juego arriba, los botones abajo */
 @media (orientation: portrait) {
   body.touch { --ctl-h: 210px; }
-  body.touch #stage { align-items: flex-start; padding-top: max(8px, env(safe-area-inset-top)); }
+  body.touch #stage { align-items: center; padding-top: max(4px, env(safe-area-inset-top)); }
   body.touch #touch { position: relative; flex: 0 0 var(--ctl-h); height: var(--ctl-h); }
   body.touch .pad { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); }
   body.touch .pad-left { left: 12px; }
-  body.touch .pad-right { right: 12px; gap: 8px; }
-  body.touch .dir { width: 78px; height: 78px; }
+  body.touch .pad-right { right: 12px; display: grid; grid-template-columns: auto auto; gap: 8px; align-items: end; }
+  body.touch .act.small { grid-column: 1; grid-row: 1; width: 62px; height: 52px; }
+  body.touch .act.mid { grid-column: 1; grid-row: 2; width: 62px; height: 66px; }
+  body.touch .act.big { grid-column: 2; grid-row: 1 / span 2; align-self: end; width: 96px; height: 96px; }
+  body.touch .dir { width: 74px; height: 74px; }
   body.touch #btn-pause { top: 4px; }
 }

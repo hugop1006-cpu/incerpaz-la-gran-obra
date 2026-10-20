@@ -557,7 +557,7 @@
     for (const [k, v] of L.temp) { if (v - dt <= 0) L.temp.delete(k); else L.temp.set(k, v - dt); }
     if (L.boss) { updateBoss(dt); updateRocks(dt); }
     L.hint = '';
-    for (const h of L.def.hints || []) if (Math.abs((p.x + 5) / T - h.col) < (h.r || 3.5)) L.hint = h.text;
+    for (const h of L.def.hints || []) if (Math.abs((p.x + 5) / T - h.col) < (h.r || 3.5)) L.hint = (h.touch && document.body.classList.contains('touch')) ? h.touch : h.text;
   }
 
   function updateCamera(dt) {
@@ -873,6 +873,7 @@
     G.buttons.push({ x: 0, y: 0, w: VW, h: VH - 20, action: 'confirm' });
     if (Math.floor(G.t * 2) % 2 === 0) txt(document.body.classList.contains('touch') ? 'TOCA LA PANTALLA PARA JUGAR' : 'PRESIONA ENTER PARA JUGAR', VW / 2, 138, B.light, { align: 'center' });
     txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2, 152, B.secondaryLight, { align: 'center' });
+    if (document.body.classList.contains('touch') && window.innerHeight > window.innerWidth) txt('GIRA EL CELULAR: SE JUEGA MEJOR EN HORIZONTAL', VW / 2, 166, B.secondary, { align: 'center' });
     txt('INCERPAZ · CERÁMICA Y MATERIALES DE CONSTRUCCIÓN · BOLIVIA', VW / 2, VH - 12, B.light, { align: 'center' });
     button(mutedLabel(), VW - 86, 6, 80, 14, 'mute', false);
   }
