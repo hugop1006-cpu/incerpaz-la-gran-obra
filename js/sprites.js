@@ -327,8 +327,13 @@
     g.fillStyle = B.secondaryDark; for (let i = 0; i < 38; i += 8) g.fillRect(x - 2 + i, y - 59, 4, 13);
     g.fillStyle = B.dark; g.fillRect(x + 3, y - 56, 28, 7);
     Font.draw(g, 'META', x + 17, y - 55, { align: 'center', color: B.secondaryLight });
-    const sw = Math.round(Math.sin(t * 5) * 1.5);
-    g.fillStyle = B.danger; g.fillRect(x + 12 + sw, y - 40, 3, 40 - 6 + 6); g.fillStyle = 'rgba(255,255,255,0.0)';
+    // banner colgante con el isotipo de INCERPAZ (2 x 3 baldosas)
+    const sw = Math.round(Math.sin(t * 3) * 1);
+    g.fillStyle = B.dark; g.fillRect(x + 10, y - 45, 14, 2); g.fillRect(x + 10 + sw, y - 43, 14, 22); g.fillRect(x + 14 + sw, y - 21, 6, 2); g.fillRect(x + 16 + sw, y - 19, 2, 1);
+    g.fillStyle = B.secondary; g.fillRect(x + 11 + sw, y - 43, 12, 20); g.fillRect(x + 15 + sw, y - 23, 4, 2);
+    g.fillStyle = B.secondaryLight; g.fillRect(x + 11 + sw, y - 43, 12, 1);
+    g.fillStyle = B.primary;
+    for (let i = 0; i < 3; i++) for (let k = 0; k < 2; k++) g.fillRect(x + 13 + sw + k * 5, y - 41 + i * 6, 4, 5);
   }
   function drawCrane(g, m, t) { // plataforma de grúa
     const x = Math.round(m.x), y = Math.round(m.y), w = m.w;
