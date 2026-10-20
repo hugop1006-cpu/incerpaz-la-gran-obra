@@ -225,10 +225,12 @@
           g.fillStyle = t.roofDark; for (let x = 0; x < T; x += 4) { const s = surf(x); g.fillRect(x, s, 1, Math.min(4, T - s)); }
         }
       } else if (ch === 'T') {
-        g.fillStyle = t.tileA; g.fillRect(0, 0, T, T);
-        g.fillStyle = t.tileB; g.fillRect(0, 0, 8, 8); g.fillRect(8, 8, 8, 8);
-        g.fillStyle = '#fff'; g.fillRect(1, 1, 3, 1); g.fillRect(9, 9, 3, 1);
-        g.fillStyle = t.groundDark; g.fillRect(0, 7, T, 1); g.fillRect(7, 0, 1, T);
+        g.fillStyle = B.dark; g.fillRect(0, 0, T, T);
+        g.fillStyle = t.tileB; g.fillRect(1, 1, 14, 14);
+        g.fillStyle = t.tileA; g.fillRect(2, 2, 12, 12);
+        g.fillStyle = t.tileB; g.fillRect(2, 8, 12, 1); g.fillRect(8, 2, 1, 12);
+        g.fillStyle = '#fff'; g.fillRect(3, 3, 3, 1); g.fillRect(3, 4, 1, 2); g.fillRect(9, 9, 3, 1);
+        g.fillStyle = t.groundDark; g.fillRect(2, 13, 12, 1); g.fillRect(13, 2, 1, 12);
       } else if (ch === '=') {
         // tablón de andamio (una sola cara, se puede atravesar desde abajo)
         g.fillStyle = B.dark; g.fillRect(0, 0, T, 6);
