@@ -180,7 +180,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   <header class="sheet-head">
     <div>
       <h1>Wireframes INCERPAZ</h1>
-      <p>Cinco pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
+      <p>Seis pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
     </div>
     <div class="stamp">
       <div><b>Lámina</b> 01 · borrador para revisión</div>
@@ -196,6 +196,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     <a href="#ficha" data-tab="ficha">Ficha de producto</a>
     <a href="#proyecto" data-tab="proyecto">Proyecto churrasquero</a>
     <a href="#pavic" data-tab="pavic">Portada PAVIC</a>
+    <a href="#constructor" data-tab="constructor">Cuenta del constructor</a>
     <a href="#donde" data-tab="donde">Dónde estamos</a>
   </nav>
 
@@ -204,8 +205,8 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     <div class="panel">
       <h2>PAVIC: portada de marca propia dentro de INCERPAZ</h2>
       <div class="grid g3">
-        <div class="card flat"><h3>Lo que sé</h3><p class="sub">30 % de las ventas nacionales. Producto para proyectos grandes, privados y estatales. Solo se vende por canales INCERPAZ. Tiene marca registrada y logo propio.</p></div>
-        <div class="card flat"><h3>Dónde se hace y vende</h3><p class="sub">Plantas especializadas en Santa Cruz y Cochabamba, y producción en la planta de Oruro junto con los ladrillos. Punto de venta especializado en La Paz, abastecido desde Oruro.</p></div>
+        <div class="card flat"><h3>Lo que sé</h3><p class="sub">30 % de las ventas nacionales. Producto para proyectos grandes, privados y estatales. Solo se vende por canales INCERPAZ. Marca registrada, logo propio, certificados de calidad, ensayos e ISO.</p></div>
+        <div class="card flat"><h3>Dónde se hace y vende</h3><p class="sub">Dos fábricas independientes en Santa Cruz y Cochabamba, y producción en la planta de Oruro junto con los ladrillos. Punto de venta especializado en La Paz, abastecido desde Oruro.</p></div>
         <div class="card flat"><h3>Recomendación</h3><p class="sub">Una portada dentro de incerpaz.com/pavic, con su logo y su tono. Comparte catálogo, cuenta, presupuesto y CRM con el resto. Un dominio corto puede redirigir a ella.</p></div>
       </div>
       <p>Como PAVIC vende a proyectos y no al público general, su portada habla distinto que la home: cotización por proyecto en lugar de carrito, documentación para licitaciones y proyectistas, obras de referencia y un ejecutivo de proyectos.</p>
@@ -214,9 +215,10 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
           <thead><tr><th>Quien compra para un proyecto necesita</th><th>La portada ofrece</th></tr></thead>
           <tbody>
             <tr><td>Saber cuánto material y cuántos camiones</td><td>Calculadora de volumen: m², merma, piezas, peso y camiones</td></tr>
-            <tr><td>Presentar el producto en una licitación o a un proyectista</td><td>Fichas técnicas, ensayos, manual de colocado y detalles en CAD, con descarga que pide datos de empresa</td></tr>
+            <tr><td>Presentar el producto en una licitación o ante un auditor</td><td>Certificados de calidad, ensayos, ISO, fichas y manual, con descarga que pide datos de empresa</td></tr>
+            <tr><td>Diseñar y calcular el pavimento en el proyecto</td><td>Recursos para técnicos: guía de diseño, datos de ensayo, textos de especificación, detalles CAD y hoja de cuantificación</td></tr>
             <tr><td>Ver que el producto ya se usó en obras como la suya</td><td>Obras de referencia, filtradas por privada o pública y por ciudad</td></tr>
-            <tr><td>Un precio por volumen y plazo</td><td>Formulario de proyecto (m², fecha de obra, tipo de entidad) que llega a un ejecutivo de proyectos</td></tr>
+            <tr><td>Un precio de referencia y otro por volumen y plazo</td><td>Precio de lista con cuenta verificada, y formulario de proyecto (m², fecha de obra, tipo de entidad) que llega a un ejecutivo de proyectos</td></tr>
             <tr><td>Ver y tocar el producto antes de decidir</td><td>Solicitud de muestras y puntos de venta PAVIC por ciudad</td></tr>
           </tbody>
         </table>
@@ -382,7 +384,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
             <div style="display:flex;flex-direction:column;gap:10px">
               <h3>Agencia más cercana</h3>
               <div class="card"><b id="cityName">Cochabamba</b><span class="sub">Av. Circunvalación y Calle Miguel de Cervantes N° 181</span><span class="sub">Horario: por definir</span><a class="btn primary" href="#home" onclick="return false">Escribir por WhatsApp</a></div>
-              <span class="mono muted">9 puntos en Cochabamba. La lista completa vive en "Dónde estamos".</span>
+              <span class="mono muted">10 puntos en Cochabamba. La lista completa vive en "Dónde estamos".</span>
             </div>
           </div>
           <i class="pin">9</i>
@@ -444,8 +446,8 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     <div class="toolbar">
       <span class="mono muted">Ver como</span>
       <div class="seg" role="group" aria-label="Estado de sesión">
-        <button type="button" id="asVisit" aria-pressed="true">Visitante</button>
-        <button type="button" id="asClient" aria-pressed="false">Cliente verificado</button>
+        <button type="button" class="asbtn" data-as="visit" id="asVisit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" id="asClient" aria-pressed="false">Cliente verificado</button>
       </div>
     </div>
     <div class="wf">
@@ -655,13 +657,20 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
 
   <!-- ============ PORTADA PAVIC ============ -->
   <section class="view" id="v-pavic" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" class="asbtn" data-as="visit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
     <div class="wf">
       <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/pavic</span></div>
       <div class="canvas">
         <div class="util"><span>PAVIC es una marca de INCERPAZ</span><span class="mono">Ejecutivo de proyectos: por asignar por ciudad</span><i class="pin in">1</i></div>
         <div class="blk row" style="justify-content:space-between">
           <span class="row" style="gap:10px"><span class="logo" style="background:var(--fg);color:var(--bg);border-color:var(--fg)">PAVIC</span><span class="mono muted">logo y MR propios</span></span>
-          <div class="nav"><span>Productos</span><span>Obras</span><span>Documentación técnica</span><span>Calculadora</span><span>Dónde comprar</span></div>
+          <div class="nav"><span>Productos</span><span>Obras</span><span>Documentación y recursos técnicos</span><span>Calculadora</span><span>Dónde comprar</span></div>
           <a class="btn primary" href="#pavic" onclick="return false">Cotizar mi proyecto</a>
         </div>
         <div class="blk">
@@ -709,22 +718,36 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
               <div class="out" id="pvPzas">0<small>piezas</small></div>
               <div class="out" id="pvKg">0<small>kg aprox.</small></div>
               <div class="out" id="pvCam">0<small>camiones</small></div>
+              <div class="out" id="pvCost">x<small>costo de lista, ejemplo</small></div>
             </div>
           </div>
-          <div class="row" style="margin-top:12px"><a class="btn primary" href="#pavic" onclick="return false">Enviar estos datos a cotización</a><span class="mono muted">Calculado con Pavic estándar: 50 piezas por m², 2,65 kg por pieza.</span></div>
+          <div class="row" style="margin-top:12px"><a class="btn primary" href="#pavic" onclick="return false">Enviar estos datos a cotización</a><span class="mono muted">Calculado con Pavic estándar: 50 piezas por m², 2,65 kg por pieza. Para volumen, el precio final sale por cotización.</span></div>
           <i class="pin">5</i>
         </div>
         <div class="blk">
-          <div class="blk-title"><h3>Documentación técnica</h3><small>descarga con nombre, empresa y correo</small></div>
+          <div class="blk-title"><h3>Calidad y documentación</h3><small>descarga con nombre, empresa y correo</small></div>
           <div class="grid g3">
+            <div class="card"><b>Certificados de calidad</b><span class="sub">Por producto y por lote, si aplica</span></div>
+            <div class="card"><b>Ensayos de laboratorio</b><span class="sub">Informes con resultados</span></div>
+            <div class="card"><b>Certificación ISO</b><span class="sub">Norma y alcance por indicar</span></div>
             <div class="card"><b>Fichas técnicas</b><span class="sub">Por producto</span></div>
-            <div class="card"><b>Ensayos y certificaciones</b><span class="sub">Por confirmar cuáles existen</span></div>
             <div class="card"><b>Manual de colocado</b><span class="sub">Preparación, colocado, fraguado</span></div>
-            <div class="card"><b>Detalles en CAD</b><span class="sub">Para proyectistas</span></div>
-            <div class="card"><b>Catálogo</b><span class="sub">PDF</span></div>
-            <div class="card"><b>Carta de producto</b><span class="sub">Para licitaciones, por confirmar</span></div>
+            <div class="card"><b>Catálogo y carta de producto</b><span class="sub">PDF, para licitaciones</span></div>
           </div>
           <i class="pin">6</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Recursos para proyectistas y calculistas</h3><small>acceso con registro de técnico</small></div>
+          <div class="grid g3">
+            <div class="card"><b>Guía de diseño del pavimento</b><span class="sub">Base, sub-base, juntas, pendientes y drenaje</span></div>
+            <div class="card"><b>Resistencias y cargas</b><span class="sub">Datos de los ensayos por tipo de tráfico</span></div>
+            <div class="card"><b>Textos de especificación</b><span class="sub">Listos para pliegos y cómputos</span></div>
+            <div class="card"><b>Detalles constructivos</b><span class="sub">CAD y, más adelante, objetos BIM</span></div>
+            <div class="card"><b>Hoja de cuantificación</b><span class="sub">Cálculo de piezas, mortero y mano de obra</span></div>
+            <div class="card"><b>Consulta a un ingeniero</b><span class="sub">Formulario y WhatsApp técnico</span></div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Todo lo de esta lista se produce con el equipo técnico de INCERPAZ. Lo que ya existe se publica primero.</span>
+          <i class="pin">7</i>
         </div>
         <div class="blk" style="background:var(--surface-2)">
           <div class="blk-title"><h3>Obras de referencia</h3>
@@ -737,7 +760,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
             <div class="card" data-k="priv"><div class="ph"><b>foto</b></div><b>Centro comercial (ejemplo)</b><span class="sub">Privada · ciudad, año, m²</span></div>
           </div>
           <span class="mono muted" style="display:block;margin-top:10px">Son marcadores. Los proyectos reales los aporta INCERPAZ.</span>
-          <i class="pin">7</i>
+          <i class="pin">8</i>
         </div>
         <div class="blk">
           <div class="blk-title"><h3>Cómo trabajamos un proyecto</h3><small>por validar con ventas</small></div>
@@ -748,7 +771,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
             <div><span><b>Despacho</b><span>Entregas programadas desde la planta más cercana.</span></span></div>
             <div><span><b>Asesoría en obra</b><span>Apoyo técnico durante el colocado.</span></span></div>
           </div>
-          <i class="pin">8</i>
+          <i class="pin">9</i>
         </div>
         <div class="blk" style="background:var(--surface-2)">
           <div class="blk-title"><h3>Dónde comprar PAVIC</h3><small>enlaza a Dónde estamos</small></div>
@@ -758,7 +781,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
             <div class="card"><b>Oruro</b><span class="sub">Planta y agencias</span></div>
             <div class="card"><b>La Paz</b><span class="sub">Punto de venta PAVIC</span></div>
           </div>
-          <i class="pin">9</i>
+          <i class="pin">10</i>
         </div>
         <div class="blk">
           <div class="blk-title"><h3>Cotiza tu proyecto</h3><small>formulario para ejecutivo de proyectos</small></div>
@@ -772,7 +795,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
             <label class="field">Celular<input type="text" placeholder="7xxxxxxx"></label>
           </div>
           <div style="margin-top:12px"><a class="btn primary" href="#pavic" onclick="return false">Enviar</a></div>
-          <i class="pin">10</i>
+          <i class="pin">11</i>
         </div>
         <div class="blk" style="background:var(--surface-2)">
           <div class="row" style="justify-content:space-between"><span class="mono muted">PAVIC es una marca de INCERPAZ · Volver a incerpaz.com · Productos del catálogo general</span></div>
@@ -786,14 +809,163 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
         <li><div><b>Hero para proyectos</b><span>El botón principal es cotizar, no comprar. La documentación técnica es la segunda salida.</span></div></li>
         <li><div><b>Públicos</b><span>Los de proyectos van primero. El dueño de casa queda como cuarto público, atendido por agencias.</span></div></li>
         <li><div><b>Productos</b><span>Los cuatro del catálogo actual. Cada uno usa la misma plantilla de ficha de producto.</span></div></li>
-        <li><div><b>Calculadora</b><span>Prueba el prototipo: cambia los m² y ve piezas, peso y camiones. La capacidad del camión es un dato de ejemplo.</span></div></li>
-        <li><div><b>Documentación</b><span>Se descarga dejando empresa y correo: cada descarga es un lead calificado. Hay que confirmar qué ensayos y certificaciones existen.</span></div></li>
+        <li><div><b>Calculadora</b><span>Prueba el prototipo: cambia los m² y ve piezas, peso y camiones. El costo de lista solo aparece al cambiar a "Cliente verificado" arriba. La capacidad del camión es un dato de ejemplo.</span></div></li>
+        <li><div><b>Calidad y documentación</b><span>PAVIC tiene certificados de calidad, ensayos e ISO, y esta es la prueba que busca quien decide. Se descarga dejando empresa y correo, así que cada descarga es un lead calificado.</span></div></li>
+        <li><div><b>Recursos para técnicos</b><span>Material para quien diseña y calcula el proyecto: guía de diseño, datos de ensayo, textos de especificación y detalles. Quien especifica PAVIC en un plano lo pide después en la obra.</span></div></li>
         <li><div><b>Obras de referencia</b><span>La prueba más fuerte para quien decide un proyecto. Filtra por tipo de obra.</span></div></li>
         <li><div><b>Proceso</b><span>Dice qué pasa después de pedir cotización. Reduce la duda de quien nunca compró.</span></div></li>
         <li><div><b>Dónde comprar</b><span>Incluye el punto de venta PAVIC de La Paz, abastecido desde Oruro.</span></div></li>
         <li><div><b>Formulario de proyecto</b><span>Tipo de entidad y m² permiten priorizar. Entra al CRM del ejecutivo de esa ciudad.</span></div></li>
       </ol>
-      <p class="muted">Precios: para proyectos grandes el precio sale por cotización. Falta decidir si una cuenta verificada puede ver una lista de referencia.</p>
+      <p class="muted">Precios: una cuenta verificada ve el precio de lista de referencia. Los proyectos de volumen se cotizan con un ejecutivo.</p>
+    </div>
+  </section>
+
+  <!-- ============ CUENTA DEL CONSTRUCTOR ============ -->
+  <section class="view" id="v-constructor" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Estado de la cuenta</span>
+      <div class="seg" role="group" aria-label="Estado de la cuenta">
+        <button type="button" data-cn="reg" aria-pressed="false">Registro</button>
+        <button type="button" data-cn="pend" aria-pressed="false">Pendiente</button>
+        <button type="button" data-cn="ok" aria-pressed="true">Verificada</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span id="cnUrl">incerpaz.com/mi-cuenta</span></div>
+      <div class="canvas">
+
+        <div id="cnReg" hidden>
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+                <h2 style="font-size:clamp(32px,5vw,46px)">Crea tu cuenta</h2>
+                <p class="muted">Con una cuenta verificada ves los precios de tu ciudad, guardas presupuestos por obra, repites pedidos y sumas puntos.</p>
+                <div class="grid">
+                  <label class="field">Soy<select><option>Constructor independiente</option><option>Empresa constructora</option><option>Ferretería o distribuidor</option><option>Entidad pública</option><option>Proyectista o calculista</option><option>Dueño de casa</option></select></label>
+                  <label class="field">Nombre o razón social<input type="text" placeholder="Nombre o razón social"></label>
+                  <label class="field">NIT o CI<input type="text" placeholder="Número"></label>
+                  <label class="field">Ciudad<select><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option><option>Otra</option></select></label>
+                  <label class="field">Celular o WhatsApp<input type="text" placeholder="7xxxxxxx"></label>
+                  <label class="field">Correo<input type="text" placeholder="correo@ejemplo.com"></label>
+                </div>
+                <div><a class="btn primary" href="#constructor" onclick="return false">Crear cuenta</a></div>
+                <i class="pin">1</i>
+              </div>
+              <div class="card flat" style="position:relative">
+                <h3>Qué pasa después</h3>
+                <div class="steps">
+                  <div><span><b>Recibimos tus datos</b><span>Puedes ver el sitio y usar las calculadoras, sin precios.</span></span></div>
+                  <div><span><b>Un ejecutivo de tu ciudad te llama</b><span>Confirma tus datos y tu tipo de cliente.</span></span></div>
+                  <div><span><b>Tu cuenta se activa</b><span>Plazo por definir con ventas.</span></span></div>
+                </div>
+                <i class="pin">2</i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="cnPend" hidden>
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+                <span class="chip lock" style="align-self:flex-start">Cuenta en revisión</span>
+                <h2 style="font-size:clamp(30px,5vw,42px)">Estamos verificando tu cuenta</h2>
+                <p class="muted">Un ejecutivo de Cochabamba revisa tus datos. Mientras tanto puedes:</p>
+                <div class="row"><span class="btn">Armar presupuesto sin precios</span><span class="btn">Usar las calculadoras</span><span class="btn">Ver proyectos</span></div>
+                <div class="row"><span class="btn primary">Hablar con mi ejecutivo por WhatsApp</span></div>
+                <i class="pin">3</i>
+              </div>
+              <div class="card flat"><h3>Tus datos</h3><table class="specs"><tbody><tr><td>Tipo</td><td>Empresa constructora</td></tr><tr><td>Ciudad</td><td>Cochabamba</td></tr><tr><td>Enviada</td><td>hoy</td></tr></tbody></table><span class="btn ghost" style="align-self:flex-start">Corregir datos</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="cnOk">
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="row" style="justify-content:space-between;position:relative">
+              <div><span class="chip" style="border-color:var(--ok);color:var(--ok)">Cliente verificado</span><h2 style="font-size:34px;margin-top:6px">Constructora Ejemplo S.R.L.</h2><span class="mono muted">Cochabamba · cuenta de ejemplo</span></div>
+              <div class="grid" style="flex:1 1 320px;max-width:520px">
+                <div class="card"><b>Mi ejecutivo</b><span class="sub">Por asignar</span><span class="btn" style="align-self:flex-start">WhatsApp</span></div>
+                <div class="card"><b>Puntos</b><span class="out" style="font-size:28px">1.240<small>nivel y premios por definir</small></span></div>
+              </div>
+              <i class="pin">4</i>
+            </div>
+          </div>
+
+          <div class="blk">
+            <div class="split" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+              <div style="position:relative">
+                <div class="blk-title"><h3>Presupuesto en curso</h3><small>precios de lista de Cochabamba, ejemplo</small></div>
+                <div class="scroll"><table>
+                  <thead><tr><th>Producto</th><th class="num">Precio</th><th class="num">Cantidad</th><th class="num">Subtotal</th></tr></thead>
+                  <tbody id="cnLines"></tbody>
+                  <tfoot><tr><th colspan="3" style="text-align:right">Total</th><th class="num" id="cnTotal"></th></tr></tfoot>
+                </table></div>
+                <div class="row" style="margin-top:10px">
+                  <label class="field" for="cnObra" style="flex:1 1 180px">Guardar en la obra<select id="cnObra"><option>Edificio Av. Ejemplo</option><option>Urbanización Los Pinos (ejemplo)</option><option>Nueva obra…</option></select></label>
+                </div>
+                <div class="row" style="margin-top:10px"><span class="btn">Guardar</span><span class="btn">Enviar a mi ejecutivo</span><span class="btn primary">Convertir en pedido</span></div>
+                <i class="pin">5</i>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+                <div class="blk-title" style="margin:0"><h3>Mis obras</h3><small>agrupan presupuestos y pedidos</small></div>
+                <div class="card"><b>Edificio Av. Ejemplo</b><span class="sub">2 presupuestos · 1 pedido en despacho</span></div>
+                <div class="card"><b>Urbanización Los Pinos (ejemplo)</b><span class="sub">1 presupuesto enviado</span></div>
+                <span class="btn ghost" style="align-self:flex-start">Nueva obra</span>
+                <i class="pin">6</i>
+              </div>
+            </div>
+          </div>
+
+          <div class="blk">
+            <div class="blk-title"><h3>Presupuestos y pedidos</h3><small>estados de ejemplo</small></div>
+            <div class="scroll"><table>
+              <thead><tr><th>N°</th><th>Obra</th><th>Fecha</th><th>Estado</th><th class="num">Total</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>P-0412</td><td>Edificio Av. Ejemplo</td><td>12 oct</td><td><span class="chip">Borrador</span></td><td class="num">Bs 18.400</td><td><span class="btn ghost">Abrir</span></td></tr>
+                <tr><td>P-0409</td><td>Edificio Av. Ejemplo</td><td>03 oct</td><td><span class="chip">Enviado</span></td><td class="num">Bs 7.250</td><td><span class="btn ghost">Abrir</span></td></tr>
+                <tr><td>PD-0187</td><td>Edificio Av. Ejemplo</td><td>28 sep</td><td><span class="chip on">En despacho</span></td><td class="num">Bs 31.900</td><td><span class="btn">Repetir</span></td></tr>
+                <tr><td>PD-0170</td><td>Urbanización Los Pinos</td><td>05 sep</td><td><span class="chip" style="border-color:var(--ok);color:var(--ok)">Entregado</span></td><td class="num">Bs 12.600</td><td><span class="btn">Repetir</span></td></tr>
+              </tbody>
+            </table></div>
+            <div class="steps" style="margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+              <div><span><b>Recibido</b><span>Pedido ingresado</span></span></div>
+              <div><span><b>Confirmado</b><span>Stock y precio</span></span></div>
+              <div><span><b>En despacho</b><span>Transporte en camino</span></span></div>
+              <div><span><b>Entregado</b><span>Recepción en obra</span></span></div>
+            </div>
+            <i class="pin">7</i>
+          </div>
+
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="grid g3">
+              <div class="card"><b>Precios de mi ciudad</b><span class="sub">Lista completa, descargable</span></div>
+              <div class="card"><b>Documentos favoritos</b><span class="sub">Fichas, certificados, manuales</span></div>
+              <div class="card"><b>Calculadoras</b><span class="sub">Piezas, muros, pavimentos</span></div>
+              <div class="card"><b>Puntos y premios</b><span class="sub">Historial y canje</span></div>
+              <div class="card"><b>Estado de cuenta</b><span class="sub">Facturas y saldos. Fase 2, requiere conectar el ERP</span></div>
+              <div class="card"><b>Mis datos</b><span class="sub">Contactos y direcciones de entrega</span></div>
+            </div>
+            <i class="pin">8</i>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la cuenta</h2>
+      <ol class="notes">
+        <li><div><b>Registro por tipo de cliente</b><span>Constructor, empresa, ferretería, entidad pública, proyectista o dueño de casa. El tipo define qué ve y quién lo atiende.</span></div></li>
+        <li><div><b>Verificación humana</b><span>Un ejecutivo de la ciudad llama. Es el filtro que protege los precios y convierte el registro en un lead calificado.</span></div></li>
+        <li><div><b>Cuenta pendiente útil</b><span>Quien espera puede usar calculadoras y armar presupuestos sin precios, y no abandona.</span></div></li>
+        <li><div><b>Resumen</b><span>Ejecutivo asignado y puntos arriba. Es la parte de "app con recompensas" tomada de Coca-Cola.</span></div></li>
+        <li><div><b>Presupuesto en curso</b><span>Prueba el prototipo: cambia cantidades y ve el total. Es la pieza central: del presupuesto sale el pedido o el envío al ejecutivo.</span></div></li>
+        <li><div><b>Obras</b><span>Un constructor trabaja por obra. Agrupar presupuestos y pedidos por obra evita rehacer listas.</span></div></li>
+        <li><div><b>Pedidos con estado y recompra</b><span>Repetir un pedido en un clic es lo que más ahorra tiempo en obras que se repiten.</span></div></li>
+        <li><div><b>Atajos</b><span>El estado de cuenta y las facturas dependen de conectar el ERP, así que van a una segunda fase.</span></div></li>
+      </ol>
+      <p class="muted">Precios, totales, puntos y nombres son de ejemplo. Falta definir las reglas del programa de puntos y si hay línea de crédito por cliente.</p>
     </div>
   </section>
 
@@ -805,9 +977,20 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
         <li><div><b>Dos tablas distintas en la misma página</b><span>Cada ciudad aparece dos veces, con ejecutivos y números que no coinciden. Por ejemplo, la agencia Central de Cochabamba tiene el WhatsApp 79723246 en una tabla y 70750963 en la otra.</span></div></li>
         <li><div><b>Números repetidos o faltantes</b><span>En la tabla más nueva, Castillo repite el número de la fábrica de Cochabamba, y varias agencias de Santa Cruz no tienen teléfono fijo. Aquí marqué el repetido con "revisar dato".</span></div></li>
         <li><div><b>No hay mapa, horarios ni búsqueda por zona</b><span>Hoy es solo una lista por ciudad.</span></div></li>
-        <li><div><b>Páginas que muestran ciudades sin operación</b><span>Las fábricas de La Paz y Tarija están paradas y no hay comercializadores, pero la página actual aún lista 7 y 1 puntos allá, y la portada todavía enlaza la tienda de Tarija. El wireframe muestra Cochabamba 9 puntos, Santa Cruz 8, Oruro 2, Sucre 1 y en La Paz solo el punto de venta PAVIC.</span></div></li>
+        <li><div><b>Páginas que muestran ciudades sin operación</b><span>Las fábricas de La Paz y Tarija están paradas y no hay comercializadores, pero la página actual aún lista 7 y 1 puntos allá, y la portada todavía enlaza la tienda de Tarija. El wireframe muestra Cochabamba 10 puntos (9 más la fábrica PAVIC), Santa Cruz 9, Oruro 2, Sucre 1 y en La Paz solo el punto de venta PAVIC.</span></div></li>
       </ol>
       <p class="muted">Todo esto sale de la página de agencias de cbba.tienda.incerpaz.com. Los nombres de los ejecutivos no se muestran en el wireframe.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Pendientes de datos</h2>
+      <p class="muted">Los marqué con el pin amarillo "!" en la lista y en las fichas.</p>
+      <ol class="notes" style="counter-reset:none">
+        <li><div><b>Punto de venta PAVIC de La Paz</b><span>Dirección, teléfono, WhatsApp y horario. Se ve luego.</span></div></li>
+        <li><div><b>Fábricas PAVIC de Cochabamba y Santa Cruz</b><span>Dirección de cada una. Son independientes de las fábricas generales aunque cercanas.</span></div></li>
+        <li><div><b>Fábrica de Oruro</b><span>Confirmar la dirección tomada del sitio actual.</span></div></li>
+        <li><div><b>Agencia Castillo, Cochabamba</b><span>Su WhatsApp es igual al de la fábrica. Falta el número propio.</span></div></li>
+      </ol>
     </div>
 
     <div class="wf">
@@ -863,13 +1046,18 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
           <i class="pin">4</i>
         </div>
         <div class="blk">
-          <div class="blk-title"><h3>Nuestras plantas</h3><small>las que operan hoy</small></div>
+          <div class="blk-title"><h3>Nuestras fábricas</h3><small>las que operan hoy</small></div>
           <div class="grid g3">
-            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cochabamba</b><span class="sub">Av. Villazón Km 7 1/2</span><div class="row"><span class="chip lock">Planta PAVIC</span></div></div>
-            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Santa Cruz</b><span class="sub">Carretera Warnes–Montero Km 37 1/2</span><div class="row"><span class="chip lock">Planta PAVIC</span></div></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cochabamba</b><span class="sub">Av. Villazón Km 7 1/2</span><div class="row"><span class="chip">Cerámica y ladrillos</span></div></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Santa Cruz</b><span class="sub">Carretera Warnes–Montero Km 37 1/2</span><div class="row"><span class="chip">Cerámica y ladrillos</span></div></div>
             <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Oruro</b><span class="sub">Carretera Oruro–La Paz Km 31</span><div class="row"><span class="chip">Ladrillos</span><span class="chip lock">PAVIC</span></div></div>
           </div>
-          <span class="mono muted" style="display:block;margin-top:10px">Direcciones tomadas del sitio actual. Hay que confirmar la de Oruro y si la planta PAVIC de cada ciudad es la misma de esa dirección.</span>
+          <div class="blk-title" style="margin-top:14px"><h3>Fábricas PAVIC</h3><small>independientes de las anteriores</small></div>
+          <div class="grid g3">
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cochabamba</b><span class="sub">Dirección por confirmar <i class="pin in" title="Pendiente de datos">!</i></span><div class="row"><span class="chip lock">PAVIC</span></div></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Santa Cruz</b><span class="sub">Dirección por confirmar <i class="pin in" title="Pendiente de datos">!</i></span><div class="row"><span class="chip lock">PAVIC</span></div></div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Direcciones de las fábricas generales tomadas del sitio actual. Hay que confirmar la de Oruro.</span>
           <i class="pin">5</i>
         </div>
         <div class="blk" style="background:var(--surface-2)">
@@ -914,7 +1102,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
 
 <script>
 (function () {
-  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'donde'];
+  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'constructor', 'donde'];
   function show() {
     var h = (location.hash || '').replace('#', '');
     if (tabs.indexOf(h) < 0) h = 'plataforma';
@@ -949,16 +1137,17 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   var client = false;
   function setClient(v) {
     client = v;
-    document.getElementById('asVisit').setAttribute('aria-pressed', String(!v));
-    document.getElementById('asClient').setAttribute('aria-pressed', String(v));
+    document.querySelectorAll('.asbtn').forEach(function (b) { b.setAttribute('aria-pressed', String((b.getAttribute('data-as') === 'client') === v)); });
     document.getElementById('priceVisit').hidden = v;
     document.getElementById('priceClient').hidden = !v;
     document.getElementById('buyNote').textContent = v ? 'Cliente verificado: Comprar está activo.' : 'El botón Comprar se activa al ingresar. Presupuesto y WhatsApp funcionan sin cuenta.';
     document.getElementById('btnBuy').style.opacity = v ? '1' : '.5';
     renderBom();
+    if (typeof refreshClient === 'function') refreshClient();
   }
-  document.getElementById('asVisit').addEventListener('click', function () { setClient(false); });
-  document.getElementById('asClient').addEventListener('click', function () { setClient(true); });
+  document.querySelectorAll('.asbtn').forEach(function (b) {
+    b.addEventListener('click', function () { setClient(b.getAttribute('data-as') === 'client'); });
+  });
 
   /* lista de materiales */
   var items = [
@@ -999,6 +1188,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   var AG = {
     'Cochabamba': [
       ['Fábrica', 'fab', 'Av. Villazón Km 7 1/2, zona Esmeralda Sud', '4 4271684 / 4 4271685', '70305319'],
+      ['Planta PAVIC', 'fab', 'Dirección por confirmar. Fábrica independiente, cercana a la fábrica general.', '', '', 'por completar', 'pavic'],
       ['Central, oficina central', 'ag', 'Av. Circunvalación y Calle Miguel de Cervantes N° 181, de Semapa una cuadra al este', '4 4287067 / 4 4669420', '70750963'],
       ['Quillacollo', 'ag', 'Av. Blanco Galindo Km 10 1/2', '4 4265309', '70349291'],
       ['Petrolera', 'ag', 'Av. Petrolera Km 2 1/2, calle Coronel Juan L. Muñoz, lado surtidor Ticti', '4 4216286', '70787648'],
@@ -1013,6 +1203,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     ],
     'Santa Cruz': [
       ['Fábrica', 'fab', 'Carretera Warnes–Montero Km 37 1/2', '', '70818053'],
+      ['Planta PAVIC', 'fab', 'Dirección por confirmar. Fábrica independiente, cercana a la fábrica general.', '', '', 'por completar', 'pavic'],
       ['Banzer', 'ag', 'Av. Banzer, 3er anillo externo, frente al surtidor Genex', '3 441918', '70009021'],
       ['Cotoca', 'ag', 'Av. Virgen de Cotoca y 4to anillo', '3 490279', '70816205'],
       ['Satélite', 'ag', 'Av. Principal de Satélite esq. coliseo Ignacio Warnes', '', '70885302'],
@@ -1046,7 +1237,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     document.getElementById('locList').innerHTML = vis.length ? vis.map(function (o, n) {
       var a = o.a;
       return '<button type="button" class="loc" data-i="' + o.i + '" aria-pressed="' + (o.i === loc.sel) + '"><b>' + (n + 1) + '. ' + a[0] +
-        ' <span class="chip">' + (a[1] === 'fab' ? 'Fábrica' : 'Agencia') + '</span>' + (a[6] ? ' <span class="chip lock">Solo PAVIC</span>' : '') + (a[5] === 'número repetido' ? ' <span class="flag">revisar dato</span>' : '') + '</b><span>' + a[2] + '</span></button>';
+        ' <span class="chip">' + (a[1] === 'fab' ? 'Fábrica' : 'Agencia') + '</span>' + (a[6] ? ' <span class="chip lock">Solo PAVIC</span>' : '') + (a[5] === 'número repetido' ? ' <span class="flag">revisar dato</span>' : '') + (a[5] === 'por completar' ? ' <i class="pin in" title="Pendiente de datos">!</i>' : '') + '</b><span>' + a[2] + '</span></button>';
     }).join('') : '<div style="padding:14px" class="muted">Sin resultados. Prueba otra zona o deja tu celular abajo.</div>';
     var map = document.getElementById('locMap');
     map.querySelectorAll('.mp').forEach(function (p) { p.remove(); });
@@ -1061,7 +1252,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     var d = document.getElementById('locDetail');
     if (loc.sel < 0) { d.innerHTML = '<span class="sub">Elige un punto para ver el detalle.</span>'; return; }
     var s = AG[loc.city][loc.sel];
-    d.innerHTML = '<div class="blk-title" style="margin:0"><h3>' + s[0] + ', ' + loc.city + '</h3><span class="chip">' + (s[1] === 'fab' ? 'Fábrica' : 'Agencia') + '</span>' + (s[6] ? ' <span class="chip lock">Solo PAVIC</span>' : '') + '</div>' +
+    d.innerHTML = '<div class="blk-title" style="margin:0"><h3>' + s[0] + ', ' + loc.city + '</h3><span class="chip">' + (s[1] === 'fab' ? 'Fábrica' : 'Agencia') + '</span>' + (s[6] ? ' <span class="chip lock">Solo PAVIC</span>' : '') + (s[5] === 'por completar' ? ' <i class="pin in" title="Pendiente de datos">!</i>' : '') + '</div>' +
       '<span class="sub">' + s[2] + '</span>' +
       '<table class="specs"><tbody><tr><td>Teléfono</td><td>' + (s[3] || '<span class="flag">por completar</span>') + '</td></tr>' +
       '<tr><td>WhatsApp</td><td>' + (s[4] ? '+591 ' + s[4] + ' <button type="button" class="chip" id="copyWa" style="cursor:pointer">copiar</button>' : '<span class="flag">por completar</span>') + '</td></tr>' +
@@ -1103,6 +1294,8 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     document.getElementById('pvPzas').firstChild.nodeValue = p.toLocaleString('es-BO');
     document.getElementById('pvKg').firstChild.nodeValue = Math.round(kg).toLocaleString('es-BO');
     document.getElementById('pvCam').firstChild.nodeValue = Math.ceil(kg / cap).toLocaleString('es-BO');
+    var c = document.getElementById('pvCost');
+    c.firstChild.nodeValue = client ? 'Bs ' + Math.round(p * 1.85).toLocaleString('es-BO') : 'Con sesión';
   }
   [pm, pc].forEach(function (e) { e.addEventListener('input', pcalc); }); pg.addEventListener('change', pcalc); pcalc();
   document.querySelectorAll('[data-kind]').forEach(function (b) {
@@ -1110,6 +1303,38 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       var k = b.getAttribute('data-kind');
       document.querySelectorAll('[data-kind]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
       document.querySelectorAll('#obras [data-k]').forEach(function (c) { c.hidden = k !== 'todas' && c.getAttribute('data-k') !== k; });
+    });
+  });
+
+  /* sesión: pavic y constructor */
+  function refreshClient() {
+    var pz = document.getElementById('pvCost');
+    if (pz && pm) pcalc();
+  }
+  var cnItems = [['Pavic estándar', 1.85, 4000], ['Ladrillo 6 huecos económico rayado', 1.2, 3000], ['Refractario para cámara', 4.5, 120]];
+  var cnQ = cnItems.map(function (r) { return r[2]; });
+  function cnRender() {
+    var t = 0, h = '';
+    cnItems.forEach(function (r, i) {
+      var sub = r[1] * cnQ[i]; t += sub;
+      h += '<tr><td>' + r[0] + '</td><td class="num">Bs ' + r[1].toFixed(2).replace('.', ',') + '</td><td class="num"><input type="number" min="0" step="10" value="' + cnQ[i] + '" data-q="' + i + '" aria-label="Cantidad de ' + r[0] + '" style="width:90px;font:400 14px var(--body);background:var(--surface);color:var(--fg);border:1.5px solid var(--line-strong);padding:4px 6px;text-align:right"></td><td class="num">Bs ' + Math.round(sub).toLocaleString('es-BO') + '</td></tr>';
+    });
+    document.getElementById('cnLines').innerHTML = h;
+    document.getElementById('cnTotal').textContent = 'Bs ' + Math.round(t).toLocaleString('es-BO');
+  }
+  document.getElementById('cnLines').addEventListener('change', function (e) {
+    var i = e.target.getAttribute('data-q');
+    if (i !== null) { cnQ[+i] = Math.max(0, parseFloat(e.target.value) || 0); cnRender(); }
+  });
+  cnRender();
+  document.querySelectorAll('[data-cn]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-cn');
+      document.querySelectorAll('[data-cn]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.getElementById('cnReg').hidden = k !== 'reg';
+      document.getElementById('cnPend').hidden = k !== 'pend';
+      document.getElementById('cnOk').hidden = k !== 'ok';
+      document.getElementById('cnUrl').textContent = k === 'reg' ? 'incerpaz.com/registro' : 'incerpaz.com/mi-cuenta';
     });
   });
 
