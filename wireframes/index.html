@@ -158,6 +158,21 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .steps b { font-weight: 600; display: block; } .steps span { font-size: 13px; color: var(--muted); }
 svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
 .theme-btn { font: 500 12px var(--mono); background: var(--surface); color: var(--fg); border: 1px solid var(--line-strong); padding: 4px 10px; cursor: pointer; }
+/* dónde estamos */
+.loc-list { display: flex; flex-direction: column; border: 1.5px solid var(--line-strong); max-height: 440px; overflow: auto; background: var(--surface); }
+.loc { display: grid; gap: 2px; text-align: left; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; font: 400 14px var(--body); }
+.loc b { font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.loc span { font-size: 13px; color: var(--muted); }
+.loc[aria-pressed="true"] { background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
+.map { position: relative; min-height: 380px; }
+.mp { position: absolute; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--fg); background: var(--surface); color: var(--fg); font: 600 11px var(--mono); display: grid; place-items: center; cursor: pointer; transform: translate(-50%, -50%); padding: 0; }
+.mp.fab { background: var(--fg); color: var(--bg); }
+.mp[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); z-index: 2; }
+.phone { width: min(300px, 100%); border: 2px solid var(--fg); background: var(--surface); margin: 0 auto; display: flex; flex-direction: column; }
+.phone > div { padding: 12px; border-bottom: 1px dashed var(--line); display: flex; flex-direction: column; gap: 8px; }
+.phone > div:last-child { border-bottom: 0; }
+.wa-preview { font-size: 13px; background: var(--surface-2); border: 1px dashed var(--line-strong); padding: 8px 10px; color: var(--muted); }
+.flag { font-family: var(--mono); font-size: 10px; color: var(--accent); border: 1px solid var(--accent); padding: 0 6px; white-space: nowrap; }
 @media (prefers-reduced-motion: no-preference) { .btn, nav.tabs a { transition: background .15s, color .15s; } }
 </style>
 
@@ -165,7 +180,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   <header class="sheet-head">
     <div>
       <h1>Wireframes INCERPAZ</h1>
-      <p>Tres pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
+      <p>Cuatro pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
     </div>
     <div class="stamp">
       <div><b>Lámina</b> 01 · borrador para revisión</div>
@@ -180,6 +195,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     <a href="#home" data-tab="home">Home</a>
     <a href="#ficha" data-tab="ficha">Ficha de producto</a>
     <a href="#proyecto" data-tab="proyecto">Proyecto churrasquero</a>
+    <a href="#donde" data-tab="donde">Dónde estamos</a>
   </nav>
 
   <!-- ============ PLATAFORMA ============ -->
@@ -600,11 +616,126 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       <p class="muted">Las cantidades y medidas son de ejemplo para el wireframe. Antes de publicar, las valida el equipo técnico de INCERPAZ.</p>
     </div>
   </section>
+
+  <!-- ============ DÓNDE ESTAMOS ============ -->
+  <section class="view" id="v-donde" hidden>
+    <div class="panel">
+      <h2>Lo que encontré en la página actual</h2>
+      <ol class="notes" style="counter-reset:none">
+        <li><div><b>Dos tablas distintas en la misma página</b><span>Cada ciudad aparece dos veces, con ejecutivos y números que no coinciden. Por ejemplo, la agencia Central de Cochabamba tiene el WhatsApp 79723246 en una tabla y 70750963 en la otra.</span></div></li>
+        <li><div><b>Datos incompletos</b><span>En la tabla más nueva, La Paz Fábrica y Calacoto no tienen WhatsApp, y Castillo repite el número de la fábrica de Cochabamba. Aquí los marqué con "revisar dato".</span></div></li>
+        <li><div><b>No hay mapa, horarios ni búsqueda por zona</b><span>Hoy es solo una lista por ciudad.</span></div></li>
+        <li><div><b>Cobertura desigual</b><span>Cochabamba 9 puntos, Santa Cruz 8, La Paz 7, Oruro 2, Sucre 1 y Tarija 1 (la fábrica). La portada solo ofrece 4 ciudades, sin La Paz ni Sucre.</span></div></li>
+      </ol>
+      <p class="muted">Todo esto sale de la página de agencias de cbba.tienda.incerpaz.com. Los nombres de los ejecutivos no se muestran en el wireframe.</p>
+    </div>
+
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/donde-estamos</span></div>
+      <div class="canvas">
+        <div class="blk">
+          <div style="position:relative;display:flex;flex-direction:column;gap:12px">
+            <h2 style="font-size:clamp(32px,5vw,46px)">Dónde estamos</h2>
+            <div class="row" id="cityTabs" role="group" aria-label="Ciudad"></div>
+            <div class="row">
+              <label class="field" for="locQ" style="flex:1 1 220px">Busca tu zona o avenida<input id="locQ" type="search" placeholder="Ej. Quillacollo, Plan 3000, Calacoto"></label>
+              <div class="seg" role="group" aria-label="Tipo de punto" style="align-self:end">
+                <button type="button" data-type="todas" aria-pressed="true">Todos</button>
+                <button type="button" data-type="ag" aria-pressed="false">Agencias</button>
+                <button type="button" data-type="fab" aria-pressed="false">Fábricas</button>
+              </div>
+              <span class="btn ghost" style="align-self:end">Usar mi ubicación</span>
+            </div>
+            <i class="pin" style="top:-4px;right:-4px">1</i>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="split" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+            <div style="position:relative">
+              <div class="blk-title"><h3 id="locCount">Puntos</h3><small>lista sincronizada con el mapa</small></div>
+              <div class="loc-list" id="locList"></div>
+              <i class="pin" style="top:-4px;right:-4px">2</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+              <div class="ph map" id="locMap"><b>mapa de la ciudad (posiciones ilustrativas)</b></div>
+              <div class="card" id="locDetail"></div>
+              <i class="pin" style="top:-4px;right:-4px">3</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>¿No encuentras tu zona?</h3>
+              <span class="sub">Déjanos tu celular y un asesor de tu ciudad te llama.</span>
+              <div class="grid">
+                <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+                <label class="field">Celular<input type="text" placeholder="7xxxxxxx"></label>
+              </div>
+              <div><a class="btn primary" href="#donde" onclick="return false">Que me llamen</a></div>
+            </div>
+            <div class="grid">
+              <div class="card"><b>Servicio al cliente</b><span class="sub">800-10-8810</span></div>
+              <div class="card"><b>Correo de ventas</b><span class="sub">ventas.cbba@incerpaz.com</span></div>
+              <div class="card"><b>Exportaciones</b><span class="sub">Sitio en español e inglés</span></div>
+            </div>
+          </div>
+          <i class="pin">4</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Nuestras fábricas</h3><small>4 en la tabla nueva</small></div>
+          <div class="grid">
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cochabamba</b><span class="sub">Av. Villazón Km 7 1/2</span></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>La Paz</b><span class="sub">Carretera a Viacha Km 27</span></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Santa Cruz</b><span class="sub">Carretera Warnes–Montero Km 37 1/2</span></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Tarija</b><span class="sub">Av. Circunvalación</span></div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">La tabla anterior también lista una fábrica en Oruro, carretera Oruro–La Paz Km 31. Hay que confirmarla.</span>
+          <i class="pin">5</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Distribuidores autorizados</h3><small>fase 2, como el buscador de distribuidor de Weber</small></div>
+          <div class="grid"><div class="card flat"><span class="sub">Ferreterías y corralones que venden INCERPAZ en ciudades sin agencia propia.</span></div></div>
+          <i class="pin">6</i>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Versión celular</h2>
+      <p class="muted">En el teléfono la lista va primero y el mapa se abre con un botón. El botón de WhatsApp queda fijo abajo.</p>
+      <div class="phone">
+        <div><span class="mono muted">incerpaz.com/donde-estamos</span><b style="font-family:var(--display);font-size:26px;text-transform:uppercase">Dónde estamos</b>
+          <div class="row" style="gap:6px"><span class="chip on">Cochabamba</span><span class="chip">La Paz</span><span class="chip">Santa Cruz</span><span class="chip">Oruro</span></div>
+          <div class="field">Busca tu zona<input type="search" placeholder="Zona o avenida" disabled></div>
+          <div class="seg" style="align-self:flex-start"><button type="button" aria-pressed="true">Lista</button><button type="button" aria-pressed="false">Mapa</button></div>
+        </div>
+        <div style="gap:0;padding:0">
+          <div class="loc" style="padding:10px 12px;border-bottom:1px solid var(--line);box-shadow:inset 4px 0 0 var(--accent);background:var(--surface-2)"><b>Central <span class="chip">Agencia</span></b><span>Av. Circunvalación y Calle Miguel de Cervantes N° 181</span></div>
+          <div class="loc" style="padding:10px 12px"><b>Quillacollo <span class="chip">Agencia</span></b><span>Av. Blanco Galindo Km 10 1/2</span></div>
+        </div>
+        <div><a class="btn primary wide" href="#donde" onclick="return false">Escribir por WhatsApp</a><a class="btn wide" href="#donde" onclick="return false">Cómo llegar</a></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Notas de la pantalla</h2>
+      <ol class="notes">
+        <li><div><b>Filtros</b><span>Ciudad, tipo de punto y búsqueda por zona. "Usar mi ubicación" ordena por cercanía cuando la persona lo permite.</span></div></li>
+        <li><div><b>Lista y mapa sincronizados</b><span>Elegir en uno marca el otro. Prueba el prototipo: cambia de ciudad y toca un punto. Los números del mapa son del orden de la lista, no coordenadas.</span></div></li>
+        <li><div><b>Ficha del punto</b><span>Dirección, teléfono, WhatsApp, horario y servicios. El mensaje de WhatsApp sale armado con el producto o proyecto que la persona venía viendo.</span></div></li>
+        <li><div><b>Captura de leads</b><span>Si no hay agencia cerca, el formulario crea un lead para el ejecutivo de la ciudad.</span></div></li>
+        <li><div><b>Fábricas</b><span>Convierte las direcciones en una parte de la historia de la marca, con fotos y visitas si las hacen.</span></div></li>
+        <li><div><b>Distribuidores</b><span>Cubre ciudades donde hoy no hay agencia propia.</span></div></li>
+      </ol>
+      <p class="muted">Horarios y servicios por agencia no existen en el sitio actual, así que quedan "por definir" hasta que alguien los confirme. Una sola fuente de datos (el CMS) debe alimentar esta pantalla, la home y el pie de página.</p>
+    </div>
+  </section>
 </div>
 
 <script>
 (function () {
-  var tabs = ['plataforma', 'home', 'ficha', 'proyecto'];
+  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'donde'];
   function show() {
     var h = (location.hash || '').replace('#', '');
     if (tabs.indexOf(h) < 0) h = 'plataforma';
@@ -684,6 +815,115 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     });
   });
   setClient(false);
+
+  /* dónde estamos: [nombre, tipo, dirección, teléfono, whatsapp, revisar] */
+  var AG = {
+    'Cochabamba': [
+      ['Fábrica', 'fab', 'Av. Villazón Km 7 1/2, zona Esmeralda Sud', '4 4271684 / 4 4271685', '70305319'],
+      ['Central, oficina central', 'ag', 'Av. Circunvalación y Calle Miguel de Cervantes N° 181, de Semapa una cuadra al este', '4 4287067 / 4 4669420', '70750963'],
+      ['Quillacollo', 'ag', 'Av. Blanco Galindo Km 10 1/2', '4 4265309', '70349291'],
+      ['Petrolera', 'ag', 'Av. Petrolera Km 2 1/2, calle Coronel Juan L. Muñoz, lado surtidor Ticti', '4 4216286', '70787648'],
+      ['Sacaba', 'ag', 'Av. Barrientos Km 12 acera norte, camino a Santa Cruz, zona Ulincate', '4 4709201', '70348697'],
+      ['Vinto', 'ag', 'Av. Albina Patiño Km 16 acera norte, zona Las Manzanas, frente a la Alcaldía', '4 4536895', '70719774'],
+      ['Tiquipaya', 'ag', 'Av. Simón López casi esq. calle Nisedo Rodríguez N° 1823, zona Colquiri Sud', '4 4012445', '70719312'],
+      ['Beijing', 'ag', 'Av. Beijing N° 177, frente al parque Demetrio Canelas', '4 4424445', '65350059'],
+      ['Castillo', 'ag', 'Av. Villazón Km 3.5 N° 04259, lado empresa Virmegraf', '4 4724248', '70305319', 'número repetido']
+    ],
+    'La Paz': [
+      ['Fábrica', 'fab', 'Carretera a Viacha Km 27', '2 2800330', '', 'sin WhatsApp'],
+      ['Calacoto, oficina central', 'ag', 'Av. Ballivián N° 375 entre calles 9 y 10, Calacoto, frente a las Torres Zafiro', '2 2776690', '', 'sin WhatsApp'],
+      ['Litoral', 'ag', 'Zona San Luis, carretera a Viacha casi esq. Av. Litoral N° 800, cerca del cruce Villa Adela', '2 2853129', '70619611'],
+      ['Juan Pablo II', 'ag', 'Av. Juan Pablo II casi esq. Alfonso Ugarte N° 2986, cerca al TAM', '2 2845722', '70619614'],
+      ['Río Seco', 'ag', 'Ex tranca de Río Seco N° 50, frente al surtidor Quemado, Av. Juan Pablo II', '2 2865300', '70619514'],
+      ['6 de Marzo', 'ag', 'Av. 6 de Marzo, carretera a Oruro N° 60, frente al colegio Intervida', '2 2816689', '70564942'],
+      ['Cruce Viacha', 'ag', 'Cruce carretera a Viacha y Av. 6 de Marzo N° 32, frente al enmallado del aeropuerto', '2 2821092', '70116723']
+    ],
+    'Santa Cruz': [
+      ['Fábrica', 'fab', 'Carretera Warnes–Montero Km 37 1/2', '', '70818053'],
+      ['Banzer', 'ag', 'Av. Banzer, 3er anillo externo, frente al surtidor Genex', '3 441918', '70009021'],
+      ['Cotoca', 'ag', 'Av. Virgen de Cotoca y 4to anillo', '3 490279', '70816205'],
+      ['Satélite', 'ag', 'Av. Principal de Satélite esq. coliseo Ignacio Warnes', '', '70885302'],
+      ['Patio', 'ag', 'Av. Doble vía La Guardia esq. 6to anillo, diagonal a Unitel', '3 544088', '70818060'],
+      ['Santos Dumont', 'ag', 'Av. Santos Dumont entre 5to y 6to anillo, casi esq. Av. 16 de Noviembre', '', '60802416'],
+      ['Plan 3000', 'ag', 'Av. Principal Plan 3000, calle Toro Toro, lado Banco Económico', '3 700257', '70930384'],
+      ['Montecristo', 'ag', 'Av. Virgen de Cotoca Km 4 1/2 entre 7mo y 8vo anillo', '', '70053778']
+    ],
+    'Oruro': [
+      ['Patio', 'ag', 'Av. Circunvalación entre Av. del Valle y Casco del Minero, urb. Milenium', '2 5252523 / 2 5233080', '60400608'],
+      ['Tacna', 'ag', 'Calle Tacna N° 600 entre Caro y Av. del Ejército', '2 5272237', '70415110']
+    ],
+    'Sucre': [
+      ['Terminal', 'ag', 'Av. Ostria Gutiérrez N° 525, zona Terminal de Buses', '6444344', '70213846']
+    ],
+    'Tarija': [
+      ['Fábrica', 'fab', 'Av. Circunvalación casi Av. Panamericana', '', '70211702']
+    ]
+  };
+  var loc = { city: 'Cochabamba', type: 'todas', q: '', sel: 0 };
+  function visible() {
+    return AG[loc.city].map(function (a, i) { return { a: a, i: i }; }).filter(function (o) {
+      return (loc.type === 'todas' || o.a[1] === loc.type) && (o.a[0] + ' ' + o.a[2]).toLowerCase().indexOf(loc.q.toLowerCase()) >= 0;
+    });
+  }
+  function renderLoc() {
+    var tabsEl = document.getElementById('cityTabs');
+    tabsEl.innerHTML = Object.keys(AG).map(function (c) {
+      return '<button type="button" class="chip' + (c === loc.city ? ' on' : '') + '" data-city="' + c + '" style="cursor:pointer;font-size:13px;padding:5px 12px">' + c + ' (' + AG[c].length + ')</button>';
+    }).join('');
+    var vis = visible();
+    if (!vis.some(function (o) { return o.i === loc.sel; })) loc.sel = vis.length ? vis[0].i : -1;
+    document.getElementById('locCount').textContent = vis.length + (vis.length === 1 ? ' punto en ' : ' puntos en ') + loc.city;
+    document.getElementById('locList').innerHTML = vis.length ? vis.map(function (o, n) {
+      var a = o.a;
+      return '<button type="button" class="loc" data-i="' + o.i + '" aria-pressed="' + (o.i === loc.sel) + '"><b>' + (n + 1) + '. ' + a[0] +
+        ' <span class="chip">' + (a[1] === 'fab' ? 'Fábrica' : 'Agencia') + '</span>' + (a[5] ? ' <span class="flag">revisar dato</span>' : '') + '</b><span>' + a[2] + '</span></button>';
+    }).join('') : '<div style="padding:14px" class="muted">Sin resultados. Prueba otra zona o deja tu celular abajo.</div>';
+    var map = document.getElementById('locMap');
+    map.querySelectorAll('.mp').forEach(function (p) { p.remove(); });
+    vis.forEach(function (o, n) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'mp' + (o.a[1] === 'fab' ? ' fab' : ''); b.textContent = n + 1;
+      b.style.left = (12 + ((n * 37 + 11) % 76)) + '%'; b.style.top = (14 + ((n * 53 + 7) % 68)) + '%';
+      b.setAttribute('data-i', o.i); b.setAttribute('aria-pressed', String(o.i === loc.sel));
+      b.setAttribute('aria-label', o.a[0]);
+      map.appendChild(b);
+    });
+    var d = document.getElementById('locDetail');
+    if (loc.sel < 0) { d.innerHTML = '<span class="sub">Elige un punto para ver el detalle.</span>'; return; }
+    var s = AG[loc.city][loc.sel];
+    d.innerHTML = '<div class="blk-title" style="margin:0"><h3>' + s[0] + ', ' + loc.city + '</h3><span class="chip">' + (s[1] === 'fab' ? 'Fábrica' : 'Agencia') + '</span></div>' +
+      '<span class="sub">' + s[2] + '</span>' +
+      '<table class="specs"><tbody><tr><td>Teléfono</td><td>' + (s[3] || '<span class="flag">por completar</span>') + '</td></tr>' +
+      '<tr><td>WhatsApp</td><td>' + (s[4] ? '+591 ' + s[4] + ' <button type="button" class="chip" id="copyWa" style="cursor:pointer">copiar</button>' : '<span class="flag">por completar</span>') + '</td></tr>' +
+      '<tr><td>Horario</td><td class="muted">por definir</td></tr>' +
+      '<tr><td>Servicios</td><td><span class="chip">retiro de pedido</span> <span class="chip">entrega a obra</span> <span class="chip">asesoría técnica</span> <span class="muted" style="font-size:12px">por confirmar</span></td></tr></tbody></table>' +
+      '<div class="wa-preview">Mensaje de WhatsApp: "Hola, vi Pavic estándar en incerpaz.com y quiero cotizar en la agencia ' + s[0] + ' de ' + loc.city + '."</div>' +
+      '<div class="row"><span class="btn primary">Escribir por WhatsApp</span><span class="btn">Cómo llegar</span><span class="btn">Llamar</span></div>';
+    var cp = document.getElementById('copyWa');
+    if (cp) cp.addEventListener('click', function () {
+      var t = '+591 ' + s[4];
+      try { navigator.clipboard.writeText(t).then(function () { cp.textContent = 'copiado'; }, function () { cp.textContent = t; }); } catch (e) { cp.textContent = t; }
+    });
+  }
+  document.getElementById('cityTabs').addEventListener('click', function (e) {
+    var c = e.target.getAttribute && e.target.getAttribute('data-city');
+    if (c) { loc.city = c; loc.sel = 0; renderLoc(); }
+  });
+  function pick(e) {
+    var t = e.target.closest ? e.target.closest('[data-i]') : null;
+    if (t) { loc.sel = parseInt(t.getAttribute('data-i'), 10); renderLoc(); }
+  }
+  document.getElementById('locList').addEventListener('click', pick);
+  document.getElementById('locMap').addEventListener('click', pick);
+  document.getElementById('locQ').addEventListener('input', function (e) { loc.q = e.target.value; renderLoc(); });
+  document.querySelectorAll('[data-type]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      loc.type = b.getAttribute('data-type');
+      document.querySelectorAll('[data-type]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      renderLoc();
+    });
+  });
+  renderLoc();
 
   /* tema */
   var modes = ['auto', 'light', 'dark'], mi = 0, tb = document.getElementById('themeBtn');
