@@ -118,7 +118,7 @@ section.view[hidden] { display: none; }
 
 /* pines de anotación */
 .pin { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--pin); color: var(--pin-ink); font: 600 12px var(--mono); display: grid; place-items: center; font-style: normal; box-shadow: 0 0 0 2px var(--surface); z-index: 2; }
-.pin.in { position: static; flex: none; box-shadow: none; }
+.pin.in { position: static; flex: none; box-shadow: none; display: inline-grid; vertical-align: middle; }
 ol.notes { list-style: none; margin: 0; padding: 0; counter-reset: n; display: grid; gap: 10px 28px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 ol.notes li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; font-size: 14px; }
 ol.notes li::before { counter-increment: n; content: counter(n); width: 22px; height: 22px; border-radius: 50%; background: var(--pin); color: var(--pin-ink); font: 600 12px var(--mono); display: grid; place-items: center; margin-top: 1px; }
@@ -180,7 +180,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   <header class="sheet-head">
     <div>
       <h1>Wireframes INCERPAZ</h1>
-      <p>Seis pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
+      <p>Siete pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
     </div>
     <div class="stamp">
       <div><b>Lámina</b> 01 · borrador para revisión</div>
@@ -194,8 +194,9 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     <a href="#plataforma" data-tab="plataforma">Plataforma</a>
     <a href="#home" data-tab="home">Home</a>
     <a href="#ficha" data-tab="ficha">Ficha de producto</a>
-    <a href="#proyecto" data-tab="proyecto">Proyecto churrasquero</a>
+    <a href="#proyecto" data-tab="proyecto">Proyectos</a>
     <a href="#pavic" data-tab="pavic">Portada PAVIC</a>
+    <a href="#techos" data-tab="techos">Categoría Techos</a>
     <a href="#constructor" data-tab="constructor">Cuenta del constructor</a>
     <a href="#donde" data-tab="donde">Dónde estamos</a>
   </nav>
@@ -228,7 +229,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
 
     <div class="panel">
       <h2>TEJAS: por ahora, una categoría</h2>
-      <p>Tejas todavía no tiene marca, nombre ni logo propios, así que no justifica una portada aparte. Se queda como la categoría "Techos" del catálogo, con fichas y fotos bien hechas.</p>
+      <p>Tejas todavía no tiene marca, nombre ni logo propios, así que no justifica una portada aparte. Se queda como la categoría "Techos" del catálogo, con fichas y fotos bien hechas. La pestaña "Categoría Techos" muestra cómo se ve mientras tanto.</p>
       <p class="muted">Cuando haya nombre y logo, al menos tres modelos con ficha y fotos, y una calculadora de tejas por m² y pendiente, se abre su portada con la misma plantilla de PAVIC. Definir esa marca es un trabajo aparte del sitio.</p>
     </div>
 
@@ -374,7 +375,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
               <span class="sub">Ingresa para ver precios de tu ciudad, repetir pedidos y tener un promotor asignado. Suma puntos en cada compra.</span>
               <div class="row"><a class="btn primary" href="#home" onclick="return false">Crear cuenta</a><a class="btn" href="#home" onclick="return false">Ingresar</a></div>
             </div>
-            <div class="grid"><div class="card"><b>Precios</b><span class="sub">de tu ciudad</span></div><div class="card"><b>Recompra</b><span class="sub">en 2 clics</span></div><div class="card"><b>Puntos</b><span class="sub">por compra</span></div></div>
+            <div class="grid"><div class="card"><b>Precios</b><span class="sub">de tu ciudad</span></div><div class="card"><b>Recompra</b><span class="sub">en 2 clics</span></div><div class="card"><b>Puntos <i class="pin in" title="Pendiente">!</i></b><span class="sub">por compra</span></div></div>
           </div>
           <i class="pin">8</i>
         </div>
@@ -559,22 +560,26 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
 
   <!-- ============ PROYECTO ============ -->
   <section class="view" id="v-proyecto" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Proyecto</span>
+      <div class="seg" role="group" aria-label="Proyecto">
+        <button type="button" data-proj="churrasquero" aria-pressed="true">Churrasquero</button>
+        <button type="button" data-proj="meson" aria-pressed="false">Mesón</button>
+        <button type="button" data-proj="pared" aria-pressed="false">Pared con enchape</button>
+      </div>
+    </div>
     <div class="wf">
-      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/proyectos/churrasquero-de-patio</span></div>
+      <div class="chrome"><i></i><i></i><i></i><span id="pjUrl">incerpaz.com/proyectos/churrasquero-de-patio</span></div>
       <div class="canvas">
-        <div class="blk"><span class="mono muted">Inicio › Proyectos › Churrasquero de patio</span></div>
+        <div class="blk"><span class="mono muted" id="pjCrumb">Inicio › Proyectos › Churrasquero de patio</span></div>
         <div class="blk">
           <div class="split">
-            <div class="ph hero"><b>foto: churrasquero terminado</b></div>
+            <div class="ph hero"><b id="pjHero">foto: churrasquero terminado</b></div>
             <div style="display:flex;flex-direction:column;gap:12px;position:relative">
-              <h2 style="font-size:40px">Churrasquero de patio</h2>
-              <p class="muted">Cámara de cocción con refractario, base de piso cerámico y parrilla de hierro.</p>
-              <div class="row"><span class="chip">Dificultad media</span><span class="chip">2 días</span><span class="chip">2 personas</span><span class="chip">Exterior</span></div>
-              <div class="seg" role="group" aria-label="Tamaño">
-                <button type="button" data-size="0.7" aria-pressed="false">Pequeño</button>
-                <button type="button" data-size="1" aria-pressed="true">Mediano</button>
-                <button type="button" data-size="1.4" aria-pressed="false">Grande</button>
-              </div>
+              <h2 style="font-size:40px" id="pjTitle">Churrasquero de patio</h2>
+              <p class="muted" id="pjDesc">Cámara de cocción con refractario, base de piso cerámico y parrilla de hierro.</p>
+              <div class="row" id="pjChips"></div>
+              <div class="seg" role="group" aria-label="Tamaño" id="pjSizes"></div>
               <span class="mono muted" id="dims">Medidas: 1,80 m de ancho × 0,60 m de fondo × 2,10 m de alto</span>
               <div class="row"><a class="btn primary" href="#proyecto" onclick="return false">Añadir todo al presupuesto</a><a class="btn" href="#proyecto" onclick="return false">Hablar con un promotor</a></div>
               <i class="pin">1</i>
@@ -597,34 +602,14 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
           <div class="split">
             <div style="position:relative">
               <div class="blk-title"><h3>Plano</h3><small>vista frontal, esquemática</small></div>
-              <svg viewBox="0 0 320 210" width="100%" role="img" aria-label="Plano esquemático frontal del churrasquero con medidas">
-                <rect x="20" y="170" width="200" height="22" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                <rect x="34" y="80" width="172" height="90" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M62 170 V110 Q62 92 80 92 H160 Q178 92 178 110 V170" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                <line x1="62" y1="132" x2="178" y2="132" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
-                <rect x="94" y="20" width="52" height="60" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                <line x1="20" y1="204" x2="220" y2="204" stroke="currentColor" stroke-width="1"/>
-                <text x="104" y="201">1,80 m</text>
-                <line x1="238" y1="20" x2="238" y2="192" stroke="currentColor" stroke-width="1"/>
-                <text x="244" y="108">2,10 m</text>
-                <text x="108" y="128">cámara</text>
-                <text x="100" y="146">parrilla</text>
-                <text x="100" y="52">chimenea</text>
-              </svg>
+              <div id="pjPlan"></div>
               <div class="row" style="margin-top:8px"><span class="btn ghost">Planos PDF</span><span class="btn ghost">Archivo CAD</span></div>
               <span class="mono muted">Descarga con correo y celular.</span>
               <i class="pin">3</i>
             </div>
             <div style="position:relative">
               <div class="blk-title"><h3>Paso a paso</h3><small>con video por paso</small></div>
-              <div class="steps">
-                <div><span><b>Base y nivelado</b><span>Replantear, compactar y colocar el piso Pavic.</span></span></div>
-                <div><span><b>Muros laterales</b><span>Ladrillo 6 huecos con mortero, hiladas a nivel.</span></span></div>
-                <div><span><b>Cámara refractaria</b><span>Refractario y mortero refractario en el interior.</span></span></div>
-                <div><span><b>Parrilla y soportes</b><span>Altura de cocción regulable.</span></span></div>
-                <div><span><b>Chimenea</b><span>Tiro, remate y revisión de humo.</span></span></div>
-                <div><span><b>Acabado y curado</b><span>Enchape o pintura y secado antes del primer fuego.</span></span></div>
-              </div>
+              <div class="steps" id="pjSteps"></div>
               <i class="pin">4</i>
             </div>
           </div>
@@ -650,6 +635,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
         <li><div><b>Planos con captación</b><span>El plano se ve en pantalla. La descarga en PDF o CAD pide correo y celular.</span></div></li>
         <li><div><b>Pasos con video</b><span>Cada paso puede llevar un video corto. Sirve a constructores y a dueños de casa.</span></div></li>
         <li><div><b>Servicio</b><span>Para quien no quiere construirlo: presupuesto con instalación o un maestro de la zona. Abre una conversación de venta.</span></div></li>
+        <li><div><b>Una plantilla, muchos proyectos</b><span>Cambia entre churrasquero, mesón y pared con enchape arriba de la pantalla. La página es la misma: solo cambian los datos, el plano y los pasos. Cada proyecto nuevo cuesta el contenido, no el diseño.</span></div></li>
       </ol>
       <p class="muted">Las cantidades y medidas son de ejemplo para el wireframe. Antes de publicar, las valida el equipo técnico de INCERPAZ.</p>
     </div>
@@ -821,6 +807,100 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     </div>
   </section>
 
+  <!-- ============ CATEGORÍA TECHOS ============ -->
+  <section class="view" id="v-techos" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" class="asbtn" data-as="visit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/productos/techos</span></div>
+      <div class="canvas">
+        <div class="blk"><span class="mono muted">Inicio › Productos › Techos y tejados</span></div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+              <h2 style="font-size:clamp(32px,5vw,46px)">Techos y tejados</h2>
+              <p class="muted">Tejas cerámicas para techos nuevos y para renovar. Calcula cuántas necesitas según la superficie y la pendiente.</p>
+              <div class="row"><a class="btn primary" href="#techos" onclick="return false">Pedir presupuesto</a><a class="btn" href="#techos" onclick="return false">WhatsApp de mi ciudad</a></div>
+              <i class="pin">1</i>
+            </div>
+            <div class="card flat" style="position:relative">
+              <span class="chip lock" style="align-self:flex-start">Marca en preparación</span>
+              <b>Una marca propia para las tejas <i class="pin in" title="Pendiente">!</i></b>
+              <span class="sub">Cuando exista nombre y logo, esta categoría pasa a una portada como la de PAVIC, con la misma plantilla.</span>
+              <i class="pin">2</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Modelos</h3><small>del catálogo actual</small></div>
+          <div class="grid">
+            <div class="card"><div class="ph" style="min-height:100px"><b>foto</b></div><b>Teja colonial 36</b><span class="chip lock" style="align-self:flex-start">Precio con sesión</span></div>
+            <div class="card"><div class="ph" style="min-height:100px"><b>foto</b></div><b>Teja andina</b><span class="chip lock" style="align-self:flex-start">Precio con sesión</span></div>
+            <div class="card"><div class="ph" style="min-height:100px"><b>foto</b></div><b>Otros modelos y accesorios</b><span class="sub">Hay 6 productos en la categoría actual</span></div>
+          </div>
+          <i class="pin">3</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Calculadora de tejas</h3><small>superficie real según la pendiente</small></div>
+          <div class="split">
+            <div class="grid">
+              <label class="field" for="tkArea">Área en planta (m²)<input id="tkArea" type="number" min="0" step="1" value="80"></label>
+              <label class="field" for="tkPend">Pendiente (%)<input id="tkPend" type="number" min="0" step="1" value="35"></label>
+              <label class="field" for="tkModel">Modelo<select id="tkModel"><option value="16">Teja colonial 36</option><option value="14">Teja andina</option></select></label>
+              <label class="field" for="tkMerma">Merma<select id="tkMerma"><option value="0.05">5 %</option><option value="0.08" selected>8 %</option><option value="0.1">10 %</option></select></label>
+            </div>
+            <div class="grid">
+              <div class="out" id="tkSup">0<small>m² de techo real</small></div>
+              <div class="out" id="tkPzas">0<small>tejas</small></div>
+              <div class="out" id="tkCost">x<small>costo de lista, ejemplo</small></div>
+            </div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">La superficie real es el área en planta por √(1 + pendiente²). Las tejas por m² (16 y 14) y el precio son de ejemplo. La pendiente mínima de cada modelo sale de su ficha técnica, por confirmar.</span>
+          <i class="pin">4</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="position:relative">
+              <div class="blk-title"><h3>Cómo instalar un techo</h3><small>guía con video, por producir</small></div>
+              <div class="steps">
+                <div><span><b>Estructura y pendiente</b><span>Verificar listones y caída antes de colocar.</span></span></div>
+                <div><span><b>Replanteo de hiladas</b><span>Marcar las líneas guía de abajo hacia arriba.</span></span></div>
+                <div><span><b>Colocado y traslape</b><span>Según el modelo y la pendiente.</span></span></div>
+                <div><span><b>Caballetes y remates</b><span>Cumbrera, limatesas y bordes.</span></span></div>
+                <div><span><b>Revisión y mantenimiento</b><span>Limpieza de canales y teja suelta.</span></span></div>
+              </div>
+              <i class="pin">5</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <div class="blk-title" style="margin:0"><h3>Descargas</h3></div>
+              <div class="card"><b>Fichas técnicas</b><span class="sub">Por modelo</span></div>
+              <div class="card"><b>Manual de instalación</b><span class="sub">PDF y video</span></div>
+              <div class="card"><b>Galería de techos</b><span class="sub">Obras terminadas por ciudad</span></div>
+              <i class="pin">6</i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la categoría Techos</h2>
+      <ol class="notes">
+        <li><div><b>Portada simple</b><span>Sin marca propia, la categoría usa la plantilla estándar de catálogo. Los dos botones de siempre: presupuesto y WhatsApp.</span></div></li>
+        <li><div><b>Espacio para la marca futura</b><span>El pin amarillo marca la decisión pendiente: nombre, logo y registro de la marca de tejas.</span></div></li>
+        <li><div><b>Modelos con precio con sesión</b><span>Colonial 36 y Andina salen del catálogo de Exportaciones. Los demás se completan con ventas.</span></div></li>
+        <li><div><b>Calculadora</b><span>Prueba el prototipo: cambia el área o la pendiente y ve la superficie real y las tejas. El costo aparece al cambiar a "Cliente verificado".</span></div></li>
+        <li><div><b>Guía de instalación</b><span>Atrae búsquedas ("cómo instalar tejas") y reduce reclamos por mala colocación.</span></div></li>
+        <li><div><b>Descargas</b><span>Las fichas piden correo, igual que en el resto del sitio.</span></div></li>
+      </ol>
+      <p class="muted">Los rendimientos, precios y pasos son de ejemplo. Los valida el equipo técnico de INCERPAZ.</p>
+    </div>
+  </section>
+
   <!-- ============ CUENTA DEL CONSTRUCTOR ============ -->
   <section class="view" id="v-constructor" hidden>
     <div class="toolbar">
@@ -840,7 +920,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
             <div class="split">
               <div style="display:flex;flex-direction:column;gap:12px;position:relative">
                 <h2 style="font-size:clamp(32px,5vw,46px)">Crea tu cuenta</h2>
-                <p class="muted">Con una cuenta verificada ves los precios de tu ciudad, guardas presupuestos por obra, repites pedidos y sumas puntos.</p>
+                <p class="muted">Con una cuenta verificada ves los precios de tu ciudad, guardas presupuestos por obra, repites pedidos y, cuando exista el programa, sumas puntos.</p>
                 <div class="grid">
                   <label class="field">Soy<select><option>Constructor independiente</option><option>Empresa constructora</option><option>Ferretería o distribuidor</option><option>Entidad pública</option><option>Proyectista o calculista</option><option>Dueño de casa</option></select></label>
                   <label class="field">Nombre o razón social<input type="text" placeholder="Nombre o razón social"></label>
@@ -887,7 +967,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
               <div><span class="chip" style="border-color:var(--ok);color:var(--ok)">Cliente verificado</span><h2 style="font-size:34px;margin-top:6px">Constructora Ejemplo S.R.L.</h2><span class="mono muted">Cochabamba · cuenta de ejemplo</span></div>
               <div class="grid" style="flex:1 1 320px;max-width:520px">
                 <div class="card"><b>Mi ejecutivo</b><span class="sub">Por asignar</span><span class="btn" style="align-self:flex-start">WhatsApp</span></div>
-                <div class="card"><b>Puntos</b><span class="out" style="font-size:28px">1.240<small>nivel y premios por definir</small></span></div>
+                <div class="card"><b>Puntos <i class="pin in" title="Pendiente">!</i></b><span class="out" style="font-size:28px">1.240<small>programa por definir</small></span></div>
               </div>
               <i class="pin">4</i>
             </div>
@@ -943,8 +1023,8 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
               <div class="card"><b>Precios de mi ciudad</b><span class="sub">Lista completa, descargable</span></div>
               <div class="card"><b>Documentos favoritos</b><span class="sub">Fichas, certificados, manuales</span></div>
               <div class="card"><b>Calculadoras</b><span class="sub">Piezas, muros, pavimentos</span></div>
-              <div class="card"><b>Puntos y premios</b><span class="sub">Historial y canje</span></div>
-              <div class="card"><b>Estado de cuenta</b><span class="sub">Facturas y saldos. Fase 2, requiere conectar el ERP</span></div>
+              <div class="card"><b>Puntos y premios <i class="pin in" title="Pendiente">!</i></b><span class="sub">Historial y canje. Programa pendiente</span></div>
+              <div class="card"><b>Mis facturas</b><span class="sub">Facturas de mis compras. Fase 2, requiere conectar el ERP</span></div>
               <div class="card"><b>Mis datos</b><span class="sub">Contactos y direcciones de entrega</span></div>
             </div>
             <i class="pin">8</i>
@@ -963,9 +1043,9 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
         <li><div><b>Presupuesto en curso</b><span>Prueba el prototipo: cambia cantidades y ve el total. Es la pieza central: del presupuesto sale el pedido o el envío al ejecutivo.</span></div></li>
         <li><div><b>Obras</b><span>Un constructor trabaja por obra. Agrupar presupuestos y pedidos por obra evita rehacer listas.</span></div></li>
         <li><div><b>Pedidos con estado y recompra</b><span>Repetir un pedido en un clic es lo que más ahorra tiempo en obras que se repiten.</span></div></li>
-        <li><div><b>Atajos</b><span>El estado de cuenta y las facturas dependen de conectar el ERP, así que van a una segunda fase.</span></div></li>
+        <li><div><b>Atajos</b><span>Las facturas dependen de conectar el ERP, así que van a una segunda fase. Sin línea de crédito, la cuenta no muestra saldos ni cupos.</span></div></li>
       </ol>
-      <p class="muted">Precios, totales, puntos y nombres son de ejemplo. Falta definir las reglas del programa de puntos y si hay línea de crédito por cliente.</p>
+      <p class="muted">Precios, totales, puntos y nombres son de ejemplo. El programa de puntos está pendiente (pin amarillo "!"): falta decidir si existe, y con qué premios y niveles.</p>
     </div>
   </section>
 
@@ -1102,7 +1182,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
 
 <script>
 (function () {
-  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'constructor', 'donde'];
+  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'techos', 'constructor', 'donde'];
   function show() {
     var h = (location.hash || '').replace('#', '');
     if (tabs.indexOf(h) < 0) h = 'plataforma';
@@ -1149,17 +1229,63 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     b.addEventListener('click', function () { setClient(b.getAttribute('data-as') === 'client'); });
   });
 
-  /* lista de materiales */
-  var items = [
-    ['Ladrillo 6 huecos económico rayado', 'INCERPAZ', 380, 'pzas', 0, 1.2],
-    ['Refractario para cámara', 'INCERPAZ', 90, 'pzas', 0, 4.5],
-    ['Pavic estándar (base)', 'INCERPAZ', 60, 'pzas', 0, 1.85],
-    ['Mortero refractario 25 kg', 'Complemento', 4, 'sacos', 0, 85],
-    ['Cemento 50 kg', 'Complemento', 6, 'sacos', 0, 62],
-    ['Arena fina', 'Complemento', 0.8, 'm³', 1, 150],
-    ['Parrilla de hierro', 'Complemento', 1, 'un.', 0, 320]
-  ];
-  var scale = 1;
+  /* proyectos: una plantilla, tres proyectos */
+  function fmt(n) { return n.toFixed(2).replace('.', ','); }
+  function lines(rows) { return rows.map(function (r) { return '<line x1="' + r[0] + '" y1="' + r[1] + '" x2="' + r[2] + '" y2="' + r[3] + '" stroke="currentColor" stroke-width="' + (r[4] || 1.5) + '"' + (r[5] ? ' stroke-dasharray="4 3"' : '') + '/>'; }).join(''); }
+  function box(x, y, w, h) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="none" stroke="currentColor" stroke-width="1.5"/>'; }
+  var P = {
+    churrasquero: {
+      url: 'incerpaz.com/proyectos/churrasquero-de-patio', crumb: 'Churrasquero de patio', hero: 'foto: churrasquero terminado',
+      title: 'Churrasquero de patio', desc: 'Cámara de cocción con refractario, base de piso cerámico y parrilla de hierro.',
+      chips: ['Dificultad media', '2 días', '2 personas', 'Exterior'],
+      sizes: [['Pequeño', .7], ['Mediano', 1], ['Grande', 1.4]],
+      dims: function (k) { return 'Medidas: ' + fmt(1.8 * k) + ' m de ancho × ' + fmt(.6 * Math.max(k, .9)) + ' m de fondo × ' + fmt(2.1 * (k === 1.4 ? 1.1 : k === .7 ? .9 : 1)) + ' m de alto'; },
+      svg: function (k) {
+        return '<svg viewBox="0 0 320 210" width="100%" role="img" aria-label="Plano esquemático frontal del churrasquero con medidas">' + box(20, 170, 200, 22) + box(34, 80, 172, 90) +
+          '<path d="M62 170 V110 Q62 92 80 92 H160 Q178 92 178 110 V170" fill="none" stroke="currentColor" stroke-width="1.5"/>' + lines([[62, 132, 178, 132, 1.5, 1], [20, 204, 220, 204, 1], [238, 20, 238, 192, 1]]) + box(94, 20, 52, 60) +
+          '<text x="104" y="201">' + fmt(1.8 * k) + ' m</text><text x="244" y="108">' + fmt(2.1 * (k === 1.4 ? 1.1 : k === .7 ? .9 : 1)) + ' m</text><text x="108" y="128">cámara</text><text x="100" y="146">parrilla</text><text x="100" y="52">chimenea</text></svg>';
+      },
+      steps: [['Base y nivelado', 'Replantear, compactar y colocar el piso Pavic.'], ['Muros laterales', 'Ladrillo 6 huecos con mortero, hiladas a nivel.'], ['Cámara refractaria', 'Refractario y mortero refractario en el interior.'], ['Parrilla y soportes', 'Altura de cocción regulable.'], ['Chimenea', 'Tiro, remate y revisión de humo.'], ['Acabado y curado', 'Enchape o pintura y secado antes del primer fuego.']],
+      items: [
+        ['Ladrillo 6 huecos económico rayado', 'INCERPAZ', 380, 'pzas', 0, 1.2], ['Refractario para cámara', 'INCERPAZ', 90, 'pzas', 0, 4.5], ['Pavic estándar (base)', 'INCERPAZ', 60, 'pzas', 0, 1.85],
+        ['Mortero refractario 25 kg', 'Complemento', 4, 'sacos', 0, 85], ['Cemento 50 kg', 'Complemento', 6, 'sacos', 0, 62], ['Arena fina', 'Complemento', 0.8, 'm³', 1, 150], ['Parrilla de hierro', 'Complemento', 1, 'un.', 0, 320]]
+    },
+    meson: {
+      url: 'incerpaz.com/proyectos/meson-de-cocina', crumb: 'Mesón de cocina', hero: 'foto: mesón terminado',
+      title: 'Mesón de cocina con base de ladrillo', desc: 'Base de ladrillo, frente con enchape y tope sobre losa. Sirve para cocina interior o para un parrillero exterior.',
+      chips: ['Dificultad media', '3 días', '2 personas', 'Interior o exterior'],
+      sizes: [['Pequeño', .7], ['Mediano', 1], ['Grande', 1.4]],
+      dims: function (k) { return 'Medidas: ' + fmt(1.8 * k) + ' m de largo × 0,60 m de fondo × 0,90 m de alto'; },
+      svg: function (k) {
+        return '<svg viewBox="0 0 320 210" width="100%" role="img" aria-label="Plano esquemático frontal del mesón con medidas">' + box(20, 60, 240, 14) + box(34, 74, 46, 108) + box(200, 74, 46, 108) + box(20, 182, 240, 8) +
+          lines([[80, 130, 200, 130, 1.5, 1], [20, 204, 260, 204, 1], [282, 60, 282, 190, 1]]) +
+          '<text x="108" y="54">tope sobre losa</text><text x="116" y="126">repisa</text><text x="37" y="132">enchape</text><text x="203" y="132">enchape</text><text x="124" y="201">' + fmt(1.8 * k) + ' m</text><text x="288" y="130">0,90 m</text></svg>';
+      },
+      steps: [['Replanteo y base', 'Marcar el trazado y preparar el contrapiso.'], ['Muros de soporte', 'Ladrillo 6 huecos con mortero, a plomo y nivel.'], ['Losa de tope', 'Encofrado, fierro y vaciado de la losa.'], ['Enchape del frente', 'Adhesivo y colocado del Brick enchape.'], ['Fraguado y limpieza', 'Juntas parejas y limpieza antes de que seque.'], ['Sellado', 'Sellador hidrorrepelente en el enchape.']],
+      items: [
+        ['Ladrillo 6 huecos económico rayado', 'INCERPAZ', 220, 'pzas', 0, 1.2], ['Brick enchape ancho (frente)', 'INCERPAZ', 90, 'pzas', 0, 2.2],
+        ['Cemento 50 kg', 'Complemento', 4, 'sacos', 0, 62], ['Arena fina', 'Complemento', 0.6, 'm³', 1, 150], ['Adhesivo cerámico 25 kg', 'Complemento', 3, 'sacos', 0, 70],
+        ['Fragua 5 kg', 'Complemento', 2, 'bolsas', 0, 35], ['Fierro de 8 mm', 'Complemento', 8, 'barras', 0, 38], ['Losa de tope', 'Complemento', 1, 'un.', 0, 450]]
+    },
+    pared: {
+      url: 'incerpaz.com/proyectos/pared-con-enchape', crumb: 'Pared con enchape', hero: 'foto: pared enchapada',
+      title: 'Pared con enchape de ladrillo', desc: 'Revestimiento de ladrillo visto sobre una pared existente, con esquineros y sellado.',
+      chips: ['Dificultad baja', '1 a 2 días', '1 a 2 personas', 'Interior o exterior'],
+      sizes: [['5 m²', .5], ['10 m²', 1], ['20 m²', 2]],
+      dims: function (k) { return 'Superficie: ' + (10 * k) + ' m² (ejemplo: ' + fmt(4 * k) + ' m de largo × 2,50 m de alto)'; },
+      svg: function (k) {
+        var w = 240, h = 150, rows = '', r, x, off;
+        for (r = 0; r < h / 12; r++) { off = r % 2 ? 18 : 0; for (x = -off; x < w; x += 36) { var x0 = Math.max(0, x), x1 = Math.min(w, x + 36); rows += '<rect x="' + (20 + x0) + '" y="' + (20 + r * 12) + '" width="' + (x1 - x0) + '" height="12" fill="none" stroke="currentColor" stroke-width=".6" opacity=".55"/>'; } }
+        return '<svg viewBox="0 0 320 210" width="100%" role="img" aria-label="Plano esquemático de la pared enchapada con medidas">' + rows + box(20, 20, w, 12 * Math.floor(h / 12)) +
+          lines([[20, 196, 260, 196, 1], [280, 20, 280, 164, 1]]) + '<text x="118" y="206">' + fmt(4 * k) + ' m</text><text x="286" y="96">2,50 m</text></svg>';
+      },
+      steps: [['Preparar la superficie', 'Limpiar, reparar y dejar la pared firme y seca.'], ['Trazar niveles', 'Línea guía horizontal para la primera hilada.'], ['Aplicar el adhesivo', 'Por paños pequeños con llana dentada.'], ['Colocar el enchape', 'Desde abajo, con esquineros en las esquinas.'], ['Fraguar las juntas', 'Relleno parejo y limpieza.'], ['Sellar', 'Sellador hidrorrepelente para exteriores.']],
+      items: [
+        ['Brick enchape ancho', 'INCERPAZ', 450, 'pzas', 0, 2.2], ['Esquineros (piezas especiales)', 'INCERPAZ', 12, 'pzas', 0, 3.5],
+        ['Adhesivo cerámico 25 kg', 'Complemento', 3, 'sacos', 0, 70], ['Fragua 5 kg', 'Complemento', 2, 'bolsas', 0, 35], ['Sellador hidrorrepelente', 'Complemento', 2, 'galones', 0, 120]]
+    }
+  };
+  var proj = 'churrasquero', scale = 1, items = P.churrasquero.items;
   function renderBom() {
     var total = 0, html = '';
     items.forEach(function (r) {
@@ -1173,15 +1299,34 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     document.getElementById('bomChip').textContent = client ? 'Cliente verificado' : 'Precios con sesión';
     document.getElementById('bomNote').textContent = client ? 'Precios de ejemplo para Cochabamba.' : 'Ingresa para ver costos de tu ciudad. Las cantidades se ven siempre.';
   }
-  document.querySelectorAll('[data-size]').forEach(function (b) {
-    b.addEventListener('click', function () {
-      scale = parseFloat(b.getAttribute('data-size'));
-      document.querySelectorAll('[data-size]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
-      var w = (1.8 * scale).toFixed(2).replace('.', ','), d = (0.6 * Math.max(scale, .9)).toFixed(2).replace('.', ','), hh = (2.1 * (scale === 1.4 ? 1.1 : scale === .7 ? .9 : 1)).toFixed(2).replace('.', ',');
-      document.getElementById('dims').textContent = 'Medidas: ' + w + ' m de ancho × ' + d + ' m de fondo × ' + hh + ' m de alto';
-      renderBom();
-    });
+  function drawProj() {
+    var d = P[proj];
+    document.getElementById('dims').textContent = d.dims(scale);
+    document.getElementById('pjPlan').innerHTML = d.svg(scale);
+    renderBom();
+  }
+  function loadProj(k) {
+    proj = k; var d = P[k]; items = d.items; scale = 1;
+    document.getElementById('pjUrl').textContent = d.url;
+    document.getElementById('pjCrumb').textContent = 'Inicio › Proyectos › ' + d.crumb;
+    document.getElementById('pjHero').textContent = d.hero;
+    document.getElementById('pjTitle').textContent = d.title;
+    document.getElementById('pjDesc').textContent = d.desc;
+    document.getElementById('pjChips').innerHTML = d.chips.map(function (c) { return '<span class="chip">' + c + '</span>'; }).join('');
+    document.getElementById('pjSizes').innerHTML = d.sizes.map(function (z) { return '<button type="button" data-size="' + z[1] + '" aria-pressed="' + (z[1] === 1) + '">' + z[0] + '</button>'; }).join('');
+    document.getElementById('pjSteps').innerHTML = d.steps.map(function (t) { return '<div><span><b>' + t[0] + '</b><span>' + t[1] + '</span></span></div>'; }).join('');
+    document.querySelectorAll('[data-proj]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-proj') === k)); });
+    drawProj();
+  }
+  document.querySelectorAll('[data-proj]').forEach(function (b) { b.addEventListener('click', function () { loadProj(b.getAttribute('data-proj')); }); });
+  document.getElementById('pjSizes').addEventListener('click', function (e) {
+    var z = e.target.getAttribute && e.target.getAttribute('data-size');
+    if (z === null || z === undefined) return;
+    scale = parseFloat(z);
+    document.querySelectorAll('#pjSizes button').forEach(function (o) { o.setAttribute('aria-pressed', String(o === e.target)); });
+    drawProj();
   });
+  loadProj('churrasquero');
   setClient(false);
 
   /* dónde estamos: [nombre, tipo, dirección, teléfono, whatsapp, revisar] */
@@ -1310,6 +1455,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   function refreshClient() {
     var pz = document.getElementById('pvCost');
     if (pz && pm) pcalc();
+    if (typeof tkA !== 'undefined' && tkA) tcalc();
   }
   var cnItems = [['Pavic estándar', 1.85, 4000], ['Ladrillo 6 huecos económico rayado', 1.2, 3000], ['Refractario para cámara', 4.5, 120]];
   var cnQ = cnItems.map(function (r) { return r[2]; });
@@ -1337,6 +1483,17 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       document.getElementById('cnUrl').textContent = k === 'reg' ? 'incerpaz.com/registro' : 'incerpaz.com/mi-cuenta';
     });
   });
+
+  /* techos */
+  var tkA = document.getElementById('tkArea'), tkP = document.getElementById('tkPend'), tkM = document.getElementById('tkModel'), tkMe = document.getElementById('tkMerma');
+  function tcalc() {
+    var a = Math.max(0, parseFloat(tkA.value) || 0), pd = Math.max(0, parseFloat(tkP.value) || 0) / 100;
+    var sup = a * Math.sqrt(1 + pd * pd), n = Math.ceil(sup * parseFloat(tkM.value) * (1 + parseFloat(tkMe.value)));
+    document.getElementById('tkSup').firstChild.nodeValue = (Math.round(sup * 10) / 10).toLocaleString('es-BO');
+    document.getElementById('tkPzas').firstChild.nodeValue = n.toLocaleString('es-BO');
+    document.getElementById('tkCost').firstChild.nodeValue = client ? 'Bs ' + Math.round(n * 3.1).toLocaleString('es-BO') : 'Con sesión';
+  }
+  [tkA, tkP].forEach(function (e) { e.addEventListener('input', tcalc); }); [tkM, tkMe].forEach(function (e) { e.addEventListener('change', tcalc); }); tcalc();
 
   /* tema */
   var modes = ['auto', 'light', 'dark'], mi = 0, tb = document.getElementById('themeBtn');
