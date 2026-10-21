@@ -1,0 +1,697 @@
+<title>Wireframes INCERPAZ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Concepto: planos de obra. Papel de concreto frío, líneas de plano, rojo INCERPAZ solo en lo que convierte (leads, presupuesto, login). Amarillo solo para los pines de anotación. */
+:root {
+  --bg: #e9ebee;
+  --surface: #ffffff;
+  --surface-2: #f3f4f6;
+  --line: #c3c8cf;
+  --line-strong: #8d95a0;
+  --fg: #1a1d22;
+  --muted: #5b626d;
+  --accent: #b5121b;
+  --accent-ink: #ffffff;
+  --pin: #f2b705;
+  --pin-ink: #1a1d22;
+  --ok: #1f7a4d;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171b; --surface: #1d2127; --surface-2: #262b32; --line: #3a414a; --line-strong: #6b7480;
+    --fg: #eceef1; --muted: #9ba3ae; --accent: #e5484d; --accent-ink: #14171b; --pin: #f2b705; --pin-ink: #14171b; --ok: #4cc38a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171b; --surface: #1d2127; --surface-2: #262b32; --line: #3a414a; --line-strong: #6b7480;
+  --fg: #eceef1; --muted: #9ba3ae; --accent: #e5484d; --accent-ink: #14171b; --pin: #f2b705; --pin-ink: #14171b; --ok: #4cc38a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-block: 20px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: .01em; text-wrap: balance; margin: 0; line-height: 1.05; }
+h1 { font-size: clamp(34px, 6vw, 52px); text-transform: uppercase; }
+h2 { font-size: 28px; text-transform: uppercase; }
+h3 { font-size: 20px; }
+p { margin: 0; }
+.mono { font-family: var(--mono); font-size: 12px; }
+.muted { color: var(--muted); }
+
+/* encabezado de la lámina */
+.sheet-head { display: flex; flex-wrap: wrap; gap: 14px 24px; justify-content: space-between; align-items: end; border-bottom: 2px solid var(--fg); padding-bottom: 14px; }
+.sheet-head p { max-width: 58ch; color: var(--muted); margin-top: 8px; }
+.stamp { font-family: var(--mono); font-size: 11px; line-height: 1.6; text-align: right; color: var(--muted); }
+.stamp b { color: var(--fg); font-weight: 500; }
+
+nav.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+nav.tabs a {
+  font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: .04em; text-transform: uppercase;
+  padding: 7px 16px; border: 1.5px solid var(--line-strong); color: var(--fg); text-decoration: none; background: var(--surface);
+}
+nav.tabs a[aria-current="page"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+nav.tabs a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--pin); outline-offset: 2px; }
+
+section.view[hidden] { display: none; }
+.view { display: flex; flex-direction: column; gap: 22px; }
+
+/* marco de navegador */
+.wf { background: var(--surface); border: 1.5px solid var(--line-strong); }
+.chrome { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-bottom: 1.5px solid var(--line-strong); background: var(--surface-2); }
+.chrome i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
+.chrome span { margin-left: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line); background: var(--surface); padding: 2px 10px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.canvas { display: flex; flex-direction: column; }
+.blk { padding: 18px; border-bottom: 1px dashed var(--line); position: relative; }
+.blk:last-child { border-bottom: 0; }
+.blk-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.blk-title small { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.grid.g2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.grid.g3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.split { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: start; }
+
+/* imagen de relleno */
+.ph {
+  position: relative; border: 1.5px solid var(--line-strong); background: var(--surface-2); min-height: 120px;
+  background-image: linear-gradient(to top right, transparent calc(50% - .75px), var(--line) calc(50% - .75px), var(--line) calc(50% + .75px), transparent calc(50% + .75px)),
+                    linear-gradient(to bottom right, transparent calc(50% - .75px), var(--line) calc(50% - .75px), var(--line) calc(50% + .75px), transparent calc(50% + .75px));
+  display: flex; align-items: flex-end; padding: 8px;
+}
+.ph b { font-family: var(--mono); font-weight: 400; font-size: 11px; background: var(--surface); border: 1px solid var(--line); padding: 2px 6px; color: var(--muted); }
+.ph.tall { min-height: 260px; } .ph.hero { min-height: 240px; }
+
+/* piezas de interfaz */
+.btn { display: inline-flex; align-items: center; gap: 6px; font: 600 14px var(--body); padding: 9px 16px; border: 1.5px solid var(--fg); background: var(--surface); color: var(--fg); cursor: pointer; text-decoration: none; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.ghost { border-style: dashed; border-color: var(--line-strong); color: var(--muted); }
+.btn.wide { width: 100%; justify-content: center; }
+.chip { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line-strong); padding: 2px 8px; color: var(--muted); background: var(--surface); white-space: nowrap; }
+.chip.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.chip.lock { border-color: var(--accent); color: var(--accent); }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); font-family: var(--mono); }
+.field input, .field select { font: 400 14px var(--body); color: var(--fg); background: var(--surface); border: 1.5px solid var(--line-strong); padding: 8px 10px; min-width: 0; width: 100%; }
+.bar { height: 10px; background: var(--line); width: 100%; } .bar.s { width: 60%; } .bar.xs { width: 35%; }
+.card { border: 1.5px solid var(--line-strong); background: var(--surface); padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card.flat { border-color: var(--line); background: var(--surface-2); }
+.card h3 { font-size: 19px; }
+.card .sub { font-size: 13px; color: var(--muted); }
+.logo { font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: .06em; color: var(--accent); border: 2px solid var(--accent); padding: 0 8px; line-height: 1.2; }
+.nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-weight: 500; font-size: 14px; }
+.nav span { padding-block: 2px; border-bottom: 2px solid transparent; }
+.nav span.on { border-color: var(--accent); }
+.util { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; padding: 8px 18px; background: var(--fg); color: var(--bg); font-size: 12px; }
+.util select { font: 500 12px var(--body); background: transparent; color: inherit; border: 1px solid currentColor; padding: 2px 6px; }
+.util select option { color: #1a1d22; }
+.locked { position: relative; user-select: none; }
+.locked .dots { letter-spacing: .15em; color: var(--muted); }
+
+/* pines de anotación */
+.pin { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--pin); color: var(--pin-ink); font: 600 12px var(--mono); display: grid; place-items: center; font-style: normal; box-shadow: 0 0 0 2px var(--surface); z-index: 2; }
+.pin.in { position: static; flex: none; box-shadow: none; }
+ol.notes { list-style: none; margin: 0; padding: 0; counter-reset: n; display: grid; gap: 10px 28px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+ol.notes li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; font-size: 14px; }
+ol.notes li::before { counter-increment: n; content: counter(n); width: 22px; height: 22px; border-radius: 50%; background: var(--pin); color: var(--pin-ink); font: 600 12px var(--mono); display: grid; place-items: center; margin-top: 1px; }
+ol.notes li b { display: block; font-weight: 600; }
+ol.notes li span { color: var(--muted); }
+.panel { background: var(--surface); border: 1.5px solid var(--line-strong); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.panel > h2 { border-bottom: 1.5px solid var(--line); padding-bottom: 8px; }
+
+/* tablas */
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1.5px solid var(--line-strong); white-space: nowrap; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.specs td:first-child { color: var(--muted); width: 42%; }
+
+/* arquitectura */
+.stack { display: grid; gap: 8px; }
+.layer { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: 14px; border: 1.5px solid var(--line-strong); background: var(--surface); padding: 12px 14px; align-items: start; }
+.layer b { font-family: var(--display); font-size: 20px; text-transform: uppercase; letter-spacing: .03em; line-height: 1.1; }
+.layer.core { border-color: var(--accent); }
+.layer p { font-size: 14px; color: var(--muted); }
+.layer p strong { color: var(--fg); font-weight: 600; }
+@media (max-width: 560px) { .layer { grid-template-columns: 1fr; gap: 4px; } }
+.tag-reco { font-family: var(--mono); font-size: 11px; background: var(--accent); color: var(--accent-ink); padding: 2px 8px; margin-left: 8px; vertical-align: middle; text-transform: uppercase; letter-spacing: .05em; }
+
+.seg { display: inline-flex; border: 1.5px solid var(--fg); }
+.seg button { font: 500 13px var(--body); padding: 6px 14px; border: 0; background: var(--surface); color: var(--fg); cursor: pointer; }
+.seg button + button { border-left: 1.5px solid var(--fg); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+.out { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.out small { font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--muted); display: block; margin-top: 4px; letter-spacing: 0; }
+.steps { display: grid; gap: 10px; counter-reset: s; }
+.steps div { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; }
+.steps div::before { counter-increment: s; content: counter(s); font-family: var(--display); font-weight: 700; font-size: 20px; width: 34px; height: 34px; border: 1.5px solid var(--fg); display: grid; place-items: center; }
+.steps b { font-weight: 600; display: block; } .steps span { font-size: 13px; color: var(--muted); }
+svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
+.theme-btn { font: 500 12px var(--mono); background: var(--surface); color: var(--fg); border: 1px solid var(--line-strong); padding: 4px 10px; cursor: pointer; }
+@media (prefers-reduced-motion: no-preference) { .btn, nav.tabs a { transition: background .15s, color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="sheet-head">
+    <div>
+      <h1>Wireframes INCERPAZ</h1>
+      <p>Tres pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
+    </div>
+    <div class="stamp">
+      <div><b>Lámina</b> 01 · borrador para revisión</div>
+      <div><b>Precios</b> solo con sesión iniciada</div>
+      <div><b>Ciudad</b> selector en el encabezado</div>
+      <button class="theme-btn" id="themeBtn" type="button">Tema: auto</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Pantallas">
+    <a href="#plataforma" data-tab="plataforma">Plataforma</a>
+    <a href="#home" data-tab="home">Home</a>
+    <a href="#ficha" data-tab="ficha">Ficha de producto</a>
+    <a href="#proyecto" data-tab="proyecto">Proyecto churrasquero</a>
+  </nav>
+
+  <!-- ============ PLATAFORMA ============ -->
+  <section class="view" id="v-plataforma" hidden>
+    <div class="panel">
+      <h2>Qué copiamos de Toyota y Coca-Cola</h2>
+      <p class="muted">Lo que sigue sale de los menús y botones de coca-cola.com/us y toyota.com. Son sitios de marca que convierten con herramientas, no con catálogos.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Lo que hacen</th><th>Dónde lo vi</th><th>Equivalente en INCERPAZ</th></tr></thead>
+          <tbody>
+            <tr><td><b>Configurador</b> (Build &amp; Price) que termina en una cotización</td><td>Toyota: Build, Request a Quote, Payment Estimator</td><td>"Construye tu proyecto": eliges qué construir y los m², sale la lista de materiales y se pide presupuesto</td></tr>
+            <tr><td><b>Encuentra un distribuidor</b> con ofertas locales</td><td>Toyota: Find a Dealer, Local Specials</td><td>Dónde estamos: agencia de tu ciudad, ejecutivo de ventas y WhatsApp de esa agencia</td></tr>
+            <tr><td><b>Folletos y recursos del dueño</b></td><td>Toyota: Brochures, Owners Resources</td><td>Fichas técnicas y manuales por producto, descarga con correo (lead)</td></tr>
+            <tr><td><b>App con recompensas</b></td><td>Coca-Cola: +one App, Start Earning Today</td><td>Programa de constructores: puntos por compra, ofertas y promotor asignado</td></tr>
+            <tr><td><b>Dónde comprar</b> y seguimiento de pedido</td><td>Coca-Cola: Where to Buy, Order Status</td><td>Mismo bloque, más estado de pedido para clientes con cuenta</td></tr>
+            <tr><td><b>Promociones y marca</b> en la misma portada</td><td>Coca-Cola: Promos &amp; Offers, Play Now</td><td>Combos, promos por ciudad y el juego "La Gran Obra" como pieza de marca</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Plataforma recomendada <span class="tag-reco">Headless</span></h2>
+      <p class="muted">Un solo sitio para todas las ciudades, con las herramientas (calculadoras, configurador, presupuesto) hechas a medida. Cada capa se puede cambiar sin rehacer las demás.</p>
+      <div class="stack">
+        <div class="layer"><b>Sitio web</b><p><strong>Next.js.</strong> Páginas rápidas en celular, bien posicionadas en Google y con las calculadoras como componentes propios. Una PWA instalable para constructores sale de la misma base.</p></div>
+        <div class="layer"><b>Contenido</b><p><strong>CMS tipo Sanity o Strapi.</strong> Proyectos, manuales, fichas, blog, agencias y textos. El equipo de marketing edita sin tocar código.</p></div>
+        <div class="layer core"><b>Comercio y precios</b><p><strong>Medusa (open source) o Odoo.</strong> Una región por ciudad, listas de precios por tipo de cliente, cuentas B2B aprobadas, presupuestos y pedidos. Aquí vive la regla "precio solo con login".</p></div>
+        <div class="layer core"><b>Leads y CRM</b><p><strong>HubSpot, Zoho u Odoo CRM.</strong> Cada formulario, descarga y presupuesto crea un lead que se asigna al ejecutivo de la agencia de esa ciudad.</p></div>
+        <div class="layer"><b>WhatsApp</b><p><strong>WhatsApp Business API.</strong> Un número por ciudad, con mensaje prellenado que incluye el producto o proyecto que la persona estaba viendo.</p></div>
+        <div class="layer"><b>Pagos y envíos</b><p>QR, transferencia y tarjeta según lo que ya usan hoy, más integración con CDC para envíos. A validar con el banco y con logística.</p></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Alternativas</h2>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Opción</th><th>A favor</th><th>En contra</th></tr></thead>
+          <tbody>
+            <tr><td><b>Headless</b> (recomendada)</td><td>Máxima libertad para herramientas y diseño. Escala a nuevas ciudades y a exportación.</td><td>Necesita un equipo o agencia de desarrollo. Costo inicial mayor.</td></tr>
+            <tr><td><b>Odoo todo en uno</b></td><td>Inventario, facturación, CRM y tienda en un solo sistema. Buena si hoy no tienen ERP integrado.</td><td>Diseño y herramientas más rígidos. Hay que adaptarse a sus plantillas.</td></tr>
+            <tr><td><b>WordPress + WooCommerce</b> (hoy)</td><td>Ya lo usan y el equipo lo conoce.</td><td>Un sitio por ciudad, plugins sueltos, mantenimiento pesado. Hoy muestra errores técnicos públicos.</td></tr>
+            <tr><td><b>Shopify</b></td><td>Muy rápido de lanzar.</td><td>Precios por login, múltiples ciudades y pagos locales requieren planes altos o apps extra. No lo veo como el mejor ajuste aquí.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">Dato que cambia la recomendación: si ya tienen un ERP que controla inventario y facturación, conviene conectarlo a la capa de comercio y no reemplazarlo.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Regla: precios solo con login</h2>
+      <div class="grid g3">
+        <div class="card"><h3>Visitante</h3><p class="sub">Ve producto, ficha, rendimiento y calculadora. En el precio ve "Ingresa para ver el precio" y puede pedir un presupuesto.</p></div>
+        <div class="card"><h3>Cuenta pendiente</h3><p class="sub">Se registró con nombre, ciudad y tipo (constructor, ferretería, dueño de casa). Un ejecutivo de esa ciudad la aprueba.</p></div>
+        <div class="card"><h3>Cliente verificado</h3><p class="sub">Ve precios de su ciudad, compra, repite pedidos y guarda presupuestos. El registro ya es un lead calificado.</p></div>
+      </div>
+      <p class="muted">Dos cuidados: los precios no deben viajar en el HTML a quien no inició sesión, y las páginas de producto deben seguir indexables para Google.</p>
+    </div>
+  </section>
+
+  <!-- ============ HOME ============ -->
+  <section class="view" id="v-home" hidden>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com</span></div>
+      <div class="canvas">
+        <div class="util">
+          <span>Compra telefónica y servicio al cliente 800-10-8810</span>
+          <span class="row" style="gap:10px">
+            <label for="citySel" class="mono">Tu ciudad</label>
+            <select id="citySel"><option>Cochabamba</option><option>Santa Cruz</option><option>La Paz</option><option>Oruro</option><option>Sucre</option><option>Tarija</option></select>
+            <span class="mono" id="cityWa">WhatsApp +591 7075 0963</span>
+          </span>
+          <i class="pin in">1</i>
+        </div>
+        <div class="blk row" style="justify-content:space-between">
+          <span class="logo">INCERPAZ</span>
+          <div class="nav"><span>Productos</span><span>Proyectos</span><span>Herramientas</span><span>Aprende</span><span>Dónde estamos</span><span>Empresa</span></div>
+          <div class="row"><span class="chip">Buscar</span><span class="chip">Presupuesto (0)</span><a class="btn primary" href="#home" onclick="return false">Ingresar</a></div>
+          <i class="pin">2</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <h2 style="font-size:clamp(34px,6vw,54px)">Construye con cerámica boliviana</h2>
+              <div class="bar"></div><div class="bar s"></div>
+              <div class="row"><a class="btn primary" href="#home" onclick="return false">Construye tu proyecto</a><a class="btn" href="#home" onclick="return false">Pedir presupuesto</a></div>
+              <span class="mono muted">Ladrillos, pisos, techos, revestimientos y refractarios. Desde Cochabamba.</span>
+            </div>
+            <div class="ph hero"><b>foto hero: obra terminada con enchape</b></div>
+          </div>
+          <i class="pin">3</i>
+        </div>
+        <div class="blk">
+          <div class="grid">
+            <div class="card flat"><h3>Calculadora</h3><span class="sub">Piezas por m²</span></div>
+            <div class="card flat"><h3>Presupuesto</h3><span class="sub">Lista y total</span></div>
+            <div class="card flat"><h3>Dónde comprar</h3><span class="sub">Agencia de tu ciudad</span></div>
+            <div class="card flat"><h3>WhatsApp</h3><span class="sub">Un asesor, ahora</span></div>
+          </div>
+          <i class="pin">4</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Productos</h3><small>6 categorías + combos</small></div>
+          <div class="grid">
+            <div class="card"><div class="ph"><b>muros</b></div><h3>Muros</h3></div>
+            <div class="card"><div class="ph"><b>piezas especiales</b></div><h3>Piezas especiales</h3></div>
+            <div class="card"><div class="ph"><b>pisos</b></div><h3>Pisos y pavimentos</h3></div>
+            <div class="card"><div class="ph"><b>techos</b></div><h3>Techos</h3></div>
+            <div class="card"><div class="ph"><b>revestimientos</b></div><h3>Revestimientos</h3></div>
+            <div class="card"><div class="ph"><b>refractarios</b></div><h3>Refractarios</h3></div>
+          </div>
+          <i class="pin">5</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Construye tu proyecto</h3><small>configurador, estilo "Build &amp; Price"</small></div>
+          <div class="grid g3">
+            <div class="card"><span class="mono muted">Paso 1</span><b>¿Qué vas a construir?</b><div class="row"><span class="chip on">Churrasquero</span><span class="chip">Mesón</span><span class="chip">Pared con enchape</span><span class="chip">Piso patio</span></div></div>
+            <div class="card"><span class="mono muted">Paso 2</span><b>Tamaño</b><div class="row"><span class="chip">Pequeño</span><span class="chip on">Mediano</span><span class="chip">Grande</span></div></div>
+            <div class="card"><span class="mono muted">Paso 3</span><b>Resultado</b><div class="bar"></div><div class="bar s"></div><a class="btn primary" href="#proyecto">Ver lista de materiales</a></div>
+          </div>
+          <i class="pin">6</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Proyectos para inspirarte</h3><small>carrusel</small></div>
+          <div class="grid g3">
+            <div class="card"><div class="ph"><b>churrasquero</b></div><b>Churrasquero de patio</b><span class="sub">Dificultad media · 2 días</span></div>
+            <div class="card"><div class="ph"><b>mesón</b></div><b>Mesón de cocina</b><span class="sub">Dificultad media · 3 días</span></div>
+            <div class="card"><div class="ph"><b>pared enchape</b></div><b>Pared con enchape</b><span class="sub">Dificultad baja · 1 día</span></div>
+          </div>
+          <i class="pin">7</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>¿Eres constructor o ferretero?</h3>
+              <span class="sub">Ingresa para ver precios de tu ciudad, repetir pedidos y tener un promotor asignado. Suma puntos en cada compra.</span>
+              <div class="row"><a class="btn primary" href="#home" onclick="return false">Crear cuenta</a><a class="btn" href="#home" onclick="return false">Ingresar</a></div>
+            </div>
+            <div class="grid"><div class="card"><b>Precios</b><span class="sub">de tu ciudad</span></div><div class="card"><b>Recompra</b><span class="sub">en 2 clics</span></div><div class="card"><b>Puntos</b><span class="sub">por compra</span></div></div>
+          </div>
+          <i class="pin">8</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div class="ph tall"><b>mapa de agencias</b></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>Agencia más cercana</h3>
+              <div class="card"><b id="cityName">Cochabamba</b><span class="sub">Av. Circunvalación y Calle Miguel de Cervantes N° 181</span><span class="sub">Horario: por definir</span><a class="btn primary" href="#home" onclick="return false">Escribir por WhatsApp</a></div>
+              <span class="mono muted">8+ agencias solo en Cochabamba. La lista completa vive en "Dónde estamos".</span>
+            </div>
+          </div>
+          <i class="pin">9</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Aprende</h3><small>contenido que atrae búsquedas</small></div>
+          <div class="grid g3">
+            <div class="card"><b>Manual de instalación</b><span class="sub">Por producto, con pasos y herramientas</span></div>
+            <div class="card"><b>Fichas técnicas</b><span class="sub">PDF, se piden con correo</span></div>
+            <div class="card"><b>Videos y revista digital</b><span class="sub">Obras reales y consejos</span></div>
+          </div>
+          <i class="pin">10</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="grid g3">
+            <div class="card"><b>Fábrica y calidad</b><span class="sub">Sistema integrado de gestión</span></div>
+            <div class="card"><b>Exportaciones</b><span class="sub">Español e inglés</span></div>
+            <div class="card"><b>Juega "La Gran Obra"</b><span class="sub">Ladri y la tormenta. Pieza de marca.</span></div>
+          </div>
+          <i class="pin">11</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Pide tu presupuesto</h3><small>formulario corto</small></div>
+          <div class="grid">
+            <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+            <label class="field">Ciudad<select><option>Cochabamba</option></select></label>
+            <label class="field">Soy<select><option>Dueño de casa</option><option>Constructor</option><option>Ferretería</option></select></label>
+            <label class="field">Celular<input type="text" placeholder="7xxxxxxx"></label>
+          </div>
+          <div style="margin-top:12px"><a class="btn primary" href="#home" onclick="return false">Enviar</a></div>
+          <i class="pin">12</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="row" style="justify-content:space-between"><span class="logo">INCERPAZ</span><span class="mono muted">Mapa del sitio · Agencias · Redes · Servicio al cliente 800-10-8810 · Política de privacidad</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la home</h2>
+      <ol class="notes">
+        <li><div><b>Ciudad siempre visible</b><span>Reemplaza la portada actual que era solo un selector. Cambia WhatsApp, agencias y precios, y se recuerda en el navegador.</span></div></li>
+        <li><div><b>Presupuesto e Ingresar en el encabezado</b><span>Los dos botones que convierten están en todas las páginas.</span></div></li>
+        <li><div><b>Hero con dos salidas</b><span>Una para quien quiere inspirarse y otra para quien ya sabe qué necesita.</span></div></li>
+        <li><div><b>Cuatro herramientas arriba</b><span>Inspirado en el acceso rápido de Toyota: lo que la gente viene a hacer, a un clic.</span></div></li>
+        <li><div><b>Categorías actuales</b><span>Se mantienen las 6 del sitio de hoy más combos y promociones por ciudad.</span></div></li>
+        <li><div><b>Configurador</b><span>Tres pasos y llega a la lista de materiales. Es el equivalente de Build &amp; Price.</span></div></li>
+        <li><div><b>Proyectos</b><span>Cada tarjeta lleva a una página con materiales, planos y pasos.</span></div></li>
+        <li><div><b>Banda B2B</b><span>Invita a crear cuenta. Aprobar la cuenta es el primer filtro de lead.</span></div></li>
+        <li><div><b>Agencia más cercana</b><span>Usa la ciudad elegida. Hoy no hay mapa ni WhatsApp por agencia.</span></div></li>
+        <li><div><b>Aprende</b><span>Manuales y fichas hoy no existen. Las descargas piden correo.</span></div></li>
+        <li><div><b>Marca y exportación</b><span>Une lo corporativo en un solo lugar, con el juego como pieza simpática.</span></div></li>
+        <li><div><b>Formulario corto</b><span>Cuatro campos. Entra al CRM asignado al ejecutivo de la ciudad.</span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ FICHA ============ -->
+  <section class="view" id="v-ficha" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" id="asVisit" aria-pressed="true">Visitante</button>
+        <button type="button" id="asClient" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/productos/pisos-y-pavimentos/pavic-estandar</span></div>
+      <div class="canvas">
+        <div class="blk"><span class="mono muted">Inicio › Pisos y pavimentos › Pavic estándar</span></div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="ph tall"><b>foto principal</b></div>
+              <div class="grid" style="grid-template-columns:repeat(4,1fr)"><div class="ph" style="min-height:60px"><b>2</b></div><div class="ph" style="min-height:60px"><b>3</b></div><div class="ph" style="min-height:60px"><b>obra</b></div><div class="ph" style="min-height:60px"><b>video</b></div></div>
+              <i class="pin" style="top:-4px;right:-4px">1</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;position:relative">
+              <div class="row"><span class="chip">PVC STD</span><span class="chip">Línea PAVIC</span><span class="chip">Pisos y pavimentos</span></div>
+              <h2 style="font-size:38px">Pavic estándar</h2>
+              <p class="muted">Cerámica rectangular maciza, rústica en todos los lados y biselada en la cara superior.</p>
+              <div class="card flat" id="priceBox">
+                <div id="priceVisit" style="display:flex;flex-direction:column;gap:8px">
+                  <span class="chip lock" style="align-self:flex-start">Precio con sesión</span>
+                  <span class="sub">Ingresa para ver el precio en obra de Cochabamba.</span>
+                  <div class="row"><a class="btn primary" href="#ficha" onclick="return false">Ingresar</a><a class="btn" href="#ficha" onclick="return false">Crear cuenta</a></div>
+                </div>
+                <div id="priceClient" hidden style="display:flex;flex-direction:column;gap:6px">
+                  <span class="chip" style="align-self:flex-start;border-color:var(--ok);color:var(--ok)">Cliente verificado · Cochabamba</span>
+                  <span class="out">Bs 1,85 <small>por pieza, puesto en obra dentro del radio urbano · precio de ejemplo</small></span>
+                </div>
+                <i class="pin">2</i>
+              </div>
+              <div class="card" style="position:relative">
+                <h3>Calculadora de piezas</h3>
+                <div class="grid">
+                  <label class="field" for="calcM2">Superficie (m²)<input id="calcM2" type="number" min="0" step="0.5" value="12"></label>
+                  <label class="field" for="calcMerma">Merma<select id="calcMerma"><option value="0.05">5 %</option><option value="0.08" selected>8 %</option><option value="0.1">10 %</option></select></label>
+                </div>
+                <div class="grid">
+                  <div class="out" id="outPzas">0<small>piezas</small></div>
+                  <div class="out" id="outKg">0<small>kg aprox.</small></div>
+                </div>
+                <span class="mono muted">Rendimiento: 50 piezas por m². Peso: 2,65 kg por pieza.</span>
+                <i class="pin">3</i>
+              </div>
+              <div class="row">
+                <a class="btn primary" href="#ficha" onclick="return false">Añadir al presupuesto</a>
+                <a class="btn" href="#ficha" onclick="return false" id="btnBuy">Comprar</a>
+                <a class="btn" href="#ficha" onclick="return false">WhatsApp Cochabamba</a>
+              </div>
+              <span class="mono muted" id="buyNote">El botón Comprar se activa al ingresar. Presupuesto y WhatsApp funcionan sin cuenta.</span>
+            </div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="position:relative">
+              <div class="blk-title"><h3>Datos del producto</h3><small>del sitio actual</small></div>
+              <table class="specs"><tbody>
+                <tr><td>Código</td><td>PVC STD</td></tr>
+                <tr><td>Color</td><td>Naranja natural</td></tr>
+                <tr><td>Acabado</td><td>Textura rústica</td></tr>
+                <tr><td>Alto</td><td>6,6 cm</td></tr>
+                <tr><td>Largo</td><td>20 cm</td></tr>
+                <tr><td>Ancho</td><td>10 cm</td></tr>
+                <tr><td>Peso</td><td>2,65 kg</td></tr>
+                <tr><td>Rendimiento</td><td>50 piezas por m²</td></tr>
+              </tbody></table>
+              <i class="pin">4</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <div class="blk-title"><h3>Descargas y ayuda</h3></div>
+              <div class="card"><b>Ficha técnica (PDF)</b><span class="sub">Se envía al correo. Crea un lead.</span><span class="btn ghost" style="align-self:flex-start">Pedir ficha</span></div>
+              <div class="card"><b>Manual de instalación</b><span class="sub">Preparación, colocado, fraguado y limpieza.</span><span class="btn ghost" style="align-self:flex-start">Ver manual</span></div>
+              <div class="card"><b>Video de colocado</b><span class="sub">2 a 3 minutos, en obra.</span></div>
+              <i class="pin">5</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Proyectos donde se usa</h3><small>enlaza a Proyectos</small></div>
+          <div class="grid g3">
+            <div class="card"><div class="ph"><b>patio</b></div><b>Piso de patio</b></div>
+            <div class="card"><div class="ph"><b>churrasquero</b></div><b>Churrasquero de patio</b></div>
+            <div class="card"><div class="ph"><b>vereda</b></div><b>Vereda peatonal</b></div>
+          </div>
+          <i class="pin">6</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Productos relacionados</h3></div>
+          <div class="grid">
+            <div class="card"><div class="ph" style="min-height:80px"><b>Pavic con tetones</b></div></div>
+            <div class="card"><div class="ph" style="min-height:80px"><b>Pavic peatonal biselado</b></div></div>
+            <div class="card"><div class="ph" style="min-height:80px"><b>Brick estándar aligerado</b></div></div>
+            <div class="card"><div class="ph" style="min-height:80px"><b>Botaguas 1 caída</b></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la ficha</h2>
+      <ol class="notes">
+        <li><div><b>Galería con video</b><span>Hoy la ficha no muestra obras terminadas ni colocado.</span></div></li>
+        <li><div><b>Precio con sesión</b><span>Cambia el modo arriba para ver los dos estados. El visitante ve un botón claro en lugar de un hueco.</span></div></li>
+        <li><div><b>Calculadora en la ficha</b><span>Usa el rendimiento que ya existe en el catálogo. Pasa de "50 piezas por m²" a "cuántas compro".</span></div></li>
+        <li><div><b>Datos del catálogo actual</b><span>Se reutilizan sin cambios. Crecen con tonos, usos y certificaciones.</span></div></li>
+        <li><div><b>Descargas</b><span>La ficha técnica pide correo y celular. El manual es abierto para atraer búsquedas.</span></div></li>
+        <li><div><b>Proyectos relacionados</b><span>Cierra el ciclo: de producto a proyecto, de proyecto a presupuesto.</span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ PROYECTO ============ -->
+  <section class="view" id="v-proyecto" hidden>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/proyectos/churrasquero-de-patio</span></div>
+      <div class="canvas">
+        <div class="blk"><span class="mono muted">Inicio › Proyectos › Churrasquero de patio</span></div>
+        <div class="blk">
+          <div class="split">
+            <div class="ph hero"><b>foto: churrasquero terminado</b></div>
+            <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+              <h2 style="font-size:40px">Churrasquero de patio</h2>
+              <p class="muted">Cámara de cocción con refractario, base de piso cerámico y parrilla de hierro.</p>
+              <div class="row"><span class="chip">Dificultad media</span><span class="chip">2 días</span><span class="chip">2 personas</span><span class="chip">Exterior</span></div>
+              <div class="seg" role="group" aria-label="Tamaño">
+                <button type="button" data-size="0.7" aria-pressed="false">Pequeño</button>
+                <button type="button" data-size="1" aria-pressed="true">Mediano</button>
+                <button type="button" data-size="1.4" aria-pressed="false">Grande</button>
+              </div>
+              <span class="mono muted" id="dims">Medidas: 1,80 m de ancho × 0,60 m de fondo × 2,10 m de alto</span>
+              <div class="row"><a class="btn primary" href="#proyecto" onclick="return false">Añadir todo al presupuesto</a><a class="btn" href="#proyecto" onclick="return false">Hablar con un promotor</a></div>
+              <i class="pin">1</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Lista de materiales</h3><small>cantidades de ejemplo, se recalculan por tamaño</small></div>
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Material</th><th>Origen</th><th class="num">Cantidad</th><th class="num">Precio</th></tr></thead>
+              <tbody id="bom"></tbody>
+              <tfoot><tr><th colspan="3" style="text-align:right">Costo estimado, Cochabamba</th><th class="num" id="bomTotal"></th></tr></tfoot>
+            </table>
+          </div>
+          <div class="row" style="margin-top:12px"><span class="chip lock" id="bomChip">Precios con sesión</span><span class="muted" style="font-size:13px" id="bomNote">Ingresa para ver costos de tu ciudad. Las cantidades se ven siempre.</span></div>
+          <i class="pin">2</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="position:relative">
+              <div class="blk-title"><h3>Plano</h3><small>vista frontal, esquemática</small></div>
+              <svg viewBox="0 0 320 210" width="100%" role="img" aria-label="Plano esquemático frontal del churrasquero con medidas">
+                <rect x="20" y="170" width="200" height="22" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="34" y="80" width="172" height="90" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M62 170 V110 Q62 92 80 92 H160 Q178 92 178 110 V170" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="62" y1="132" x2="178" y2="132" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <rect x="94" y="20" width="52" height="60" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="20" y1="204" x2="220" y2="204" stroke="currentColor" stroke-width="1"/>
+                <text x="104" y="201">1,80 m</text>
+                <line x1="238" y1="20" x2="238" y2="192" stroke="currentColor" stroke-width="1"/>
+                <text x="244" y="108">2,10 m</text>
+                <text x="108" y="128">cámara</text>
+                <text x="100" y="146">parrilla</text>
+                <text x="100" y="52">chimenea</text>
+              </svg>
+              <div class="row" style="margin-top:8px"><span class="btn ghost">Planos PDF</span><span class="btn ghost">Archivo CAD</span></div>
+              <span class="mono muted">Descarga con correo y celular.</span>
+              <i class="pin">3</i>
+            </div>
+            <div style="position:relative">
+              <div class="blk-title"><h3>Paso a paso</h3><small>con video por paso</small></div>
+              <div class="steps">
+                <div><span><b>Base y nivelado</b><span>Replantear, compactar y colocar el piso Pavic.</span></span></div>
+                <div><span><b>Muros laterales</b><span>Ladrillo 6 huecos con mortero, hiladas a nivel.</span></span></div>
+                <div><span><b>Cámara refractaria</b><span>Refractario y mortero refractario en el interior.</span></span></div>
+                <div><span><b>Parrilla y soportes</b><span>Altura de cocción regulable.</span></span></div>
+                <div><span><b>Chimenea</b><span>Tiro, remate y revisión de humo.</span></span></div>
+                <div><span><b>Acabado y curado</b><span>Enchape o pintura y secado antes del primer fuego.</span></span></div>
+              </div>
+              <i class="pin">4</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>¿Lo hacemos por ti?</h3>
+              <span class="sub">Pide un maestro recomendado de tu ciudad o un presupuesto con instalación.</span>
+              <div class="row"><a class="btn primary" href="#proyecto" onclick="return false">Pedir presupuesto con instalación</a></div>
+            </div>
+            <div class="grid"><div class="card"><b>Más proyectos</b><span class="sub">Mesón, pared con enchape, piso de patio</span></div><div class="card"><b>Productos usados</b><span class="sub">Cada fila de la lista enlaza a su ficha</span></div></div>
+          </div>
+          <i class="pin">5</i>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas del proyecto</h2>
+      <ol class="notes">
+        <li><div><b>Selector de tamaño</b><span>Cambia medidas, cantidades y costo al instante. Es la versión simple del configurador de la home.</span></div></li>
+        <li><div><b>Cantidades abiertas, precios con sesión</b><span>Cambia a "Cliente verificado" en la pestaña Ficha para ver la columna de precios. El presupuesto sale con o sin cuenta. Los materiales que no son de INCERPAZ se marcan como complemento.</span></div></li>
+        <li><div><b>Planos con captación</b><span>El plano se ve en pantalla. La descarga en PDF o CAD pide correo y celular.</span></div></li>
+        <li><div><b>Pasos con video</b><span>Cada paso puede llevar un video corto. Sirve a constructores y a dueños de casa.</span></div></li>
+        <li><div><b>Servicio</b><span>Para quien no quiere construirlo: presupuesto con instalación o un maestro de la zona. Abre una conversación de venta.</span></div></li>
+      </ol>
+      <p class="muted">Las cantidades y medidas son de ejemplo para el wireframe. Antes de publicar, las valida el equipo técnico de INCERPAZ.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var tabs = ['plataforma', 'home', 'ficha', 'proyecto'];
+  function show() {
+    var h = (location.hash || '').replace('#', '');
+    if (tabs.indexOf(h) < 0) h = 'plataforma';
+    tabs.forEach(function (t) {
+      document.getElementById('v-' + t).hidden = t !== h;
+      var a = document.querySelector('[data-tab="' + t + '"]');
+      if (t === h) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+  }
+  window.addEventListener('hashchange', show);
+  show();
+
+  /* ciudad */
+  var wa = { 'Cochabamba': '+591 7075 0963' };
+  var sel = document.getElementById('citySel');
+  sel.addEventListener('change', function () {
+    document.getElementById('cityWa').textContent = 'WhatsApp ' + (wa[sel.value] || '+591 ··· por asignar');
+    document.getElementById('cityName').textContent = sel.value;
+  });
+
+  /* calculadora */
+  var m2 = document.getElementById('calcM2'), merma = document.getElementById('calcMerma');
+  function calc() {
+    var a = Math.max(0, parseFloat(m2.value) || 0);
+    var p = Math.ceil(a * 50 * (1 + parseFloat(merma.value)));
+    document.getElementById('outPzas').firstChild.nodeValue = p.toLocaleString('es-BO');
+    document.getElementById('outKg').firstChild.nodeValue = Math.round(p * 2.65).toLocaleString('es-BO');
+  }
+  m2.addEventListener('input', calc); merma.addEventListener('change', calc); calc();
+
+  /* sesión */
+  var client = false;
+  function setClient(v) {
+    client = v;
+    document.getElementById('asVisit').setAttribute('aria-pressed', String(!v));
+    document.getElementById('asClient').setAttribute('aria-pressed', String(v));
+    document.getElementById('priceVisit').hidden = v;
+    document.getElementById('priceClient').hidden = !v;
+    document.getElementById('buyNote').textContent = v ? 'Cliente verificado: Comprar está activo.' : 'El botón Comprar se activa al ingresar. Presupuesto y WhatsApp funcionan sin cuenta.';
+    document.getElementById('btnBuy').style.opacity = v ? '1' : '.5';
+    renderBom();
+  }
+  document.getElementById('asVisit').addEventListener('click', function () { setClient(false); });
+  document.getElementById('asClient').addEventListener('click', function () { setClient(true); });
+
+  /* lista de materiales */
+  var items = [
+    ['Ladrillo 6 huecos económico rayado', 'INCERPAZ', 380, 'pzas', 0, 1.2],
+    ['Refractario para cámara', 'INCERPAZ', 90, 'pzas', 0, 4.5],
+    ['Pavic estándar (base)', 'INCERPAZ', 60, 'pzas', 0, 1.85],
+    ['Mortero refractario 25 kg', 'Complemento', 4, 'sacos', 0, 85],
+    ['Cemento 50 kg', 'Complemento', 6, 'sacos', 0, 62],
+    ['Arena fina', 'Complemento', 0.8, 'm³', 1, 150],
+    ['Parrilla de hierro', 'Complemento', 1, 'un.', 0, 320]
+  ];
+  var scale = 1;
+  function renderBom() {
+    var total = 0, html = '';
+    items.forEach(function (r) {
+      var q = r[4] ? Math.round(r[2] * scale * 10) / 10 : Math.ceil(r[2] * scale);
+      var cost = q * r[5]; total += cost;
+      html += '<tr><td>' + r[0] + '</td><td><span class="chip">' + r[1] + '</span></td><td class="num">' + q.toString().replace('.', ',') + ' ' + r[3] + '</td><td class="num">' +
+        (client ? 'Bs ' + Math.round(cost).toLocaleString('es-BO') : '<span class="dots">Bs ••••</span>') + '</td></tr>';
+    });
+    document.getElementById('bom').innerHTML = html;
+    document.getElementById('bomTotal').innerHTML = client ? 'Bs ' + Math.round(total).toLocaleString('es-BO') : '<span class="dots">Bs ••••••</span>';
+    document.getElementById('bomChip').textContent = client ? 'Cliente verificado' : 'Precios con sesión';
+    document.getElementById('bomNote').textContent = client ? 'Precios de ejemplo para Cochabamba.' : 'Ingresa para ver costos de tu ciudad. Las cantidades se ven siempre.';
+  }
+  document.querySelectorAll('[data-size]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      scale = parseFloat(b.getAttribute('data-size'));
+      document.querySelectorAll('[data-size]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      var w = (1.8 * scale).toFixed(2).replace('.', ','), d = (0.6 * Math.max(scale, .9)).toFixed(2).replace('.', ','), hh = (2.1 * (scale === 1.4 ? 1.1 : scale === .7 ? .9 : 1)).toFixed(2).replace('.', ',');
+      document.getElementById('dims').textContent = 'Medidas: ' + w + ' m de ancho × ' + d + ' m de fondo × ' + hh + ' m de alto';
+      renderBom();
+    });
+  });
+  setClient(false);
+
+  /* tema */
+  var modes = ['auto', 'light', 'dark'], mi = 0, tb = document.getElementById('themeBtn');
+  tb.addEventListener('click', function () {
+    mi = (mi + 1) % 3;
+    var r = document.documentElement;
+    if (modes[mi] === 'auto') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', modes[mi]);
+    tb.textContent = 'Tema: ' + modes[mi];
+  });
+})();
+</script>
