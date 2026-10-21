@@ -201,6 +201,34 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   <!-- ============ PLATAFORMA ============ -->
   <section class="view" id="v-plataforma" hidden>
     <div class="panel">
+      <h2>PAVIC y TEJAS: hubs de marca dentro de INCERPAZ</h2>
+      <p><b>Recomendación:</b> sí, pero como secciones propias dentro de incerpaz.com (incerpaz.com/pavic e incerpaz.com/tejas), no como sitios separados. Cada hub tiene su portada, su tono y sus herramientas, y comparte con el resto el catálogo, la cuenta, el login de precios, el presupuesto y el CRM.</p>
+      <div class="grid g3">
+        <div class="card"><h3>Por qué dentro</h3><p class="sub">Una sola cuenta, un solo presupuesto y un solo carrito. Google suma la autoridad al mismo dominio y el equipo mantiene un solo sitio. Un dominio corto como pavic.com.bo puede redirigir a la sección.</p></div>
+        <div class="card"><h3>Cuándo tiene sentido un hub</h3><p class="sub">Cuando la línea tiene público propio, usos propios, herramientas propias y búsquedas propias en Google. Si falta alguno, basta una categoría bien armada.</p></div>
+        <div class="card"><h3>Qué no hacer</h3><p class="sub">Separar dominios, cuentas o tiendas por marca. Duplica trabajo y parte las ventas y los leads en dos sistemas.</p></div>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Hub</th><th>Para quién (hipótesis)</th><th>Herramienta propia</th><th>Contenido propio</th></tr></thead>
+          <tbody>
+            <tr><td><b>PAVIC</b><br><span class="muted">Pisos y pavimentos: estándar, con tetones, peatonal natural y biselado</span></td><td>Dueños de casa (patios, veredas), constructores, paisajistas, urbanizaciones y municipios</td><td>Calculadora de piezas por m² con merma y patrón de colocado. El rendimiento de 50 piezas por m² ya está en el catálogo.</td><td>Galería de obras, manual de colocado, ficha técnica, patrones, proyectos (vereda, patio, base de churrasquero)</td></tr>
+            <tr><td><b>TEJAS</b><br><span class="muted">Techos y tejados: Colonial 36, Andina y otras</span></td><td>Dueños de casa, constructores, restauración de techos tipo colonial</td><td>Calculadora de tejas por m² y pendiente, con caballetes y accesorios</td><td>Guía de instalación de techo, mantenimiento, modelos y colores, galería de techos</td></tr>
+            <tr><td><b>Resto del catálogo</b><br><span class="muted">Muros, piezas especiales, revestimientos, refractarios</span></td><td>Constructores y maestros</td><td>Calculadora de ladrillos por m² de muro</td><td>Se quedan en el catálogo general con su ficha y manual</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">Todo lo de públicos y herramientas es hipótesis. Lo valida el equipo comercial con las ventas por línea.</p>
+      <p><b>Cómo empezar:</b> una portada por hub con hero, 3 a 4 productos, la calculadora y 3 proyectos reales. Si la portada funciona, se suma contenido. Así se prueba la idea sin construir dos sitios.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Cobertura real de ciudades</h2>
+      <p>La Paz y Tarija no operan hoy (fábricas paradas y sin comercializadores), así que el sitio no debe venderles ni mostrarles agencias que no existen. El selector de ciudad ofrece Cochabamba, Santa Cruz, Oruro y Sucre. Quien llega desde otra ciudad ve un formulario de lista de espera y no una tienda.</p>
+      <p class="muted">Si se decide enviar desde otra planta a esas ciudades, la lista de espera sirve para medir cuánta demanda hay antes de invertir en distribuidores.</p>
+    </div>
+
+    <div class="panel">
       <h2>Qué copiamos de Toyota y Coca-Cola</h2>
       <p class="muted">Lo que sigue sale de los menús y botones de coca-cola.com/us y toyota.com. Son sitios de marca que convierten con herramientas, no con catálogos.</p>
       <div class="scroll">
@@ -267,7 +295,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
           <span>Compra telefónica y servicio al cliente 800-10-8810</span>
           <span class="row" style="gap:10px">
             <label for="citySel" class="mono">Tu ciudad</label>
-            <select id="citySel"><option>Cochabamba</option><option>Santa Cruz</option><option>La Paz</option><option>Oruro</option><option>Sucre</option><option>Tarija</option></select>
+            <select id="citySel"><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option></select>
             <span class="mono" id="cityWa">WhatsApp +591 7075 0963</span>
           </span>
           <i class="pin in">1</i>
@@ -346,7 +374,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
             <div style="display:flex;flex-direction:column;gap:10px">
               <h3>Agencia más cercana</h3>
               <div class="card"><b id="cityName">Cochabamba</b><span class="sub">Av. Circunvalación y Calle Miguel de Cervantes N° 181</span><span class="sub">Horario: por definir</span><a class="btn primary" href="#home" onclick="return false">Escribir por WhatsApp</a></div>
-              <span class="mono muted">8+ agencias solo en Cochabamba. La lista completa vive en "Dónde estamos".</span>
+              <span class="mono muted">9 puntos en Cochabamba. La lista completa vive en "Dónde estamos".</span>
             </div>
           </div>
           <i class="pin">9</i>
@@ -623,9 +651,9 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       <h2>Lo que encontré en la página actual</h2>
       <ol class="notes" style="counter-reset:none">
         <li><div><b>Dos tablas distintas en la misma página</b><span>Cada ciudad aparece dos veces, con ejecutivos y números que no coinciden. Por ejemplo, la agencia Central de Cochabamba tiene el WhatsApp 79723246 en una tabla y 70750963 en la otra.</span></div></li>
-        <li><div><b>Datos incompletos</b><span>En la tabla más nueva, La Paz Fábrica y Calacoto no tienen WhatsApp, y Castillo repite el número de la fábrica de Cochabamba. Aquí los marqué con "revisar dato".</span></div></li>
+        <li><div><b>Números repetidos o faltantes</b><span>En la tabla más nueva, Castillo repite el número de la fábrica de Cochabamba, y varias agencias de Santa Cruz no tienen teléfono fijo. Aquí marqué el repetido con "revisar dato".</span></div></li>
         <li><div><b>No hay mapa, horarios ni búsqueda por zona</b><span>Hoy es solo una lista por ciudad.</span></div></li>
-        <li><div><b>Cobertura desigual</b><span>Cochabamba 9 puntos, Santa Cruz 8, La Paz 7, Oruro 2, Sucre 1 y Tarija 1 (la fábrica). La portada solo ofrece 4 ciudades, sin La Paz ni Sucre.</span></div></li>
+        <li><div><b>Páginas que muestran ciudades sin operación</b><span>La Paz y Tarija no operan hoy (fábricas paradas, sin comercializadores), pero la página actual aún las lista con 7 y 1 puntos, y la portada todavía enlaza la tienda de Tarija. El wireframe muestra solo lo que opera: Cochabamba 9 puntos, Santa Cruz 8, Oruro 2 y Sucre 1.</span></div></li>
       </ol>
       <p class="muted">Todo esto sale de la página de agencias de cbba.tienda.incerpaz.com. Los nombres de los ejecutivos no se muestran en el wireframe.</p>
     </div>
@@ -666,8 +694,8 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
         <div class="blk" style="background:var(--surface-2)">
           <div class="split">
             <div style="display:flex;flex-direction:column;gap:10px">
-              <h3>¿No encuentras tu zona?</h3>
-              <span class="sub">Déjanos tu celular y un asesor de tu ciudad te llama.</span>
+              <h3>¿Estás en La Paz, Tarija u otra ciudad?</h3>
+              <span class="sub">Hoy no tenemos agencia ahí. Déjanos tu celular y te avisamos cuando abramos, o te cotizamos un envío desde la planta más cercana.</span>
               <div class="grid">
                 <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
                 <label class="field">Celular<input type="text" placeholder="7xxxxxxx"></label>
@@ -683,19 +711,17 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
           <i class="pin">4</i>
         </div>
         <div class="blk">
-          <div class="blk-title"><h3>Nuestras fábricas</h3><small>4 en la tabla nueva</small></div>
+          <div class="blk-title"><h3>Nuestras fábricas</h3><small>las que operan hoy</small></div>
           <div class="grid">
             <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cochabamba</b><span class="sub">Av. Villazón Km 7 1/2</span></div>
-            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>La Paz</b><span class="sub">Carretera a Viacha Km 27</span></div>
             <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Santa Cruz</b><span class="sub">Carretera Warnes–Montero Km 37 1/2</span></div>
-            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Tarija</b><span class="sub">Av. Circunvalación</span></div>
           </div>
-          <span class="mono muted" style="display:block;margin-top:10px">La tabla anterior también lista una fábrica en Oruro, carretera Oruro–La Paz Km 31. Hay que confirmarla.</span>
+          <span class="mono muted" style="display:block;margin-top:10px">La tabla anterior lista también una fábrica en Oruro, carretera Oruro–La Paz Km 31. Hay que confirmar si opera.</span>
           <i class="pin">5</i>
         </div>
         <div class="blk" style="background:var(--surface-2)">
-          <div class="blk-title"><h3>Distribuidores autorizados</h3><small>fase 2, como el buscador de distribuidor de Weber</small></div>
-          <div class="grid"><div class="card flat"><span class="sub">Ferreterías y corralones que venden INCERPAZ en ciudades sin agencia propia.</span></div></div>
+          <div class="blk-title"><h3>Distribuidores autorizados</h3><small>fase 2, como el buscador de distribuidor de Weber. Hoy sin datos.</small></div>
+          <div class="grid"><div class="card flat"><span class="sub">Ferreterías y corralones que venden INCERPAZ en ciudades sin agencia propia. Se activa cuando existan los primeros.</span></div></div>
           <i class="pin">6</i>
         </div>
       </div>
@@ -706,7 +732,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       <p class="muted">En el teléfono la lista va primero y el mapa se abre con un botón. El botón de WhatsApp queda fijo abajo.</p>
       <div class="phone">
         <div><span class="mono muted">incerpaz.com/donde-estamos</span><b style="font-family:var(--display);font-size:26px;text-transform:uppercase">Dónde estamos</b>
-          <div class="row" style="gap:6px"><span class="chip on">Cochabamba</span><span class="chip">La Paz</span><span class="chip">Santa Cruz</span><span class="chip">Oruro</span></div>
+          <div class="row" style="gap:6px"><span class="chip on">Cochabamba</span><span class="chip">Santa Cruz</span><span class="chip">Oruro</span><span class="chip">Sucre</span></div>
           <div class="field">Busca tu zona<input type="search" placeholder="Zona o avenida" disabled></div>
           <div class="seg" style="align-self:flex-start"><button type="button" aria-pressed="true">Lista</button><button type="button" aria-pressed="false">Mapa</button></div>
         </div>
@@ -724,9 +750,9 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
         <li><div><b>Filtros</b><span>Ciudad, tipo de punto y búsqueda por zona. "Usar mi ubicación" ordena por cercanía cuando la persona lo permite.</span></div></li>
         <li><div><b>Lista y mapa sincronizados</b><span>Elegir en uno marca el otro. Prueba el prototipo: cambia de ciudad y toca un punto. Los números del mapa son del orden de la lista, no coordenadas.</span></div></li>
         <li><div><b>Ficha del punto</b><span>Dirección, teléfono, WhatsApp, horario y servicios. El mensaje de WhatsApp sale armado con el producto o proyecto que la persona venía viendo.</span></div></li>
-        <li><div><b>Captura de leads</b><span>Si no hay agencia cerca, el formulario crea un lead para el ejecutivo de la ciudad.</span></div></li>
+        <li><div><b>Ciudades sin cobertura</b><span>En lugar de ocultar La Paz y Tarija, el formulario convierte esas visitas en una lista de espera. Si se decide cotizar envíos desde otra planta, el mismo lead sirve.</span></div></li>
         <li><div><b>Fábricas</b><span>Convierte las direcciones en una parte de la historia de la marca, con fotos y visitas si las hacen.</span></div></li>
-        <li><div><b>Distribuidores</b><span>Cubre ciudades donde hoy no hay agencia propia.</span></div></li>
+        <li><div><b>Distribuidores</b><span>Es la salida natural para La Paz y Tarija si no se reabren las plantas. Hoy no hay comercializadores allá.</span></div></li>
       </ol>
       <p class="muted">Horarios y servicios por agencia no existen en el sitio actual, así que quedan "por definir" hasta que alguien los confirme. Una sola fuente de datos (el CMS) debe alimentar esta pantalla, la home y el pie de página.</p>
     </div>
@@ -829,15 +855,6 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       ['Beijing', 'ag', 'Av. Beijing N° 177, frente al parque Demetrio Canelas', '4 4424445', '65350059'],
       ['Castillo', 'ag', 'Av. Villazón Km 3.5 N° 04259, lado empresa Virmegraf', '4 4724248', '70305319', 'número repetido']
     ],
-    'La Paz': [
-      ['Fábrica', 'fab', 'Carretera a Viacha Km 27', '2 2800330', '', 'sin WhatsApp'],
-      ['Calacoto, oficina central', 'ag', 'Av. Ballivián N° 375 entre calles 9 y 10, Calacoto, frente a las Torres Zafiro', '2 2776690', '', 'sin WhatsApp'],
-      ['Litoral', 'ag', 'Zona San Luis, carretera a Viacha casi esq. Av. Litoral N° 800, cerca del cruce Villa Adela', '2 2853129', '70619611'],
-      ['Juan Pablo II', 'ag', 'Av. Juan Pablo II casi esq. Alfonso Ugarte N° 2986, cerca al TAM', '2 2845722', '70619614'],
-      ['Río Seco', 'ag', 'Ex tranca de Río Seco N° 50, frente al surtidor Quemado, Av. Juan Pablo II', '2 2865300', '70619514'],
-      ['6 de Marzo', 'ag', 'Av. 6 de Marzo, carretera a Oruro N° 60, frente al colegio Intervida', '2 2816689', '70564942'],
-      ['Cruce Viacha', 'ag', 'Cruce carretera a Viacha y Av. 6 de Marzo N° 32, frente al enmallado del aeropuerto', '2 2821092', '70116723']
-    ],
     'Santa Cruz': [
       ['Fábrica', 'fab', 'Carretera Warnes–Montero Km 37 1/2', '', '70818053'],
       ['Banzer', 'ag', 'Av. Banzer, 3er anillo externo, frente al surtidor Genex', '3 441918', '70009021'],
@@ -854,9 +871,6 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     ],
     'Sucre': [
       ['Terminal', 'ag', 'Av. Ostria Gutiérrez N° 525, zona Terminal de Buses', '6444344', '70213846']
-    ],
-    'Tarija': [
-      ['Fábrica', 'fab', 'Av. Circunvalación casi Av. Panamericana', '', '70211702']
     ]
   };
   var loc = { city: 'Cochabamba', type: 'todas', q: '', sel: 0 };
