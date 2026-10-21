@@ -180,7 +180,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   <header class="sheet-head">
     <div>
       <h1>Wireframes INCERPAZ</h1>
-      <p>Siete pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
+      <p>Ocho pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
     </div>
     <div class="stamp">
       <div><b>Lámina</b> 01 · borrador para revisión</div>
@@ -199,6 +199,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     <a href="#techos" data-tab="techos">Categoría Techos</a>
     <a href="#constructor" data-tab="constructor">Cuenta del constructor</a>
     <a href="#donde" data-tab="donde">Dónde estamos</a>
+    <a href="#empresa" data-tab="empresa">Empresa</a>
   </nav>
 
   <!-- ============ PLATAFORMA ============ -->
@@ -1178,11 +1179,172 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       <p class="muted">Horarios y servicios por agencia no existen en el sitio actual, así que quedan "por definir" hasta que alguien los confirme. Una sola fuente de datos (el CMS) debe alimentar esta pantalla, la home y el pie de página.</p>
     </div>
   </section>
+
+  <!-- ============ EMPRESA ============ -->
+  <section class="view" id="v-empresa" hidden>
+    <div class="panel">
+      <h2>Lo que hay hoy en la página Empresa</h2>
+      <ol class="notes" style="counter-reset:none">
+        <li><div><b>Contenido mínimo</b><span>Solo misión, visión y valores, más un párrafo sobre el compromiso con los trabajadores. No hay fábricas, certificaciones, historia, equipo ni contacto.</span></div></li>
+        <li><div><b>Texto escrito hacia adentro</b><span>El párrafo sobre "que todos avancemos juntos" habla a los empleados, no a clientes. La visión habla de expandirse hacia Europa y necesita revisión.</span></div></li>
+        <li><div><b>Base útil</b><span>La frase "Somos INCERPAZ y queremos ayudarte a construir tu hogar" y el sistema integrado de gestión sirven de punto de partida.</span></div></li>
+      </ol>
+    </div>
+
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/empresa</span></div>
+      <div class="canvas">
+        <div class="blk row" style="gap:6px 16px">
+          <span class="chip on">Nosotros</span><span class="chip">Fábricas</span><span class="chip">Calidad</span><span class="chip">Marcas</span><span class="chip">Sostenibilidad</span><span class="chip">Historia</span><span class="chip">Trabaja con nosotros</span><span class="chip">Exportaciones</span><span class="chip">Contacto</span>
+          <i class="pin">1</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <h2 style="font-size:clamp(34px,6vw,54px)">Cerámica para construir tu hogar</h2>
+              <p class="muted">Somos INCERPAZ y queremos ayudarte a construir tu hogar. Trabajamos día a día comprometidos con la mejora continua a través del sistema integrado de gestión en todos nuestros procesos.</p>
+              <div class="row"><a class="btn primary" href="#empresa" onclick="return false">Ver nuestras fábricas</a><a class="btn" href="#empresa" onclick="return false">Hablar con un asesor</a></div>
+            </div>
+            <div class="ph hero"><b>foto: fábrica o equipo en planta</b></div>
+          </div>
+          <i class="pin">2</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Cifras de INCERPAZ</h3><small>por confirmar con gerencia <i class="pin in" title="Pendiente">!</i></small></div>
+          <div class="grid">
+            <div class="card"><span class="out">—<small>años de trayectoria</small></span></div>
+            <div class="card"><span class="out">—<small>fábricas en operación</small></span></div>
+            <div class="card"><span class="out">—<small>agencias y puntos de venta</small></span></div>
+            <div class="card"><span class="out">—<small>ciudades atendidas</small></span></div>
+          </div>
+          <i class="pin">3</i>
+        </div>
+        <div class="blk">
+          <div class="grid g3">
+            <div class="card"><h3>Misión</h3><span class="sub">Contribuir al desarrollo del país proveyendo productos cerámicos destinados al mercado de la construcción local e internacional, ofreciendo los mejores productos y servicios.</span></div>
+            <div class="card"><h3>Visión <i class="pin in" title="Pendiente">!</i></h3><span class="sub">Texto actual: expandir el mercado hacia Europa. Por revisar con gerencia antes de publicar.</span></div>
+            <div class="card"><h3>Valores</h3><div class="row"><span class="chip">Calidad</span><span class="chip">Amabilidad</span><span class="chip">Liderazgo</span><span class="chip">Innovación</span><span class="chip">Disciplina</span><span class="chip">Autonomía</span><span class="chip">Dedicación</span></div></div>
+          </div>
+          <i class="pin">4</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Nuestras fábricas</h3>
+            <div class="seg" role="group" aria-label="Tipo de fábrica"><button type="button" data-ek="todas" aria-pressed="true">Todas</button><button type="button" data-ek="gen" aria-pressed="false">Generales</button><button type="button" data-ek="pavic" aria-pressed="false">PAVIC</button></div>
+          </div>
+          <div class="grid g3" id="emFab">
+            <div class="card" data-k="gen"><div class="ph" style="min-height:80px"><b>foto</b></div><b>Cochabamba</b><span class="sub">Av. Villazón Km 7 1/2</span></div>
+            <div class="card" data-k="gen"><div class="ph" style="min-height:80px"><b>foto</b></div><b>Santa Cruz</b><span class="sub">Carretera Warnes–Montero Km 37 1/2</span></div>
+            <div class="card" data-k="gen pavic"><div class="ph" style="min-height:80px"><b>foto</b></div><b>Oruro</b><span class="sub">Carretera Oruro–La Paz Km 31 (por confirmar). Ladrillos y PAVIC</span></div>
+            <div class="card" data-k="pavic"><div class="ph" style="min-height:80px"><b>foto</b></div><b>PAVIC Cochabamba</b><span class="sub">Dirección por confirmar <i class="pin in" title="Pendiente">!</i></span></div>
+            <div class="card" data-k="pavic"><div class="ph" style="min-height:80px"><b>foto</b></div><b>PAVIC Santa Cruz</b><span class="sub">Dirección por confirmar <i class="pin in" title="Pendiente">!</i></span></div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Cada tarjeta enlaza a Dónde estamos. Una visita guiada a planta queda como idea, si la empresa la ofrece.</span>
+          <i class="pin">5</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Calidad y certificaciones</h3><small>toca una tarjeta de descarga</small></div>
+          <div class="grid">
+            <div class="card"><b>Sistema integrado de gestión</b><span class="sub">Cómo se controla cada proceso</span></div>
+            <div class="card"><b>Certificación ISO</b><span class="sub">Norma y alcance por indicar</span><button type="button" class="btn" data-gate="1" style="align-self:flex-start">Descargar</button></div>
+            <div class="card"><b>Ensayos de laboratorio</b><span class="sub">Informes de PAVIC</span><button type="button" class="btn" data-gate="1" style="align-self:flex-start">Descargar</button></div>
+            <div class="card"><b>Certificados de calidad</b><span class="sub">Por producto</span><button type="button" class="btn" data-gate="1" style="align-self:flex-start">Descargar</button></div>
+          </div>
+          <div class="card flat" id="emGate" hidden style="margin-top:12px">
+            <b>Para descargar, déjanos tus datos</b>
+            <div class="grid">
+              <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+              <label class="field">Empresa o entidad<input type="text" placeholder="Razón social"></label>
+              <label class="field">Correo<input type="text" placeholder="correo@ejemplo.com"></label>
+            </div>
+            <div><span class="btn primary">Enviar y descargar</span></div>
+            <span class="mono muted">Cada descarga entra al CRM como un lead, con el documento que pidió.</span>
+          </div>
+          <i class="pin">6</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Nuestras marcas y líneas</h3></div>
+          <div class="grid g3">
+            <div class="card"><b>INCERPAZ</b><span class="sub">Muros, piezas especiales, pisos, revestimientos y refractarios</span><a class="btn" href="#home" style="align-self:flex-start">Ver catálogo</a></div>
+            <div class="card"><b>PAVIC</b><span class="sub">Pavimentos para proyectos. Marca propia</span><a class="btn primary" href="#pavic" style="align-self:flex-start">Ir a PAVIC</a></div>
+            <div class="card"><b>Tejas <i class="pin in" title="Pendiente">!</i></b><span class="sub">Marca en preparación. Hoy es la categoría Techos</span><a class="btn" href="#techos" style="align-self:flex-start">Ver techos</a></div>
+          </div>
+          <i class="pin">7</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <h3>Sostenibilidad <i class="pin in" title="Pendiente">!</i></h3>
+              <span class="sub">El blog actual ya tiene una categoría "Construcción sostenible". Falta definir qué compromisos y cifras se pueden afirmar.</span>
+              <div class="grid"><div class="card flat"><b>Producción responsable</b><span class="sub">Por definir</span></div><div class="card flat"><b>Obra sostenible</b><span class="sub">Por definir</span></div></div>
+              <i class="pin">8</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <h3>Historia <i class="pin in" title="Pendiente">!</i></h3>
+              <span class="sub">Línea de tiempo con los hitos de la empresa. La galería actual guarda obras de 2011 a 2020.</span>
+              <div class="row" style="gap:6px;flex-wrap:nowrap;overflow-x:auto"><span class="chip">hito 1</span><span class="mono muted">—</span><span class="chip">hito 2</span><span class="mono muted">—</span><span class="chip">hito 3</span><span class="mono muted">—</span><span class="chip">hoy</span></div>
+              <i class="pin">9</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="grid g3">
+            <div class="card"><b>Trabaja con nosotros <i class="pin in" title="Pendiente">!</i></b><span class="sub">Vacantes por ciudad. Proceso por definir</span></div>
+            <div class="card"><b>Promotores</b><span class="sub">Acceso al portal actual de promotores</span></div>
+            <div class="card"><b>Exportaciones</b><span class="sub">Sitio en español e inglés</span><div class="row"><span class="chip on">ES</span><span class="chip">EN</span></div></div>
+          </div>
+          <i class="pin">10</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Prensa y contenido</h3><small>blog, revista digital y redes</small></div>
+          <div class="grid g3">
+            <div class="card"><div class="ph" style="min-height:70px"><b>nota</b></div><b>Blog</b><span class="sub">Novedades de producto y obra</span></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>portada</b></div><b>Revista digital</b><span class="sub">Edición actual</span></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>feed</b></div><b>Instagram</b><span class="sub">@incerpaz_bolivia</span></div>
+          </div>
+          <i class="pin">11</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>Contacto</h3>
+              <table class="specs"><tbody><tr><td>Servicio al cliente</td><td>800-10-8810</td></tr><tr><td>Correo de ventas</td><td>ventas.cbba@incerpaz.com</td></tr><tr><td>Redes</td><td>Facebook, Instagram y YouTube</td></tr><tr><td>Por ciudad</td><td><a href="#donde">Ver Dónde estamos</a></td></tr></tbody></table>
+            </div>
+            <div class="grid">
+              <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+              <label class="field">Motivo<select><option>Quiero comprar</option><option>Quiero cotizar un proyecto</option><option>Reclamo o sugerencia</option><option>Prensa</option><option>Trabajo</option></select></label>
+              <label class="field">Celular<input type="text" placeholder="7xxxxxxx"></label>
+              <label class="field">Ciudad<select><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option><option>Otra</option></select></label>
+            </div>
+          </div>
+          <div style="margin-top:12px"><a class="btn primary" href="#empresa" onclick="return false">Enviar</a></div>
+          <i class="pin">12</i>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la página Empresa</h2>
+      <ol class="notes">
+        <li><div><b>Submenú propio</b><span>Reúne en una página lo que hoy está disperso: fábricas, calidad, marcas, empleo y exportaciones.</span></div></li>
+        <li><div><b>Hero con la frase de marca</b><span>Usa el texto que ya existe en el sitio, con dos salidas: conocer las fábricas o hablar con un asesor.</span></div></li>
+        <li><div><b>Cifras</b><span>Años, fábricas, agencias y ciudades dan peso a la marca. Son marcadores hasta que gerencia las confirme.</span></div></li>
+        <li><div><b>Misión, visión y valores</b><span>La misión y los valores son los actuales. La visión hay que reescribirla pensando en clientes y proyectos.</span></div></li>
+        <li><div><b>Fábricas</b><span>Prueba el prototipo: el filtro separa fábricas generales y PAVIC. Oruro cuenta para las dos. Enlaza a Dónde estamos.</span></div></li>
+        <li><div><b>Calidad con descarga</b><span>Prueba el prototipo: tocar Descargar abre el formulario. Los certificados, ISO y ensayos son un imán de leads, sobre todo para PAVIC.</span></div></li>
+        <li><div><b>Marcas</b><span>Presenta INCERPAZ, PAVIC y la futura marca de tejas bajo un mismo paraguas, con enlace a cada una.</span></div></li>
+        <li><div><b>Sostenibilidad</b><span>Solo se publica lo que la empresa pueda sostener con datos. Hasta entonces queda como pendiente.</span></div></li>
+        <li><div><b>Historia</b><span>Una línea de tiempo corta humaniza la marca. Los hitos los aporta la empresa.</span></div></li>
+        <li><div><b>Empleo, promotores y exportaciones</b><span>Tres accesos para públicos que hoy no encuentran dónde ir.</span></div></li>
+        <li><div><b>Prensa y contenido</b><span>Da un hogar al blog, la revista digital y las redes.</span></div></li>
+        <li><div><b>Contacto con motivo</b><span>El motivo del mensaje decide a quién llega: ventas, proyectos, reclamos, prensa o empleo. Reclamos y sugerencias es una idea mía.</span></div></li>
+      </ol>
+      <p class="muted">Cifras, historia, sostenibilidad y empleo no existen en el sitio actual y quedan con pin amarillo "!" hasta que la empresa aporte los datos.</p>
+    </div>
+  </section>
 </div>
 
 <script>
 (function () {
-  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'techos', 'constructor', 'donde'];
+  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'techos', 'constructor', 'donde', 'empresa'];
   function show() {
     var h = (location.hash || '').replace('#', '');
     if (tabs.indexOf(h) < 0) h = 'plataforma';
@@ -1494,6 +1656,18 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     document.getElementById('tkCost').firstChild.nodeValue = client ? 'Bs ' + Math.round(n * 3.1).toLocaleString('es-BO') : 'Con sesión';
   }
   [tkA, tkP].forEach(function (e) { e.addEventListener('input', tcalc); }); [tkM, tkMe].forEach(function (e) { e.addEventListener('change', tcalc); }); tcalc();
+
+  /* empresa */
+  document.querySelectorAll('[data-ek]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-ek');
+      document.querySelectorAll('[data-ek]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.querySelectorAll('#emFab [data-k]').forEach(function (c) { c.hidden = k !== 'todas' && (' ' + c.getAttribute('data-k') + ' ').indexOf(' ' + k + ' ') < 0; });
+    });
+  });
+  document.querySelectorAll('[data-gate]').forEach(function (b) {
+    b.addEventListener('click', function () { var g = document.getElementById('emGate'); g.hidden = false; });
+  });
 
   /* tema */
   var modes = ['auto', 'light', 'dark'], mi = 0, tb = document.getElementById('themeBtn');
