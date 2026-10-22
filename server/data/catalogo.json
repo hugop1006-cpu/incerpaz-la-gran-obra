@@ -1,0 +1,344 @@
+[
+ {
+  "ciudad": "cochabamba",
+  "slug": "18-h",
+  "codigo": "18H",
+  "nombre": "18 huecos"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "18-h-1-2",
+  "codigo": "18H 1/2",
+  "nombre": "18 huecos medios"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "18-huecos-luis-xv-2",
+  "codigo": "18H LXV",
+  "nombre": "18 huecos luis XV"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "3-huecos-economico-rayado",
+  "codigo": "3HER",
+  "nombre": "3 huecos económico rayado"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "3-huecos-economico-rayado-mitad",
+  "codigo": "3HER 1/2",
+  "nombre": "3 huecos económico rayado medios"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "6-huecos-big-rayado",
+  "codigo": "6HER",
+  "nombre": "6 huecos económico rayado"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "6-huecos-big-rayado-mitad",
+  "codigo": "6HER 1/2",
+  "nombre": "6 huecos económico rayado medios"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "6-huecos-redondo",
+  "codigo": "6H-R",
+  "nombre": "6 huecos redondo"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "6-huecos-redondo-medios",
+  "codigo": "6H-R 1/2",
+  "nombre": "6 huecos redondo medios"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "8-huecos-economico-rayado",
+  "codigo": "8HER",
+  "nombre": "8 huecos económico rayado"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "8-huecos-economico-rayado-constructor",
+  "codigo": "8HER C",
+  "nombre": "8 huecos económico rayado constructor"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "8-huecos-economico-rayado-constructor-medios",
+  "codigo": "8HER C 1/2",
+  "nombre": "8 huecos económico rayado constructor medios"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "8-huecos-economico-rayado-medios",
+  "codigo": "8HER 1/2",
+  "nombre": "8 huecos económico rayado medios"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "9-huecos-economico-rayado",
+  "codigo": "9HER",
+  "nombre": "9 huecos económico rayado"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "9-huecos-economico-rayado-medios",
+  "codigo": "9HER 1/2",
+  "nombre": "9 huecos económico rayado medios"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "biscocho",
+  "codigo": "RB-210",
+  "nombre": "Biscocho"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "biscocho-213",
+  "codigo": "RB-213",
+  "nombre": "Biscocho 213"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "bloque-ceramico-9-cm",
+  "codigo": "BC 9",
+  "nombre": "Bloque cerámico 9 cm"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "botaguas-de-1-caida",
+  "codigo": "BOT 1C",
+  "nombre": "Botaguas de 1 caída"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "botaguas-de-2-caida",
+  "codigo": "BOT 2C",
+  "nombre": "Botaguas de 2 caídas"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "brick-cornisa-punta-bosel",
+  "codigo": "BRK CD",
+  "nombre": "Brick cornisa curva doble"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "brick-enchape-ancho",
+  "codigo": "BRK EA",
+  "nombre": "Brick enchape ancho"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "brick-enchape-corto",
+  "codigo": "BRK EC",
+  "nombre": "Brick enchape corto"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "brick-estandar",
+  "codigo": "BRK STD",
+  "nombre": "Brick estándar"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "brick-estandar-aligerado",
+  "codigo": "BRK SA",
+  "nombre": "Brick estándar aligerado"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "brick-gambote-rustico-22",
+  "codigo": "BRK GR22",
+  "nombre": "Brick gambote rústico 22"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "brick-gambote-rustico18",
+  "codigo": "BRK GR18",
+  "nombre": "Brick gambote rústico 18"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "brick-terminacion-grada",
+  "codigo": "BRK RD",
+  "nombre": "Brick punta redonda"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "celosia",
+  "codigo": "CEL",
+  "nombre": "celosía"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "pavic-estandar",
+  "codigo": "PVC STD",
+  "nombre": "PAVIC estándar"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "pavic-peatonal",
+  "codigo": "PVC PE B 45",
+  "nombre": "PAVIC peatonal biselado"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "pavic-tabaco",
+  "codigo": "PVC STD T",
+  "nombre": "PAVIC estándar con tetones"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "18-h",
+  "codigo": "18H",
+  "nombre": "Ladrillo visto (18 huecos)"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "18-h-1-2",
+  "codigo": "18H 1/2",
+  "nombre": "18 huecos mitad"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "3-huecos-economico-rayado",
+  "codigo": "3HV",
+  "nombre": "3 huecos rayado"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "6-huecos-big-rayado",
+  "codigo": "6HBR",
+  "nombre": "Ladrillo rápido avance (6 huecos big)"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "6-huecos-big-rayado-mitad",
+  "codigo": "6HBR 1/2",
+  "nombre": "6 huecos big rayado mitad"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "6her",
+  "codigo": "6HER",
+  "nombre": "Ladrillo estándar (6 huecos)"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "6her-2",
+  "codigo": "6HER 1/2",
+  "nombre": "6 huecos mitad"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "adobito-industrial",
+  "codigo": "ADOBITO",
+  "nombre": "Adobito premium"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "botaguas-de-1-caida",
+  "codigo": "BOT 1C",
+  "nombre": "Botaguas de 1 caída"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "botaguas-de-2-caida",
+  "codigo": "BOT 2C",
+  "nombre": "Botaguas de 2 caídas"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "brick-enchape-ancho",
+  "codigo": "BRK EA",
+  "nombre": "Brick enchape ancho"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "brick-enchape-corto",
+  "codigo": "BRK EC",
+  "nombre": "Brick enchape angosto"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "brick-punta-redonda",
+  "codigo": "BRK RD",
+  "nombre": "Brick punta redonda"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "brick-punta-redonda-simple",
+  "codigo": "BRK PRS",
+  "nombre": "Brick punta redonda simple"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "celosia",
+  "codigo": "CEL",
+  "nombre": "Celosía"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "ladrillo-6-huecos-33",
+  "codigo": "6HER 33 1RA",
+  "nombre": "Ladrillo 6 huecos 33"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "parasol",
+  "codigo": "PARASOL",
+  "nombre": "Parasol"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pavic-estandar",
+  "codigo": "PVC STD",
+  "nombre": "PAVIC estándar (alto tráfico)"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pavic-estandar-mitad",
+  "codigo": "PVC STD 1/2",
+  "nombre": "PAVIC estándar mitad"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pavic-peatonal",
+  "codigo": "PVC PE",
+  "nombre": "PAVIC peatonal"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pieza-decorativa-eucalipto",
+  "codigo": "DEC EUCALIPTO P",
+  "nombre": "Pieza decorativa eucalipto"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pieza-decorativa-trebol",
+  "codigo": "DEC TRBL 15",
+  "nombre": "Pieza decorativa trébol"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pieza-decorativa-tronquito",
+  "codigo": "DEC TRC 50",
+  "nombre": "Pieza decorativa tronquito"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "teja-super-colonial-tapa-50",
+  "codigo": "TSC 50",
+  "nombre": "Teja colonial canal"
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "tsc",
+  "codigo": "TSC 50",
+  "nombre": "Teja colonial tapa"
+ }
+]

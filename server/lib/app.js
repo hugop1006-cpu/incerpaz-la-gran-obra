@@ -1,0 +1,363 @@
+'use strict';
+/* Aplicación web de INCERPAZ: sirve el sitio estático (/site) y la API de cuentas, precios, presupuestos y pedidos.
+   Sin dependencias externas. Los precios solo salen de aquí para cuentas verificadas. */
+const fs = require('node:fs');
+const path = require('node:path');
+const { ErrorHttp, falla, leerJson, responder, cookies, cookie, ip, limitador } = require('./http');
+const auth = require('./auth');
+
+const RAIZ = path.resolve(__dirname, '..', '..');
+const SITIO = path.join(RAIZ, 'site');
+const NOMBRE_COOKIE = 'incerpaz_sid';
+const TIPOS = ['constructor', 'empresa', 'ferreteria', 'entidad', 'proyectista', 'dueno'];
+const CIUDADES = ['cochabamba', 'santa-cruz', 'oruro', 'sucre'];
+const CATALOGOS = ['cochabamba', 'santa-cruz'];
+const PAGOS = ['transferencia', 'qr', 'agencia'];
+const ESTADOS_PEDIDO = ['recibido', 'confirmado', 'en_despacho', 'entregado', 'anulado'];
+const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8' };
+
+const txt = (v, max, nombre, { obligatorio = false } = {}) => {
+  const s = v == null ? '' : String(v).trim();
+  if (obligatorio && !s) falla(400, `Falta ${nombre}`);
+  if (s.length > max) falla(400, `${nombre} es demasiado largo`);
+  return s;
+};
+const publico = (u) => u && ({ id: u.id, rol: u.rol, estado: u.estado, tipo: u.tipo, nombre: u.nombre, razon_social: u.razon_social, nit: u.nit, ciudad: u.ciudad, celular: u.celular, correo: u.correo, lista_precios: u.lista_precios });
+
+function crearApp({ db, erp, catalogoRuta, seguro = process.env.COOKIE_SECURE === '1' }) {
+  const catalogo = JSON.parse(fs.readFileSync(catalogoRuta || path.join(__dirname, '..', 'data', 'catalogo.json'), 'utf8'));
+  const porClave = new Map(catalogo.map((p) => [`${p.ciudad}:${p.slug}`, p]));
+  const limLogin = limitador({ max: 10, ventanaMs: 15 * 60_000 });
+  const limRegistro = limitador({ max: 20, ventanaMs: 60 * 60_000 });
+
+  /* ---------- utilidades de negocio ---------- */
+  const verificado = (u) => u && (u.estado === 'verificado' || u.rol !== 'cliente');
+  function requerirUsuario(u) { if (!u) falla(401, 'Inicia sesión para continuar'); return u; }
+  function requerirVerificado(u) { requerirUsuario(u); if (!verificado(u)) falla(403, 'Tu cuenta está en revisión. Un ejecutivo la verificará pronto.'); return u; }
+  function requerirStaff(u) { requerirUsuario(u); if (u.rol === 'cliente') falla(403, 'No tienes permiso para esta acción'); return u; }
+
+  function validarItems(items) {
+    if (!Array.isArray(items) || !items.length) falla(400, 'Agrega al menos un producto');
+    if (items.length > 100) falla(400, 'Demasiados productos en un solo documento');
+    const vistos = new Set();
+    return items.map((it) => {
+      const p = porClave.get(`${it && it.ciudad}:${it && it.slug}`);
+      if (!p) falla(400, 'Hay un producto que no existe en el catálogo');
+      const cantidad = Number(it.cantidad);
+      if (!Number.isFinite(cantidad) || cantidad <= 0 || cantidad > 10_000_000) falla(400, `Cantidad inválida para ${p.nombre}`);
+      if (vistos.has(`${p.ciudad}:${p.slug}`)) falla(400, `${p.nombre} está repetido`);
+      vistos.add(`${p.ciudad}:${p.slug}`);
+      return { ciudad: p.ciudad, slug: p.slug, codigo: p.codigo, nombre: p.nombre, cantidad };
+    });
+  }
+  async function preciosDe(items, usuario) {
+    /* items ya validados; devuelve Map clave -> precio|null agrupando por catálogo */
+    const out = new Map();
+    for (const c of new Set(items.map((i) => i.ciudad))) {
+      const lista = items.filter((i) => i.ciudad === c);
+      const r = await erp.getPrecios({ ciudad: c, listaPrecios: usuario.lista_precios, productos: lista.map((i) => ({ slug: i.slug, codigo: i.codigo })) });
+      lista.forEach((i) => out.set(`${i.ciudad}:${i.slug}`, typeof r[i.slug] === 'number' ? r[i.slug] : null));
+    }
+    return out;
+  }
+  const total = (items) => items.every((i) => i.precio_unitario != null) ? Math.round(items.reduce((t, i) => t + i.subtotal, 0) * 100) / 100 : null;
+
+  function guardarPresupuesto(usuario, id, { obra, notas }, items, totalEst) {
+    db.exec('BEGIN');
+    try {
+      let pid = id;
+      if (pid) {
+        db.prepare("UPDATE presupuestos SET obra = ?, notas = ?, total_estimado = ?, actualizado_en = datetime('now') WHERE id = ?").run(obra, notas, totalEst, pid);
+        db.prepare('DELETE FROM presupuesto_items WHERE presupuesto_id = ?').run(pid);
+      } else {
+        pid = Number(db.prepare('INSERT INTO presupuestos (usuario_id, obra, notas, total_estimado) VALUES (?, ?, ?, ?)').run(usuario.id, obra, notas, totalEst).lastInsertRowid);
+      }
+      const ins = db.prepare('INSERT INTO presupuesto_items (presupuesto_id, ciudad_catalogo, slug, codigo, nombre, cantidad) VALUES (?, ?, ?, ?, ?, ?)');
+      items.forEach((i) => ins.run(pid, i.ciudad, i.slug, i.codigo, i.nombre, i.cantidad));
+      db.exec('COMMIT');
+      return pid;
+    } catch (e) { db.exec('ROLLBACK'); throw e; }
+  }
+  const presupuestoDe = (usuario, id) => {
+    const p = db.prepare('SELECT * FROM presupuestos WHERE id = ? AND usuario_id = ?').get(id, usuario.id);
+    if (!p) falla(404, 'No encontramos ese presupuesto');
+    p.items = db.prepare('SELECT ciudad_catalogo AS ciudad, slug, codigo, nombre, cantidad FROM presupuesto_items WHERE presupuesto_id = ? ORDER BY id').all(id);
+    return p;
+  };
+  const pedidoDe = (usuario, id, staff) => {
+    const p = staff ? db.prepare('SELECT * FROM pedidos WHERE id = ?').get(id) : db.prepare('SELECT * FROM pedidos WHERE id = ? AND usuario_id = ?').get(id, usuario.id);
+    if (!p) falla(404, 'No encontramos ese pedido');
+    p.items = db.prepare('SELECT ciudad_catalogo AS ciudad, slug, codigo, nombre, cantidad, precio_unitario, subtotal FROM pedido_items WHERE pedido_id = ? ORDER BY id').all(id);
+    p.eventos = db.prepare('SELECT estado, nota, creado_en FROM pedido_eventos WHERE pedido_id = ? ORDER BY id').all(id);
+    return p;
+  };
+  const ocultarErp = (p) => { const { erp_error, ...resto } = p; return resto; };
+
+  /* ---------- rutas de la API ---------- */
+  const rutas = [];
+  const ruta = (metodo, patron, fn) => rutas.push({ metodo, re: new RegExp(`^${patron.replace(/:(\w+)/g, '(?<$1>[^/]+)')}$`), fn });
+
+  ruta('GET', '/api/salud', async () => ({ ok: true, erp: erp.nombre }));
+
+  ruta('POST', '/api/registro', async ({ req, body }) => {
+    if (!limRegistro(ip(req))) falla(429, 'Demasiados intentos. Prueba más tarde.');
+    const tipo = txt(body.tipo, 20, 'el tipo de cliente', { obligatorio: true });
+    if (!TIPOS.includes(tipo)) falla(400, 'Tipo de cliente inválido');
+    const ciudad = txt(body.ciudad, 20, 'la ciudad', { obligatorio: true });
+    if (!CIUDADES.includes(ciudad)) falla(400, 'Elige una ciudad con agencia');
+    const nombre = txt(body.nombre, 120, 'el nombre', { obligatorio: true });
+    const razon = txt(body.razon_social, 160, 'la razón social');
+    const nit = txt(body.nit, 20, 'el NIT o CI');
+    if (nit && !/^[0-9A-Za-z-]{4,20}$/.test(nit)) falla(400, 'El NIT o CI no es válido');
+    if (['empresa', 'entidad', 'ferreteria'].includes(tipo) && (!nit || !razon)) falla(400, 'Para empresas y entidades, el NIT y la razón social son obligatorios');
+    const celular = txt(body.celular, 20, 'el celular', { obligatorio: true }).replace(/[\s-]/g, '');
+    if (!/^\d{8}$/.test(celular)) falla(400, 'El celular debe tener 8 dígitos');
+    const correo = txt(body.correo, 160, 'el correo', { obligatorio: true }).toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) falla(400, 'El correo no es válido');
+    const password = String(body.password || '');
+    if (password.length < 8 || password.length > 200) falla(400, 'La contraseña debe tener al menos 8 caracteres');
+    if (db.prepare('SELECT 1 FROM usuarios WHERE correo = ?').get(correo)) falla(409, 'Ya existe una cuenta con ese correo');
+    let erpId = null;
+    if (nit) { try { const c = await erp.buscarCliente({ nit }); if (c) erpId = c.erpId; } catch { /* el ERP puede no responder: se verifica a mano */ } }
+    const r = db.prepare('INSERT INTO usuarios (tipo, nombre, razon_social, nit, ciudad, celular, correo, pass_hash, erp_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(tipo, nombre, razon || null, nit || null, ciudad, celular, correo, auth.hashPassword(password), erpId);
+    return { status: 201, cuerpo: { id: Number(r.lastInsertRowid), estado: 'pendiente', mensaje: 'Recibimos tu registro. Un ejecutivo de tu ciudad verificará tu cuenta y te avisará.' } };
+  });
+
+  ruta('POST', '/api/login', async ({ req, res, body }) => {
+    const correo = txt(body.correo, 160, 'el correo', { obligatorio: true }).toLowerCase();
+    if (!limLogin(`${ip(req)}|${correo}`)) falla(429, 'Demasiados intentos. Espera unos minutos.');
+    const u = db.prepare('SELECT * FROM usuarios WHERE correo = ?').get(correo);
+    /* mismo trabajo de hash aunque el usuario no exista, para no revelar qué correos están registrados */
+    const ok = auth.verificarPassword(String(body.password || ''), u ? u.pass_hash : 'scrypt$00$00');
+    if (!u || !ok) falla(401, 'Correo o contraseña incorrectos');
+    if (u.estado === 'rechazado') falla(403, 'Esta cuenta no fue aprobada. Comunícate con tu agencia.');
+    const token = auth.crearSesion(db, u.id);
+    res.setHeader('Set-Cookie', cookie(NOMBRE_COOKIE, token, { maxAge: auth.DIAS_SESION * 86400, seguro }));
+    return { usuario: publico(u) };
+  });
+
+  ruta('POST', '/api/logout', async ({ req, res }) => {
+    auth.cerrarSesion(db, cookies(req)[NOMBRE_COOKIE]);
+    res.setHeader('Set-Cookie', cookie(NOMBRE_COOKIE, '', { maxAge: 0, seguro }));
+    return { ok: true };
+  });
+
+  ruta('GET', '/api/yo', async ({ usuario }) => ({ usuario: publico(usuario) || null, erp_ejemplo: !!erp.ejemplo }));
+
+  ruta('GET', '/api/precios', async ({ usuario, url }) => {
+    requerirVerificado(usuario);
+    const ciudad = url.searchParams.get('ciudad');
+    if (!CATALOGOS.includes(ciudad)) falla(400, 'Catálogo inexistente');
+    const lista = catalogo.filter((p) => p.ciudad === ciudad);
+    const r = await erp.getPrecios({ ciudad, listaPrecios: usuario.lista_precios, productos: lista.map((p) => ({ slug: p.slug, codigo: p.codigo })) });
+    const precios = {}; lista.forEach((p) => { precios[p.slug] = typeof r[p.slug] === 'number' ? r[p.slug] : null; });
+    return { moneda: 'BOB', ejemplo: !!erp.ejemplo, precios };
+  });
+
+  /* presupuestos */
+  ruta('GET', '/api/presupuestos', async ({ usuario }) => {
+    requerirUsuario(usuario);
+    return { presupuestos: db.prepare(`SELECT p.id, p.obra, p.estado, p.total_estimado, p.creado_en, p.actualizado_en,
+      (SELECT COUNT(*) FROM presupuesto_items i WHERE i.presupuesto_id = p.id) AS productos FROM presupuestos p WHERE p.usuario_id = ? ORDER BY p.actualizado_en DESC, p.id DESC`).all(usuario.id) };
+  });
+  ruta('POST', '/api/presupuestos', async ({ usuario, body }) => {
+    requerirUsuario(usuario);
+    const items = validarItems(body.items);
+    const datos = { obra: txt(body.obra, 120, 'la obra') || null, notas: txt(body.notas, 1000, 'las notas') || null };
+    let id = null;
+    if (body.id != null) { const p = presupuestoDe(usuario, Number(body.id)); if (p.estado === 'convertido') falla(409, 'Este presupuesto ya se convirtió en pedido'); id = p.id; }
+    let totalEst = null;
+    if (verificado(usuario)) {
+      const pr = await preciosDe(items, usuario);
+      const conPrecio = items.map((i) => ({ ...i, precio_unitario: pr.get(`${i.ciudad}:${i.slug}`) }));
+      conPrecio.forEach((i) => { i.subtotal = i.precio_unitario == null ? null : Math.round(i.precio_unitario * i.cantidad * 100) / 100; });
+      totalEst = total(conPrecio);
+    }
+    const pid = guardarPresupuesto(usuario, id, datos, items, totalEst);
+    return { status: id ? 200 : 201, cuerpo: { id: pid, total_estimado: totalEst } };
+  });
+  ruta('GET', '/api/presupuestos/:id', async ({ usuario, params }) => {
+    requerirUsuario(usuario);
+    const p = presupuestoDe(usuario, Number(params.id));
+    if (verificado(usuario)) {
+      const pr = await preciosDe(p.items, usuario);
+      p.items.forEach((i) => { i.precio_unitario = pr.get(`${i.ciudad}:${i.slug}`); i.subtotal = i.precio_unitario == null ? null : Math.round(i.precio_unitario * i.cantidad * 100) / 100; });
+      p.total_estimado = total(p.items);
+    }
+    return { presupuesto: p };
+  });
+  ruta('POST', '/api/presupuestos/:id/enviar', async ({ usuario, params }) => {
+    requerirUsuario(usuario);
+    const p = presupuestoDe(usuario, Number(params.id));
+    if (p.estado === 'convertido') falla(409, 'Este presupuesto ya se convirtió en pedido');
+    db.prepare("UPDATE presupuestos SET estado = 'enviado', actualizado_en = datetime('now') WHERE id = ?").run(p.id);
+    return { ok: true, estado: 'enviado' };
+  });
+  ruta('DELETE', '/api/presupuestos/:id', async ({ usuario, params }) => {
+    requerirUsuario(usuario);
+    const p = presupuestoDe(usuario, Number(params.id));
+    if (p.estado === 'convertido') falla(409, 'Este presupuesto ya se convirtió en pedido');
+    db.prepare('DELETE FROM presupuestos WHERE id = ?').run(p.id);
+    return { ok: true };
+  });
+
+  /* pedidos */
+  ruta('GET', '/api/pedidos', async ({ usuario }) => {
+    requerirUsuario(usuario);
+    return { pedidos: db.prepare('SELECT id, numero, estado, ciudad, total_estimado, entrega_tipo, creado_en, actualizado_en FROM pedidos WHERE usuario_id = ? ORDER BY id DESC').all(usuario.id) };
+  });
+  ruta('POST', '/api/pedidos', async ({ usuario, body }) => {
+    requerirVerificado(usuario);
+    let items; let presupuesto = null;
+    if (body.presupuesto_id != null) { presupuesto = presupuestoDe(usuario, Number(body.presupuesto_id)); if (presupuesto.estado === 'convertido') falla(409, 'Este presupuesto ya se convirtió en pedido'); items = validarItems(presupuesto.items); }
+    else items = validarItems(body.items);
+    const ciudades = new Set(items.map((i) => i.ciudad));
+    if (ciudades.size > 1) falla(400, 'Un pedido solo puede tener productos de un catálogo. Haz un pedido por ciudad.');
+    const ciudadCatalogo = [...ciudades][0];
+    const e = body.entrega || {};
+    const tipoEntrega = txt(e.tipo, 10, 'la entrega', { obligatorio: true });
+    if (!['retiro', 'envio'].includes(tipoEntrega)) falla(400, 'Elige retiro en agencia o envío a obra');
+    const agencia = txt(e.agencia, 80, 'la agencia'); const direccion = txt(e.direccion, 240, 'la dirección');
+    if (tipoEntrega === 'retiro' && !agencia) falla(400, 'Elige la agencia donde retirarás');
+    if (tipoEntrega === 'envio' && !direccion) falla(400, 'Indica la dirección de la obra');
+    const pago = txt(body.pago, 20, 'la forma de pago', { obligatorio: true });
+    if (!PAGOS.includes(pago)) falla(400, 'Forma de pago inválida');
+    const pr = await preciosDe(items, usuario);
+    const sinPrecio = items.filter((i) => pr.get(`${i.ciudad}:${i.slug}`) == null);
+    if (sinPrecio.length) falla(422, `Estos productos no tienen precio y hay que cotizarlos con tu ejecutivo: ${sinPrecio.map((i) => i.nombre).join(', ')}`);
+    const lineas = items.map((i) => { const pu = pr.get(`${i.ciudad}:${i.slug}`); return { ...i, precio_unitario: pu, subtotal: Math.round(pu * i.cantidad * 100) / 100 }; });
+    const totalPedido = total(lineas);
+    const notas = txt(body.notas, 1000, 'las notas') || (presupuesto && presupuesto.notas) || null;
+    let id;
+    db.exec('BEGIN');
+    try {
+      id = Number(db.prepare(`INSERT INTO pedidos (numero, usuario_id, presupuesto_id, ciudad, entrega_tipo, entrega_agencia, entrega_direccion, fecha_deseada, pago, nit, razon_social, notas, total_estimado)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(`TMP-${Math.random().toString(36).slice(2)}`, usuario.id, presupuesto ? presupuesto.id : null, ciudadCatalogo, tipoEntrega, agencia || null, direccion || null,
+        txt(e.fecha, 40, 'la fecha') || null, pago, usuario.nit, usuario.razon_social || usuario.nombre, notas, totalPedido).lastInsertRowid);
+      const numero = `PD-${String(id).padStart(5, '0')}`;
+      db.prepare('UPDATE pedidos SET numero = ? WHERE id = ?').run(numero, id);
+      const ins = db.prepare('INSERT INTO pedido_items (pedido_id, ciudad_catalogo, slug, codigo, nombre, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+      lineas.forEach((l) => ins.run(id, l.ciudad, l.slug, l.codigo, l.nombre, l.cantidad, l.precio_unitario, l.subtotal));
+      db.prepare("INSERT INTO pedido_eventos (pedido_id, estado, nota, autor_id) VALUES (?, 'recibido', 'Pedido recibido desde el sitio', ?)").run(id, usuario.id);
+      if (presupuesto) db.prepare("UPDATE presupuestos SET estado = 'convertido', actualizado_en = datetime('now') WHERE id = ?").run(presupuesto.id);
+      db.exec('COMMIT');
+    } catch (err) { db.exec('ROLLBACK'); throw err; }
+    const pedido = pedidoDe(usuario, id, false);
+    try {
+      const r = await erp.enviarPedido({ numero: pedido.numero, cliente: { erp_id: usuario.erp_id, nit: usuario.nit, razon_social: usuario.razon_social || usuario.nombre, nombre: usuario.nombre, celular: usuario.celular, correo: usuario.correo },
+        ciudad: ciudadCatalogo, entrega: { tipo: tipoEntrega, agencia, direccion, fecha: e.fecha || null }, pago, notas, total: totalPedido, items: lineas.map((l) => ({ codigo: l.codigo, nombre: l.nombre, cantidad: l.cantidad, precio: l.precio_unitario })) });
+      db.prepare("UPDATE pedidos SET erp_ref = ?, erp_error = NULL WHERE id = ?").run(r.erpRef, id);
+    } catch (err) {
+      /* el pedido queda guardado; un ejecutivo lo reenvía al ERP desde el panel */
+      db.prepare('UPDATE pedidos SET erp_error = ? WHERE id = ?').run(String(err.message).slice(0, 300), id);
+    }
+    return { status: 201, cuerpo: { pedido: ocultarErp(pedidoDe(usuario, id, false)) } };
+  });
+  ruta('GET', '/api/pedidos/:id', async ({ usuario, params }) => { requerirUsuario(usuario); return { pedido: ocultarErp(pedidoDe(usuario, Number(params.id), false)) }; });
+  ruta('POST', '/api/pedidos/:id/repetir', async ({ usuario, params }) => {
+    requerirUsuario(usuario);
+    const p = pedidoDe(usuario, Number(params.id), false);
+    return { items: p.items.map((i) => ({ ciudad: i.ciudad, slug: i.slug, codigo: i.codigo, nombre: i.nombre, cantidad: i.cantidad })), obra: null };
+  });
+
+  /* panel del equipo (ejecutivos y administradores) */
+  const alcance = (u) => (u.rol === 'admin' ? { sql: '', args: [] } : { sql: ' AND ciudad = ?', args: [u.ciudad] });
+  ruta('GET', '/api/admin/cuentas', async ({ usuario, url }) => {
+    requerirStaff(usuario);
+    const estado = url.searchParams.get('estado') || 'pendiente';
+    if (!['pendiente', 'verificado', 'rechazado'].includes(estado)) falla(400, 'Estado inválido');
+    const a = alcance(usuario);
+    return { cuentas: db.prepare(`SELECT id, estado, tipo, nombre, razon_social, nit, ciudad, celular, correo, lista_precios, erp_id, creado_en FROM usuarios WHERE rol = 'cliente' AND estado = ?${a.sql} ORDER BY id DESC LIMIT 200`).all(estado, ...a.args) };
+  });
+  ruta('POST', '/api/admin/cuentas/:id', async ({ usuario, params, body }) => {
+    requerirStaff(usuario);
+    const a = alcance(usuario);
+    const u = db.prepare(`SELECT * FROM usuarios WHERE id = ? AND rol = 'cliente'${a.sql}`).get(Number(params.id), ...a.args);
+    if (!u) falla(404, 'No encontramos esa cuenta');
+    if (!['verificar', 'rechazar'].includes(body.accion)) falla(400, 'Acción inválida');
+    const lista = txt(body.lista_precios, 40, 'la lista de precios') || u.lista_precios;
+    if (!/^[a-z0-9_-]+$/i.test(lista)) falla(400, 'Lista de precios inválida');
+    db.prepare("UPDATE usuarios SET estado = ?, lista_precios = ?, erp_id = COALESCE(?, erp_id), verificado_por = ?, verificado_en = datetime('now') WHERE id = ?")
+      .run(body.accion === 'verificar' ? 'verificado' : 'rechazado', lista, txt(body.erp_id, 40, 'el código del ERP') || null, usuario.id, u.id);
+    return { ok: true };
+  });
+  ruta('GET', '/api/admin/pedidos', async ({ usuario, url }) => {
+    requerirStaff(usuario);
+    const estado = url.searchParams.get('estado');
+    if (estado && !ESTADOS_PEDIDO.includes(estado)) falla(400, 'Estado inválido');
+    const a = alcance(usuario);
+    const filas = db.prepare(`SELECT p.id, p.numero, p.estado, p.ciudad, p.total_estimado, p.entrega_tipo, p.entrega_agencia, p.entrega_direccion, p.pago, p.erp_ref, p.erp_error, p.creado_en, u.nombre AS cliente, u.celular
+      FROM pedidos p JOIN usuarios u ON u.id = p.usuario_id WHERE 1 = 1${estado ? ' AND p.estado = ?' : ''}${a.sql.replace('ciudad', 'p.ciudad')} ORDER BY p.id DESC LIMIT 200`).all(...(estado ? [estado] : []), ...a.args);
+    return { pedidos: filas };
+  });
+  ruta('POST', '/api/admin/pedidos/:id/estado', async ({ usuario, params, body }) => {
+    requerirStaff(usuario);
+    const a = alcance(usuario);
+    const p = db.prepare(`SELECT * FROM pedidos WHERE id = ?${a.sql}`).get(Number(params.id), ...a.args);
+    if (!p) falla(404, 'No encontramos ese pedido');
+    if (!ESTADOS_PEDIDO.includes(body.estado)) falla(400, 'Estado inválido');
+    db.prepare("UPDATE pedidos SET estado = ?, actualizado_en = datetime('now') WHERE id = ?").run(body.estado, p.id);
+    db.prepare('INSERT INTO pedido_eventos (pedido_id, estado, nota, autor_id) VALUES (?, ?, ?, ?)').run(p.id, body.estado, txt(body.nota, 300, 'la nota') || null, usuario.id);
+    return { ok: true };
+  });
+
+  /* ---------- servidor de archivos del sitio ---------- */
+  function servirEstatico(req, res, url) {
+    let p = decodeURIComponent(url.pathname);
+    if (p.includes('\0')) return responder(res, 400, { error: 'Solicitud inválida' });
+    if (p === '/' || p === '') p = '/index.html';
+    else if (!path.extname(p)) p = fs.existsSync(path.join(SITIO, p + '.html')) ? p + '.html' : p;
+    const archivo = path.normalize(path.join(SITIO, p));
+    const relativo = path.relative(SITIO, archivo);
+    const oculto = relativo.split(path.sep).some((s) => s.startsWith('.'));
+    if (relativo.startsWith('..') || path.isAbsolute(relativo) || oculto) return responder(res, 404, { error: 'No encontrado' });
+    fs.stat(archivo, (err, st) => {
+      if (err || !st.isFile()) {
+        const nf = path.join(SITIO, '404.html');
+        const html = fs.existsSync(nf) ? fs.readFileSync(nf) : Buffer.from('No encontrado');
+        res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': html.length }); return res.end(req.method === 'HEAD' ? undefined : html);
+      }
+      const ext = path.extname(archivo).toLowerCase();
+      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Content-Length': st.size, 'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=3600' });
+      if (req.method === 'HEAD') return res.end();
+      fs.createReadStream(archivo).pipe(res);
+    });
+  }
+
+  /* ---------- manejador principal ---------- */
+  return async function manejar(req, res) {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    const url = new URL(req.url, 'http://localhost');
+    try {
+      if (!url.pathname.startsWith('/api/')) {
+        if (!['GET', 'HEAD'].includes(req.method)) return responder(res, 405, { error: 'Método no permitido' });
+        return servirEstatico(req, res, url);
+      }
+      const usuario = auth.usuarioDeSesion(db, cookies(req)[NOMBRE_COOKIE]);
+      const cambia = !['GET', 'HEAD'].includes(req.method);
+      if (cambia) {
+        if (req.headers['x-requested-with'] !== 'incerpaz') falla(403, 'Solicitud no permitida');
+        const origen = req.headers.origin;
+        if (origen && new URL(origen).host !== req.headers.host) falla(403, 'Origen no permitido');
+      }
+      for (const r of rutas) {
+        if (r.metodo !== req.method) continue;
+        const m = r.re.exec(url.pathname);
+        if (!m) continue;
+        const body = cambia && req.method !== 'DELETE' ? await leerJson(req) : {};
+        const salida = await r.fn({ req, res, url, usuario, params: m.groups || {}, body });
+        if (salida && salida.status) return responder(res, salida.status, salida.cuerpo);
+        return responder(res, 200, salida);
+      }
+      return responder(res, 404, { error: 'No encontrado' });
+    } catch (e) {
+      if (e instanceof ErrorHttp) return responder(res, e.status, { error: e.message });
+      console.error('[error]', e);
+      return responder(res, 500, { error: 'Ocurrió un error. Intenta de nuevo.' });
+    }
+  };
+}
+module.exports = { crearApp };

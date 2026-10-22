@@ -230,3 +230,46 @@ textarea { min-height: 96px; resize: vertical; }
 .wa-float { position: fixed; right: 16px; bottom: 16px; z-index: 60; background: var(--wa); color: #fff; font: 700 17px var(--display); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; padding: 14px 20px; box-shadow: 0 6px 20px rgba(0,0,0,.28); }
 .wa-float:hover { background: #0f5f34; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* comercio: tarjetas con compra, presupuesto, cuenta y panel */
+.narrow { max-width: 760px; }
+.pcard-link { text-decoration: none; display: flex; flex-direction: column; flex: 1; color: inherit; }
+.pcard-buy { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px 16px; border-top: 1.5px solid var(--line); background: var(--paper); }
+.precio { font-size: 14px; color: var(--ink-2); line-height: 1.3; }
+.precio a { color: var(--red); font-weight: 600; }
+.buy-box { background: var(--white); border: 2px solid var(--ink); padding: 18px 20px; margin-block: 18px; }
+.precio-big { font: 700 28px var(--display); letter-spacing: .02em; text-transform: uppercase; }
+.precio-big a { color: var(--red); }
+.buy-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-top: 12px; }
+.buy-row label { max-width: 190px; }
+.topbar [data-acct] { white-space: nowrap; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 14px 22px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 80; max-width: calc(100vw - 32px); text-align: center; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+.tabla { width: 100%; border-collapse: collapse; background: var(--white); font-size: 16px; }
+.tabla th, .tabla td { padding: 12px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.tabla th { font: 600 13px var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); border-bottom: 2px solid var(--ink); white-space: nowrap; }
+.tabla td.num, .tabla th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.tabla tr.fuera { opacity: .45; }
+.tabla .btn-row { flex-wrap: nowrap; }
+.tabla tfoot th { font: 700 18px var(--display); color: var(--ink); letter-spacing: .04em; border-top: 2px solid var(--ink); border-bottom: 0; }
+.qty { width: 110px; text-align: right; padding: 8px 10px; min-height: 40px; }
+.sel { font: 500 15px var(--body); background: var(--white); color: var(--ink); border: 1.5px solid var(--ink); padding: 6px 8px; min-height: 40px; width: auto; }
+.chip.ok { background: #e5f2ea; border-color: var(--wa); color: #0f5f34; cursor: default; }
+.chip.warn { background: #fff4cc; border-color: #b58900; color: #5b4600; cursor: default; }
+span.chip { display: inline-block; cursor: default; padding: 4px 10px; font-size: 14px; }
+.form-msg.error { border-left-color: var(--red); background: #fbe8e9; }
+.done { border: 2px solid var(--wa); background: #e5f2ea; padding: 22px; display: flex; flex-direction: column; gap: 6px; }
+.done b { font: 700 28px var(--display); text-transform: uppercase; }
+.acct-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 20px; }
+.timeline { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 10px 14px; }
+.timeline .paso { padding: 6px 12px; border: 1.5px solid var(--line); color: var(--ink-2); font-size: 14px; }
+.timeline .paso.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.timeline .paso.anulado { background: var(--red); border-color: var(--red); color: #fff; }
+tr.detalle td { background: var(--paper); padding: 16px 20px; }
+.specs td { vertical-align: top; }
+.scroll { overflow-x: auto; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 2px solid var(--ink); background: var(--white); }
+.seg button { font: 600 16px var(--body); padding: 10px 16px; border: 0; background: var(--white); color: var(--ink); cursor: pointer; border-radius: 0; min-height: 44px; }
+.seg button + button { border-left: 2px solid var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+@media (max-width: 520px) { .seg button { flex: 1 1 auto; padding: 10px 10px; font-size: 15px; } .seg button + button { border-left: 0; border-top: 2px solid var(--ink); } .seg { width: 100%; } }

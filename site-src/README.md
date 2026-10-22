@@ -46,3 +46,6 @@ Para verlo en tu computador: `npx http-server -p 8080 .` y abre http://localhost
 Cuando se publique en incerpaz.com: cambia `interno` a `false`, ejecuta `node site-src/build.js` (se generan `sitemap.xml` y un `robots.txt` que permite indexar) y copia `site/` al servidor del dominio.
 
 El dominio previsto es https://www.incerpaz.com (campo `dominio` de `data/sitio.json`).
+
+## Modo comercio
+Con `"comercio": true` (por defecto) el sitio carga `comercio.js` y necesita el servidor de `server/` (ver `server/README.md`) para cuentas, precios y pedidos.

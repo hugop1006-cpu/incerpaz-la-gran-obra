@@ -3,7 +3,8 @@
    Uso: node site-src/build.js
    Los textos y datos viven en site-src/data (sitio.json y productos.json). Las páginas se
    generan completas en HTML para que carguen rápido en celular y las lea bien Google.
-   site-src/config.json: "interno": true mantiene el sitio fuera de Google (noindex) hasta publicarlo. */
+   site-src/config.json: "interno": true mantiene el sitio fuera de Google (noindex) hasta publicarlo.
+   "comercio": true activa cuentas, precios con sesión y pedidos (necesita el servidor de /server). */
 const fs = require('fs');
 const path = require('path');
 
@@ -11,7 +12,7 @@ const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(ROOT, 'site');
 const sitio = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/sitio.json'), 'utf8'));
 let productos = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/productos.json'), 'utf8'));
-const config = Object.assign({ leadEndpoint: '', interno: true }, fs.existsSync(path.join(__dirname, 'config.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')) : {});
+const config = Object.assign({ leadEndpoint: '', interno: true, comercio: true }, fs.existsSync(path.join(__dirname, 'config.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')) : {});
 
 const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const num = (n) => Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 });
@@ -61,6 +62,9 @@ productos = productos.map((p) => {
   const linea = p.linea ? sentence(p.linea.replace(/VARIADADES/i, 'VARIEDADES').replace(/VARIEDAD(?!ES)/i, 'VARIEDADES').replace(/RUSTICO/i, 'RÚSTICO')) : '';
   return Object.assign({}, p, { nombre: bonito(p.titulo), linea, medidas, variantes, sinFicha, peso: sinFicha ? null : p.peso, cat: categoriaPrincipal(p), todas: p.categorias, largo: dim('Largo'), ancho: dim('Ancho'), alto: dim('Alto') });
 });
+/* catálogo confiable para el servidor: valida pedidos y presupuestos sin fiarse del navegador */
+fs.mkdirSync(path.join(ROOT, 'server/data'), { recursive: true });
+fs.writeFileSync(path.join(ROOT, 'server/data/catalogo.json'), JSON.stringify(productos.map((p) => ({ ciudad: p.ciudad, slug: p.slug, codigo: p.codigo || null, nombre: p.nombre })), null, 1));
 const pavic = productos.filter((p) => /pavic/i.test(p.linea) || /^pavic/.test(p.slug));
 const purl = (p, base = '') => `${base}productos/${p.ciudad}/${p.slug}.html`;
 const medidaTexto = (p) => (p.largo && p.ancho && p.alto) ? `${num(p.largo)} × ${num(p.ancho)} × ${num(p.alto)} cm` : (p.medidas.length ? p.medidas.slice(0, 2).map(([l, v]) => `${l.toLowerCase()} ${num(v)} cm`).join(' · ') : (p.codigo ? `Código ${p.codigo}` : ''));
@@ -73,7 +77,7 @@ const NAV = [
   ['empresa.html', 'Empresa']
 ];
 const ciudadDefecto = sitio.ciudades[0];
-function layout({ file, base = '', title, desc, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '' }) {
+function layout({ file, base = '', title, desc, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '' }) {
   const url = `${sitio.dominio}/${file === 'index.html' ? '' : file}`;
   const nav = NAV.map(([href, label]) => `<a href="${base}${href}"${file === href ? ' aria-current="page"' : ''}>${label}</a>`).join('');
   const cfg = JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || '' });
@@ -84,7 +88,7 @@ function layout({ file, base = '', title, desc, body, og = 'assets/img/productos
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-${config.interno ? '<meta name="robots" content="noindex, nofollow">' : ''}
+${config.interno || ['ingresar','registro','presupuesto','cuenta','equipo'].includes(pagina) ? '<meta name="robots" content="noindex, nofollow">' : ''}
 <link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:locale" content="es_BO"><meta property="og:site_name" content="INCERPAZ">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${sitio.dominio}/${og}">
@@ -95,11 +99,11 @@ ${config.interno ? '<meta name="robots" content="noindex, nofollow">' : ''}
 <link rel="stylesheet" href="${base}assets/css/site.css">
 ${jsonld}
 </head>
-<body>
+<body data-base="${base}" data-pagina="${pagina}">
 <a class="skip" href="#contenido">Saltar al contenido</a>
 <div class="topbar"><div class="wrap">
   <span>Servicio al cliente <a href="tel:${sitio.servicio_cliente.tel}"><strong>${sitio.servicio_cliente.texto}</strong></a></span>
-  <span><a href="${sitio.enlaces_externos.exportaciones}" rel="noopener">Exportaciones</a> · <a href="${sitio.enlaces_externos.promotores}" rel="noopener">Promotores</a></span>
+  <span>${config.comercio ? `<span data-acct><a href="${base}presupuesto.html">Presupuesto (<span data-bcount>0</span>)</a> · <a href="${base}ingresar.html">Ingresar</a></span> · ` : ''}<a href="${sitio.enlaces_externos.exportaciones}" rel="noopener">Exportaciones</a> · <a href="${sitio.enlaces_externos.promotores}" rel="noopener">Promotores</a></span>
 </div></div>
 <header class="site-header"><div class="wrap">
   <a class="brand" href="${base || './'}" aria-label="INCERPAZ, inicio"><img src="${base}assets/img/logo-header.png" alt="INCERPAZ" width="235" height="38"></a>
@@ -129,6 +133,7 @@ ${body}
 <a class="wa-float" href="${waHref(ciudadDefecto.whatsapp, 'Hola, quisiera más información, por favor.')}" data-wa="Hola, quisiera más información, por favor." rel="noopener">WhatsApp</a>
 <script>window.INCERPAZ=${cfg};</script>
 <script src="${base}assets/js/site.js" defer></script>
+${config.comercio ? `<script src="${base}assets/js/comercio.js" defer></script>` : ''}
 </body>
 </html>`;
 }
@@ -142,16 +147,18 @@ const orgLd = `<script type="application/ld+json">${JSON.stringify({
 /* ---- piezas reutilizables ---- */
 function productCard(p, base = '') {
   const im = p.imagenes[0];
-  return `<a class="pcard" href="${purl(p, base)}" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}">
+  return `<article class="pcard" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}">
+  <a class="pcard-link" href="${purl(p, base)}">
   <div class="img">${im ? `<img src="${base}${im}" alt="${esc(p.nombre)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
-  <div class="body"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>`;
+  <div class="body"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>
+  ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir</button></div>` : ''}</article>`;
 }
 function calcOptions(list) {
   const grupos = {};
   list.forEach((p) => { const v = p.variantes[0]; if (v) (grupos[p.ciudad] = grupos[p.ciudad] || []).push(`<option data-rend="${v.rend}" data-peso="${p.peso || 0}" data-unidad="${v.unidad}" data-nombre="${esc(p.nombre)}">${esc(p.nombre)}</option>`); });
   return Object.keys(grupos).map((c) => `<optgroup label="Catálogo de ${CIUDAD_CATALOGO[c]}" data-ciudad="${c}">${grupos[c].join('')}</optgroup>`).join('');
 }
-function calcBox({ options, idp = 'c', waText, noteExtra = '' }) {
+function calcBox({ options, idp = 'c', waText, noteExtra = '', addBtn = '' }) {
   return `<div class="calc" data-calc>
   <div class="fields">
     <label class="full">Producto<select data-calc-prod name="${idp}prod">${options}</select></label>
@@ -163,6 +170,7 @@ function calcBox({ options, idp = 'c', waText, noteExtra = '' }) {
     <div><span class="num" data-out="pzas">0</span><small>piezas</small></div>
     <div class="pair"><div><span class="num" style="font-size:36px" data-out="kg">0</span><small>kg aprox.</small></div><div><span class="num" style="font-size:36px" data-out="ton">0</span><small>toneladas</small></div></div>
     <a class="btn btn--wa" data-calc-wa data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText)}" rel="noopener">Cotizar por WhatsApp</a>
+    ${addBtn}
   </div>
 </div>`;
 }
@@ -300,12 +308,14 @@ for (const p of productos) {
     ${p.descripcion ? `<p class="lead">${esc(p.descripcion)}</p>` : ''}
     ${rows.length ? `<table class="specs"><tbody>${rows.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${/<br>/.test(v) ? v : esc(v)}</td></tr>`).join('')}</tbody></table>` : `<p class="price-note">Las medidas de este producto las confirma la agencia. Escríbenos y te las enviamos.</p>`}
     ${otra ? `<p class="muted" style="font-size:15px">Este producto también está en el <a href="${base}${purl(otra)}">catálogo de ${CIUDAD_CATALOGO[otra.ciudad]}</a>. Las medidas pueden variar según la fábrica.</p>` : ''}
-    <p class="price-note"><strong>Precio:</strong> lo confirma la agencia de tu ciudad según tu obra y la cantidad. Escríbenos y te cotizamos.</p>
+    ${config.comercio ? `<div class="buy-box"><p class="precio-big" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</p>
+      <div class="buy-row"><label>Cantidad (piezas)<input id="qty" type="number" min="1" step="1" value="100"></label><button class="btn btn--red" type="button" data-add data-qty-from="#qty" data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir al presupuesto</button></div>
+      <p class="muted" style="font-size:15px;margin-top:10px">Los precios se ven con una cuenta verificada. Para obras grandes, cotiza por WhatsApp.</p></div>` : `<p class="price-note"><strong>Precio:</strong> lo confirma la agencia de tu ciudad según tu obra y la cantidad. Escríbenos y te cotizamos.</p>`}
     <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a><a class="btn" href="${base}donde-estamos.html">Dónde comprar</a></div>
   </div>
 </div></section>
 ${p.variantes.length ? `<section class="section section--grey"><div class="wrap"><div class="section-head"><h2>Calcula cuántas piezas necesitas</h2></div>
-${calcBox({ options: opts, idp: 'p', waText })}</div></section>` : ''}
+${calcBox({ options: opts, idp: 'p', waText, addBtn: config.comercio ? `<button class="btn" type="button" data-calc-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir al presupuesto</button>` : '' })}</div></section>` : ''}
 ${rel.length ? `<section class="section"><div class="wrap"><div class="section-head"><h2>Productos relacionados</h2></div><div class="grid-products">${rel.map((q) => productCard(q, base)).join('')}</div></div></section>` : ''}`
   }));
 }
@@ -436,6 +446,42 @@ write('empresa.html', layout({
       `<label>Motivo<select name="motivo"><option>Quiero comprar</option><option>Quiero cotizar un proyecto</option><option>Reclamo o sugerencia</option><option>Prensa</option><option>Trabajo</option></select></label>` + field('Celular', 'celular', 'type="tel" required autocomplete="tel"') + `<label class="full">Mensaje<textarea name="mensaje"></textarea></label>` })}</div>
 </div></section>`
 }));
+
+/* ============================ COMERCIO: cuenta, presupuesto, pedidos, panel ============================ */
+if (config.comercio) {
+  const TIPOS = [['constructor', 'Constructor independiente'], ['empresa', 'Empresa constructora'], ['ferreteria', 'Ferretería o distribuidor'], ['entidad', 'Entidad pública'], ['proyectista', 'Proyectista o calculista'], ['dueno', 'Dueño de casa']];
+  const agenciasJson = JSON.stringify(Object.fromEntries(Object.entries(sitio.agencias).map(([c, l]) => [c, l.map((a) => ({ nombre: a.nombre, tipo: a.tipo }))]))).replace(/</g, '\\u003c');
+  const sinJs = '<noscript><p class="price-note">Esta sección necesita JavaScript.</p></noscript>';
+  write('ingresar.html', layout({ file: 'ingresar.html', pagina: 'ingresar', title: 'Ingresar | INCERPAZ', desc: 'Ingresa a tu cuenta INCERPAZ para ver los precios de tu ciudad y hacer pedidos.', body: `
+<section class="section"><div class="wrap narrow"><span class="eyebrow">Mi cuenta</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Ingresar</h1>
+<p class="lead">Con una cuenta verificada ves los precios de tu ciudad, guardas presupuestos y haces pedidos.</p>
+<div class="form-box" style="margin-top:28px"><form id="form-ingreso"><div class="form-grid"><label class="full">Correo<input name="correo" type="email" required autocomplete="username"></label><label class="full">Contraseña<input name="password" type="password" required autocomplete="current-password"></label></div>
+<div class="btn-row" style="margin-top:18px"><button class="btn btn--red" type="submit">Ingresar</button><a class="btn" href="registro.html">Crear cuenta</a></div></form><p id="msg" class="form-msg" hidden style="margin-top:16px"></p></div>${sinJs}</div></section>` }));
+  write('registro.html', layout({ file: 'registro.html', pagina: 'registro', title: 'Crear cuenta | INCERPAZ', desc: 'Crea tu cuenta INCERPAZ. Un ejecutivo de tu ciudad la verifica y desde ese momento ves los precios y haces pedidos.', body: `
+<section class="section"><div class="wrap narrow"><span class="eyebrow">Mi cuenta</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Crear cuenta</h1>
+<p class="lead">Un ejecutivo de tu ciudad verifica tus datos. Mientras tanto puedes armar presupuestos; al verificarte ves los precios y haces pedidos.</p>
+<div class="form-box" style="margin-top:28px"><form id="form-registro"><div class="form-grid">
+<label class="full">Soy<select name="tipo">${TIPOS.map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></label>
+<label>Nombre y apellido<input name="nombre" required maxlength="120" autocomplete="name"></label>
+<label data-emp>Razón social<input name="razon_social" maxlength="160" autocomplete="organization"></label>
+<label data-emp>NIT o CI<input name="nit" maxlength="20" inputmode="numeric"></label>
+<label>Ciudad<select name="ciudad">${sitio.ciudades.map((c) => `<option value="${c.slug}">${c.nombre}</option>`).join('')}</select></label>
+<label>Celular o WhatsApp<input name="celular" required inputmode="tel" maxlength="20" placeholder="7xxxxxxx" autocomplete="tel"></label>
+<label>Correo<input name="correo" type="email" required maxlength="160" autocomplete="email"></label>
+<label>Contraseña (8 o más caracteres)<input name="password" type="password" required minlength="8" autocomplete="new-password"></label>
+<label>Repite la contraseña<input name="password2" type="password" required minlength="8" autocomplete="new-password"></label></div>
+<div class="btn-row" style="margin-top:18px"><button class="btn btn--red" type="submit">Crear cuenta</button><a class="btn" href="ingresar.html">Ya tengo cuenta</a></div></form>
+<p id="msg" class="form-msg" hidden style="margin-top:16px"></p>
+<div id="despues" hidden style="margin-top:20px"><p class="muted">Puedes seguir viendo el catálogo y armando tu presupuesto mientras verificamos tu cuenta.</p><div class="btn-row" style="margin-top:12px"><a class="btn btn--red" href="catalogo.html">Ver productos</a></div></div></div>${sinJs}</div></section>` }));
+  write('presupuesto.html', layout({ file: 'presupuesto.html', pagina: 'presupuesto', title: 'Mi presupuesto | INCERPAZ', desc: 'Arma tu presupuesto con los productos INCERPAZ y pide una cotización o envía tu pedido.', body: `
+<section class="section"><div class="wrap"><span class="eyebrow">Presupuesto</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 28px">Mi presupuesto</h1><div id="app">Cargando…</div>${sinJs}</div></section>
+<script type="application/json" id="datos-agencias">${agenciasJson}</script>` }));
+  write('mi-cuenta.html', layout({ file: 'mi-cuenta.html', pagina: 'cuenta', title: 'Mi cuenta | INCERPAZ', desc: 'Tus presupuestos y pedidos en INCERPAZ.', body: `
+<section class="section"><div class="wrap"><span class="eyebrow">Mi cuenta</span><div id="app" style="margin-top:12px">Cargando…</div>${sinJs}</div></section>` }));
+  write('equipo.html', layout({ file: 'equipo.html', pagina: 'equipo', title: 'Panel del equipo | INCERPAZ', desc: 'Verificación de cuentas y seguimiento de pedidos para el equipo de INCERPAZ.', body: `
+<section class="section"><div class="wrap"><span class="eyebrow">Equipo INCERPAZ</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 24px">Panel</h1><div id="app">Cargando…</div>${sinJs}</div></section>
+<script type="application/json" id="datos-listas">${JSON.stringify(sitio.listas_precios || ['general'])}</script>` }));
+}
 
 /* ============================ 404, sitemap, robots ============================ */
 write('404.html', layout({

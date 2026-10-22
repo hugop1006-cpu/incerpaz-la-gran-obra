@@ -278,5 +278,9 @@
     "Dedicación"
   ],
   "mision": "Contribuir al desarrollo del país proveyendo productos cerámicos destinados al mercado de la construcción local e internacional, ofreciendo los mejores productos y servicios.",
-  "somos": "Somos INCERPAZ y queremos ayudarte a construir tu hogar. Trabajamos día a día comprometidos con la mejora continua a través del sistema integrado de gestión en todos nuestros procesos. Tenemos el objetivo de superar siempre las expectativas de nuestros clientes y los logramos otorgando productos y servicios de calidad."
+  "somos": "Somos INCERPAZ y queremos ayudarte a construir tu hogar. Trabajamos día a día comprometidos con la mejora continua a través del sistema integrado de gestión en todos nuestros procesos. Tenemos el objetivo de superar siempre las expectativas de nuestros clientes y los logramos otorgando productos y servicios de calidad.",
+  "listas_precios": [
+    "general",
+    "constructor"
+  ]
 }

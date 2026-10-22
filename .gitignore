@@ -1,0 +1,4 @@
+
+server/data/incerpaz.db*
+*.db-wal
+*.db-shm

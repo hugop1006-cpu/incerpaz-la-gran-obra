@@ -39,3 +39,8 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 ## Para conectar después
 - Formularios al CRM: poner la dirección en `config.json`.
 - Precios, stock y pedidos con el ERP Seasoft: segunda etapa.
+
+## Segunda etapa (comercio)
+- Tarifas reales por ciudad y lista (general/constructor): hoy `server/data/tarifas.ejemplo.json` es ficticio.
+- API real de Seasoft y ambiente de pruebas (ver `server/ERP.md`); el adaptador no se ha probado contra el ERP.
+- Servidor interno para alojar `server/` y primeras cuentas ejecutivo/admin.
