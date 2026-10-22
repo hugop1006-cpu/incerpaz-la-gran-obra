@@ -103,7 +103,7 @@
   });
 
   /* ---------- páginas ---------- */
-  function volverA() { var m = /[?&]volver=([^&]+)/.exec(location.search); var v = m ? decodeURIComponent(m[1]) : ''; return /^[a-z0-9\-]+\.html(\?[a-z0-9=&%\-]*)?$/i.test(v) ? v : ''; }
+  function volverA() { var m = /[?&]volver=([^&]+)/.exec(location.search); var v = m ? decodeURIComponent(m[1]) : ''; return /^([a-z0-9\-]+\/){0,2}[a-z0-9\-]+\.html(\?[a-z0-9=&%\-]*)?$/i.test(v) ? v : ''; }
   function mensaje(box, texto, tipo) { box.className = 'form-msg' + (tipo === 'error' ? ' error' : ''); box.textContent = texto; box.hidden = false; }
   var SIN_API = '<div class="empty"><b>El servicio de cuentas no está disponible ahora.</b><p class="muted" style="margin-top:6px">Puedes seguir viendo el catálogo y cotizar por WhatsApp.</p></div>';
 
@@ -327,6 +327,8 @@
 
   /* ---------- arranque ---------- */
   contador();
+  /* lo usan las herramientas del sitio (proyectos) para sumar al presupuesto y leer precios */
+  window.IncerpazPresupuesto = { añadir: function (it, n) { añadir(it, n); }, precios: precios, sesion: sesion, aviso: aviso, fmtBs: fmtBs, verificado: verificado };
   sesion.then(function (s) {
     pintarCabecera(s); pintarPrecios(s);
     if (PAGINA === 'ingresar') paginaIngresar(s);

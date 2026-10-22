@@ -75,6 +75,7 @@ const medidaTexto = (p) => (p.largo && p.ancho && p.alto) ? `${num(p.largo)} × 
 /* ---- plantilla ---- */
 const NAV = [
   ['catalogo.html', 'Productos'],
+  ['proyectos.html', 'Proyectos'],
   ['pavic.html', 'PAVIC'],
   ['donde-estamos.html', 'Dónde estamos'],
   ['empresa.html', 'Empresa']
@@ -137,6 +138,7 @@ ${body}
 <script>window.INCERPAZ=${cfg};</script>
 <script src="${base}assets/js/site.js" defer></script>
 ${config.comercio ? `<script src="${base}assets/js/comercio.js" defer></script>` : ''}
+${pagina === 'proyecto' ? `<script src="${base}assets/js/proyectos.js" defer></script>` : ''}
 ${config.comercio && pagina === 'admin' ? `<script src="${base}assets/js/admin.js" defer></script>` : ''}
 </body>
 </html>`;
@@ -218,6 +220,7 @@ write('index.html', layout({
 <section class="wrap" style="padding-bottom:8px"><div class="quick">
   <a href="#calculadora"><b>Calcula tus piezas</b><span>Cuántas necesitas por m²</span></a>
   <a href="catalogo.html"><b>Catálogo</b><span>Fichas con medidas y rendimiento</span></a>
+  <a href="proyectos.html"><b>Proyectos</b><span>Churrasquero, mesón, pared con enchape</span></a>
   <a href="donde-estamos.html"><b>Dónde comprar</b><span>Agencias y WhatsApp por ciudad</span></a>
   <a href="pavic.html"><b>PAVIC</b><span>Pavimentos para proyectos</span></a>
 </div></section>
@@ -492,12 +495,77 @@ if (config.comercio) {
 <section class="section"><div class="wrap"><span class="eyebrow">Administración</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 24px">Contenido del sitio</h1><div id="app">Cargando…</div><noscript><p class="price-note">Esta sección necesita JavaScript.</p></noscript></div></section>` }));
 }
 
+/* ============================ PROYECTOS (qué construir, con lista de materiales) ============================ */
+const proyectosData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/proyectos.json'), 'utf8'));
+/* rendimiento por m² de una ficha; el catálogo de Santa Cruz publica el enchape corto "por ml" pero la cifra corresponde a m² (20 × 7,5 cm) */
+function rendM2(p) {
+  const v = p.variantes.find((x) => x.unidad === 'm2') || (/^brick-enchape/.test(p.slug) ? p.variantes[0] : null);
+  return v ? v.rend : null;
+}
+const porSlug = (ciudad, slug) => productos.find((p) => p.ciudad === ciudad && p.slug === slug);
+const NIVEL_CLASE = { Básico: 'ok', Medio: 'warn' };
+write('proyectos.html', layout({
+  file: 'proyectos.html', pagina: 'proyectos', title: 'Proyectos para construir | INCERPAZ',
+  desc: 'Churrasquero, mesón y pared con enchape de ladrillo: calcula la lista de materiales, los costos y sigue los pasos para construirlos.',
+  body: `<section class="section"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Inspiración y obra</span><h1 style="font-size:clamp(36px,5vw,60px)">Proyectos para construir</h1><p class="lead">Elige un proyecto, ajusta las medidas a tu espacio y obtén la lista de materiales con cantidades, el esquema y los pasos. Con tu cuenta verificada ves el costo y lo envías a tu presupuesto.</p></div>
+  <div class="proys">${proyectosData.proyectos.map((pr) => `<a class="cat" href="proyectos/${pr.slug}.html" style="grid-column:auto"><img src="${pr.imagen}" alt="" loading="lazy" width="600" height="400"><div><h3>${esc(pr.titulo)}</h3><span>${esc(pr.resumen)}</span><span style="display:block;margin-top:8px">Nivel ${pr.nivel.toLowerCase()} · ${esc(pr.dias)}</span></div></a>`).join('')}</div>
+  <p class="price-note" style="margin-top:32px">${esc(proyectosData.aviso)}</p>
+</div></section>
+<section class="section section--grey"><div class="wrap split">
+  <div><span class="eyebrow">¿Tienes otra idea?</span><h2 style="margin-block:12px 18px">Cuéntanos tu proyecto</h2><p class="lead">Escríbenos con la medida de tu espacio y te ayudamos a elegir la pieza y a calcular el material.</p></div>
+  <div><a class="btn btn--wa" data-wa="Hola, tengo un proyecto de construcción y quisiera asesoría en {ciudad}." href="${waHref(ciudadDefecto.whatsapp, 'Hola, tengo un proyecto de construcción y quisiera asesoría en Cochabamba.')}" rel="noopener">Consultar por WhatsApp</a></div>
+</div></section>`
+}));
+for (const pr of proyectosData.proyectos) {
+  const slugs = new Set();
+  pr.materiales.forEach((m) => { if (m.producto) Object.values(m.producto).forEach((s) => slugs.add(s)); });
+  if (pr.eleccion) pr.eleccion.opciones.forEach((s) => slugs.add(s));
+  const catalogos = {};
+  for (const c of Object.keys(CIUDAD_CATALOGO)) {
+    catalogos[c] = {};
+    slugs.forEach((slug) => { const p = porSlug(c, slug); if (p && rendM2(p)) catalogos[c][slug] = { nombre: p.nombre, codigo: p.codigo || '', rend: rendM2(p) }; });
+  }
+  const datos = { proyecto: pr, catalogos, ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })) };
+  const ld = { '@context': 'https://schema.org', '@type': 'HowTo', name: pr.titulo, description: pr.resumen, tool: pr.herramientas.map((h) => ({ '@type': 'HowToTool', name: h })), step: pr.pasos.map((x, i) => ({ '@type': 'HowToStep', position: i + 1, name: x.titulo, text: x.texto })) };
+  write(`proyectos/${pr.slug}.html`, layout({
+    file: `proyectos/${pr.slug}.html`, base: '../', pagina: 'proyecto', title: `${pr.titulo}: materiales, costos y pasos | INCERPAZ`, desc: `${pr.resumen} Calcula la lista de materiales y sigue los pasos.`,
+    og: pr.imagen, jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`,
+    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../proyectos.html">Proyectos</a> › ${esc(pr.titulo)}</nav></div>
+<section class="section" style="padding-top:12px"><div class="wrap">
+  <span class="eyebrow">Proyecto</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 12px">${esc(pr.titulo)}</h1>
+  <p class="lead">${esc(pr.resumen)}</p>
+  <p style="margin-top:14px"><span class="chip ${NIVEL_CLASE[pr.nivel] || 'ok'}">Nivel ${pr.nivel.toLowerCase()}</span> <span class="chip ok">${esc(pr.dias)}</span> <span class="chip ok">${esc(pr.personas)}</span></p>
+</div></section>
+<section class="section section--grey"><div class="wrap">
+  <div class="section-head"><h2>1. Ajusta las medidas</h2></div>
+  <div class="proy">
+    <div class="calc" style="display:block"><div class="fields" id="proy-campos"></div></div>
+    <figure class="plano" id="proy-plano" aria-label="Esquema del proyecto"></figure>
+  </div>
+</div></section>
+<section class="section"><div class="wrap">
+  <div class="section-head"><h2>2. Lista de materiales</h2><p class="lead" id="proy-estado"></p></div>
+  <div id="proy-lista"><p class="muted">Cargando…</p></div>
+  <noscript><p class="price-note">Para calcular los materiales se necesita JavaScript. Escríbenos por WhatsApp y te ayudamos.</p></noscript>
+  <div class="btn-row" style="margin-top:20px" id="proy-acciones" hidden></div>
+</div></section>
+<section class="section section--grey"><div class="wrap split">
+  <div><div class="section-head"><h2>3. Pasos</h2></div><ol class="pasos">${pr.pasos.map((x) => `<li><b>${esc(x.titulo)}</b><span>${esc(x.texto)}</span></li>`).join('')}</ol></div>
+  <div><div class="section-head"><h2>Herramientas</h2></div><ul class="lista">${pr.herramientas.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
+    <div class="section-head" style="margin-top:32px"><h2>Consejos</h2></div><ul class="lista">${pr.consejos.map((h) => `<li>${esc(h)}</li>`).join('')}</ul></div>
+</div></section>
+<section class="section"><div class="wrap"><p class="price-note">${esc(proyectosData.aviso)}</p></div></section>
+<script type="application/json" id="datos-proyecto">${JSON.stringify(datos).replace(/</g, '\\u003c')}</script>`
+  }));
+}
+
 /* ============================ 404, sitemap, robots ============================ */
 write('404.html', layout({
   file: '404.html', title: 'Página no encontrada | INCERPAZ', desc: 'La página que buscas no existe.',
   body: `<section class="section"><div class="wrap"><h1>No encontramos esa página</h1><p class="lead" style="margin-block:16px 28px">Puede que el enlace haya cambiado. Prueba desde el inicio o el catálogo.</p><div class="btn-row"><a class="btn btn--red" href="${sitio.dominio}/">Ir al inicio</a><a class="btn" href="${sitio.dominio}/catalogo.html">Ver productos</a></div></div></section>`
 }));
-const urls = ['', 'catalogo.html', 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
+const urls = ['', 'catalogo.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
 if (config.interno) {
   fs.rmSync(path.join(OUT, 'sitemap.xml'), { force: true });
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');

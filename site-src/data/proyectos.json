@@ -1,0 +1,109 @@
+{
+  "aviso": "Las cantidades son una estimación para cotizar y no reemplazan el diseño de un profesional. Verifica medidas, estructura y normas de tu ciudad con un arquitecto o maestro de obra antes de construir.",
+  "proyectos": [
+    {
+      "slug": "churrasquero",
+      "titulo": "Churrasquero de ladrillo",
+      "resumen": "Parrilla de obra con hogar refractario y chimenea, para el patio o la terraza.",
+      "imagen": "assets/img/productos/brick-estandar-2.jpg",
+      "nivel": "Medio",
+      "dias": "3 a 5 días",
+      "personas": "Maestro y ayudante",
+      "parametros": [
+        { "id": "ancho", "etiqueta": "Ancho exterior", "unidad": "m", "valor": 1.2, "min": 0.8, "max": 2.5, "paso": 0.05 },
+        { "id": "fondo", "etiqueta": "Fondo exterior", "unidad": "m", "valor": 0.6, "min": 0.5, "max": 1, "paso": 0.05 },
+        { "id": "alto_base", "etiqueta": "Altura de la base", "unidad": "m", "valor": 0.9, "min": 0.7, "max": 1.1, "paso": 0.05 },
+        { "id": "alto_chimenea", "etiqueta": "Altura de la chimenea", "unidad": "m", "valor": 1.2, "min": 0.6, "max": 2.5, "paso": 0.1 }
+      ],
+      "materiales": [
+        { "grupo": "Cerámica INCERPAZ", "nombre": "Muros de la base y la chimenea", "producto": { "cochabamba": "brick-estandar" }, "area": "muros", "merma": 0.08 },
+        { "grupo": "Cerámica INCERPAZ", "nombre": "Revestimiento refractario del hogar", "producto": { "cochabamba": "biscocho" }, "area": "hogar", "merma": 0.1 },
+        { "grupo": "Otros materiales", "nombre": "Cemento para asentado", "unidad": "bolsas de 50 kg", "area": "muros", "por_m2": 0.18, "merma": 0.1 },
+        { "grupo": "Otros materiales", "nombre": "Arena fina", "unidad": "m³", "area": "muros", "por_m2": 0.03, "merma": 0.1, "decimales": 1 },
+        { "grupo": "Otros materiales", "nombre": "Mortero refractario", "unidad": "kg", "area": "hogar", "por_m2": 7, "merma": 0.1 },
+        { "grupo": "Otros materiales", "nombre": "Hormigón para la losa de base (10 cm)", "unidad": "m³", "area": "losa", "por_m2": 0.1, "merma": 0.05, "decimales": 2 },
+        { "grupo": "Otros materiales", "nombre": "Parrilla de acero del ancho interior", "unidad": "pieza", "fijo": 1 },
+        { "grupo": "Otros materiales", "nombre": "Chimenea metálica o sombrerete", "unidad": "pieza", "fijo": 1 }
+      ],
+      "herramientas": ["Nivel de mano y plomada", "Cordel y escuadra", "Cuchara y llana", "Balde y pala", "Amoladora con disco para cerámica"],
+      "pasos": [
+        { "titulo": "Elige el lugar", "texto": "Ubica el churrasquero a más de 2 metros de paredes, techos, árboles o cercos combustibles, sobre piso firme y con la chimenea libre. Si vives en un condominio, revisa su reglamento." },
+        { "titulo": "Replantea y vacía la losa", "texto": "Marca el contorno con cordel y escuadra. Vacía una losa de hormigón de 10 cm, nivelada y con malla, 10 cm más grande que la base por cada lado. Déjala curar 3 días." },
+        { "titulo": "Levanta la base", "texto": "Asienta el brick estándar con mezcla de cemento y arena 1:4 y juntas de 1 cm. Revisa el plomo y el nivel cada tres hiladas y traba las esquinas." },
+        { "titulo": "Reviste el hogar", "texto": "Coloca el biscocho refractario en el interior con mortero refractario y juntas finas de 3 a 5 mm. No uses mezcla de cemento común donde haya fuego directo." },
+        { "titulo": "Deja los apoyos de la parrilla", "texto": "Prevé apoyos a 15 y 25 cm sobre las brasas, con ladrillos salientes o ángulos de acero, para poder subir o bajar la parrilla." },
+        { "titulo": "Cierra la campana y la chimenea", "texto": "Reduce la sección poco a poco, con un voladizo máximo de 5 cm por hilada, hasta llegar al ducto. Termina al menos 80 cm sobre cualquier techo cercano y coloca un sombrerete." },
+        { "titulo": "Cura y enciende", "texto": "Espera 7 días antes del primer fuego. Haz tres encendidos pequeños y progresivos antes de usarlo con normalidad, para que no se fisure." }
+      ],
+      "consejos": ["Mide primero la parrilla que vas a usar y ajusta el ancho interior a ella.", "Pide el biscocho y el mortero refractario juntos: deben ser compatibles.", "Un hogar de 35 a 40 cm de altura da buen tiro sin perder calor."]
+    },
+    {
+      "slug": "meson-con-enchape",
+      "titulo": "Mesón con enchape",
+      "resumen": "Mesón o barra de obra con base de ladrillo hueco y frente enchapado en ladrillo visto.",
+      "imagen": "assets/img/productos/brick-enchape-ancho-2.jpg",
+      "nivel": "Básico",
+      "dias": "2 a 3 días",
+      "personas": "Maestro y ayudante",
+      "parametros": [
+        { "id": "largo", "etiqueta": "Largo", "unidad": "m", "valor": 2.4, "min": 1, "max": 6, "paso": 0.1 },
+        { "id": "fondo", "etiqueta": "Fondo", "unidad": "m", "valor": 0.6, "min": 0.45, "max": 0.9, "paso": 0.05 },
+        { "id": "alto", "etiqueta": "Altura", "unidad": "m", "valor": 0.9, "min": 0.8, "max": 1.1, "paso": 0.05 },
+        { "id": "extremos", "etiqueta": "Extremos a la vista", "unidad": "", "valor": 2, "opciones": [[0, "Ninguno"], [1, "Uno"], [2, "Los dos"]] }
+      ],
+      "eleccion": { "id": "enchape", "etiqueta": "Ladrillo de enchape", "opciones": ["brick-enchape-corto", "brick-enchape-ancho"] },
+      "materiales": [
+        { "grupo": "Cerámica INCERPAZ", "nombre": "Base del mesón", "producto": { "cochabamba": "6-huecos-big-rayado", "santa-cruz": "6-huecos-big-rayado" }, "area": "base", "merma": 0.08 },
+        { "grupo": "Cerámica INCERPAZ", "nombre": "Enchape de las caras a la vista", "eleccion": "enchape", "area": "enchape", "merma": 0.1 },
+        { "grupo": "Otros materiales", "nombre": "Cemento para asentado", "unidad": "bolsas de 50 kg", "area": "base", "por_m2": 0.15, "merma": 0.1 },
+        { "grupo": "Otros materiales", "nombre": "Arena fina", "unidad": "m³", "area": "base", "por_m2": 0.025, "merma": 0.1, "decimales": 1 },
+        { "grupo": "Otros materiales", "nombre": "Adhesivo cerámico", "unidad": "kg", "area": "enchape", "por_m2": 5, "merma": 0.1 },
+        { "grupo": "Otros materiales", "nombre": "Fragüe o junta", "unidad": "kg", "area": "enchape", "por_m2": 0.6, "merma": 0.1, "decimales": 1 },
+        { "grupo": "Otros materiales", "nombre": "Tapa o mesada (granito, cerámica u hormigón)", "unidad": "m²", "area": "tapa", "por_m2": 1, "merma": 0, "decimales": 1 },
+        { "grupo": "Otros materiales", "nombre": "Pilaretes de refuerzo de hormigón armado", "unidad": "pieza", "area": "pilares", "por_m2": 1, "merma": 0 }
+      ],
+      "herramientas": ["Nivel de mano y plomada", "Cordel", "Cuchara y llana", "Llana dentada de 8 mm", "Amoladora con disco para cerámica", "Crucetas o separadores de 1 cm"],
+      "pasos": [
+        { "titulo": "Marca y nivela el piso", "texto": "Traza el contorno del mesón sobre un piso firme y nivelado. Si el piso no está a nivel, corrígelo con una base de mortero." },
+        { "titulo": "Levanta la base", "texto": "Asienta los ladrillos de 6 huecos con mezcla de cemento y arena 1:4, formando el frente y los extremos. Incluye un pilarete de hormigón armado cada 2 metros para dar rigidez." },
+        { "titulo": "Coloca la tapa", "texto": "Apoya la mesada con un volado de 3 cm al frente. Asegúrala con mortero o adhesivo según el material." },
+        { "titulo": "Replantea el enchape", "texto": "Pega un perfil de arranque a nivel en la base y marca las hiladas con cordel. Ensaya la primera hilada en seco para ajustar los cortes." },
+        { "titulo": "Pega el enchape", "texto": "Extiende adhesivo con la llana dentada por paños de 1 m² y coloca las piezas de abajo hacia arriba, trabadas a mitad, con juntas de 1 cm." },
+        { "titulo": "Rejunta y limpia", "texto": "Después de 24 horas rellena las juntas con fragüe y limpia el exceso con esponja antes de que seque." }
+      ],
+      "consejos": ["La altura cómoda de un mesón de cocina es de 90 cm; para una barra de desayuno, de 105 a 110 cm.", "Usa piezas de esquina o corta a inglete en los extremos a la vista.", "Calcula la mesada aparte: se cotiza por m² con quien la fabrica."]
+    },
+    {
+      "slug": "pared-con-enchape",
+      "titulo": "Pared con enchape de ladrillo",
+      "resumen": "Muro interior o exterior revestido con ladrillo visto, para sala, fachada o jardín.",
+      "imagen": "assets/img/productos/brick-enchape-corto-2.jpg",
+      "nivel": "Básico",
+      "dias": "1 a 3 días",
+      "personas": "Maestro y ayudante",
+      "parametros": [
+        { "id": "ancho", "etiqueta": "Ancho de la pared", "unidad": "m", "valor": 4, "min": 0.5, "max": 20, "paso": 0.1 },
+        { "id": "alto", "etiqueta": "Altura", "unidad": "m", "valor": 2.4, "min": 0.5, "max": 6, "paso": 0.1 },
+        { "id": "vanos", "etiqueta": "Ventanas y puertas a descontar", "unidad": "m²", "valor": 0, "min": 0, "max": 40, "paso": 0.1 }
+      ],
+      "eleccion": { "id": "enchape", "etiqueta": "Ladrillo de enchape", "opciones": ["brick-enchape-corto", "brick-enchape-ancho"] },
+      "materiales": [
+        { "grupo": "Cerámica INCERPAZ", "nombre": "Ladrillo de enchape", "eleccion": "enchape", "area": "pared", "merma": 0.1 },
+        { "grupo": "Otros materiales", "nombre": "Adhesivo cerámico", "unidad": "kg", "area": "pared", "por_m2": 5, "merma": 0.1 },
+        { "grupo": "Otros materiales", "nombre": "Fragüe o junta", "unidad": "kg", "area": "pared", "por_m2": 0.6, "merma": 0.1, "decimales": 1 },
+        { "grupo": "Otros materiales", "nombre": "Perfil de arranque", "unidad": "m", "area": "arranque", "por_m2": 1, "merma": 0.05, "decimales": 1 },
+        { "grupo": "Otros materiales", "nombre": "Sellador o hidrofugante (opcional, exteriores)", "unidad": "litros", "area": "pared", "por_m2": 0.15, "merma": 0.1, "decimales": 1 }
+      ],
+      "herramientas": ["Nivel de mano", "Cordel y lápiz", "Llana dentada de 8 mm", "Amoladora con disco para cerámica", "Crucetas de 1 cm", "Esponja y balde"],
+      "pasos": [
+        { "titulo": "Prepara la superficie", "texto": "El muro debe estar plano, limpio, seco y sin pintura suelta. Si hay humedad, resuélvela antes. Corrige desniveles con revoque." },
+        { "titulo": "Traza el nivel de arranque", "texto": "Marca una línea a nivel y fija el perfil de arranque. Desde ahí se trazan las demás hiladas." },
+        { "titulo": "Pega por paños", "texto": "Extiende adhesivo con la llana dentada en paños de 1 m² y presiona cada pieza. Trabaja de abajo hacia arriba." },
+        { "titulo": "Traba las hiladas", "texto": "Desplaza cada hilada media pieza respecto a la anterior y mantén juntas de 1 cm con las crucetas." },
+        { "titulo": "Corta y remata", "texto": "Mide y corta con amoladora en los bordes, vanos y esquinas. Usa piezas de esquina cuando existan." },
+        { "titulo": "Rejunta y limpia", "texto": "Después de 24 horas llena las juntas con fragüe, límpialas con esponja y, en exteriores, aplica un hidrofugante." }
+      ],
+      "consejos": ["Compra todo el ladrillo de una misma producción para que el color sea parejo.", "Mezcla piezas de varias cajas mientras pegas para evitar manchones de color.", "Si el muro es exterior, evita pegar con lluvia y protege el trabajo 24 horas."]
+    }
+  ]
+}

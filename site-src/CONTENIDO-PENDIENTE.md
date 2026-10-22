@@ -44,3 +44,10 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - Precios: se usan los publicados en las tiendas actuales (lista general); falta definir los precios propios de la lista constructor y si Cochabamba y Santa Cruz comparten la condición "puesto en obra dentro del radio urbano" (hoy solo Cochabamba la declara).
 - API real de Seasoft y ambiente de pruebas (ver `server/ERP.md`); el adaptador no se ha probado contra el ERP.
 - Servidor interno para alojar `server/` y primeras cuentas ejecutivo/admin.
+
+## Proyectos (tercera etapa)
+- Las fórmulas de cantidades (rendimientos de cemento, arena, adhesivo, mortero refractario, alturas del hogar, etc.) son estimaciones razonables, no validadas por un técnico de INCERPAZ. Falta que un ingeniero o maestro de confianza las revise antes de publicar.
+- Santa Cruz publica el enchape corto como "67 pzas/ml"; se interpreta como por m² (pieza de 20 × 7,5 cm). Confirmar.
+- Biscocho y brick estándar solo existen en el catálogo de Cochabamba; en Santa Cruz el churrasquero avisa que se consulte con la agencia.
+- Los esquemas son referenciales. Falta decidir si se ofrecen planos descargables en PDF (requiere dibujos de un proyectista).
+- Faltan más proyectos (muro de jardín, piso de patio con PAVIC, fachada con celosía) y fotos reales de obra.

@@ -273,3 +273,22 @@ tr.detalle td { background: var(--paper); padding: 16px 20px; }
 .seg button + button { border-left: 2px solid var(--ink); }
 .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
 @media (max-width: 520px) { .seg button { flex: 1 1 auto; padding: 10px 10px; font-size: 15px; } .seg button + button { border-left: 0; border-top: 2px solid var(--ink); } .seg { width: 100%; } }
+
+/* ---- proyectos ---- */
+.proys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.proys .cat { min-height: 300px; }
+@media (max-width: 860px) { .proys { grid-template-columns: 1fr; } }
+.proy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(20px, 4vw, 44px); align-items: start; }
+.proy .calc .fields { grid-template-columns: 1fr 1fr; }
+.plano { margin: 0; background: var(--white); border: 2px solid var(--ink); padding: 14px; }
+.plano svg { width: 100%; height: auto; display: block; }
+.plano figcaption { font-size: 14px; color: var(--ink-2); margin-top: 8px; }
+.pasos { list-style: none; counter-reset: p; display: grid; gap: 16px; padding: 0; margin: 0; }
+.pasos li { counter-increment: p; display: grid; grid-template-columns: 44px 1fr; gap: 4px 14px; }
+.pasos li::before { content: counter(p); grid-row: span 2; font: 700 28px var(--display); background: var(--ink); color: #fff; width: 44px; height: 44px; display: grid; place-items: center; }
+.pasos li b { font-size: 18px; }
+.pasos li span { color: var(--ink-2); }
+.lista { padding-left: 20px; display: grid; gap: 8px; margin: 0; }
+.tabla tr.grupo th { background: var(--paper-2); font-size: 14px; }
+@media (max-width: 860px) { .proy { grid-template-columns: 1fr; } }
+@media print { .site-header, .topbar, .site-footer, .btn-row, .wa-float, .nav-toggle { display: none !important; } .section--grey { background: none; } }
