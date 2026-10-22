@@ -158,6 +158,16 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .steps b { font-weight: 600; display: block; } .steps span { font-size: 13px; color: var(--muted); }
 svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
 .theme-btn { font: 500 12px var(--mono); background: var(--surface); color: var(--fg); border: 1px solid var(--line-strong); padding: 4px 10px; cursor: pointer; }
+/* catálogo y pedido */
+.shop { display: grid; grid-template-columns: minmax(190px, 230px) 1fr; gap: 16px; align-items: start; }
+@media (max-width: 700px) { .shop { grid-template-columns: 1fr; } }
+.chk { display: flex; gap: 8px; align-items: center; font-size: 14px; justify-content: space-between; }
+.chk label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.chk input { accent-color: var(--accent); width: 16px; height: 16px; }
+.mini { font: 600 12px var(--body); padding: 5px 10px; border: 1.5px solid var(--fg); background: var(--surface); color: var(--fg); cursor: pointer; }
+.mini.on { background: var(--fg); color: var(--bg); }
+.qty { width: 90px; font: 400 14px var(--body); background: var(--surface); color: var(--fg); border: 1.5px solid var(--line-strong); padding: 4px 6px; text-align: right; }
+.done { border: 2px solid var(--ok); padding: 14px; display: flex; flex-direction: column; gap: 6px; }
 /* dónde estamos */
 .loc-list { display: flex; flex-direction: column; border: 1.5px solid var(--line-strong); max-height: 440px; overflow: auto; background: var(--surface); }
 .loc { display: grid; gap: 2px; text-align: left; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; font: 400 14px var(--body); }
@@ -180,7 +190,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   <header class="sheet-head">
     <div>
       <h1>Wireframes INCERPAZ</h1>
-      <p>Ocho pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
+      <p>Diez pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
     </div>
     <div class="stamp">
       <div><b>Lámina</b> 01 · borrador para revisión</div>
@@ -200,6 +210,8 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     <a href="#constructor" data-tab="constructor">Cuenta del constructor</a>
     <a href="#donde" data-tab="donde">Dónde estamos</a>
     <a href="#empresa" data-tab="empresa">Empresa</a>
+    <a href="#catalogo" data-tab="catalogo">Catálogo y búsqueda</a>
+    <a href="#pedido" data-tab="pedido">Presupuesto y pedido</a>
   </nav>
 
   <!-- ============ PLATAFORMA ============ -->
@@ -1340,11 +1352,173 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       <p class="muted">Cifras, historia, sostenibilidad y empleo no existen en el sitio actual y quedan con pin amarillo "!" hasta que la empresa aporte los datos.</p>
     </div>
   </section>
+
+  <!-- ============ CATÁLOGO Y BÚSQUEDA ============ -->
+  <section class="view" id="v-catalogo" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" class="asbtn" data-as="visit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/productos</span></div>
+      <div class="canvas">
+        <div class="blk row" style="justify-content:space-between">
+          <span class="logo">INCERPAZ</span>
+          <label class="field" for="shopQ" style="flex:1 1 280px;max-width:560px;position:relative">Buscar en el catálogo<input id="shopQ" type="search" placeholder="Ej. 6 huecos, enchape, Pavic, botaguas" autocomplete="off"></label>
+          <span class="chip" id="shopBudget">Presupuesto (0)</span>
+          <i class="pin">1</i>
+        </div>
+        <div class="blk"><span class="mono muted">Inicio › Productos</span></div>
+        <div class="blk">
+          <div class="shop">
+            <aside style="display:flex;flex-direction:column;gap:14px;position:relative">
+              <h3>Filtros</h3>
+              <div style="display:flex;flex-direction:column;gap:8px" id="shopCats"></div>
+              <div class="chk"><label><input type="checkbox" id="shopStock" disabled> Solo con stock en mi ciudad</label></div>
+              <span class="mono muted">El stock viene del ERP. Se activa al conectarlo. <i class="pin in" title="Pendiente">!</i></span>
+              <label class="field" for="shopSort">Ordenar<select id="shopSort"><option value="az">Nombre A a Z</option><option value="cat">Categoría</option></select></label>
+              <i class="pin" style="top:-4px;right:-4px">2</i>
+            </aside>
+            <div style="position:relative">
+              <div class="blk-title"><h3 id="shopCount">Productos</h3><small>nombres de la tienda de Cochabamba</small></div>
+              <div class="grid" id="shopGrid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))"></div>
+              <i class="pin" style="top:-4px;right:-4px">3</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div class="card"><b>¿No encuentras lo que buscas?</b><span class="sub">Escríbenos por WhatsApp con el nombre o una foto del producto.</span><span class="btn primary" style="align-self:flex-start">WhatsApp de mi ciudad</span></div>
+            <div class="card"><b>Combos y promociones</b><span class="sub">Paquetes de producto con regalos. En Santa Cruz hay 47 hoy.</span><span class="btn" style="align-self:flex-start">Ver combos</span></div>
+          </div>
+          <i class="pin">4</i>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas del catálogo y la búsqueda</h2>
+      <ol class="notes">
+        <li><div><b>Búsqueda en el encabezado</b><span>Prueba el prototipo: escribe "huecos", "Pavic" o "enchape" y la lista se filtra. Busca por nombre; por código y uso vendrán con las fichas del ERP.</span></div></li>
+        <li><div><b>Filtros por categoría</b><span>Las seis categorías actuales con su conteo. El filtro de stock espera la conexión con el ERP.</span></div></li>
+        <li><div><b>Tarjetas con acción</b><span>Cada producto se puede añadir al presupuesto sin entrar a la ficha. Cambia a "Cliente verificado" arriba para ver cómo aparece el precio.</span></div></li>
+        <li><div><b>Salidas</b><span>WhatsApp para lo que no se encuentra y acceso a combos, que hoy son una palanca fuerte de venta.</span></div></li>
+      </ol>
+      <p class="muted">La lista usa los nombres de la tienda de Cochabamba, tomados de las direcciones de sus productos, y conviene revisarlos. Fotos, dimensiones y precios son marcadores. Cada ciudad vende un catálogo distinto, así que la lista cambiaría según la ciudad elegida.</p>
+    </div>
+  </section>
+
+  <!-- ============ PRESUPUESTO Y PEDIDO ============ -->
+  <section class="view" id="v-pedido" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" class="asbtn" data-as="visit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span id="ppUrl">incerpaz.com/presupuesto</span></div>
+      <div class="canvas">
+        <div class="blk" style="position:relative">
+          <div class="seg" role="group" aria-label="Pasos">
+            <button type="button" data-pp="1" aria-pressed="true">1. Mi presupuesto</button>
+            <button type="button" data-pp="2" aria-pressed="false">2. Entrega</button>
+            <button type="button" data-pp="3" aria-pressed="false">3. Datos</button>
+            <button type="button" data-pp="4" aria-pressed="false">4. Resumen</button>
+          </div>
+          <i class="pin">1</i>
+        </div>
+
+        <div class="blk" id="pp1">
+          <div class="blk-title"><h3>Mi presupuesto</h3><small>cantidades editables</small></div>
+          <div class="scroll"><table>
+            <thead><tr><th>Producto</th><th class="num">Precio</th><th class="num">Cantidad</th><th class="num">Subtotal</th></tr></thead>
+            <tbody id="ppLines"></tbody>
+            <tfoot><tr><th colspan="3" style="text-align:right">Total</th><th class="num" id="ppTotal"></th></tr></tfoot>
+          </table></div>
+          <div class="grid" style="margin-top:12px">
+            <label class="field" for="ppObra">Obra<select id="ppObra"><option>Sin obra</option><option>Edificio Av. Ejemplo</option><option>Nueva obra…</option></select></label>
+            <label class="field" for="ppNote">Notas para el ejecutivo<input id="ppNote" type="text" placeholder="Plazos, medidas, dudas"></label>
+          </div>
+          <span class="mono muted" id="ppPriceNote" style="display:block;margin-top:10px"></span>
+          <i class="pin">2</i>
+        </div>
+
+        <div class="blk" id="pp2" hidden>
+          <div class="blk-title"><h3>Entrega</h3><small>retiro o envío</small></div>
+          <div class="seg" role="group" aria-label="Modalidad" style="margin-bottom:12px">
+            <button type="button" data-ent="ret" aria-pressed="true">Retiro en agencia</button>
+            <button type="button" data-ent="env" aria-pressed="false">Envío a obra</button>
+          </div>
+          <div class="grid">
+            <label class="field" for="ppCiudad">Ciudad<select id="ppCiudad"></select></label>
+            <label class="field" for="ppAg" id="ppAgW">Agencia de retiro<select id="ppAg"></select></label>
+            <label class="field" for="ppDir" id="ppDirW" hidden>Dirección de la obra<input id="ppDir" type="text" placeholder="Avenida, zona, referencia"></label>
+            <label class="field" for="ppFecha">Fecha deseada<input id="ppFecha" type="text" placeholder="Día y mes"></label>
+          </div>
+          <span class="mono muted" id="ppEntNote" style="display:block;margin-top:10px"></span>
+          <i class="pin">3</i>
+        </div>
+
+        <div class="blk" id="pp3" hidden>
+          <div class="blk-title"><h3>Datos</h3><small id="ppDatosSub"></small></div>
+          <div class="grid" id="ppDatosV">
+            <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+            <label class="field">Celular o WhatsApp<input type="text" placeholder="7xxxxxxx"></label>
+            <label class="field">Correo<input type="text" placeholder="correo@ejemplo.com"></label>
+          </div>
+          <div id="ppDatosC" hidden>
+            <div class="grid">
+              <label class="field">NIT<input type="text" value="1234567012" readonly></label>
+              <label class="field">Razón social<input type="text" value="Constructora Ejemplo S.R.L." readonly></label>
+              <label class="field">Nombre comercial<input type="text" value="Constructora Ejemplo" readonly></label>
+            </div>
+            <div style="margin-top:12px">
+              <div class="mono muted" style="margin-bottom:6px">Forma de pago <i class="pin in" title="Pendiente">!</i></div>
+              <div class="seg" role="group" aria-label="Forma de pago"><button type="button" aria-pressed="true">Transferencia</button><button type="button" aria-pressed="false">QR</button><button type="button" aria-pressed="false">En agencia</button></div>
+            </div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Los datos de facturación (NIT, razón social, nombre comercial) salen de la ficha del cliente en el ERP. Pago solo al contado: no hay línea de crédito.</span>
+          <i class="pin">4</i>
+        </div>
+
+        <div class="blk" id="pp4" hidden>
+          <div class="blk-title"><h3>Resumen</h3><small id="ppResSub"></small></div>
+          <table class="specs"><tbody>
+            <tr><td>Productos</td><td id="ppResN"></td></tr>
+            <tr><td>Total</td><td id="ppResT"></td></tr>
+            <tr><td>Entrega</td><td id="ppResE"></td></tr>
+          </tbody></table>
+          <div class="row" style="margin-top:12px"><button type="button" class="btn primary" id="ppSend">Enviar</button><span class="mono muted" id="ppSendNote"></span></div>
+          <div class="done" id="ppDone" hidden style="margin-top:12px">
+            <b id="ppDoneT"></b>
+            <span class="sub" id="ppDoneS"></span>
+            <div class="row"><span class="chip on">Recibido</span><span class="chip">Confirmado</span><span class="chip">En despacho</span><span class="chip">Entregado</span></div>
+          </div>
+          <i class="pin">5</i>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas del presupuesto y el pedido</h2>
+      <ol class="notes">
+        <li><div><b>Cuatro pasos</b><span>Prueba el prototipo: navega por los pasos y mira cómo cambian los botones según la sesión. El carrito actual se reemplaza por este flujo.</span></div></li>
+        <li><div><b>Presupuesto editable</b><span>Cantidades, obra y notas. El visitante ve cantidades sin precios. El cliente verificado ve precios y total de las tarifas del ERP.</span></div></li>
+        <li><div><b>Entrega</b><span>Retiro en una agencia de la ciudad elegida o envío a obra. El costo del envío por zona está por definir.</span></div></li>
+        <li><div><b>Datos</b><span>El visitante deja nombre y celular: es un lead. El cliente verificado trae sus datos de facturación del ERP y elige cómo paga.</span></div></li>
+        <li><div><b>Resumen y envío</b><span>El visitante solicita una cotización que llega al ejecutivo de la ciudad. El cliente envía un pedido que baja al ERP y puede seguir por estado.</span></div></li>
+      </ol>
+      <p class="muted">Los pasos de entrega y pago son una propuesta mía. Las formas de pago y el costo de envío deben confirmarlos ventas y finanzas. Precios y NIT son de ejemplo.</p>
+    </div>
+  </section>
 </div>
 
 <script>
 (function () {
-  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'techos', 'constructor', 'donde', 'empresa'];
+  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'techos', 'constructor', 'donde', 'empresa', 'catalogo', 'pedido'];
   function show() {
     var h = (location.hash || '').replace('#', '');
     if (tabs.indexOf(h) < 0) h = 'plataforma';
@@ -1618,6 +1792,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     var pz = document.getElementById('pvCost');
     if (pz && pm) pcalc();
     if (typeof tkA !== 'undefined' && tkA) tcalc();
+    if (typeof ppEl !== 'undefined' && ppEl) { renderPed(); renderShop(); }
   }
   var cnItems = [['Pavic estándar', 1.85, 4000], ['Ladrillo 6 huecos económico rayado', 1.2, 3000], ['Refractario para cámara', 4.5, 120]];
   var cnQ = cnItems.map(function (r) { return r[2]; });
@@ -1668,6 +1843,100 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   document.querySelectorAll('[data-gate]').forEach(function (b) {
     b.addEventListener('click', function () { var g = document.getElementById('emGate'); g.hidden = false; });
   });
+
+  /* catálogo */
+  var CATS = { muros: 'Muros', piezas: 'Piezas especiales', pisos: 'Pisos y pavimentos', ref: 'Refractarios', rev: 'Revestimientos y decorativos', combos: 'Combos y promociones' };
+  var PRODS = [
+    ['18 huecos', 'muros'], ['18 huecos 1/2', 'muros'], ['18 huecos Luis XV', 'muros,piezas,rev'], ['3 huecos económico rayado', 'muros'], ['3 huecos económico rayado mitad', 'muros'],
+    ['6 huecos big rayado', 'muros'], ['6 huecos big rayado mitad', 'muros'], ['6 huecos redondo', 'muros'], ['6 huecos redondo medios', 'muros'], ['8 huecos económico rayado', 'muros'],
+    ['8 huecos económico rayado constructor', 'muros'], ['8 huecos económico rayado constructor medios', 'muros'], ['8 huecos económico rayado medios', 'muros'], ['9 huecos económico rayado', 'muros'], ['9 huecos económico rayado medios', 'muros'],
+    ['Biscocho', 'ref,rev'], ['Biscocho 213', 'ref,rev'], ['Bloque cerámico 9 cm', 'piezas'], ['Botaguas de 1 caída', 'piezas'], ['Botaguas de 2 caídas', 'piezas'],
+    ['Brick cornisa punta bosel', 'muros,rev'], ['Brick enchape ancho', 'rev'], ['Brick enchape corto', 'rev'], ['Brick estándar', 'muros,rev'], ['Brick estándar aligerado', 'muros,pisos,rev'],
+    ['Brick gambote rústico 22', 'muros,rev'], ['Brick gambote rústico 18', 'muros,rev'], ['Brick terminación grada', 'muros,rev'], ['Celosía', 'muros,piezas,rev'],
+    ['Pavic estándar', 'pisos'], ['Pavic peatonal', 'pisos'], ['Pavic estándar con tetones', 'pisos'], ['Combo 18H visto', 'combos'], ['Combo 6H redondo', 'combos']
+  ];
+  var shopQ = document.getElementById('shopQ'), shopOn = {}, shopBudget = 0;
+  Object.keys(CATS).forEach(function (k) { shopOn[k] = true; });
+  function shopMatch(p) { return p[0].toLowerCase().indexOf(shopQ.value.toLowerCase()) >= 0; }
+  function renderShop() {
+    var list = PRODS.filter(shopMatch);
+    document.getElementById('shopCats').innerHTML = Object.keys(CATS).map(function (k) {
+      var n = list.filter(function (p) { return p[1].split(',').indexOf(k) >= 0; }).length;
+      return '<div class="chk"><label><input type="checkbox" data-cat="' + k + '"' + (shopOn[k] ? ' checked' : '') + '> ' + CATS[k] + '</label><span class="mono muted">' + n + '</span></div>';
+    }).join('');
+    var shown = list.filter(function (p) { return p[1].split(',').some(function (c) { return shopOn[c]; }); });
+    if (document.getElementById('shopSort').value === 'cat') shown = shown.slice().sort(function (a, b) { return a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]); });
+    else shown = shown.slice().sort(function (a, b) { return a[0].localeCompare(b[0], 'es'); });
+    document.getElementById('shopCount').textContent = shown.length + (shown.length === 1 ? ' producto' : ' productos');
+    document.getElementById('shopGrid').innerHTML = shown.length ? shown.map(function (p) {
+      var first = p[1].split(',')[0];
+      return '<div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>' + p[0] + '</b><span class="chip" style="align-self:flex-start">' + CATS[first] + '</span>' +
+        (client ? '<span class="sub">Bs 0,00 <span class="muted">(precio del ERP)</span></span>' : '<span class="chip lock" style="align-self:flex-start">Precio con sesión</span>') +
+        '<button type="button" class="mini" data-add="1">Añadir al presupuesto</button></div>';
+    }).join('') : '<div class="card flat"><span class="sub">Sin resultados. Prueba otra palabra o escríbenos por WhatsApp.</span></div>';
+  }
+  shopQ.addEventListener('input', renderShop);
+  document.getElementById('shopSort').addEventListener('change', renderShop);
+  document.getElementById('shopCats').addEventListener('change', function (e) { var k = e.target.getAttribute('data-cat'); if (k) { shopOn[k] = e.target.checked; renderShop(); } });
+  document.getElementById('shopGrid').addEventListener('click', function (e) {
+    if (e.target.getAttribute && e.target.getAttribute('data-add')) { shopBudget++; document.getElementById('shopBudget').textContent = 'Presupuesto (' + shopBudget + ')'; e.target.textContent = 'Añadido'; }
+  });
+  renderShop();
+
+  /* presupuesto y pedido */
+  var PP = [['Pavic estándar', 1.85, 2000], ['6 huecos económico rayado', 1.2, 3000], ['Brick enchape ancho', 2.2, 450]];
+  var ppQ = PP.map(function (r) { return r[2]; }), ppEnt = 'ret', ppEl = document.getElementById('ppLines');
+  function ppTotal() { return PP.reduce(function (t, r, i) { return t + r[1] * ppQ[i]; }, 0); }
+  function renderPed() {
+    ppEl.innerHTML = PP.map(function (r, i) {
+      return '<tr><td>' + r[0] + '</td><td class="num">' + (client ? 'Bs ' + r[1].toFixed(2).replace('.', ',') : '<span class="dots">Bs ••••</span>') + '</td><td class="num"><input class="qty" type="number" min="0" step="10" value="' + ppQ[i] + '" data-q="' + i + '" aria-label="Cantidad de ' + r[0] + '"></td><td class="num">' + (client ? 'Bs ' + Math.round(r[1] * ppQ[i]).toLocaleString('es-BO') : '<span class="dots">Bs ••••</span>') + '</td></tr>';
+    }).join('');
+    document.getElementById('ppTotal').innerHTML = client ? 'Bs ' + Math.round(ppTotal()).toLocaleString('es-BO') : '<span class="dots">Bs ••••••</span>';
+    document.getElementById('ppPriceNote').textContent = client ? 'Precios de lista de Cochabamba, de ejemplo. Del ERP al conectarlo.' : 'Ingresa para ver precios. Puedes pedir una cotización sin cuenta.';
+    document.getElementById('ppDatosV').hidden = client; document.getElementById('ppDatosC').hidden = !client;
+    document.getElementById('ppDatosSub').textContent = client ? 'datos de facturación de tu cuenta' : 'para que un ejecutivo te contacte';
+    document.getElementById('ppResSub').textContent = client ? 'pedido' : 'solicitud de cotización';
+    document.getElementById('ppSend').textContent = client ? 'Enviar pedido' : 'Solicitar cotización';
+    document.getElementById('ppSendNote').textContent = client ? 'El pedido baja al ERP.' : 'Llega al ejecutivo de tu ciudad.';
+    document.getElementById('ppUrl').textContent = client ? 'incerpaz.com/mi-cuenta/pedido' : 'incerpaz.com/presupuesto';
+    document.getElementById('ppResN').textContent = PP.length + ' productos, ' + ppQ.reduce(function (a, b) { return a + b; }, 0).toLocaleString('es-BO') + ' piezas';
+    document.getElementById('ppResT').textContent = client ? 'Bs ' + Math.round(ppTotal()).toLocaleString('es-BO') + ' (de ejemplo)' : 'Se informa en la cotización';
+    document.getElementById('ppResE').textContent = (ppEnt === 'ret' ? 'Retiro en ' + (document.getElementById('ppAg').value || 'agencia') : 'Envío a obra') + ', ' + document.getElementById('ppCiudad').value;
+    document.getElementById('ppDone').hidden = true;
+  }
+  function fillAg() {
+    var c = document.getElementById('ppCiudad').value;
+    document.getElementById('ppAg').innerHTML = (AG[c] || []).filter(function (a) { return a[1] === 'ag'; }).map(function (a) { return '<option>' + a[0] + '</option>'; }).join('');
+  }
+  document.getElementById('ppCiudad').innerHTML = ['Cochabamba', 'Santa Cruz', 'Oruro', 'Sucre'].map(function (c) { return '<option>' + c + '</option>'; }).join('');
+  document.getElementById('ppCiudad').addEventListener('change', function () { fillAg(); renderPed(); });
+  document.getElementById('ppAg').addEventListener('change', renderPed);
+  fillAg();
+  ppEl.addEventListener('change', function (e) { var i = e.target.getAttribute('data-q'); if (i !== null) { ppQ[+i] = Math.max(0, parseFloat(e.target.value) || 0); renderPed(); } });
+  document.querySelectorAll('[data-ent]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      ppEnt = b.getAttribute('data-ent');
+      document.querySelectorAll('[data-ent]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.getElementById('ppAgW').hidden = ppEnt !== 'ret'; document.getElementById('ppDirW').hidden = ppEnt !== 'env';
+      document.getElementById('ppEntNote').textContent = ppEnt === 'ret' ? 'Sin costo. La agencia confirma cuándo está listo.' : 'Costo de envío por zona: por definir con logística.';
+      renderPed();
+    });
+  });
+  document.getElementById('ppEntNote').textContent = 'Sin costo. La agencia confirma cuándo está listo.';
+  document.querySelectorAll('[data-pp]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-pp');
+      document.querySelectorAll('[data-pp]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      [1, 2, 3, 4].forEach(function (n) { document.getElementById('pp' + n).hidden = String(n) !== k; });
+      renderPed();
+    });
+  });
+  document.getElementById('ppSend').addEventListener('click', function () {
+    document.getElementById('ppDone').hidden = false;
+    document.getElementById('ppDoneT').textContent = client ? 'Pedido PD-0188 recibido (número de ejemplo)' : 'Recibimos tu solicitud de cotización';
+    document.getElementById('ppDoneS').textContent = client ? 'Tu ejecutivo lo confirma y puedes seguir su estado en Mi cuenta.' : 'Un ejecutivo de ' + document.getElementById('ppCiudad').value + ' te contactará por WhatsApp.';
+  });
+  renderPed();
 
   /* tema */
   var modes = ['auto', 'light', 'dark'], mi = 0, tb = document.getElementById('themeBtn');
