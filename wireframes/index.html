@@ -1477,11 +1477,11 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
               <label class="field">Nombre comercial<input type="text" value="Constructora Ejemplo" readonly></label>
             </div>
             <div style="margin-top:12px">
-              <div class="mono muted" style="margin-bottom:6px">Forma de pago <i class="pin in" title="Pendiente">!</i></div>
+              <div class="mono muted" style="margin-bottom:6px">Forma de pago</div>
               <div class="seg" role="group" aria-label="Forma de pago"><button type="button" aria-pressed="true">Transferencia</button><button type="button" aria-pressed="false">QR</button><button type="button" aria-pressed="false">En agencia</button></div>
             </div>
           </div>
-          <span class="mono muted" style="display:block;margin-top:10px">Los datos de facturación (NIT, razón social, nombre comercial) salen de la ficha del cliente en el ERP. Pago solo al contado: no hay línea de crédito.</span>
+          <span class="mono muted" style="display:block;margin-top:10px">Los datos de facturación (NIT, razón social, nombre comercial) salen de la ficha del cliente en el ERP. Se paga al contado por transferencia, QR o en agencia. No hay línea de crédito.</span>
           <i class="pin">4</i>
         </div>
 
@@ -1507,11 +1507,11 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       <ol class="notes">
         <li><div><b>Cuatro pasos</b><span>Prueba el prototipo: navega por los pasos y mira cómo cambian los botones según la sesión. El carrito actual se reemplaza por este flujo.</span></div></li>
         <li><div><b>Presupuesto editable</b><span>Cantidades, obra y notas. El visitante ve cantidades sin precios. El cliente verificado ve precios y total de las tarifas del ERP.</span></div></li>
-        <li><div><b>Entrega</b><span>Retiro en una agencia de la ciudad elegida o envío a obra. El costo del envío por zona está por definir.</span></div></li>
+        <li><div><b>Entrega</b><span>Retiro en una agencia de la ciudad elegida o envío a obra. Cada ciudad tiene sus propios montos y políticas de envío: se cargan por ciudad y se muestran según la ciudad elegida (cambia la ciudad y mira el texto).</span></div></li>
         <li><div><b>Datos</b><span>El visitante deja nombre y celular: es un lead. El cliente verificado trae sus datos de facturación del ERP y elige cómo paga.</span></div></li>
         <li><div><b>Resumen y envío</b><span>El visitante solicita una cotización que llega al ejecutivo de la ciudad. El cliente envía un pedido que baja al ERP y puede seguir por estado.</span></div></li>
       </ol>
-      <p class="muted">Los pasos de entrega y pago son una propuesta mía. Las formas de pago y el costo de envío deben confirmarlos ventas y finanzas. Precios y NIT son de ejemplo.</p>
+      <p class="muted">Los pasos son una propuesta mía. Las formas de pago (transferencia, QR y en agencia) están confirmadas. Los montos y las políticas de envío de cada ciudad los carga INCERPAZ. Precios y NIT son de ejemplo.</p>
     </div>
   </section>
 </div>
@@ -1909,7 +1909,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     document.getElementById('ppAg').innerHTML = (AG[c] || []).filter(function (a) { return a[1] === 'ag'; }).map(function (a) { return '<option>' + a[0] + '</option>'; }).join('');
   }
   document.getElementById('ppCiudad').innerHTML = ['Cochabamba', 'Santa Cruz', 'Oruro', 'Sucre'].map(function (c) { return '<option>' + c + '</option>'; }).join('');
-  document.getElementById('ppCiudad').addEventListener('change', function () { fillAg(); renderPed(); });
+  document.getElementById('ppCiudad').addEventListener('change', function () { fillAg(); updEnt(); renderPed(); });
   document.getElementById('ppAg').addEventListener('change', renderPed);
   fillAg();
   ppEl.addEventListener('change', function (e) { var i = e.target.getAttribute('data-q'); if (i !== null) { ppQ[+i] = Math.max(0, parseFloat(e.target.value) || 0); renderPed(); } });
@@ -1918,11 +1918,15 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       ppEnt = b.getAttribute('data-ent');
       document.querySelectorAll('[data-ent]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
       document.getElementById('ppAgW').hidden = ppEnt !== 'ret'; document.getElementById('ppDirW').hidden = ppEnt !== 'env';
-      document.getElementById('ppEntNote').textContent = ppEnt === 'ret' ? 'Sin costo. La agencia confirma cuándo está listo.' : 'Costo de envío por zona: por definir con logística.';
+      updEnt();
       renderPed();
     });
   });
-  document.getElementById('ppEntNote').textContent = 'Sin costo. La agencia confirma cuándo está listo.';
+  function updEnt() {
+    var c = document.getElementById('ppCiudad').value;
+    document.getElementById('ppEntNote').textContent = ppEnt === 'ret' ? 'Retiro en agencia. Cada agencia confirma cuándo está listo.' : 'El monto y las condiciones del envío son los de la política de ' + c + '.';
+  }
+  updEnt();
   document.querySelectorAll('[data-pp]').forEach(function (b) {
     b.addEventListener('click', function () {
       var k = b.getAttribute('data-pp');
