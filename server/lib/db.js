@@ -94,6 +94,23 @@ CREATE TABLE IF NOT EXISTS pedido_eventos (
   autor_id INTEGER,
   creado_en TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS precios (
+  ciudad TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  lista TEXT NOT NULL,
+  precio REAL NOT NULL CHECK (precio >= 0),
+  actualizado_en TEXT NOT NULL DEFAULT (datetime('now')),
+  actualizado_por INTEGER,
+  PRIMARY KEY (ciudad, slug, lista)
+);
+CREATE TABLE IF NOT EXISTS ajustes (clave TEXT PRIMARY KEY, valor TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS cambios (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  usuario_id INTEGER,
+  entidad TEXT NOT NULL,
+  detalle TEXT NOT NULL,
+  creado_en TEXT NOT NULL DEFAULT (datetime('now'))
+);
 CREATE INDEX IF NOT EXISTS ix_pedidos_usuario ON pedidos(usuario_id);
 CREATE INDEX IF NOT EXISTS ix_presupuestos_usuario ON presupuestos(usuario_id);
 `);

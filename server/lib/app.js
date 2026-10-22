@@ -24,9 +24,14 @@ const txt = (v, max, nombre, { obligatorio = false } = {}) => {
 };
 const publico = (u) => u && ({ id: u.id, rol: u.rol, estado: u.estado, tipo: u.tipo, nombre: u.nombre, razon_social: u.razon_social, nit: u.nit, ciudad: u.ciudad, celular: u.celular, correo: u.correo, lista_precios: u.lista_precios });
 
-function crearApp({ db, erp, catalogoRuta, seguro = process.env.COOKIE_SECURE === '1' }) {
-  const catalogo = JSON.parse(fs.readFileSync(catalogoRuta || path.join(__dirname, '..', 'data', 'catalogo.json'), 'utf8'));
-  const porClave = new Map(catalogo.map((p) => [`${p.ciudad}:${p.slug}`, p]));
+function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKIE_SECURE === '1' }) {
+  const rutaCatalogo = catalogoRuta || path.join(__dirname, '..', 'data', 'catalogo.json');
+  let catalogo; let porClave;
+  const cargarCatalogo = () => { catalogo = JSON.parse(fs.readFileSync(rutaCatalogo, 'utf8')); porClave = new Map(catalogo.map((p) => [`${p.ciudad}:${p.slug}`, p])); };
+  cargarCatalogo();
+  const SUBIDAS = contenido ? path.join(contenido.dir, 'imagenes') : null;
+  if (SUBIDAS) fs.mkdirSync(SUBIDAS, { recursive: true });
+  db.prepare("INSERT OR IGNORE INTO ajustes (clave, valor) VALUES ('nota_precios:cochabamba', 'Precio por pieza, puesto en obra dentro del radio urbano.')").run();
   const limLogin = limitador({ max: 10, ventanaMs: 15 * 60_000 });
   const limRegistro = limitador({ max: 20, ventanaMs: 60 * 60_000 });
 
@@ -34,6 +39,7 @@ function crearApp({ db, erp, catalogoRuta, seguro = process.env.COOKIE_SECURE ==
   const verificado = (u) => u && (u.estado === 'verificado' || u.rol !== 'cliente');
   function requerirUsuario(u) { if (!u) falla(401, 'Inicia sesión para continuar'); return u; }
   function requerirVerificado(u) { requerirUsuario(u); if (!verificado(u)) falla(403, 'Tu cuenta está en revisión. Un ejecutivo la verificará pronto.'); return u; }
+  function requerirAdmin(u) { requerirUsuario(u); if (u.rol !== 'admin') falla(403, 'Solo un administrador puede hacer este cambio'); if (!contenido) falla(501, 'El panel de contenido no está activo en este servidor'); return u; }
   function requerirStaff(u) { requerirUsuario(u); if (u.rol === 'cliente') falla(403, 'No tienes permiso para esta acción'); return u; }
 
   function validarItems(items) {
@@ -152,7 +158,8 @@ function crearApp({ db, erp, catalogoRuta, seguro = process.env.COOKIE_SECURE ==
     const lista = catalogo.filter((p) => p.ciudad === ciudad);
     const r = await erp.getPrecios({ ciudad, listaPrecios: usuario.lista_precios, productos: lista.map((p) => ({ slug: p.slug, codigo: p.codigo })) });
     const precios = {}; lista.forEach((p) => { precios[p.slug] = typeof r[p.slug] === 'number' ? r[p.slug] : null; });
-    return { moneda: 'BOB', ejemplo: !!erp.ejemplo, precios };
+    const nota = db.prepare('SELECT valor FROM ajustes WHERE clave = ?').get(`nota_precios:${ciudad}`);
+    return { moneda: 'BOB', ejemplo: !!erp.ejemplo, nota: nota ? nota.valor : '', precios };
   });
 
   /* presupuestos */
@@ -302,14 +309,147 @@ function crearApp({ db, erp, catalogoRuta, seguro = process.env.COOKIE_SECURE ==
     return { ok: true };
   });
 
+  /* ---------- administración del contenido (solo administradores) ---------- */
+  const LISTAS = ['general', 'constructor'];
+  const registrar = (u, entidad, detalle) => db.prepare('INSERT INTO cambios (usuario_id, entidad, detalle) VALUES (?, ?, ?)').run(u.id, entidad, String(detalle).slice(0, 300));
+  async function publicar() { await contenido.reconstruir(); cargarCatalogo(); }
+  const ciudadCat = (v) => { if (!CATALOGOS.includes(v)) falla(400, 'Catálogo inexistente'); return v; };
+
+  ruta('GET', '/api/admin/contenido', async ({ usuario }) => {
+    requerirAdmin(usuario);
+    const { sitio, productos } = contenido.leer();
+    return { sitio: { ciudades: sitio.ciudades, agencias: sitio.agencias, correo: sitio.correo, servicio_cliente: sitio.servicio_cliente, redes: sitio.redes }, categorias: sitio.categorias, productos, listas: LISTAS };
+  });
+  ruta('PUT', '/api/admin/sitio', async ({ usuario, body }) => {
+    requerirAdmin(usuario);
+    contenido.guardarSitio(body);
+    registrar(usuario, 'sitio', `Actualizó ${Object.keys(body).join(', ')}`);
+    await publicar();
+    return { ok: true };
+  });
+  ruta('POST', '/api/admin/productos', async ({ usuario, body }) => {
+    requerirAdmin(usuario);
+    const p = contenido.crearProducto(body);
+    registrar(usuario, 'producto', `Creó ${p.ciudad}:${p.slug}`);
+    await publicar();
+    return { status: 201, cuerpo: { producto: p } };
+  });
+  ruta('PUT', '/api/admin/productos/:ciudad/:slug', async ({ usuario, params, body }) => {
+    requerirAdmin(usuario);
+    ciudadCat(params.ciudad);
+    contenido.guardarProducto(params.ciudad, params.slug, body);
+    registrar(usuario, 'producto', `Editó ${params.ciudad}:${params.slug}`);
+    await publicar();
+    return { ok: true };
+  });
+  ruta('DELETE', '/api/admin/productos/:ciudad/:slug', async ({ usuario, params }) => {
+    requerirAdmin(usuario);
+    ciudadCat(params.ciudad);
+    contenido.borrarProducto(params.ciudad, params.slug);
+    db.prepare('DELETE FROM precios WHERE ciudad = ? AND slug = ?').run(params.ciudad, params.slug);
+    registrar(usuario, 'producto', `Eliminó ${params.ciudad}:${params.slug}`);
+    await publicar();
+    return { ok: true };
+  });
+
+  ruta('GET', '/api/admin/precios', async ({ usuario, url }) => {
+    requerirAdmin(usuario);
+    const ciudad = ciudadCat(url.searchParams.get('ciudad'));
+    const filas = db.prepare('SELECT slug, lista, precio, actualizado_en FROM precios WHERE ciudad = ?').all(ciudad);
+    const productos = contenido.leer().productos.filter((p) => p.ciudad === ciudad).map((p) => {
+      const precios = {}; let act = null;
+      filas.filter((f) => f.slug === p.slug).forEach((f) => { precios[f.lista] = f.precio; if (!act || f.actualizado_en > act) act = f.actualizado_en; });
+      return { slug: p.slug, nombre: p.titulo, codigo: p.codigo, precios, actualizado_en: act };
+    });
+    const nota = db.prepare('SELECT valor FROM ajustes WHERE clave = ?').get(`nota_precios:${ciudad}`);
+    return { ciudad, listas: LISTAS, nota: nota ? nota.valor : '', productos };
+  });
+  ruta('PUT', '/api/admin/precios', async ({ usuario, body }) => {
+    requerirAdmin(usuario);
+    const ciudad = ciudadCat(body.ciudad);
+    const cambios = Array.isArray(body.cambios) ? body.cambios : [];
+    if (cambios.length > 500) falla(400, 'Demasiados cambios a la vez');
+    const slugs = new Set(contenido.leer().productos.filter((p) => p.ciudad === ciudad).map((p) => p.slug));
+    db.exec('BEGIN');
+    try {
+      for (const c of cambios) {
+        if (!slugs.has(c.slug)) falla(400, `Producto inexistente: ${c.slug}`);
+        if (!LISTAS.includes(c.lista)) falla(400, 'Lista de precios inválida');
+        if (c.precio === null || c.precio === '') { db.prepare('DELETE FROM precios WHERE ciudad = ? AND slug = ? AND lista = ?').run(ciudad, c.slug, c.lista); continue; }
+        const v = Number(c.precio);
+        if (!Number.isFinite(v) || v < 0 || v > 100000) falla(400, `Precio inválido para ${c.slug}`);
+        db.prepare("INSERT INTO precios (ciudad, slug, lista, precio, actualizado_por) VALUES (?, ?, ?, ?, ?) ON CONFLICT(ciudad, slug, lista) DO UPDATE SET precio = excluded.precio, actualizado_en = datetime('now'), actualizado_por = excluded.actualizado_por").run(ciudad, c.slug, c.lista, Math.round(v * 100) / 100, usuario.id);
+      }
+      if (body.nota != null) db.prepare('INSERT INTO ajustes (clave, valor) VALUES (?, ?) ON CONFLICT(clave) DO UPDATE SET valor = excluded.valor').run(`nota_precios:${ciudad}`, txt(body.nota, 200, 'la nota'));
+      db.exec('COMMIT');
+    } catch (e) { db.exec('ROLLBACK'); throw e; }
+    registrar(usuario, 'precios', `${ciudad}: ${cambios.length} cambios`);
+    return { ok: true, cambios: cambios.length };
+  });
+
+  ruta('POST', '/api/admin/imagenes', async ({ usuario, body }) => {
+    requerirAdmin(usuario);
+    const datos = Buffer.from(String(body.datos || ''), 'base64');
+    if (!datos.length || datos.length > 4_000_000) falla(400, 'La imagen debe pesar menos de 4 MB');
+    const ext = datos.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff])) ? 'jpg' : datos.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47])) ? 'png' : (datos.subarray(0, 4).toString() === 'RIFF' && datos.subarray(8, 12).toString() === 'WEBP') ? 'webp' : null;
+    if (!ext) falla(400, 'Solo se aceptan imágenes JPG, PNG o WebP');
+    const nombre = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    fs.writeFileSync(path.join(SUBIDAS, nombre), datos);
+    registrar(usuario, 'imagen', nombre);
+    return { status: 201, cuerpo: { ruta: `assets/img/subidas/${nombre}` } };
+  });
+
+  ruta('GET', '/api/admin/historial', async ({ usuario }) => {
+    requerirAdmin(usuario);
+    return { versiones: contenido.historial(), cambios: db.prepare('SELECT c.id, c.entidad, c.detalle, c.creado_en, u.nombre AS autor FROM cambios c LEFT JOIN usuarios u ON u.id = c.usuario_id ORDER BY c.id DESC LIMIT 100').all() };
+  });
+  ruta('POST', '/api/admin/restaurar', async ({ usuario, body }) => {
+    requerirAdmin(usuario);
+    contenido.restaurar(String(body.version || ''));
+    registrar(usuario, 'restaurar', body.version);
+    await publicar();
+    return { ok: true };
+  });
+
+  ruta('GET', '/api/admin/equipo', async ({ usuario }) => {
+    requerirAdmin(usuario);
+    return { equipo: db.prepare("SELECT id, rol, estado, nombre, ciudad, correo, creado_en FROM usuarios WHERE rol IN ('admin','ejecutivo') ORDER BY rol, id").all() };
+  });
+  ruta('POST', '/api/admin/equipo', async ({ usuario, body }) => {
+    requerirAdmin(usuario);
+    const correo = txt(body.correo, 120, 'el correo', { obligatorio: true }).toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) falla(400, 'Correo inválido');
+    if (!['admin', 'ejecutivo'].includes(body.rol)) falla(400, 'Rol inválido');
+    if (!CIUDADES.includes(body.ciudad)) falla(400, 'Ciudad inválida');
+    const password = String(body.password || '');
+    if (password.length < 10) falla(400, 'La contraseña debe tener al menos 10 caracteres');
+    if (db.prepare('SELECT id FROM usuarios WHERE correo = ?').get(correo)) falla(409, 'Ya existe una cuenta con ese correo');
+    db.prepare("INSERT INTO usuarios (rol, estado, tipo, nombre, ciudad, celular, correo, pass_hash) VALUES (?, 'verificado', 'empresa', ?, ?, '00000000', ?, ?)")
+      .run(body.rol, txt(body.nombre, 80, 'el nombre', { obligatorio: true }), body.ciudad, correo, auth.hashPassword(password));
+    registrar(usuario, 'equipo', `Creó ${body.rol} ${correo}`);
+    return { status: 201, cuerpo: { ok: true } };
+  });
+  ruta('POST', '/api/admin/equipo/:id/baja', async ({ usuario, params }) => {
+    requerirAdmin(usuario);
+    const id = Number(params.id);
+    if (id === usuario.id) falla(400, 'No puedes dar de baja tu propia cuenta');
+    const r = db.prepare("UPDATE usuarios SET estado = 'rechazado' WHERE id = ? AND rol IN ('admin','ejecutivo')").run(id);
+    if (!r.changes) falla(404, 'No encontramos esa cuenta');
+    db.prepare('DELETE FROM sesiones WHERE usuario_id = ?').run(id);
+    registrar(usuario, 'equipo', `Dio de baja la cuenta ${id}`);
+    return { ok: true };
+  });
+
   /* ---------- servidor de archivos del sitio ---------- */
   function servirEstatico(req, res, url) {
     let p = decodeURIComponent(url.pathname);
     if (p.includes('\0')) return responder(res, 400, { error: 'Solicitud inválida' });
     if (p === '/' || p === '') p = '/index.html';
     else if (!path.extname(p)) p = fs.existsSync(path.join(SITIO, p + '.html')) ? p + '.html' : p;
-    const archivo = path.normalize(path.join(SITIO, p));
-    const relativo = path.relative(SITIO, archivo);
+    const BASE = SUBIDAS && p.startsWith('/assets/img/subidas/') ? SUBIDAS : SITIO;
+    if (BASE === SUBIDAS) p = p.slice('/assets/img/subidas'.length);
+    const archivo = path.normalize(path.join(BASE, p));
+    const relativo = path.relative(BASE, archivo);
     const oculto = relativo.split(path.sep).some((s) => s.startsWith('.'));
     if (relativo.startsWith('..') || path.isAbsolute(relativo) || oculto) return responder(res, 404, { error: 'No encontrado' });
     fs.stat(archivo, (err, st) => {
@@ -347,7 +487,7 @@ function crearApp({ db, erp, catalogoRuta, seguro = process.env.COOKIE_SECURE ==
         if (r.metodo !== req.method) continue;
         const m = r.re.exec(url.pathname);
         if (!m) continue;
-        const body = cambia && req.method !== 'DELETE' ? await leerJson(req) : {};
+        const body = cambia && req.method !== 'DELETE' ? await leerJson(req, url.pathname === '/api/admin/imagenes' ? 6_000_000 : undefined) : {};
         const salida = await r.fn({ req, res, url, usuario, params: m.groups || {}, body });
         if (salida && salida.status) return responder(res, salida.status, salida.cuerpo);
         return responder(res, 200, salida);

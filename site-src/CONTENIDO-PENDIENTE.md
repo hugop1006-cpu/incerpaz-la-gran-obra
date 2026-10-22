@@ -41,6 +41,6 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - Precios, stock y pedidos con el ERP Seasoft: segunda etapa.
 
 ## Segunda etapa (comercio)
-- Tarifas reales por ciudad y lista (general/constructor): hoy `server/data/tarifas.ejemplo.json` es ficticio.
+- Precios: se usan los publicados en las tiendas actuales (lista general); falta definir los precios propios de la lista constructor y si Cochabamba y Santa Cruz comparten la condición "puesto en obra dentro del radio urbano" (hoy solo Cochabamba la declara).
 - API real de Seasoft y ambiente de pruebas (ver `server/ERP.md`); el adaptador no se ha probado contra el ERP.
 - Servidor interno para alojar `server/` y primeras cuentas ejecutivo/admin.

@@ -9,12 +9,12 @@ class ErrorHttp extends Error {
 }
 const falla = (status, mensaje, detalle) => { throw new ErrorHttp(status, mensaje, detalle); };
 
-function leerJson(req) {
+function leerJson(req, max = MAX_CUERPO) {
   return new Promise((resolve, reject) => {
     const tipo = (req.headers['content-type'] || '').split(';')[0].trim();
     if (tipo !== 'application/json') return reject(new ErrorHttp(415, 'El contenido debe ser application/json'));
     let tam = 0; const partes = [];
-    req.on('data', (c) => { tam += c.length; if (tam > MAX_CUERPO) { reject(new ErrorHttp(413, 'Solicitud demasiado grande')); req.destroy(); } else partes.push(c); });
+    req.on('data', (c) => { tam += c.length; if (tam > max) { reject(new ErrorHttp(413, 'Solicitud demasiado grande')); req.destroy(); } else partes.push(c); });
     req.on('end', () => { try { resolve(partes.length ? JSON.parse(Buffer.concat(partes).toString('utf8')) : {}); } catch { reject(new ErrorHttp(400, 'JSON inválido')); } });
     req.on('error', reject);
   });

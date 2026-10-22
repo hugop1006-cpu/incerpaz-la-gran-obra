@@ -9,9 +9,12 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const OUT = path.join(ROOT, 'site');
-const sitio = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/sitio.json'), 'utf8'));
-let productos = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/productos.json'), 'utf8'));
+const OUT = process.env.SITE_OUT ? path.resolve(process.env.SITE_OUT) : path.join(ROOT, 'site');
+/* CONTENT_DIR: carpeta con sitio.json y productos.json (el panel de administración los edita ahí). */
+const DATA = process.env.CONTENT_DIR ? path.resolve(process.env.CONTENT_DIR) : path.join(__dirname, 'data');
+const CATALOGO_OUT = process.env.CATALOGO_OUT ? path.resolve(process.env.CATALOGO_OUT) : path.join(ROOT, 'server/data/catalogo.json');
+const sitio = JSON.parse(fs.readFileSync(path.join(DATA, 'sitio.json'), 'utf8'));
+let productos = JSON.parse(fs.readFileSync(path.join(DATA, 'productos.json'), 'utf8'));
 const config = Object.assign({ leadEndpoint: '', interno: true, comercio: true }, fs.existsSync(path.join(__dirname, 'config.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')) : {});
 
 const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -63,8 +66,8 @@ productos = productos.map((p) => {
   return Object.assign({}, p, { nombre: bonito(p.titulo), linea, medidas, variantes, sinFicha, peso: sinFicha ? null : p.peso, cat: categoriaPrincipal(p), todas: p.categorias, largo: dim('Largo'), ancho: dim('Ancho'), alto: dim('Alto') });
 });
 /* catálogo confiable para el servidor: valida pedidos y presupuestos sin fiarse del navegador */
-fs.mkdirSync(path.join(ROOT, 'server/data'), { recursive: true });
-fs.writeFileSync(path.join(ROOT, 'server/data/catalogo.json'), JSON.stringify(productos.map((p) => ({ ciudad: p.ciudad, slug: p.slug, codigo: p.codigo || null, nombre: p.nombre })), null, 1));
+fs.mkdirSync(path.dirname(CATALOGO_OUT), { recursive: true });
+fs.writeFileSync(CATALOGO_OUT, JSON.stringify(productos.map((p) => ({ ciudad: p.ciudad, slug: p.slug, codigo: p.codigo || null, nombre: p.nombre })), null, 1));
 const pavic = productos.filter((p) => /pavic/i.test(p.linea) || /^pavic/.test(p.slug));
 const purl = (p, base = '') => `${base}productos/${p.ciudad}/${p.slug}.html`;
 const medidaTexto = (p) => (p.largo && p.ancho && p.alto) ? `${num(p.largo)} × ${num(p.ancho)} × ${num(p.alto)} cm` : (p.medidas.length ? p.medidas.slice(0, 2).map(([l, v]) => `${l.toLowerCase()} ${num(v)} cm`).join(' · ') : (p.codigo ? `Código ${p.codigo}` : ''));
@@ -88,7 +91,7 @@ function layout({ file, base = '', title, desc, body, og = 'assets/img/productos
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-${config.interno || ['ingresar','registro','presupuesto','cuenta','equipo'].includes(pagina) ? '<meta name="robots" content="noindex, nofollow">' : ''}
+${config.interno || ['ingresar','registro','presupuesto','cuenta','equipo','admin'].includes(pagina) ? '<meta name="robots" content="noindex, nofollow">' : ''}
 <link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:locale" content="es_BO"><meta property="og:site_name" content="INCERPAZ">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${sitio.dominio}/${og}">
@@ -134,6 +137,7 @@ ${body}
 <script>window.INCERPAZ=${cfg};</script>
 <script src="${base}assets/js/site.js" defer></script>
 ${config.comercio ? `<script src="${base}assets/js/comercio.js" defer></script>` : ''}
+${config.comercio && pagina === 'admin' ? `<script src="${base}assets/js/admin.js" defer></script>` : ''}
 </body>
 </html>`;
 }
@@ -481,6 +485,11 @@ if (config.comercio) {
   write('equipo.html', layout({ file: 'equipo.html', pagina: 'equipo', title: 'Panel del equipo | INCERPAZ', desc: 'Verificación de cuentas y seguimiento de pedidos para el equipo de INCERPAZ.', body: `
 <section class="section"><div class="wrap"><span class="eyebrow">Equipo INCERPAZ</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 24px">Panel</h1><div id="app">Cargando…</div>${sinJs}</div></section>
 <script type="application/json" id="datos-listas">${JSON.stringify(sitio.listas_precios || ['general'])}</script>` }));
+}
+
+if (config.comercio) {
+  write('admin.html', layout({ file: 'admin.html', pagina: 'admin', title: 'Administrar el sitio | INCERPAZ', desc: 'Edición de productos, precios, agencias y contacto del sitio de INCERPAZ.', body: `
+<section class="section"><div class="wrap"><span class="eyebrow">Administración</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 24px">Contenido del sitio</h1><div id="app">Cargando…</div><noscript><p class="price-note">Esta sección necesita JavaScript.</p></noscript></div></section>` }));
 }
 
 /* ============================ 404, sitemap, robots ============================ */

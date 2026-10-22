@@ -64,7 +64,7 @@
       precios(c).then(function (r) {
         nodos.filter(function (n) { return n.getAttribute('data-ciudad') === c; }).forEach(function (n) {
           var v = r && r.precios ? r.precios[n.getAttribute('data-slug')] : null;
-          n.innerHTML = typeof v === 'number' ? '<strong>' + fmtBs(v) + '</strong> <span class="muted">por pieza' + (r.ejemplo ? ' · precio de ejemplo' : '') + '</span>' : 'Precio por cotizar con tu ejecutivo';
+          n.innerHTML = typeof v === 'number' ? '<strong>' + fmtBs(v) + '</strong> <span class="muted">por pieza' + (r.ejemplo ? ' · precio de ejemplo' : '') + (r.nota ? ' · ' + esc(r.nota.replace(/^Precio por pieza,?\s*/i, '')) : '') + '</span>' : 'Precio por cotizar con tu ejecutivo';
         });
       });
     });
@@ -313,7 +313,7 @@
       });
     }
     function pintar() {
-      app.innerHTML = '<div class="seg" role="group" aria-label="Sección"><button type="button" data-tab="cuentas" aria-pressed="' + (tab === 'cuentas') + '">Cuentas por verificar</button><button type="button" data-tab="pedidos" aria-pressed="' + (tab === 'pedidos') + '">Pedidos</button></div><p class="muted" style="margin-top:12px">' + esc(u.nombre) + ' · ' + (u.rol === 'admin' ? 'todas las ciudades' : esc(NOMBRE_CIUDAD[u.ciudad])) + '</p><div id="panel" style="margin-top:18px">Cargando…</div>';
+      app.innerHTML = '<div class="seg" role="group" aria-label="Sección"><button type="button" data-tab="cuentas" aria-pressed="' + (tab === 'cuentas') + '">Cuentas por verificar</button><button type="button" data-tab="pedidos" aria-pressed="' + (tab === 'pedidos') + '">Pedidos</button></div><p class="muted" style="margin-top:12px">' + esc(u.nombre) + ' · ' + (u.rol === 'admin' ? 'todas las ciudades · <a href="' + BASE + 'admin.html"><b>Administrar el sitio</b></a>' : esc(NOMBRE_CIUDAD[u.ciudad])) + '</p><div id="panel" style="margin-top:18px">Cargando…</div>';
       $$('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { tab = b.getAttribute('data-tab'); pintar(); }); });
       (tab === 'cuentas' ? cuentas() : pedidos()).then(function (html) {
         $('#panel').innerHTML = html;

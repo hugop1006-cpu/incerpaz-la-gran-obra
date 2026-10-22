@@ -1,0 +1,5 @@
+.git
+wireframes
+server/data/incerpaz.db*
+server/data/contenido
+node_modules

@@ -8,6 +8,11 @@ const { abrir } = require('../lib/db');
 const { hashPassword } = require('../lib/auth');
 const { crearApp } = require('../lib/app');
 const erpMock = require('../lib/erp/mock');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { crearContenido } = require('../lib/contenido');
+const { crear: crearLocal } = require('../lib/erp/local');
 
 function levantar(erp = erpMock) {
   const db = abrir(':memory:');
@@ -25,7 +30,7 @@ function cliente(base) {
     const texto = await r.text(); let json = null; try { json = JSON.parse(texto); } catch { /* no es JSON */ }
     return { status: r.status, json, texto, headers: r.headers };
   };
-  return { get: (r) => llamar('GET', r), post: (r, b = {}) => llamar('POST', r, b), del: (r) => llamar('DELETE', r), raw: llamar };
+  return { get: (r) => llamar('GET', r), put: (r, b = {}) => llamar('PUT', r, b), post: (r, b = {}) => llamar('POST', r, b), del: (r) => llamar('DELETE', r), raw: llamar };
 }
 const registro = (o = {}) => Object.assign({ tipo: 'empresa', nombre: 'Ana Ejemplo', razon_social: 'Constructora Ejemplo SRL', nit: '1234567012', ciudad: 'cochabamba', celular: '70000001', correo: 'ana@ejemplo.com', password: 'clave-segura-1' }, o);
 const items = [{ ciudad: 'cochabamba', slug: 'pavic-estandar', cantidad: 1000 }, { ciudad: 'cochabamba', slug: '18-h', cantidad: 500 }];
@@ -148,5 +153,69 @@ test('seguridad: CSRF, archivos fuera del sitio y límite de intentos', async ()
   assert.match((await fetch(`${base}/`)).headers.get('x-content-type-options'), /nosniff/);
   let ultimo = 0; for (let i = 0; i < 12; i++) ultimo = (await c.post('/api/login', { correo: 'nadie@ejemplo.com', password: 'cualquiera-1' })).status;
   assert.equal(ultimo, 429, 'tras varios intentos fallidos se bloquea');
+  cerrar(servidor);
+});
+
+test('panel de administración: solo el administrador edita precios, productos, agencias e imágenes', async () => {
+  const db = abrir(':memory:'); const erp = crearLocal(db);
+  const contenido = crearContenido({ dir: fs.mkdtempSync(path.join(os.tmpdir(), 'inc-cont-')), construir: false });
+  const servidor = http.createServer(crearApp({ db, erp, contenido }));
+  await new Promise((ok) => servidor.listen(0, '127.0.0.1', ok));
+  const base = `http://127.0.0.1:${servidor.address().port}`; const adm = cliente(base), ej = cliente(base), cli = cliente(base);
+  const cuenta = (rol, correo, ciudad) => db.prepare("INSERT INTO usuarios (rol, estado, tipo, nombre, ciudad, celular, correo, pass_hash) VALUES (?, 'verificado','empresa','Persona','cochabamba','70000009',?,?)").run(rol, correo, hashPassword('clave-larga-123'));
+  cuenta('admin', 'admin@incerpaz.test'); cuenta('ejecutivo', 'ej@incerpaz.test');
+  await adm.post('/api/login', { correo: 'admin@incerpaz.test', password: 'clave-larga-123' });
+  await ej.post('/api/login', { correo: 'ej@incerpaz.test', password: 'clave-larga-123' });
+  assert.equal((await ej.get('/api/admin/contenido')).status, 403, 'un ejecutivo no edita el contenido');
+  assert.equal((await ej.put('/api/admin/precios', { ciudad: 'cochabamba', cambios: [] })).status, 403);
+
+  /* precios publicados sembrados y editables; un cliente verificado los ve, uno pendiente no */
+  const lista = await adm.get('/api/admin/precios?ciudad=cochabamba');
+  const fila = lista.json.productos.find((p) => p.slug === '18-h'); assert.equal(typeof fila.precios.general, 'number');
+  assert.equal((await adm.put('/api/admin/precios', { ciudad: 'cochabamba', cambios: [{ slug: '18-h', lista: 'general', precio: 'abc' }] })).status, 400);
+  assert.equal((await adm.put('/api/admin/precios', { ciudad: 'cochabamba', cambios: [{ slug: 'no-existe', lista: 'general', precio: 1 }] })).status, 400);
+  await adm.put('/api/admin/precios', { ciudad: 'cochabamba', cambios: [{ slug: '18-h', lista: 'general', precio: 9.5 }, { slug: '18-h', lista: 'constructor', precio: 8 }], nota: 'Nota de prueba' });
+  await cli.post('/api/registro', registro()); await cli.post('/api/login', { correo: 'ana@ejemplo.com', password: 'clave-segura-1' });
+  assert.equal((await cli.get('/api/precios?ciudad=cochabamba')).status, 403, 'pendiente: sin precios');
+  db.prepare("UPDATE usuarios SET estado='verificado' WHERE correo='ana@ejemplo.com'").run();
+  let pr = (await cli.get('/api/precios?ciudad=cochabamba')).json; assert.equal(pr.precios['18-h'], 9.5); assert.equal(pr.nota, 'Nota de prueba');
+  db.prepare("UPDATE usuarios SET lista_precios='constructor' WHERE correo='ana@ejemplo.com'").run();
+  pr = (await cli.get('/api/precios?ciudad=cochabamba')).json; assert.equal(pr.precios['18-h'], 8, 'la lista constructor tiene su precio');
+  assert.equal(pr.precios['pavic-estandar'], lista.json.productos.find((p) => p.slug === 'pavic-estandar').precios.general, 'sin precio propio usa el general');
+  assert.equal((await cli.get('/api/admin/precios?ciudad=cochabamba')).status, 403);
+
+  /* agencias: se valida y se guarda */
+  const c = (await adm.get('/api/admin/contenido')).json;
+  const malo = JSON.parse(JSON.stringify(c.sitio)); malo.agencias.cochabamba[0].telefonos = ['12'];
+  assert.equal((await adm.put('/api/admin/sitio', malo)).status, 400);
+  const bueno = JSON.parse(JSON.stringify(c.sitio)); bueno.agencias.oruro.push({ nombre: 'Agencia Nueva', tipo: 'agencia', direccion: 'Av. Prueba 123', telefonos: ['2-5230000'], whatsapp: '' });
+  bueno.ciudades.find((x) => x.slug === 'sucre').whatsapp = '71111111';
+  assert.equal((await adm.put('/api/admin/sitio', bueno)).status, 200);
+  const despues = (await adm.get('/api/admin/contenido')).json.sitio; assert.ok(despues.agencias.oruro.some((a) => a.nombre === 'Agencia Nueva')); assert.equal(despues.ciudades.find((x) => x.slug === 'sucre').whatsapp, '71111111');
+
+  /* productos: editar, crear, borrar */
+  const p = c.productos.find((x) => x.ciudad === 'cochabamba' && x.slug === '18-h');
+  assert.equal((await adm.put('/api/admin/productos/cochabamba/18-h', { ...p, titulo: '18 HUECOS RENOVADO', medidas: [['Alto', -1]] })).status, 400);
+  assert.equal((await adm.put('/api/admin/productos/cochabamba/18-h', { ...p, titulo: '18 HUECOS RENOVADO', peso: 2.4 })).status, 200);
+  assert.equal((await adm.get('/api/admin/contenido')).json.productos.find((x) => x.slug === '18-h' && x.ciudad === 'cochabamba').titulo, '18 HUECOS RENOVADO');
+  const nuevo = { ciudad: 'santa-cruz', slug: 'ladrillo-nuevo', titulo: 'Ladrillo nuevo', codigo: 'LN1', categorias: ['muros'], medidas: [['Alto', 7], ['Largo', 25]], imagenes: [] };
+  assert.equal((await adm.post('/api/admin/productos', nuevo)).status, 201);
+  assert.equal((await adm.post('/api/admin/productos', nuevo)).status, 409, 'no se duplica');
+  assert.equal((await adm.post('/api/admin/productos', { ...nuevo, slug: 'Mal Slug' })).status, 400);
+  assert.equal((await adm.raw('DELETE', '/api/admin/productos/santa-cruz/ladrillo-nuevo')).status, 200);
+
+  /* imágenes: solo imágenes reales */
+  const png = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47]), Buffer.alloc(40)]).toString('base64');
+  const sube = await adm.post('/api/admin/imagenes', { datos: png }); assert.equal(sube.status, 201); assert.match(sube.json.ruta, /^assets\/img\/subidas\/.+\.png$/);
+  assert.equal((await fetch(`${base}/${sube.json.ruta}`)).status, 200);
+  assert.equal((await adm.post('/api/admin/imagenes', { datos: Buffer.from('<script>').toString('base64') })).status, 400);
+
+  /* equipo, historial y restauración */
+  assert.equal((await adm.post('/api/admin/equipo', { nombre: 'Nuevo Ejecutivo', correo: 'nuevo@incerpaz.test', rol: 'ejecutivo', ciudad: 'santa-cruz', password: 'corta' })).status, 400);
+  assert.equal((await adm.post('/api/admin/equipo', { nombre: 'Nuevo Ejecutivo', correo: 'nuevo@incerpaz.test', rol: 'ejecutivo', ciudad: 'santa-cruz', password: 'una-clave-larga' })).status, 201);
+  const h = (await adm.get('/api/admin/historial')).json; assert.ok(h.versiones.length >= 2); assert.ok(h.cambios.length >= 4);
+  const prev = h.versiones.find((v) => v.endsWith('-productos.json'));
+  assert.equal((await adm.post('/api/admin/restaurar', { version: prev })).status, 200);
+  assert.equal((await adm.post('/api/admin/restaurar', { version: '../../etc/passwd' })).status, 400);
   cerrar(servidor);
 });
