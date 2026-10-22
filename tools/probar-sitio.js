@@ -12,7 +12,7 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   const pg = await ctx.newPage();
   const errores = [];
   pg.on('pageerror', (e) => errores.push(e.message));
-  for (const p of ['index.html', 'catalogo.html', 'pavic.html', 'donde-estamos.html', 'empresa.html', 'productos/pavic-estandar.html', 'productos/bloque-ceramico-9-cm.html']) {
+  for (const p of ['index.html', 'catalogo.html', 'pavic.html', 'donde-estamos.html', 'empresa.html', 'productos/cochabamba/pavic-estandar.html', 'productos/cochabamba/bloque-ceramico-9-cm.html', 'productos/santa-cruz/tsc.html', 'productos/santa-cruz/pieza-decorativa-trebol.html']) {
     const r = await pg.goto(BASE + p, { waitUntil: 'load' });
     for (let y = 0; y < 9000; y += 700) { await pg.evaluate((v) => window.scrollTo(0, v), y); await pg.waitForTimeout(40); }
     const rotas = await pg.evaluate(() => Array.from(document.images).filter((i) => i.complete && i.naturalWidth === 0).length);
@@ -24,10 +24,14 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok((await pg.getAttribute('.wa-float', 'href')).includes('59170009021'), 'el WhatsApp cambia con la ciudad');
   await pg.fill('[data-calc-area]', '100'); await pg.selectOption('[data-calc-merma]', '0.1');
   ok((await pg.textContent('[data-out="pzas"]')).replace(/\D/g, '') === String(Math.ceil(100 * 45 * 1.1)), 'la calculadora de inicio calcula las piezas');
-  await pg.goto(BASE + 'catalogo.html?cat=pisos-y-pavimentos');
+  await pg.goto(BASE + 'catalogo.html?ciudad=cochabamba&cat=pisos-y-pavimentos');
   ok((await pg.textContent('#count')).startsWith('4'), 'el filtro de categoría funciona');
   await pg.click('[data-cat="todas"]'); await pg.fill('#q', 'enchape');
   ok((await pg.textContent('#count')).startsWith('2'), 'la búsqueda funciona');
+  await pg.fill('#q', ''); await pg.click('[data-catalogo="santa-cruz"]'); await pg.click('[data-cat="techos"]');
+  ok((await pg.textContent('#count')).startsWith('2'), 'el catálogo de Santa Cruz muestra sus tejas');
+  await pg.goto(BASE + 'catalogo.html'); await pg.selectOption('#citySel', 'santa-cruz');
+  ok(await pg.evaluate(() => document.querySelector('[data-catalogo="santa-cruz"]').getAttribute('aria-pressed') === 'true'), 'al cambiar de ciudad cambia el catálogo');
   await pg.goto(BASE + 'donde-estamos.html#oruro');
   ok(await pg.evaluate(() => !document.getElementById('oruro').hidden && document.getElementById('cochabamba').hidden), 'las pestañas de ciudad funcionan');
   await pg.click('[data-city-tab="otra-ciudad"]');

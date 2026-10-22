@@ -2,7 +2,8 @@
 /* Genera el sitio estático de INCERPAZ en /site a partir de /site-src/data.
    Uso: node site-src/build.js
    Los textos y datos viven en site-src/data (sitio.json y productos.json). Las páginas se
-   generan completas en HTML para que carguen rápido en celular y las lea bien Google. */
+   generan completas en HTML para que carguen rápido en celular y las lea bien Google.
+   site-src/config.json: "interno": true mantiene el sitio fuera de Google (noindex) hasta publicarlo. */
 const fs = require('fs');
 const path = require('path');
 
@@ -10,7 +11,7 @@ const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(ROOT, 'site');
 const sitio = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/sitio.json'), 'utf8'));
 let productos = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/productos.json'), 'utf8'));
-const config = fs.existsSync(path.join(__dirname, 'config.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')) : { leadEndpoint: '' };
+const config = Object.assign({ leadEndpoint: '', interno: true }, fs.existsSync(path.join(__dirname, 'config.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')) : {});
 
 const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const num = (n) => Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 });
@@ -19,31 +20,50 @@ const telDisplay = (t) => t.replace(/^(\d)-(\d+)$/, '($1) $2');
 const telHref = (t) => 'tel:+591' + t.replace(/\D/g, '');
 
 /* ---- normalización de los datos del catálogo actual ---- */
+const CIUDAD_CATALOGO = { cochabamba: 'Cochabamba', 'santa-cruz': 'Santa Cruz' };
 const CAT_NOMBRE = Object.fromEntries(sitio.categorias.map((c) => [c.slug, c.nombre]));
 const sentence = (s) => s.toLowerCase().replace(/^./, (c) => c.toUpperCase());
 function bonito(nombre) {
-  let s = sentence(nombre.replace(/\s+–\s+/g, ' ').trim());
+  let s = sentence(nombre.replace(/\s+/g, ' ').replace(/\s+–\s+/g, ' ').trim());
   s = s.replace(/\bpavic\b/gi, 'PAVIC').replace(/\bxv\b/gi, 'XV').replace(/\bestandar\b/gi, 'estándar').replace(/\bceloc?ia\b/gi, 'celosía')
     .replace(/\beconomico\b/gi, 'económico').replace(/\brustico\b/gi, 'rústico').replace(/\bcaida\b/gi, 'caída').replace(/\bceramico\b/gi, 'cerámico')
-    .replace(/(\d+)h\b/gi, '$1H');
+    .replace(/\btrafico\b/gi, 'tráfico').replace(/\brapido\b/gi, 'rápido').replace(/\btrebol\b/gi, 'trébol').replace(/\bsuper\b/gi, 'súper')
+    .replace(/(\d+)h\b/gi, '$1H').replace(/\( /g, '(').replace(/ \)/g, ')');
   return s;
 }
-const OVERRIDES = {
-  '3-huecos-economico-rayado': { ancho: 7 } /* el sitio actual dice 0,7 cm: se asume 7 cm (ver CONTENIDO-PENDIENTE.md) */
+/* Correcciones puntuales de datos que parecen errores del sitio actual (ver CONTENIDO-PENDIENTE.md) */
+const CORRECCIONES = {
+  'cochabamba:3-huecos-economico-rayado': { Ancho: 7 },
+  'santa-cruz:6-huecos-big-rayado-mitad': { Largo: 12 }
 };
+const SIN_FICHA = new Set(['santa-cruz:teja-super-colonial-tapa-50']); /* su ficha repite los datos de la tapa */
+const CAT_FORZADA = { 'brick-estandar-aligerado': 'muros', 'brick-estandar': 'muros', 'biscocho': 'refractarios', 'biscocho-213': 'refractarios', 'celosia': 'piezas-especiales', 'parasol': 'piezas-especiales' };
+const PRIORIDAD = ['techos', 'refractarios', 'piezas-especiales', 'pisos-y-pavimentos', 'revestimientos-y-decorativos', 'muros'];
+function categoriaPrincipal(p) {
+  if (CAT_FORZADA[p.slug]) return CAT_FORZADA[p.slug];
+  if (/punta-redonda/.test(p.slug)) return 'piezas-especiales';
+  if (/enchape|gambote|decorativa|terminacion|cornisa/.test(p.slug)) return 'revestimientos-y-decorativos';
+  if (/^(teja|tsc)/.test(p.slug)) return 'techos';
+  return PRIORIDAD.find((c) => p.categorias.includes(c)) || p.categorias[0];
+}
+const ETQ = { 'Alto Sup': 'Alto superior', 'Alto Inf': 'Alto inferior', 'Ancho Sup': 'Ancho superior', 'Ancho Inf': 'Ancho inferior' };
 productos = productos.map((p) => {
-  const o = OVERRIDES[p.slug] || {};
-  const full = p.rendimiento ? `${p.rendimiento} ${p.rendimiento_unidad || ''}` : '';
+  const key = `${p.ciudad}:${p.slug}`;
+  const corr = CORRECCIONES[key] || {};
+  const sinFicha = SIN_FICHA.has(key);
+  const medidas = sinFicha ? [] : p.medidas.map(([l, v]) => [ETQ[l] || l, corr[l] != null ? corr[l] : v]);
+  const dim = (l) => (medidas.find((m) => m[0] === l) || [])[1];
   const variantes = [];
-  full.replace(/([\d.,]+)\s*pzas\/(m2|ml)\s*(?:\(([^)]*)\))?/gi, (_, n, u, etq) => {
+  if (!sinFicha && p.rendimiento) p.rendimiento.replace(/([\d.,]+)\s*pzas\/(m2|ml)\s*(?:\(([^)]*)\))?/gi, (_, n, u, etq) => {
     variantes.push({ rend: parseFloat(n.replace(',', '.')), unidad: u.toLowerCase(), etiqueta: etq ? sentence(etq.trim()) : '' });
     return '';
   });
-  const linea = p.linea ? sentence(p.linea.replace('VARIADADES', 'VARIEDADES').replace('VARIEDAD ', 'VARIEDADES ').replace(/VARIEDAD$/, 'VARIEDADES')) : '';
-  return Object.assign({}, p, o, { nombre: bonito(p.nombre), linea, variantes, cat: p.categorias[0], todas: p.categorias });
+  const linea = p.linea ? sentence(p.linea.replace(/VARIADADES/i, 'VARIEDADES').replace(/VARIEDAD(?!ES)/i, 'VARIEDADES').replace(/RUSTICO/i, 'RÚSTICO')) : '';
+  return Object.assign({}, p, { nombre: bonito(p.titulo), linea, medidas, variantes, sinFicha, peso: sinFicha ? null : p.peso, cat: categoriaPrincipal(p), todas: p.categorias, largo: dim('Largo'), ancho: dim('Ancho'), alto: dim('Alto') });
 });
-const bySlug = Object.fromEntries(productos.map((p) => [p.slug, p]));
-const pavic = productos.filter((p) => /pavic/i.test(p.linea) || p.slug.startsWith('pavic'));
+const pavic = productos.filter((p) => /pavic/i.test(p.linea) || /^pavic/.test(p.slug));
+const purl = (p, base = '') => `${base}productos/${p.ciudad}/${p.slug}.html`;
+const medidaTexto = (p) => (p.largo && p.ancho && p.alto) ? `${num(p.largo)} × ${num(p.ancho)} × ${num(p.alto)} cm` : (p.medidas.length ? p.medidas.slice(0, 2).map(([l, v]) => `${l.toLowerCase()} ${num(v)} cm`).join(' · ') : (p.codigo ? `Código ${p.codigo}` : ''));
 
 /* ---- plantilla ---- */
 const NAV = [
@@ -64,6 +84,7 @@ function layout({ file, base = '', title, desc, body, og = 'assets/img/productos
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
+${config.interno ? '<meta name="robots" content="noindex, nofollow">' : ''}
 <link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:locale" content="es_BO"><meta property="og:site_name" content="INCERPAZ">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${sitio.dominio}/${og}">
@@ -119,22 +140,18 @@ const orgLd = `<script type="application/ld+json">${JSON.stringify({
 })}</script>`;
 
 /* ---- piezas reutilizables ---- */
-const img = (p, i = 0) => p.imagenes[i] || null;
 function productCard(p, base = '') {
-  const im = img(p, 0);
-  const dims = [p.largo && `${num(p.largo)}`, p.ancho && `${num(p.ancho)}`, p.alto && `${num(p.alto)}`].filter(Boolean);
-  const meta = dims.length === 3 ? `${dims.join(' × ')} cm` : (p.codigo ? `Código ${p.codigo}` : '');
-  return `<a class="pcard" href="${base}productos/${p.slug}.html" data-cats="${p.todas.join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}">
+  const im = p.imagenes[0];
+  return `<a class="pcard" href="${purl(p, base)}" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}">
   <div class="img">${im ? `<img src="${base}${im}" alt="${esc(p.nombre)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
-  <div class="body"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><h3>${esc(p.nombre)}</h3><span class="meta">${esc(meta)}</span></div></a>`;
+  <div class="body"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>`;
 }
 function calcOptions(list) {
-  return list.map((p) => {
-    const v = p.variantes[0];
-    return v ? `<option data-rend="${v.rend}" data-peso="${p.peso || 0}" data-unidad="${v.unidad}" data-nombre="${esc(p.nombre)}">${esc(p.nombre)}</option>` : '';
-  }).join('');
+  const grupos = {};
+  list.forEach((p) => { const v = p.variantes[0]; if (v) (grupos[p.ciudad] = grupos[p.ciudad] || []).push(`<option data-rend="${v.rend}" data-peso="${p.peso || 0}" data-unidad="${v.unidad}" data-nombre="${esc(p.nombre)}">${esc(p.nombre)}</option>`); });
+  return Object.keys(grupos).map((c) => `<optgroup label="Catálogo de ${CIUDAD_CATALOGO[c]}" data-ciudad="${c}">${grupos[c].join('')}</optgroup>`).join('');
 }
-function calcBox({ options, idp = 'c', waText, light = false, noteExtra = '' }) {
+function calcBox({ options, idp = 'c', waText, noteExtra = '' }) {
   return `<div class="calc" data-calc>
   <div class="fields">
     <label class="full">Producto<select data-calc-prod name="${idp}prod">${options}</select></label>
@@ -149,7 +166,7 @@ function calcBox({ options, idp = 'c', waText, light = false, noteExtra = '' }) 
   </div>
 </div>`;
 }
-function leadForm({ asunto, campos, boton, ok = '', waNum = '' }) {
+function leadForm({ asunto, campos, boton, waNum = '' }) {
   return `<div class="form-box"><form data-lead="${esc(asunto)}" ${waNum ? `data-wa-num="${waNum}"` : ''}>
   <div class="form-grid">${campos}</div>
   <div class="hp" aria-hidden="true"><label>No llenar<input type="text" name="web" tabindex="-1" autocomplete="off"></label></div>
@@ -157,29 +174,30 @@ function leadForm({ asunto, campos, boton, ok = '', waNum = '' }) {
 </form><p class="form-msg" role="status" hidden style="margin-top:16px"></p></div>`;
 }
 const field = (label, name, extra = '', cls = '') => `<label class="${cls}">${label}<input name="${name}" ${extra}></label>`;
-const selectCities = (name = 'ciudad', extra = '') => `<label>Ciudad<select name="${name}" ${extra}>${sitio.ciudades.map((c) => `<option>${c.nombre}</option>`).join('')}<option>Otra ciudad</option></select></label>`;
+const selectCities = (name = 'ciudad') => `<label>Ciudad<select name="${name}">${sitio.ciudades.map((c) => `<option>${c.nombre}</option>`).join('')}<option>Otra ciudad</option></select></label>`;
 
 function write(file, html) {
   const p = path.join(OUT, file);
   fs.mkdirSync(path.dirname(p), { recursive: true });
   fs.writeFileSync(p, html);
 }
+/* borra las páginas de producto anteriores para no dejar archivos huérfanos */
+fs.rmSync(path.join(OUT, 'productos'), { recursive: true, force: true });
 
 /* ============================ HOME ============================ */
 const mosaico = ['18-h', 'brick-enchape-corto', '9-huecos-economico-rayado', 'brick-estandar', 'pavic-peatonal', 'biscocho']
   .map((s) => `assets/img/productos/${s}-2.jpg`);
-const catCount = (slug) => productos.filter((p) => p.todas.includes(slug)).length;
 write('index.html', layout({
   file: 'index.html',
   title: 'INCERPAZ | Cerámica para construir tu hogar',
-  desc: 'Ladrillos, pisos, revestimientos y pavimentos cerámicos fabricados en Bolivia. Calcula tus piezas, encuentra tu agencia y cotiza por WhatsApp en Cochabamba, Santa Cruz, Oruro y Sucre.',
+  desc: 'Ladrillos, pisos, techos, revestimientos y pavimentos cerámicos fabricados en Bolivia. Calcula tus piezas, encuentra tu agencia y cotiza por WhatsApp en Cochabamba, Santa Cruz, Oruro y Sucre.',
   jsonld: orgLd,
   body: `
 <section class="hero"><div class="wrap">
   <div>
     <span class="eyebrow">Cerámica industrial boliviana</span>
     <h1>Cerámica para construir <em>tu hogar</em></h1>
-    <p class="lead">Ladrillos, revestimientos y pavimentos fabricados en Bolivia. Calcula cuántas piezas necesitas y cotiza con una agencia de tu ciudad.</p>
+    <p class="lead">Ladrillos, techos, revestimientos y pavimentos fabricados en Bolivia. Calcula cuántas piezas necesitas y cotiza con una agencia de tu ciudad.</p>
     <div class="btn-row"><a class="btn btn--red" href="catalogo.html">Ver productos</a><a class="btn btn--wa" data-wa="Hola, quisiera cotizar en {ciudad}." href="${waHref(ciudadDefecto.whatsapp, 'Hola, quisiera cotizar en Cochabamba.')}" rel="noopener">Cotizar por WhatsApp</a></div>
   </div>
   <div class="mosaic" aria-hidden="true">${mosaico.map((m) => `<img src="${m}" alt="" loading="eager" width="400" height="400">`).join('')}</div>
@@ -187,14 +205,14 @@ write('index.html', layout({
 
 <section class="wrap" style="padding-bottom:8px"><div class="quick">
   <a href="#calculadora"><b>Calcula tus piezas</b><span>Cuántas necesitas por m²</span></a>
-  <a href="catalogo.html"><b>Catálogo</b><span>${productos.length} productos con ficha</span></a>
+  <a href="catalogo.html"><b>Catálogo</b><span>Fichas con medidas y rendimiento</span></a>
   <a href="donde-estamos.html"><b>Dónde comprar</b><span>Agencias y WhatsApp por ciudad</span></a>
   <a href="pavic.html"><b>PAVIC</b><span>Pavimentos para proyectos</span></a>
 </div></section>
 
 <section class="section"><div class="wrap">
   <div class="section-head"><span class="eyebrow">Productos</span><h2>Todo para levantar y terminar tu obra</h2></div>
-  <div class="cats">${sitio.categorias.map((c) => `<a class="cat" href="catalogo.html?cat=${c.slug}"><img src="${c.imagen}" alt="" loading="lazy" width="600" height="400"><div><h3>${esc(c.nombre)}</h3><span>${esc(c.descripcion)} · ${catCount(c.slug)} productos</span></div></a>`).join('')}</div>
+  <div class="cats">${sitio.categorias.map((c) => `<a class="cat" href="catalogo.html?cat=${c.slug}"><img src="${c.imagen}" alt="" loading="lazy" width="600" height="400"><div><h3>${esc(c.nombre)}</h3><span>${esc(c.descripcion)}</span></div></a>`).join('')}</div>
 </div></section>
 
 <section class="section dark pavic-band"><div class="wrap">
@@ -231,7 +249,7 @@ write('index.html', layout({
 write('catalogo.html', layout({
   file: 'catalogo.html',
   title: 'Productos | INCERPAZ',
-  desc: `Catálogo de ladrillos, revestimientos, pisos y piezas especiales de INCERPAZ: ${productos.length} productos con dimensiones, peso y rendimiento por m².`,
+  desc: 'Catálogo de ladrillos, techos, revestimientos, pisos y piezas especiales de INCERPAZ, con dimensiones, peso y rendimiento por m². Catálogos de Cochabamba y Santa Cruz.',
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
   <span class="eyebrow">Catálogo</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Productos</h1>
@@ -239,56 +257,60 @@ write('catalogo.html', layout({
 </div></section>
 <section class="wrap" style="padding-bottom:72px">
   <div class="filters">
-    <div class="chips" role="group" aria-label="Categorías"><button class="chip" data-cat="todas" type="button" aria-pressed="true">Todas</button>${sitio.categorias.map((c) => `<button class="chip" data-cat="${c.slug}" type="button" aria-pressed="false">${esc(c.nombre)} (${catCount(c.slug)})</button>`).join('')}</div>
-    <label class="search">Buscar<input id="q" type="search" placeholder="Ej. 6 huecos, enchape, botaguas" autocomplete="off"></label>
+    <div><span class="mono-label">Catálogo de</span><div class="chips" role="group" aria-label="Catálogo por ciudad">${Object.entries(CIUDAD_CATALOGO).map(([s, n]) => `<button class="chip" data-catalogo="${s}" type="button" aria-pressed="false">${n}</button>`).join('')}</div></div>
+    <div style="flex:1 1 100%"><span class="mono-label">Categoría</span><div class="chips" role="group" aria-label="Categorías"><button class="chip" data-cat="todas" type="button" aria-pressed="true">Todas</button>${sitio.categorias.map((c) => `<button class="chip" data-cat="${c.slug}" type="button" aria-pressed="false">${esc(c.nombre)}</button>`).join('')}</div></div>
+    <label class="search">Buscar<input id="q" type="search" placeholder="Ej. 6 huecos, enchape, teja" autocomplete="off"></label>
     <span id="count" class="muted" aria-live="polite"></span>
   </div>
+  <p class="price-note" id="catNota" hidden></p>
   <div class="grid-products" id="grid">${productos.map((p) => productCard(p)).join('')}</div>
-  <div class="empty" id="empty" hidden><b>No encontramos ese producto.</b><p class="muted" style="margin-top:6px">Prueba otra palabra o escríbenos por WhatsApp y te ayudamos.</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--wa" data-wa="Hola, busco un producto que no encuentro en el catálogo. Estoy en {ciudad}." href="${waHref(ciudadDefecto.whatsapp, 'Hola, busco un producto que no encuentro en el catálogo.')}" rel="noopener">Escribir por WhatsApp</a></div></div>
+  <div class="empty" id="empty" hidden><b>No encontramos ese producto en este catálogo.</b><p class="muted" style="margin-top:6px">Prueba otra palabra, cambia de catálogo o escríbenos por WhatsApp y te ayudamos.</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--wa" data-wa="Hola, busco un producto que no encuentro en el catálogo. Estoy en {ciudad}." href="${waHref(ciudadDefecto.whatsapp, 'Hola, busco un producto que no encuentro en el catálogo.')}" rel="noopener">Escribir por WhatsApp</a></div></div>
 </section>`
 }));
 
 /* ============================ PRODUCTOS ============================ */
 for (const p of productos) {
-  const rel = productos.filter((q) => q.cat === p.cat && q.slug !== p.slug).slice(0, 4);
+  const rel = productos.filter((q) => q.ciudad === p.ciudad && q.cat === p.cat && q.slug !== p.slug).slice(0, 4);
+  const otra = productos.find((q) => q.ciudad !== p.ciudad && q.codigo && q.codigo === p.codigo);
   const rows = [
     p.codigo && ['Código', p.codigo], p.linea && ['Línea', p.linea], p.color && ['Color', p.color], p.acabado && ['Acabado', p.acabado],
-    p.alto && ['Alto', `${num(p.alto)} cm`], p.largo && ['Largo', `${num(p.largo)} cm`], p.ancho && ['Ancho', `${num(p.ancho)} cm`], p.peso && ['Peso', `${num(p.peso)} kg`],
+    ...p.medidas.map(([l, v]) => [l, `${num(v)} cm`]), p.peso && ['Peso', `${num(p.peso)} kg`],
     p.variantes.length && ['Rendimiento', p.variantes.map((v) => `${num(v.rend)} piezas por ${v.unidad === 'ml' ? 'metro lineal' : 'm²'}${v.etiqueta ? ` (${v.etiqueta.toLowerCase()})` : ''}`).join('<br>')]
   ].filter(Boolean);
   const imgs = p.imagenes;
   const opts = p.variantes.map((v) => `<option data-rend="${v.rend}" data-peso="${p.peso || 0}" data-unidad="${v.unidad}" data-nombre="${esc(p.nombre)}">${num(v.rend)} piezas por ${v.unidad === 'ml' ? 'ml' : 'm²'}${v.etiqueta ? ` · ${esc(v.etiqueta.toLowerCase())}` : ''}</option>`).join('');
   const ld = `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Product', name: p.nombre, description: p.descripcion || p.nombre, sku: p.codigo || undefined, brand: { '@type': 'Brand', name: /pavic/i.test(p.linea) ? 'PAVIC' : 'INCERPAZ' }, image: imgs.map((i) => `${sitio.dominio}/${i}`) })}</script>`;
   const waText = `Hola, quiero cotizar ${p.nombre}${p.codigo ? ` (código ${p.codigo})` : ''} en {ciudad}.`;
-  write(`productos/${p.slug}.html`, layout({
-    file: `productos/${p.slug}.html`, base: '../',
+  const base = '../../';
+  write(`productos/${p.ciudad}/${p.slug}.html`, layout({
+    file: `productos/${p.ciudad}/${p.slug}.html`, base,
     title: `${p.nombre} | INCERPAZ`,
-    desc: `${p.nombre}${p.descripcion ? ': ' + p.descripcion : ''} Dimensiones, peso y rendimiento. Cotiza por WhatsApp en tu ciudad.`,
+    desc: `${p.nombre}${p.descripcion ? ': ' + p.descripcion.replace(/\.$/, '') + '.' : ''} Dimensiones, peso y rendimiento. Cotiza por WhatsApp en tu ciudad.`,
     og: imgs[0] || 'assets/img/logo-header.png', jsonld: ld,
     body: `
-<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../catalogo.html">Productos</a> › <a href="../catalogo.html?cat=${p.cat}">${esc(CAT_NOMBRE[p.cat] || '')}</a> › ${esc(p.nombre)}</nav></div>
+<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="${base}index.html">Inicio</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}">Productos</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}&amp;cat=${p.cat}">${esc(CAT_NOMBRE[p.cat] || '')}</a> › ${esc(p.nombre)}</nav></div>
 <section class="wrap" style="padding-bottom:64px"><div class="prod">
   <div class="gallery">
-    <div class="main">${imgs[0] ? `<img id="mainImg" src="../${imgs[0]}" alt="${esc(p.nombre)}" width="800" height="800">` : `<img id="mainImg" src="../assets/img/logo-icono.png" alt="" style="width:30%;opacity:.25">`}</div>
-    ${imgs.length > 1 ? `<div class="thumbs">${imgs.map((im, i) => `<button type="button" data-thumb="../${im}" aria-pressed="${i === 0}" aria-label="Ver imagen ${i + 1}"><img src="../${im}" alt="" width="84" height="84"></button>`).join('')}</div>` : ''}
+    <div class="main">${imgs[0] ? `<img id="mainImg" src="${base}${imgs[0]}" alt="${esc(p.nombre)}" width="800" height="800">` : `<img id="mainImg" src="${base}assets/img/logo-icono.png" alt="" style="width:30%;opacity:.25">`}</div>
+    ${imgs.length > 1 ? `<div class="thumbs">${imgs.map((im, i) => `<button type="button" data-thumb="${base}${im}" aria-pressed="${i === 0}" aria-label="Ver imagen ${i + 1}"><img src="${base}${im}" alt="" width="84" height="84"></button>`).join('')}</div>` : ''}
   </div>
   <div>
-    <span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span>
+    <div class="btn-row" style="gap:8px"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><span class="tag">Catálogo de ${CIUDAD_CATALOGO[p.ciudad]}</span>${p.a_pedido ? '<span class="tag" style="background:var(--yellow)">Producto a pedido</span>' : ''}</div>
     <h1>${esc(p.nombre)}</h1>
     ${p.descripcion ? `<p class="lead">${esc(p.descripcion)}</p>` : ''}
-    ${rows.length ? `<table class="specs"><tbody>${rows.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${/<br>/.test(v) ? v : esc(v)}</td></tr>`).join('')}</tbody></table>` : ''}
+    ${rows.length ? `<table class="specs"><tbody>${rows.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${/<br>/.test(v) ? v : esc(v)}</td></tr>`).join('')}</tbody></table>` : `<p class="price-note">Las medidas de este producto las confirma la agencia. Escríbenos y te las enviamos.</p>`}
+    ${otra ? `<p class="muted" style="font-size:15px">Este producto también está en el <a href="${base}${purl(otra)}">catálogo de ${CIUDAD_CATALOGO[otra.ciudad]}</a>. Las medidas pueden variar según la fábrica.</p>` : ''}
     <p class="price-note"><strong>Precio:</strong> lo confirma la agencia de tu ciudad según tu obra y la cantidad. Escríbenos y te cotizamos.</p>
-    <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a><a class="btn" href="../donde-estamos.html">Dónde comprar</a></div>
+    <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a><a class="btn" href="${base}donde-estamos.html">Dónde comprar</a></div>
   </div>
 </div></section>
 ${p.variantes.length ? `<section class="section section--grey"><div class="wrap"><div class="section-head"><h2>Calcula cuántas piezas necesitas</h2></div>
-${calcBox({ options: opts, idp: 'p', waText: waText })}</div></section>` : ''}
-${rel.length ? `<section class="section"><div class="wrap"><div class="section-head"><h2>Productos relacionados</h2></div><div class="grid-products">${rel.map((q) => productCard(q, '../')).join('')}</div></div></section>` : ''}`
+${calcBox({ options: opts, idp: 'p', waText })}</div></section>` : ''}
+${rel.length ? `<section class="section"><div class="wrap"><div class="section-head"><h2>Productos relacionados</h2></div><div class="grid-products">${rel.map((q) => productCard(q, base)).join('')}</div></div></section>` : ''}`
   }));
 }
 
 /* ============================ PAVIC ============================ */
-const pavicOpts = calcOptions(pavic);
 const fotosPavic = ['pavic-estandar', 'pavic-peatonal', 'pavic-tabaco'].map((s) => `assets/img/productos/${s}-2.jpg`);
 write('pavic.html', layout({
   file: 'pavic.html',
@@ -311,19 +333,19 @@ write('pavic.html', layout({
 </div></section>
 
 <section class="section section--grey"><div class="wrap">
-  <div class="section-head"><span class="eyebrow">Productos PAVIC</span><h2>Líneas de pavimento</h2></div>
-  <div class="grid-products">${pavic.map((p) => productCard(p)).join('')}</div>
+  <div class="section-head"><span class="eyebrow">Productos PAVIC</span><h2>Líneas de pavimento</h2><p class="lead">Cada fábrica publica sus propias medidas y pesos. Elige el catálogo de tu ciudad.</p></div>
+  ${Object.entries(CIUDAD_CATALOGO).map(([c, n]) => `<h3 style="margin:8px 0 14px">Catálogo de ${n}</h3><div class="grid-products" style="margin-bottom:32px">${pavic.filter((p) => p.ciudad === c).map((p) => productCard(p)).join('')}</div>`).join('')}
 </div></section>
 
 <section class="section" id="calculadora"><div class="wrap">
   <div class="section-head"><span class="eyebrow">Herramienta</span><h2>Calculadora de obra</h2><p class="lead">Estima las piezas y el peso para tu proyecto. Para volumen y plazos, el precio final sale por cotización.</p></div>
-  ${calcBox({ options: pavicOpts, idp: 'v', waText: 'Hola, quiero cotizar un proyecto con PAVIC en {ciudad}.', noteExtra: ' Para obras grandes, pide tu cotización con ejecutivo de proyectos.' })}
+  ${calcBox({ options: calcOptions(pavic), idp: 'v', waText: 'Hola, quiero cotizar un proyecto con PAVIC en {ciudad}.', noteExtra: ' Para obras grandes, pide tu cotización con ejecutivo de proyectos.' })}
 </div></section>
 
 <section class="section dark" id="calidad"><div class="wrap split">
   <div><span class="eyebrow">Calidad y documentación</span><h2 style="margin-block:12px 18px">Respaldo técnico para tu licitación</h2>
     <p class="lead">PAVIC cuenta con certificados de calidad, ensayos de laboratorio y certificación ISO. Solicita la documentación y un ejecutivo te la envía.</p></div>
-  <div class="on-dark">${leadForm({ asunto: 'Solicitud de documentación técnica PAVIC', boton: 'Solicitar documentación', campos:
+  <div>${leadForm({ asunto: 'Solicitud de documentación técnica PAVIC', boton: 'Solicitar documentación', campos:
     field('Nombre', 'nombre', 'required autocomplete="name"') + field('Empresa o entidad', 'empresa', 'required autocomplete="organization"') + field('Correo', 'correo', 'type="email" required autocomplete="email"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel"') +
     `<label class="full">¿Qué necesitas?<select name="documentos"><option>Certificados de calidad</option><option>Ensayos de laboratorio</option><option>Certificación ISO</option><option>Todo lo anterior</option></select></label>` })}</div>
 </div></section>
@@ -402,7 +424,7 @@ write('empresa.html', layout({
     <p class="lead">Trabajamos con un sistema integrado de gestión en todos nuestros procesos. PAVIC cuenta con certificados de calidad, ensayos de laboratorio y certificación ISO.</p>
     <div class="btn-row" style="margin-top:24px"><a class="btn btn--red" href="pavic.html#calidad">Solicitar documentación</a></div></div>
   <div><span class="eyebrow">Marcas</span>
-    <div class="three" style="grid-template-columns:1fr 1fr;margin-top:16px"><div style="background:#2a2725;border-color:#3a3633;color:#fff"><h3 style="color:#fff">INCERPAZ</h3><p style="color:#cfc9c2">Ladrillos, revestimientos y piezas especiales.</p><a class="btn btn--sm btn--ghost" style="color:#fff" href="catalogo.html">Ver productos</a></div><div style="background:#2a2725;border-color:#3a3633;color:#fff"><h3 style="color:#fff">PAVIC</h3><p style="color:#cfc9c2">Pavimento cerámico para proyectos.</p><a class="btn btn--sm btn--ghost" style="color:#fff" href="pavic.html">Ir a PAVIC</a></div></div></div>
+    <div class="three" style="grid-template-columns:1fr 1fr;margin-top:16px"><div style="background:#2a2725;border-color:#3a3633;color:#fff"><h3 style="color:#fff">INCERPAZ</h3><p style="color:#cfc9c2">Ladrillos, techos, revestimientos y piezas especiales.</p><a class="btn btn--sm btn--ghost" style="color:#fff" href="catalogo.html">Ver productos</a></div><div style="background:#2a2725;border-color:#3a3633;color:#fff"><h3 style="color:#fff">PAVIC</h3><p style="color:#cfc9c2">Pavimento cerámico para proyectos.</p><a class="btn btn--sm btn--ghost" style="color:#fff" href="pavic.html">Ir a PAVIC</a></div></div></div>
 </div></section>
 
 <section class="section"><div class="wrap split">
@@ -420,7 +442,12 @@ write('404.html', layout({
   file: '404.html', title: 'Página no encontrada | INCERPAZ', desc: 'La página que buscas no existe.',
   body: `<section class="section"><div class="wrap"><h1>No encontramos esa página</h1><p class="lead" style="margin-block:16px 28px">Puede que el enlace haya cambiado. Prueba desde el inicio o el catálogo.</p><div class="btn-row"><a class="btn btn--red" href="${sitio.dominio}/">Ir al inicio</a><a class="btn" href="${sitio.dominio}/catalogo.html">Ver productos</a></div></div></section>`
 }));
-const urls = ['', 'catalogo.html', 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.slug}.html`)];
-fs.writeFileSync(path.join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${sitio.dominio}/${u}</loc></url>`).join('\n')}\n</urlset>\n`);
-fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${sitio.dominio}/sitemap.xml\n`);
-console.log(`Sitio generado: ${urls.length} páginas en ${path.relative(ROOT, OUT)}/`);
+const urls = ['', 'catalogo.html', 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
+if (config.interno) {
+  fs.rmSync(path.join(OUT, 'sitemap.xml'), { force: true });
+  fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
+} else {
+  fs.writeFileSync(path.join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${sitio.dominio}/${u}</loc></url>`).join('\n')}\n</urlset>\n`);
+  fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${sitio.dominio}/sitemap.xml\n`);
+}
+console.log(`Sitio generado: ${urls.length} páginas en ${path.relative(ROOT, OUT)}/ (${config.interno ? 'interno, sin indexar' : 'público, indexable'})`);

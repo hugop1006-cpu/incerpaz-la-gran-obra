@@ -28,7 +28,7 @@
   if (sel) {
     sel.innerHTML = CFG.ciudades.map(function (c) { return '<option value="' + c.slug + '">' + c.nombre + '</option>'; }).join('');
     sel.value = currentCity().slug;
-    sel.addEventListener('change', function () { store(KEY, sel.value); updateWa(); syncTabs(sel.value); });
+    sel.addEventListener('change', function () { store(KEY, sel.value); updateWa(); syncTabs(sel.value); document.dispatchEvent(new CustomEvent('incerpaz:city', { detail: sel.value })); });
   }
   updateWa();
 
@@ -63,25 +63,33 @@
     run();
   });
 
-  /* ---- catálogo: filtros y búsqueda ---- */
+  /* ---- catálogo: ciudad, filtros y búsqueda ---- */
   var grid = $('#grid');
   if (grid) {
-    var chips = $$('[data-cat]'), q = $('#q'), cards = $$('.pcard', grid), count = $('#count'), empty = $('#empty');
+    var chips = $$('[data-cat]'), cityChips = $$('[data-catalogo]'), q = $('#q'), cards = $$('.pcard', grid), count = $('#count'), empty = $('#empty'), nota = $('#catNota');
     var cat = 'todas';
     var m = /[?&]cat=([^&]+)/.exec(location.search); if (m) cat = decodeURIComponent(m[1]);
-    function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+    var mc = /[?&]ciudad=([^&]+)/.exec(location.search);
+    var enCatalogo = function (slug) { return slug === 'santa-cruz' ? 'santa-cruz' : 'cochabamba'; };
+    var catCity = mc ? decodeURIComponent(mc[1]) : enCatalogo(currentCity().slug);
+    function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
     function apply() {
       var term = norm(q.value.trim()), n = 0;
       cards.forEach(function (c) {
-        var ok = (cat === 'todas' || c.getAttribute('data-cats').split(' ').indexOf(cat) >= 0) && norm(c.getAttribute('data-name')).indexOf(term) >= 0;
+        var ok = c.getAttribute('data-ciudad') === catCity && (cat === 'todas' || c.getAttribute('data-cats').split(' ').indexOf(cat) >= 0) && norm(c.getAttribute('data-name')).indexOf(term) >= 0;
         c.hidden = !ok; if (ok) n++;
       });
       chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-cat') === cat)); });
+      cityChips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-catalogo') === catCity)); });
       count.textContent = n + (n === 1 ? ' producto' : ' productos');
       empty.hidden = n !== 0;
+      var sel = currentCity().slug;
+      if (sel === 'oruro' || sel === 'sucre') { nota.hidden = false; nota.textContent = 'En ' + currentCity().nombre + ' atendemos con el catálogo de la fábrica más cercana. Confirma la disponibilidad con tu agencia.'; } else { nota.hidden = true; }
     }
     chips.forEach(function (c) { c.addEventListener('click', function () { cat = c.getAttribute('data-cat'); apply(); }); });
+    cityChips.forEach(function (c) { c.addEventListener('click', function () { catCity = c.getAttribute('data-catalogo'); apply(); }); });
     q.addEventListener('input', apply);
+    document.addEventListener('incerpaz:city', function (e) { catCity = enCatalogo(e.detail); apply(); });
     apply();
   }
 

@@ -1,18 +1,30 @@
 [
  {
+  "ciudad": "cochabamba",
   "slug": "18-h",
-  "nombre": "18 HUECOS",
+  "titulo": "18 HUECOS",
   "codigo": "18H",
   "linea": "BRICK LISO",
-  "descripcion": "Cerámica rectangular con 18 huecos redondos en la cara superior y liso en sus caras.",
+  "descripcion": "Cerámica rectangular con 18 huecos redondos en la cara superior y liso en sus caras",
   "color": "Naranja",
   "acabado": "Textura lisa en los laterales de la pieza",
-  "alto": 7.0,
-  "largo": 25.0,
-  "ancho": 12.0,
+  "medidas": [
+   [
+    "Alto",
+    7.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    12.0
+   ]
+  ],
   "peso": 2.35,
-  "rendimiento": 45.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "45 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -22,19 +34,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "18-h-1-2",
-  "nombre": "18 HUECOS MEDIOS",
+  "titulo": "18 HUECOS MEDIOS",
   "codigo": "18H 1/2",
   "linea": "BRICK LISO",
-  "descripcion": "Cerámica rectangular con 18 huecos redondos en la cara superior y liso en sus caras laterales.",
+  "descripcion": "Cerámica rectangular con 18 huecos redondos en la cara superior y liso en sus caras laterales",
   "color": "Naranja",
   "acabado": "Textura Lisa en los laterales de la pieza",
-  "alto": 7.0,
-  "largo": 12.5,
-  "ancho": 12.0,
+  "medidas": [
+   [
+    "Alto",
+    7.0
+   ],
+   [
+    "Largo",
+    12.5
+   ],
+   [
+    "Ancho",
+    12.0
+   ]
+  ],
   "peso": 1.25,
-  "rendimiento": 84.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "84 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -43,19 +67,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "18-huecos-luis-xv-2",
-  "nombre": "18 HUECOS LXV",
+  "titulo": "18 HUECOS LUIS XV",
   "codigo": "18H LXV",
   "linea": "BRICK LISO",
-  "descripcion": "Cerámica rectangular con 16 huecos, liso en sus caras.",
+  "descripcion": "Cerámica rectangular con 16 huecos, liso en sus caras",
   "color": "Naranja",
   "acabado": "Textura lisa en los laterales de la pieza",
-  "alto": 7.0,
-  "largo": 25.0,
-  "ancho": 12.5,
+  "medidas": [
+   [
+    "Alto",
+    7.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    12.5
+   ]
+  ],
   "peso": 2.35,
-  "rendimiento": 12.0,
-  "rendimiento_unidad": "Pzas/ML",
+  "rendimiento": "12 Pzas/ML",
+  "a_pedido": false,
   "categorias": [
    "muros",
    "piezas-especiales",
@@ -67,19 +103,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "3-huecos-economico-rayado",
-  "nombre": "3 HUECOS ECONÓMICO RAYADO",
+  "titulo": "3 HUECOS ECONÓMICO RAYADO",
   "codigo": "3HER",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 3 huecos cuadrados en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 3 huecos cuadrados en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías en todas sus caras",
-  "alto": 15.0,
-  "largo": 25.0,
-  "ancho": 0.7,
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    0.7
+   ]
+  ],
   "peso": 1.95,
-  "rendimiento": 23.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "23 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -89,19 +137,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "3-huecos-economico-rayado-mitad",
-  "nombre": "3 HUECOS ECONÓMICO RAYADO MEDIOS",
+  "titulo": "3 HUECOS ECONÓMICO RAYADO MEDIOS",
   "codigo": "3HER 1/2",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Ladrillo Estructural, presenta 3 huecos rayado por sus caras superior e inferior, liso por sus lados.",
+  "descripcion": "Ladrillo Estructural, presenta 3 huecos rayado por sus caras superior e inferior, liso por sus lados",
   "color": "Terracota",
   "acabado": "Rayado",
-  "alto": 15.0,
-  "largo": 12.5,
-  "ancho": 7.0,
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    12.5
+   ],
+   [
+    "Ancho",
+    7.0
+   ]
+  ],
   "peso": 0.975,
-  "rendimiento": 43.0,
-  "rendimiento_unidad": "Pzas/m2 (Tizón)",
+  "rendimiento": "43 Pzas/m2 (Tizón)",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -110,19 +170,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "6-huecos-big-rayado",
-  "nombre": "6 HUECOS ECONÓMICO RAYADO",
+  "titulo": "6 HUECOS ECONÓMICO RAYADO",
   "codigo": "6HER",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 6 huecos cuadrados en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 6 huecos cuadrados en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías en todas sus caras",
-  "alto": 15.0,
-  "largo": 25.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 2.7,
-  "rendimiento": 23.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "23 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -132,19 +204,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "6-huecos-big-rayado-mitad",
-  "nombre": "6 HUECOS ECONÓMICO RAYADO MEDIOS",
+  "titulo": "6 HUECOS ECONÓMICO RAYADO MEDIOS",
   "codigo": "6HER 1/2",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 6 huecos cuadrados en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 6 huecos cuadrados en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrias en todas sus caras",
-  "alto": 15.0,
-  "largo": 12.5,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    12.5
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 1.4,
-  "rendimiento": 43.0,
-  "rendimiento_unidad": "Pzas/m2 (Posición tabique), 62 Pzas/m2 (Posición soguilla o carga)",
+  "rendimiento": "43 Pzas/m2 (Posición tabique), 62 Pzas/m2 (Posición soguilla o carga)",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -153,19 +237,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "6-huecos-redondo",
-  "nombre": "6 HUECOS REDONDO",
+  "titulo": "6 HUECOS REDONDO",
   "codigo": "6H-R",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 6 huecos circulares en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 6 huecos circulares en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías y ranuras circulares en todas sus caras",
-  "alto": 15.0,
-  "largo": 25.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 3.5,
-  "rendimiento": 23.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "23 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -175,19 +271,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "6-huecos-redondo-medios",
-  "nombre": "6 HUECOS REDONDO MEDIOS",
+  "titulo": "6 HUECOS REDONDO MEDIOS",
   "codigo": "6H-R 1/2",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 6 huecos circulares en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 6 huecos circulares en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías y ranuras circulares en todas sus caras",
-  "alto": 15.0,
-  "largo": 12.5,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    12.5
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 1.8,
-  "rendimiento": 43.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "43 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -196,19 +304,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "8-huecos-economico-rayado",
-  "nombre": "8 HUECOS ECONÓMICO RAYADO",
+  "titulo": "8 HUECOS ECONÓMICO RAYADO",
   "codigo": "8HER",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías en todas sus caras",
-  "alto": 19.0,
-  "largo": 25.0,
-  "ancho": 8.0,
+  "medidas": [
+   [
+    "Alto",
+    19.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    8.0
+   ]
+  ],
   "peso": 2.75,
-  "rendimiento": 18.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "18 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -218,19 +338,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "8-huecos-economico-rayado-constructor",
-  "nombre": "8 HUECOS ECONÓMICO RAYADO CONSTRUCTOR",
+  "titulo": "8 HUECOS ECONÓMICO RAYADO CONSTRUCTOR",
   "codigo": "8HER C",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías en todas sus caras",
-  "alto": 19.0,
-  "largo": 25.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    19.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 3.35,
-  "rendimiento": 19.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "19 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -240,19 +372,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "8-huecos-economico-rayado-constructor-medios",
-  "nombre": "8 HUECOS ECONÓMICO RAYADO CONSTRUCTOR MEDIOS",
+  "titulo": "8 HUECOS ECONÓMICO RAYADO CONSTRUCTOR MEDIOS",
   "codigo": "8HER C 1/2",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías en todas sus caras",
-  "alto": 19.0,
-  "largo": 12.5,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    19.0
+   ],
+   [
+    "Largo",
+    12.5
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 1.75,
-  "rendimiento": 35.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "35 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -261,19 +405,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "8-huecos-economico-rayado-medios",
-  "nombre": "8 HUECOS ECONÓMICO RAYADO MEDIOS",
+  "titulo": "8 HUECOS ECONÓMICO RAYADO MEDIOS",
   "codigo": "8HER 1/2",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías en todas sus caras",
-  "alto": 19.0,
-  "largo": 12.5,
-  "ancho": 8.0,
+  "medidas": [
+   [
+    "Alto",
+    19.0
+   ],
+   [
+    "Largo",
+    12.5
+   ],
+   [
+    "Ancho",
+    8.0
+   ]
+  ],
   "peso": 1.4,
-  "rendimiento": 35.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "35 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -282,19 +438,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "9-huecos-economico-rayado",
-  "nombre": "9 HUECOS ECONÓMICO RAYADO",
+  "titulo": "9 HUECOS ECONÓMICO RAYADO",
   "codigo": "9HER",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 9 huecos cuadrados en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 9 huecos cuadrados en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías en todas sus caras",
-  "alto": 15.0,
-  "largo": 25.0,
-  "ancho": 15.0,
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    15.0
+   ]
+  ],
   "peso": 4.1,
-  "rendimiento": 23.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "23 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -304,19 +472,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "9-huecos-economico-rayado-medios",
-  "nombre": "9 HUECOS ECONÓMICO RAYADO MEDIOS",
+  "titulo": "9 HUECOS ECONÓMICO RAYADO MEDIOS",
   "codigo": "9HER 1/2",
   "linea": "CLÁSICA TABIQUERIA",
-  "descripcion": "Cerámica rectangular con 9 huecos cuadrados en la cara frontal.",
+  "descripcion": "Cerámica rectangular con 9 huecos cuadrados en la cara frontal",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías en todas sus caras",
-  "alto": 15.0,
-  "largo": 12.5,
-  "ancho": 15.0,
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    12.5
+   ],
+   [
+    "Ancho",
+    15.0
+   ]
+  ],
   "peso": 2.0,
-  "rendimiento": 42.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "42 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros"
   ],
@@ -325,19 +505,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "biscocho",
-  "nombre": "BISCOCHO",
+  "titulo": "BISCOCHO",
   "codigo": "RB-210",
   "linea": "REFRACTARIO",
-  "descripcion": "Cerámica refractaria rectangular rayado en la cara superior y liso en las otras caras.",
+  "descripcion": "Cerámica refractaria rectangular rayado en la cara superior y liso en las otras caras",
   "color": "Naranja blanquesino",
   "acabado": "Rústico en una cara – Liso en las otras caras",
-  "alto": 1.2,
-  "largo": 20.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    1.2
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 0.5,
-  "rendimiento": 50.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "50 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "refractarios",
    "revestimientos-y-decorativos"
@@ -348,19 +540,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "biscocho-213",
-  "nombre": "BISCOCHO-213",
+  "titulo": "BISCOCHO – 213",
   "codigo": "RB-213",
   "linea": "REFRACTARIO",
-  "descripcion": "Cerámica refractaria rectangular rayado en la cara superior y liso en las otras caras.",
+  "descripcion": "Cerámica refractaria rectangular rayado en la cara superior y liso en las otras caras",
   "color": "Naranja blanquesino",
   "acabado": "Rústico en una cara – Liso en las otras caras",
-  "alto": 1.8,
-  "largo": 24.2,
-  "ancho": 12.2,
+  "medidas": [
+   [
+    "Alto",
+    1.8
+   ],
+   [
+    "Largo",
+    24.2
+   ],
+   [
+    "Ancho",
+    12.2
+   ]
+  ],
   "peso": 0.865,
-  "rendimiento": 32.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "32 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "refractarios",
    "revestimientos-y-decorativos"
@@ -370,38 +574,62 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "bloque-ceramico-9-cm",
-  "nombre": "BLOQUE CERÁMICO 9 CM",
+  "titulo": "BLOQUE CERÁMICO 9 CM",
   "codigo": "BC 9",
   "linea": "CLÁSICA VARIEDAD",
-  "descripcion": "Cerámica rectangular, con 8 huecos en la cara frontal, rayado en las caras superior e inferior.",
+  "descripcion": "Cerámica rectangular, con 8 huecos en la cara frontal, rayado en las caras superior e inferior",
   "color": "Naranja",
   "acabado": "Textura de la superficie con estrías en todas sus caras",
-  "alto": 9.0,
-  "largo": 25.0,
-  "ancho": 43.0,
+  "medidas": [
+   [
+    "Alto",
+    9.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    43.0
+   ]
+  ],
   "peso": 6.6,
-  "rendimiento": 8.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "8 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "piezas-especiales"
   ],
   "imagenes": []
  },
  {
+  "ciudad": "cochabamba",
   "slug": "botaguas-de-1-caida",
-  "nombre": "BOTAGUAS DE 1 CAÍDA",
+  "titulo": "BOTAGUAS DE 1 CAÍDA",
   "codigo": "BOT 1C",
   "linea": "CLÁSICA VARIEDADES",
-  "descripcion": "Cerámica rectangular, con 4 huecos de diferentes tamaños en la cara frontal, liso todas las caras.",
+  "descripcion": "Cerámica rectangular, con 4 huecos de diferentes tamaños en la cara frontal, liso todas las caras",
   "color": "Naranja",
   "acabado": "Textura lisa en los laterales de la pieza",
-  "alto": 9.0,
-  "largo": 25.0,
-  "ancho": 18.5,
+  "medidas": [
+   [
+    "Alto",
+    9.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    18.5
+   ]
+  ],
   "peso": 3.1,
-  "rendimiento": 4.0,
-  "rendimiento_unidad": "Pzas/ML",
+  "rendimiento": "4 Pzas/ML",
+  "a_pedido": false,
   "categorias": [
    "piezas-especiales"
   ],
@@ -411,19 +639,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "botaguas-de-2-caida",
-  "nombre": "BOTAGUAS DE 2 CAÍDAS",
+  "titulo": "BOTAGUAS DE 2 CAÍDAS",
   "codigo": "BOT 2C",
   "linea": "CLÁSICA VARIEDADES",
-  "descripcion": "Cerámica rectangular, con 5 huecos en la cara frontal, liso todas las caras.",
+  "descripcion": "Cerámica rectangular, con 5 huecos en la cara frontal, liso todas las caras",
   "color": "Natural",
   "acabado": "Textura lisa en los laterales de las piezas",
-  "alto": 9.0,
-  "largo": 25.0,
-  "ancho": 25.5,
+  "medidas": [
+   [
+    "Alto",
+    9.0
+   ],
+   [
+    "Largo",
+    25.0
+   ],
+   [
+    "Ancho",
+    25.5
+   ]
+  ],
   "peso": 4.3,
-  "rendimiento": 4.0,
-  "rendimiento_unidad": "Pzas/ML",
+  "rendimiento": "4 Pzas/ML",
+  "a_pedido": false,
   "categorias": [
    "piezas-especiales"
   ],
@@ -433,19 +673,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "brick-cornisa-punta-bosel",
-  "nombre": "BRICK CORNISA CURVA DOBLE",
+  "titulo": "BRICK CORNISA CURVA DOBLE",
   "codigo": "BRK CD",
   "linea": "BRICK RÚSTICO",
-  "descripcion": "Cerámica rectangular macizo acabado rústico en todos los lados con una curva doble en una cara.",
+  "descripcion": "Cerámica rectangular macizo acabado rústico en todos los lados con una curva doble en una cara",
   "color": "Engobado – Naranja",
   "acabado": "Textura rústico",
-  "alto": 6.6,
-  "largo": 20.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    6.6
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 2.2,
-  "rendimiento": 13.0,
-  "rendimiento_unidad": "Pzas/ML",
+  "rendimiento": "13 Pzas/ML",
+  "a_pedido": false,
   "categorias": [
    "muros",
    "revestimientos-y-decorativos"
@@ -456,19 +708,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "brick-enchape-ancho",
-  "nombre": "BRICK ENCHAPE ANCHO",
+  "titulo": "BRICK ENCHAPE ANCHO",
   "codigo": "BRK EA",
   "linea": "BRICK RÚSTICO",
-  "descripcion": "Cerámica rectangular, acabado rústico en todos los lados.",
+  "descripcion": "Cerámica rectangular, acabado rústico en todos los lados",
   "color": "Engobado – Naranja",
   "acabado": "Textura rústico",
-  "alto": 2.0,
-  "largo": 20.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    2.0
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 0.75,
-  "rendimiento": 50.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "50 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "revestimientos-y-decorativos"
   ],
@@ -478,19 +742,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "brick-enchape-corto",
-  "nombre": "BRICK ENCHAPE CORTO",
+  "titulo": "BRICK ENCHAPE CORTO",
   "codigo": "BRK EC",
   "linea": "BRICK RÚSTICO",
-  "descripcion": "Cerámica rectangular, acabado rústico en todos los lados.",
+  "descripcion": "Cerámica rectangular, acabado rústico en todos los lados",
   "color": "Engobado – Naranja",
   "acabado": "Textura rústico",
-  "alto": 2.0,
-  "largo": 20.0,
-  "ancho": 6.6,
+  "medidas": [
+   [
+    "Alto",
+    2.0
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    6.6
+   ]
+  ],
   "peso": 0.5,
-  "rendimiento": 76.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "76 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "revestimientos-y-decorativos"
   ],
@@ -500,19 +776,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "brick-estandar",
-  "nombre": "BRICK ESTANDAR",
+  "titulo": "BRICK ESTANDAR",
   "codigo": "BRK STD",
   "linea": "BRICK RÚSTICO",
-  "descripcion": "Cerámica rectangular macizo acabado rústico en todos los lados.",
+  "descripcion": "Cerámica rectangular macizo acabado rústico en todos los lados",
   "color": "Engobe – Naranja",
   "acabado": "Textura rústico",
-  "alto": 6.6,
-  "largo": 20.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    6.6
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 2.65,
-  "rendimiento": 50.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "50 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros",
    "revestimientos-y-decorativos"
@@ -523,19 +811,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "brick-estandar-aligerado",
-  "nombre": "BRICK ESTANDAR ALIGERADO",
+  "titulo": "BRICK ESTANDAR ALIGERADO",
   "codigo": "BRK SA",
   "linea": "BRICK RÚSTICO",
-  "descripcion": "Cerámica rectangular macizo acabado rústico en todos los lados con 3 huecos en la cara superior.",
+  "descripcion": "Cerámica rectangular macizo acabado rústico en todos los lados con 3 huecos en la cara superior",
   "color": "Engobe – Naranja",
   "acabado": "Textura rústico",
-  "alto": 6.6,
-  "largo": 20.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    6.6
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 2.2,
-  "rendimiento": 50.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "50 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros",
    "pisos-y-pavimentos",
@@ -547,19 +847,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "brick-gambote-rustico-22",
-  "nombre": "BRICK GAMBOTE RÚSTICO 22",
+  "titulo": "BRICK GAMBOTE RÚSTICO 22",
   "codigo": "BRK GR22",
   "linea": "BRICK RÚSTICO",
-  "descripcion": "Cerámica rectangular, macizo acabado rústico en todos los lados.",
+  "descripcion": "Cerámica rectangular, macizo acabado rústico en todos los lados",
   "color": "Naranja Natural",
   "acabado": "Textura rústico",
-  "alto": 5.1,
-  "largo": 22.0,
-  "ancho": 11.0,
+  "medidas": [
+   [
+    "Alto",
+    5.1
+   ],
+   [
+    "Largo",
+    22.0
+   ],
+   [
+    "Ancho",
+    11.0
+   ]
+  ],
   "peso": 2.5,
-  "rendimiento": 63.0,
-  "rendimiento_unidad": "Pzas/M2",
+  "rendimiento": "63 Pzas/M2",
+  "a_pedido": false,
   "categorias": [
    "muros",
    "revestimientos-y-decorativos"
@@ -569,19 +881,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "brick-gambote-rustico18",
-  "nombre": "BRICK GAMBOTE RÚSTICO 18",
+  "titulo": "BRICK GAMBOTE RÚSTICO 18",
   "codigo": "BRK GR18",
   "linea": "BRICK RÚSTICO",
-  "descripcion": "Cerámica rectangular, macizo acabado rústico en todos los lados.",
+  "descripcion": "Cerámica rectangular, macizo acabado rústico en todos los lados",
   "color": "Naranja Natural",
   "acabado": "Textura rústico",
-  "alto": 5.1,
-  "largo": 18.0,
-  "ancho": 12.0,
+  "medidas": [
+   [
+    "Alto",
+    5.1
+   ],
+   [
+    "Largo",
+    18.0
+   ],
+   [
+    "Ancho",
+    12.0
+   ]
+  ],
   "peso": 2.2,
-  "rendimiento": 75.0,
-  "rendimiento_unidad": "Pzas/M2",
+  "rendimiento": "75 Pzas/M2",
+  "a_pedido": false,
   "categorias": [
    "muros",
    "revestimientos-y-decorativos"
@@ -591,19 +915,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "brick-terminacion-grada",
-  "nombre": "BRICK PUNTA REDONDA",
+  "titulo": "BRICK PUNTA REDONDA",
   "codigo": "BRK RD",
   "linea": "BRICK RÚSTICO",
-  "descripcion": "Cerámica rectangular punta redonda, macizo acabado rústico en todos los lados.",
+  "descripcion": "Cerámica rectangular punta redonda, macizo acabado rústico en todos los lados",
   "color": "Engabado – Naranja",
   "acabado": "Textura rústico",
-  "alto": 6.6,
-  "largo": 19.5,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    6.6
+   ],
+   [
+    "Largo",
+    19.5
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 2.65,
-  "rendimiento": 13.0,
-  "rendimiento_unidad": "Pzas/ML",
+  "rendimiento": "13 Pzas/ML",
+  "a_pedido": false,
   "categorias": [
    "muros",
    "revestimientos-y-decorativos"
@@ -614,19 +950,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "celosia",
-  "nombre": "CELOCIA",
+  "titulo": "CELOCIA",
   "codigo": "CEL",
   "linea": "CLÁSICA VARIADADES",
-  "descripcion": "Cerámica cuadrada con 5 huecos en la cara lateral, en forma de estrella.",
+  "descripcion": "Cerámica cuadrada con 5 huecos en la cara lateral, en forma de estrella",
   "color": "Naranja",
   "acabado": "Textura lisa en los laterales de la pieza",
-  "alto": 12.0,
-  "largo": 17.0,
-  "ancho": 17.0,
+  "medidas": [
+   [
+    "Alto",
+    12.0
+   ],
+   [
+    "Largo",
+    17.0
+   ],
+   [
+    "Ancho",
+    17.0
+   ]
+  ],
   "peso": 2.35,
-  "rendimiento": 29.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "29 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "muros",
    "piezas-especiales",
@@ -638,19 +986,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "pavic-estandar",
-  "nombre": "PAVIC ESTÁNDAR",
+  "titulo": "PAVIC ESTÁNDAR",
   "codigo": "PVC STD",
   "linea": "PAVIC",
-  "descripcion": "Cerámica rectangular macizo rústico en todos los lados y biselado en la cara superior.",
+  "descripcion": "Cerámica rectangular macizo rústico en todos los lados y biselado en la cara superior",
   "color": "Naranja Natural",
   "acabado": "Textura rústico",
-  "alto": 6.6,
-  "largo": 20.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    6.6
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 2.65,
-  "rendimiento": 50.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "50 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "pisos-y-pavimentos"
   ],
@@ -660,19 +1020,31 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "pavic-peatonal",
-  "nombre": "PAVIC PEATONAL BISELADO",
+  "titulo": "PAVIC PEATONAL BISELADO",
   "codigo": "PVC PE B 45",
   "linea": "PAVIC",
-  "descripcion": "Cerámica rectangular macizo rústico en todos los lados y biselado en la cara superior.",
+  "descripcion": "Cerámica rectangular macizo rústico en todos los lados y biselado en la cara superior",
   "color": "Naranja Natural",
   "acabado": "Textura rústico",
-  "alto": 4.5,
-  "largo": 20.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    4.5
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 1.63,
-  "rendimiento": 50.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "50 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "pisos-y-pavimentos"
   ],
@@ -682,25 +1054,902 @@
   ]
  },
  {
+  "ciudad": "cochabamba",
   "slug": "pavic-tabaco",
-  "nombre": "PAVIC ESTÁNDAR CON TETONES",
+  "titulo": "PAVIC ESTÁNDAR CON TETONES",
   "codigo": "PVC STD T",
   "linea": "PAVIC",
-  "descripcion": "Cerámica rectangular macizo rústico en todos los lados y con tetones en 3 lados.",
+  "descripcion": "Cerámica rectangular macizo rústico en todos los lados y con tetones en 3 lados",
   "color": "Naranja Natural",
   "acabado": "Textura rústico",
-  "alto": 6.6,
-  "largo": 20.0,
-  "ancho": 10.0,
+  "medidas": [
+   [
+    "Alto",
+    6.6
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
   "peso": 2.65,
-  "rendimiento": 50.0,
-  "rendimiento_unidad": "Pzas/m2",
+  "rendimiento": "50 Pzas/m2",
+  "a_pedido": false,
   "categorias": [
    "pisos-y-pavimentos"
   ],
   "imagenes": [
    "assets/img/productos/pavic-tabaco-1.jpg",
    "assets/img/productos/pavic-tabaco-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "18-h",
+  "titulo": "LADRILLO VISTO (18 HUECOS)",
+  "codigo": "18H",
+  "linea": "BRICK",
+  "descripcion": "Ladrillo visto, presenta 18 orificios en la parte superior e inferior, liso por su 4 caras",
+  "color": "Terracota",
+  "acabado": "Lisa",
+  "medidas": [
+   [
+    "Alto",
+    7.0
+   ],
+   [
+    "Largo",
+    24.0
+   ],
+   [
+    "Ancho",
+    12.0
+   ]
+  ],
+  "peso": 2.35,
+  "rendimiento": "46 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-18-h-1.jpg",
+   "assets/img/productos/scz-18-h-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "18-h-1-2",
+  "titulo": "18 HUECOS MITAD",
+  "codigo": "18H 1/2",
+  "linea": "BRICK",
+  "descripcion": "Ladrillo visto, presenta 9 orificios en la parte superior e inferior, liso por su 4 caras",
+  "color": "Terracota",
+  "acabado": "Lisa",
+  "medidas": [
+   [
+    "Alto",
+    6.5
+   ],
+   [
+    "Largo",
+    12.5
+   ],
+   [
+    "Ancho",
+    12.0
+   ]
+  ],
+  "peso": 1.3,
+  "rendimiento": "100 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-18-h-1-2-1.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "3-huecos-economico-rayado",
+  "titulo": "3 HUECOS RAYADO",
+  "codigo": "3HV",
+  "linea": "CLÁSICA",
+  "descripcion": "Ladrillo Estructural, presenta 3 huecos rayado por sus caras superior e inferior, liso por sus lados",
+  "color": "Terracota",
+  "acabado": "Rayado",
+  "medidas": [
+   [
+    "Alto",
+    7.0
+   ],
+   [
+    "Largo",
+    24.0
+   ],
+   [
+    "Ancho",
+    12.0
+   ]
+  ],
+  "peso": 1.8,
+  "rendimiento": "46 Pzas/m2 (Tizón)",
+  "a_pedido": false,
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-3-huecos-economico-rayado-1.jpg",
+   "assets/img/productos/scz-3-huecos-economico-rayado-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "6-huecos-big-rayado",
+  "titulo": "LADRILLO RAPIDO AVANCE (6 HUECOS BIG)",
+  "codigo": "6HBR",
+  "linea": "CLÁSICA",
+  "descripcion": "Ladrillo Estructural de mayor dimensión, presenta 6 huecos Rayado por sus 4 caras",
+  "color": "Terracota",
+  "acabado": "Rayado",
+  "medidas": [
+   [
+    "Alto",
+    17.5
+   ],
+   [
+    "Largo",
+    24.0
+   ],
+   [
+    "Ancho",
+    12.0
+   ]
+  ],
+  "peso": 3.4,
+  "rendimiento": "17 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-6-huecos-big-rayado-1.jpg",
+   "assets/img/productos/scz-6-huecos-big-rayado-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "6-huecos-big-rayado-mitad",
+  "titulo": "6 HUECOS BIG RAYADO MITAD",
+  "codigo": "6HBR 1/2",
+  "linea": "CLÁSICA",
+  "descripcion": "Ladrillo Estructural de mayor dimensión, presenta 6 huecos rayado por sus 4 caras",
+  "color": "Terracota",
+  "acabado": "Rayado",
+  "medidas": [
+   [
+    "Alto",
+    18.0
+   ],
+   [
+    "Largo",
+    1.2
+   ],
+   [
+    "Ancho",
+    9.5
+   ]
+  ],
+  "peso": 1.75,
+  "rendimiento": "40 Pzas/m2 (Tizón)",
+  "a_pedido": false,
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-6-huecos-big-rayado-mitad-1.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "6her",
+  "titulo": "LADRILLO ESTANDAR  (6 HUECOS)",
+  "codigo": "6HER",
+  "linea": "CLÁSICA",
+  "descripcion": "Producto de acabado texturado presenta 6 orificios en la parte frontal y posterior",
+  "color": "Terracota",
+  "acabado": "Rayado",
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    24.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
+  "peso": 2.65,
+  "rendimiento": "24 Pzas/m2 (soga), 36 Pzas/m2 (Tizón)",
+  "a_pedido": false,
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-6her-1.jpg",
+   "assets/img/productos/scz-6her-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "6her-2",
+  "titulo": "6 HUECOS MITAD",
+  "codigo": "6HER 1/2",
+  "linea": "CLÁSICA",
+  "descripcion": "Producto de acabado texturado presenta 6 orificios en la parte frontal y posterior",
+  "color": "Terracota",
+  "acabado": "Rayado",
+  "medidas": [
+   [
+    "Alto",
+    15.0
+   ],
+   [
+    "Largo",
+    12.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
+  "peso": 1.325,
+  "rendimiento": "48 Pzas/m2 (Tizón)",
+  "a_pedido": false,
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-6her-2-1.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "adobito-industrial",
+  "titulo": "ADOBITO PREMIUM",
+  "codigo": "ADOBITO",
+  "linea": "BRICK",
+  "descripcion": "Producto de acabado rustico, macizo especial para muros",
+  "color": "Terracota",
+  "acabado": "Rustico",
+  "medidas": [
+   [
+    "Alto",
+    4.5
+   ],
+   [
+    "Largo",
+    22.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
+  "peso": 2.04,
+  "rendimiento": "68 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-adobito-industrial-1.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "botaguas-de-1-caida",
+  "titulo": "BOTAGUAS DE 1 CAÍDA",
+  "codigo": "BOT 1C",
+  "linea": "CLÁSICA VARIEDADES",
+  "descripcion": "Cerámica rectangular, con 4 huecos de diferentes tamaños en la cara frontal, liso todas las caras",
+  "color": "Terracota",
+  "acabado": "Liso",
+  "medidas": [
+   [
+    "Alto",
+    17.5
+   ],
+   [
+    "Largo",
+    24.0
+   ],
+   [
+    "Ancho",
+    9.5
+   ]
+  ],
+  "peso": 2.6,
+  "rendimiento": "4 Pzas/ML",
+  "a_pedido": false,
+  "categorias": [
+   "piezas-especiales"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-botaguas-de-1-caida-1.jpg",
+   "assets/img/productos/scz-botaguas-de-1-caida-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "botaguas-de-2-caida",
+  "titulo": "BOTAGUAS DE 2 CAÍDAS",
+  "codigo": "BOT 2C",
+  "linea": "CLÁSICA VARIEDADES",
+  "descripcion": "Cerámica rectangular, con 5 huecos de diferentes tamaños en la cara frontal, liso todas las caras",
+  "color": "Terracota",
+  "acabado": "Liso",
+  "medidas": [
+   [
+    "Alto",
+    9.5
+   ],
+   [
+    "Largo",
+    24.5
+   ],
+   [
+    "Ancho",
+    24.5
+   ]
+  ],
+  "peso": 3.175,
+  "rendimiento": "4 Pzas/ML",
+  "a_pedido": false,
+  "categorias": [
+   "piezas-especiales"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-botaguas-de-2-caida-1.jpg",
+   "assets/img/productos/scz-botaguas-de-2-caida-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "brick-enchape-ancho",
+  "titulo": "BRICK ENCHAPE ANCHO",
+  "codigo": "BRK EA",
+  "linea": "BRICK RUSTICO",
+  "descripcion": "Producto sin refilar de acabado en todas sus cara rustico tipo corcho de 15 mm de espesor",
+  "color": "Natural",
+  "acabado": "Rugoso",
+  "medidas": [
+   [
+    "Alto",
+    1.8
+   ],
+   [
+    "Largo",
+    20.2
+   ],
+   [
+    "Ancho",
+    10.4
+   ]
+  ],
+  "peso": 870.0,
+  "rendimiento": "40 Pzas/m2 (con junta)",
+  "a_pedido": false,
+  "categorias": [
+   "muros",
+   "pisos-y-pavimentos",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-brick-enchape-ancho-1.jpg",
+   "assets/img/productos/scz-brick-enchape-ancho-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "brick-enchape-corto",
+  "titulo": "BRICK ENCHAPE ANGOSTO",
+  "codigo": "BRK EC",
+  "linea": "BRICK RUSTICO",
+  "descripcion": "Pieza cerámica decorativa, rustica por sus cuatro caras",
+  "color": "Natural",
+  "acabado": "Rugoso",
+  "medidas": [
+   [
+    "Alto",
+    1.5
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    7.5
+   ]
+  ],
+  "peso": 0.45,
+  "rendimiento": "67 Pzas/ml",
+  "a_pedido": false,
+  "categorias": [
+   "muros",
+   "pisos-y-pavimentos",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-brick-enchape-corto-1.jpg",
+   "assets/img/productos/scz-brick-enchape-corto-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "brick-punta-redonda",
+  "titulo": "BRICK PUNTA REDONDA",
+  "codigo": "BRK RD",
+  "linea": "BRICK",
+  "descripcion": "Producto decorativo de cbado rustico, tiene 3 lados rectos y uno de sus lados menores es curvo",
+  "color": "Terracota",
+  "acabado": "Rustico",
+  "medidas": [
+   [
+    "Alto",
+    6.5
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
+  "peso": 2.6,
+  "rendimiento": "13 Pzas/ML",
+  "a_pedido": true,
+  "categorias": [
+   "piezas-especiales",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-brick-punta-redonda-1.jpg",
+   "assets/img/productos/scz-brick-punta-redonda-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "brick-punta-redonda-simple",
+  "titulo": "BRICK PUNTA REDONDA SIMPLE",
+  "codigo": "BRK PRS",
+  "linea": "BRICK",
+  "descripcion": "Producto decorativo de acado rustico, una de sus esquinas tiene termincion de forma curva",
+  "color": "Terracota",
+  "acabado": "Rustico",
+  "medidas": [
+   [
+    "Alto",
+    6.5
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
+  "peso": 2.6,
+  "rendimiento": "13 Pzas/ML",
+  "a_pedido": true,
+  "categorias": [
+   "piezas-especiales",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-brick-punta-redonda-simple-1.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "celosia",
+  "titulo": "CELOSÍA",
+  "codigo": "CEL",
+  "linea": "CLÁSICA VARIADADES",
+  "descripcion": "Producto cerámico decorativo para ambientes externos",
+  "color": "Terracota",
+  "acabado": "Liso",
+  "medidas": [
+   [
+    "Alto",
+    19.5
+   ],
+   [
+    "Largo",
+    12.0
+   ],
+   [
+    "Ancho",
+    19.5
+   ]
+  ],
+  "peso": 2.5,
+  "rendimiento": "25 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "piezas-especiales"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-celosia-1.jpg",
+   "assets/img/productos/scz-celosia-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "ladrillo-6-huecos-33",
+  "titulo": "LADRILLO 6 HUECOS 33",
+  "codigo": "6HER 33 1RA",
+  "linea": "CLÁSICA",
+  "descripcion": "Producto de acabado texturado presenta 6 orificios en la parte frontal y posterior",
+  "color": "Terracota",
+  "acabado": "Rayado",
+  "medidas": [
+   [
+    "Alto",
+    18.0
+   ],
+   [
+    "Largo",
+    33.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
+  "peso": 3.7,
+  "rendimiento": "15 Pzas/m2 (soga), 30 Pzas/m2 (Tizón)",
+  "a_pedido": false,
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-ladrillo-6-huecos-33-1.jpg",
+   "assets/img/productos/scz-ladrillo-6-huecos-33-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "parasol",
+  "titulo": "PARASOL",
+  "codigo": "PARASOL",
+  "linea": "CLÁSICA VARIADADES",
+  "descripcion": "Producto cerámico decorativo para ambientes externos",
+  "color": "Terracota",
+  "acabado": "Liso",
+  "medidas": [
+   [
+    "Alto",
+    19.0
+   ],
+   [
+    "Largo",
+    23.5
+   ],
+   [
+    "Ancho",
+    12.5
+   ]
+  ],
+  "peso": 2.68,
+  "rendimiento": "25 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "piezas-especiales"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-parasol-1.jpg",
+   "assets/img/productos/scz-parasol-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pavic-estandar",
+  "titulo": "PAVIC ESTÁNDAR (ALTO TRAFICO)",
+  "codigo": "PVC STD",
+  "linea": "PAVIC",
+  "descripcion": "Pieza cerámica para acabados que demandan resistencias y durabilidad muy altas, rústico por sus cuatro caras",
+  "color": "Naranja",
+  "acabado": "Rústico",
+  "medidas": [
+   [
+    "Alto",
+    6.5
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
+  "peso": 2.6,
+  "rendimiento": "50 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "pisos-y-pavimentos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-pavic-estandar-1.jpg",
+   "assets/img/productos/scz-pavic-estandar-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pavic-estandar-mitad",
+  "titulo": "PAVIC ESTÁNDAR MITAD",
+  "codigo": "PVC STD 1/2",
+  "linea": "PAVIC",
+  "descripcion": "Pieza cerámica para acabados que demandan resistencias y durabilidad muy altas, rústico por sus cuatro caras",
+  "color": "Naranja rojizo",
+  "acabado": "Rústico",
+  "medidas": [
+   [
+    "Alto",
+    6.5
+   ],
+   [
+    "Largo",
+    10.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
+  "peso": 1.3,
+  "rendimiento": "5 Pzas/ML (Trama Hilera)",
+  "a_pedido": false,
+  "categorias": [
+   "pisos-y-pavimentos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-pavic-estandar-mitad-1.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pavic-peatonal",
+  "titulo": "PAVIC PEATONAL",
+  "codigo": "PVC PE",
+  "linea": "PAVIC",
+  "descripcion": "Pieza cerámica para acabados que demandan resistencias y durabilidad altas, rústico por sus cuatro caras",
+  "color": "Naranja",
+  "acabado": "Rústico",
+  "medidas": [
+   [
+    "Alto",
+    4.5
+   ],
+   [
+    "Largo",
+    20.0
+   ],
+   [
+    "Ancho",
+    10.0
+   ]
+  ],
+  "peso": 2.2,
+  "rendimiento": "50 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "pisos-y-pavimentos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-pavic-peatonal-1.jpg",
+   "assets/img/productos/scz-pavic-peatonal-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pieza-decorativa-eucalipto",
+  "titulo": "PIEZA DECORATIVA EUCALIPTO",
+  "codigo": "DEC EUCALIPTO P",
+  "linea": "DECO",
+  "descripcion": "Pieza cerámica decorativa",
+  "color": null,
+  "acabado": "Rustico",
+  "medidas": [
+   [
+    "Espesor",
+    1.5
+   ],
+   [
+    "Ancho",
+    2.0
+   ],
+   [
+    "Largo",
+    10.0
+   ]
+  ],
+  "peso": 0.05,
+  "rendimiento": "500 Pzas/m2",
+  "a_pedido": true,
+  "categorias": [
+   "piezas-especiales",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-pieza-decorativa-eucalipto-1.jpg",
+   "assets/img/productos/scz-pieza-decorativa-eucalipto-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pieza-decorativa-trebol",
+  "titulo": "PIEZA DECORATIVA TREBOL",
+  "codigo": "DEC TRBL 15",
+  "linea": "DECO",
+  "descripcion": "Pieza cerámica decorativa, rustico en forma de trebol",
+  "color": null,
+  "acabado": "Rustico",
+  "medidas": [
+   [
+    "Espesor",
+    1.5
+   ],
+   [
+    "Largo",
+    5.5
+   ],
+   [
+    "Ancho",
+    5.5
+   ]
+  ],
+  "peso": 0.055,
+  "rendimiento": "432 Pzas/m2",
+  "a_pedido": true,
+  "categorias": [
+   "piezas-especiales",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-pieza-decorativa-trebol-1.jpg",
+   "assets/img/productos/scz-pieza-decorativa-trebol-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "pieza-decorativa-tronquito",
+  "titulo": "PIEZA DECORATIVA TRONQUITO",
+  "codigo": "DEC TRC 50",
+  "linea": "DECO",
+  "descripcion": "Pieza cerámica decorativa",
+  "color": null,
+  "acabado": "Rustico",
+  "medidas": [
+   [
+    "Espesor",
+    1.5
+   ],
+   [
+    "Diámetro",
+    5.0
+   ]
+  ],
+  "peso": 0.055,
+  "rendimiento": "400 Pzas/m2",
+  "a_pedido": true,
+  "categorias": [
+   "piezas-especiales",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-pieza-decorativa-tronquito-1.jpg",
+   "assets/img/productos/scz-pieza-decorativa-tronquito-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "teja-super-colonial-tapa-50",
+  "titulo": "TEJA COLONIAL CANAL",
+  "codigo": "TSC 50",
+  "linea": "TEJAS",
+  "descripcion": "Pieza cerámica para cubiertas, liso por sus 2 caras",
+  "color": "Terracota",
+  "acabado": "Liso",
+  "medidas": [
+   [
+    "Alto Sup",
+    7.6
+   ],
+   [
+    "Alto Inf",
+    5.75
+   ],
+   [
+    "Largo",
+    50.0
+   ],
+   [
+    "Ancho Sup",
+    20.0
+   ],
+   [
+    "Ancho Inf",
+    16.5
+   ]
+  ],
+  "peso": 2.6,
+  "rendimiento": "18 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "techos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-teja-super-colonial-tapa-50-1.jpg",
+   "assets/img/productos/scz-teja-super-colonial-tapa-50-2.jpg"
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "tsc",
+  "titulo": "TEJA COLONIAL TAPA",
+  "codigo": "TSC 50",
+  "linea": "TEJAS",
+  "descripcion": "Pieza cerámica para cubiertas, liso por sus 2 caras",
+  "color": "Terracota",
+  "acabado": "Liso",
+  "medidas": [
+   [
+    "Alto Sup",
+    7.6
+   ],
+   [
+    "Alto Inf",
+    5.75
+   ],
+   [
+    "Largo",
+    50.0
+   ],
+   [
+    "Ancho Sup",
+    20.0
+   ],
+   [
+    "Ancho Inf",
+    16.5
+   ]
+  ],
+  "peso": 2.6,
+  "rendimiento": "18 Pzas/m2",
+  "a_pedido": false,
+  "categorias": [
+   "techos"
+  ],
+  "imagenes": [
+   "assets/img/productos/scz-tsc-1.jpg",
+   "assets/img/productos/scz-tsc-2.jpg"
   ]
  }
 ]

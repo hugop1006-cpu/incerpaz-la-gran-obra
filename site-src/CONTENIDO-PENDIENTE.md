@@ -21,9 +21,18 @@ Hay que confirmar:
 - Precios, programa de puntos, marca de tejas, cifras de la empresa, historia y sostenibilidad: fuera de esta entrega.
 
 ## Catálogo
-- Los 32 productos salen de la tienda de Cochabamba. Santa Cruz vende un catálogo distinto (por ejemplo, tejas): falta incorporarlo.
-- **3 huecos económico rayado:** el sitio actual dice ancho 0,7 cm. Se mostró 7 cm. Confirmar.
-- **Bloque cerámico 9 cm:** su foto no carga en el sitio actual (nombre de archivo con tilde). Hoy muestra un marcador.
+El sitio tiene **dos catálogos**, tal como en las tiendas actuales: Cochabamba (32 productos) y Santa Cruz (25 productos, incluidas 2 tejas).
+El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tienda propia: muestran el de la fábrica más cercana con un aviso para confirmar disponibilidad.
+- **Combos y promociones:** no se incluyeron. Santa Cruz tiene 47 y Cochabamba 2; son campañas temporales ("hasta agotar stock", con regalos como coolers y parlantes). Si se quieren mostrar, conviene hacerlo como sección de promociones con vigencia.
+- **Existencias:** el sitio actual marca "Sin existencias" en algunos productos. No se copió porque cambia; se mostrará cuando se conecte el ERP.
+- **Producto a pedido:** se muestra en las piezas decorativas y en el brick punta redonda de Santa Cruz.
+- **Datos que cambian entre ciudades** (parecen fábricas distintas o errores): 18 huecos mide 25 cm de largo en Cochabamba y 24 en Santa Cruz; el PAVIC peatonal pesa 1,63 kg en Cochabamba y 2,2 kg en Santa Cruz; el nombre y el código de varios productos también difieren. Hay que confirmar los valores correctos de cada uno.
+- **Correcciones hechas a mano** (ver `CORRECCIONES` en `build.js`):
+  - 3 huecos económico rayado (Cochabamba): el sitio dice ancho 0,7 cm; se mostró 7 cm.
+  - 6 huecos big rayado mitad (Santa Cruz): el sitio dice largo 1,2 cm; se mostró 12 cm.
+- **Teja colonial canal (Santa Cruz):** su ficha repite exactamente los datos de la tapa. Se muestra sin medidas ni calculadora hasta confirmarlos.
+- **Bloque cerámico 9 cm:** su foto no carga en el sitio actual (nombre de archivo con tilde). Muestra un marcador.
+- Los productos de la tienda de Oruro y de Tarija no se pudieron revisar (no abrían).
 - Faltan fichas técnicas en PDF y manuales de instalación.
 - Los nombres de producto se normalizaron (de MAYÚSCULAS a minúsculas con tildes). Revisar ortografía.
 

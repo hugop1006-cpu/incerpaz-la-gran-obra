@@ -1,6 +1,6 @@
 # Sitio de INCERPAZ (primera entrega)
 
-Sitio estático de marca: inicio, catálogo con 32 fichas de producto, PAVIC, Dónde estamos y Empresa.
+Sitio estático de marca: inicio, catálogos de Cochabamba y Santa Cruz (57 fichas de producto), PAVIC, Dónde estamos y Empresa.
 No necesita servidor ni dependencias: se genera con Node y se publica copiando la carpeta `site/`.
 
 ## Estructura
@@ -8,9 +8,9 @@ No necesita servidor ni dependencias: se genera con Node y se publica copiando l
 ```
 site-src/
   build.js              genera todo el HTML en /site
-  config.json           leadEndpoint: dirección que recibe los formularios (vacío = abren WhatsApp)
+  config.json           interno (true = sin indexar), leadEndpoint (dirección que recibe los formularios; vacío = abren WhatsApp)
   data/sitio.json       ciudades, WhatsApp, agencias, fábricas, valores, misión, redes
-  data/productos.json   catálogo (32 productos tomados de la tienda de Cochabamba)
+  data/productos.json   catálogo (productos de las tiendas de Cochabamba y Santa Cruz)
   CONTENIDO-PENDIENTE.md  datos que faltan o hay que confirmar antes de publicar
 site/                   resultado listo para publicar (HTML, CSS, JS e imágenes)
 tools/probar-sitio.js   prueba automática del sitio
@@ -37,7 +37,12 @@ Sin servidor, cada formulario abre WhatsApp con el mensaje armado hacia el núme
 Para enviarlos a un CRM o a un correo, pon la dirección en `config.json` (`leadEndpoint`). El sitio envía un
 POST con JSON (`asunto`, `ciudad`, `nombre`, `celular`, etc.) y, si falla, vuelve a abrir WhatsApp.
 
-## Publicación
+## Uso interno y publicación
 
-Copia la carpeta `site/` al servidor del dominio (o publícala con GitHub Pages desde la raíz del repositorio:
-quedará en `/site/`). Cambia `dominio` en `data/sitio.json` si el sitio no vive en https://www.incerpaz.com.
+Por ahora el sitio es **interno**: `config.json` trae `"interno": true`, así que todas las páginas llevan `noindex` y `robots.txt` bloquea a los buscadores.
+No lo publiques en un alojamiento público (por ejemplo, GitHub Pages en un repositorio público) mientras siga así.
+Para verlo en tu computador: `npx http-server -p 8080 .` y abre http://localhost:8080/site/. Para compartirlo dentro de la empresa, copia la carpeta `site/` a un servidor interno.
+
+Cuando se publique en incerpaz.com: cambia `interno` a `false`, ejecuta `node site-src/build.js` (se generan `sitemap.xml` y un `robots.txt` que permite indexar) y copia `site/` al servidor del dominio.
+
+El dominio previsto es https://www.incerpaz.com (campo `dominio` de `data/sitio.json`).
