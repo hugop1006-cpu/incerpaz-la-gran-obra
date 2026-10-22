@@ -13,6 +13,7 @@ const TIPOS = ['constructor', 'empresa', 'ferreteria', 'entidad', 'proyectista',
 const CIUDADES = ['cochabamba', 'santa-cruz', 'oruro', 'sucre'];
 const CATALOGOS = ['cochabamba', 'santa-cruz'];
 const PAGOS = ['transferencia', 'qr', 'agencia'];
+const ESTADOS_LEAD = ['nuevo', 'contactado', 'cotizado', 'ganado', 'perdido'];
 const ESTADOS_PEDIDO = ['recibido', 'confirmado', 'en_despacho', 'entregado', 'anulado'];
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8' };
 
@@ -34,6 +35,7 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
   db.prepare("INSERT OR IGNORE INTO ajustes (clave, valor) VALUES ('nota_precios:cochabamba', 'Precio por pieza, puesto en obra dentro del radio urbano.')").run();
   const limLogin = limitador({ max: 10, ventanaMs: 15 * 60_000 });
   const limRegistro = limitador({ max: 20, ventanaMs: 60 * 60_000 });
+  const limLeads = limitador({ max: 15, ventanaMs: 60 * 60_000 });
 
   /* ---------- utilidades de negocio ---------- */
   const verificado = (u) => u && (u.estado === 'verificado' || u.rol !== 'cliente');
@@ -309,6 +311,64 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
     return { ok: true };
   });
 
+  /* ---------- leads: solicitudes de los formularios del sitio ---------- */
+  const sinTildes = (v) => String(v || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  const ciudadLead = (v) => { const n = sinTildes(v).replace(/\s+/g, '-'); return CIUDADES.includes(n) ? n : 'otra'; };
+  ruta('POST', '/api/leads', async ({ req, body }) => {
+    if (!limLeads(ip(req))) falla(429, 'Demasiados envíos. Prueba más tarde.');
+    if (body.web) return { ok: true }; /* campo trampa: los bots lo llenan */
+    const asunto = txt(body.asunto, 120, 'el asunto', { obligatorio: true });
+    const nombre = txt(body.nombre, 120, 'el nombre', { obligatorio: true });
+    const correo = txt(body.correo, 120, 'el correo').toLowerCase();
+    const celular = txt(body.celular, 30, 'el celular');
+    if (!correo && !celular) falla(400, 'Déjanos un celular o un correo para responderte');
+    if (correo && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) falla(400, 'El correo no es válido');
+    if (celular && !/^[\d\s+()-]{6,30}$/.test(celular)) falla(400, 'El celular no es válido');
+    const aparte = new Set(['asunto', 'nombre', 'correo', 'celular', 'empresa', 'ciudad', 'pagina', 'web']);
+    const datos = {};
+    Object.keys(body).filter((k) => !aparte.has(k) && typeof body[k] !== 'object').slice(0, 20).forEach((k) => { const v = txt(body[k], 500, k); if (v) datos[txt(k, 40, 'un campo')] = v; });
+    const ciudad = ciudadLead(body.ciudad);
+    const r = db.prepare('INSERT INTO leads (asunto, ciudad, nombre, empresa, correo, celular, datos, pagina) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(asunto, ciudad, nombre, txt(body.empresa, 120, 'la empresa') || null, correo || null, celular || null, Object.keys(datos).length ? JSON.stringify(datos) : null, txt(body.pagina, 120, 'la página') || null);
+    return { status: 201, cuerpo: { ok: true, id: Number(r.lastInsertRowid) } };
+  });
+  const alcanceLeads = (u) => (u.rol === 'admin' ? { sql: '', args: [] } : { sql: ' AND ciudad = ?', args: [u.ciudad] });
+  const filaLead = (l) => ({ ...l, datos: l.datos ? JSON.parse(l.datos) : {} });
+  function consultaLeads(usuario, url) {
+    const a = alcanceLeads(usuario); const estado = url.searchParams.get('estado'); const q = (url.searchParams.get('q') || '').trim().slice(0, 60);
+    if (estado && !ESTADOS_LEAD.includes(estado)) falla(400, 'Estado inválido');
+    let sql = `SELECT id, creado_en, asunto, ciudad, nombre, empresa, correo, celular, datos, pagina, estado, nota, actualizado_en FROM leads WHERE 1 = 1${a.sql}`; const args = [...a.args];
+    if (estado) { sql += ' AND estado = ?'; args.push(estado); }
+    if (q) { sql += " AND (nombre LIKE ? ESCAPE '\\' OR empresa LIKE ? ESCAPE '\\' OR correo LIKE ? ESCAPE '\\' OR celular LIKE ? ESCAPE '\\' OR asunto LIKE ? ESCAPE '\\')"; const like = `%${q.replace(/[\\%_]/g, '\\$&')}%`; args.push(like, like, like, like, like); }
+    return { sql: sql + ' ORDER BY id DESC LIMIT 500', args, a };
+  }
+  ruta('GET', '/api/admin/leads', async ({ usuario, url }) => {
+    requerirStaff(usuario);
+    const c = consultaLeads(usuario, url);
+    const cuentas = db.prepare(`SELECT estado, COUNT(*) AS n FROM leads WHERE 1 = 1${c.a.sql} GROUP BY estado`).all(...c.a.args);
+    return { leads: db.prepare(c.sql).all(...c.args).map(filaLead), cuentas: Object.fromEntries(cuentas.map((x) => [x.estado, x.n])), estados: ESTADOS_LEAD };
+  });
+  ruta('GET', '/api/admin/leads.csv', async ({ usuario, url }) => {
+    requerirStaff(usuario);
+    const c = consultaLeads(usuario, url);
+    const celda = (v) => { let s = v == null ? '' : String(v); if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`; return `"${s.replace(/"/g, '""')}"`; };
+    const filas = db.prepare(c.sql).all(...c.args).map(filaLead);
+    const cab = ['Fecha (UTC)', 'Asunto', 'Ciudad', 'Nombre', 'Empresa', 'Correo', 'Celular', 'Estado', 'Nota', 'Detalle', 'Página'];
+    const csv = '﻿' + [cab, ...filas.map((l) => [l.creado_en, l.asunto, l.ciudad, l.nombre, l.empresa, l.correo, l.celular, l.estado, l.nota, Object.entries(l.datos).map(([k, v]) => `${k}: ${v}`).join(' | '), l.pagina])].map((r) => r.map(celda).join(';')).join('\r\n');
+    return { crudo: csv, cabeceras: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="leads-incerpaz.csv"', 'Cache-Control': 'no-store' } };
+  });
+  ruta('POST', '/api/admin/leads/:id', async ({ usuario, params, body }) => {
+    requerirStaff(usuario);
+    const a = alcanceLeads(usuario);
+    const l = db.prepare(`SELECT id FROM leads WHERE id = ?${a.sql}`).get(Number(params.id), ...a.args);
+    if (!l) falla(404, 'No encontramos ese contacto');
+    if (body.estado !== undefined && !ESTADOS_LEAD.includes(body.estado)) falla(400, 'Estado inválido');
+    const nota = body.nota === undefined ? undefined : txt(body.nota, 500, 'la nota');
+    db.prepare("UPDATE leads SET estado = COALESCE(?, estado), nota = CASE WHEN ? = 1 THEN ? ELSE nota END, atendido_por = ?, actualizado_en = datetime('now') WHERE id = ?")
+      .run(body.estado === undefined ? null : body.estado, nota === undefined ? 0 : 1, nota || null, usuario.id, l.id);
+    return { ok: true };
+  });
+
   /* ---------- administración del contenido (solo administradores) ---------- */
   const LISTAS = ['general', 'constructor'];
   const registrar = (u, entidad, detalle) => db.prepare('INSERT INTO cambios (usuario_id, entidad, detalle) VALUES (?, ?, ?)').run(u.id, entidad, String(detalle).slice(0, 300));
@@ -489,6 +549,7 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
         if (!m) continue;
         const body = cambia && req.method !== 'DELETE' ? await leerJson(req, url.pathname === '/api/admin/imagenes' ? 6_000_000 : undefined) : {};
         const salida = await r.fn({ req, res, url, usuario, params: m.groups || {}, body });
+        if (salida && salida.crudo !== undefined) { const buf = Buffer.from(salida.crudo, 'utf8'); res.writeHead(200, Object.assign({ 'Content-Length': buf.length }, salida.cabeceras)); return res.end(buf); }
         if (salida && salida.status) return responder(res, salida.status, salida.cuerpo);
         return responder(res, 200, salida);
       }

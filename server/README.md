@@ -35,6 +35,9 @@ Productos (editar, crear, borrar, imágenes), precios por ciudad y lista (con ca
 ## Precios
 Con `ERP_ADAPTER=local` los precios viven en la tabla `precios`. La primera vez se cargan los publicados en las tiendas actuales (`server/data/precios-publicados.json`, lista general; Cochabamba es precio puesto en obra dentro del radio urbano). La lista "constructor" usa el precio general mientras no tenga uno propio.
 
+## Contactos (leads)
+Los formularios del sitio envían a `POST /api/leads` (límite de 15 por hora y por IP, campo trampa anti-bots). El equipo los ve en `equipo.html` → Contactos, con estado (nuevo, contactado, cotizado, ganado, perdido), nota y exportación a CSV. Cada ejecutivo ve los de su ciudad; el administrador ve todos. Si el servidor no responde, el sitio abre WhatsApp con el mensaje armado.
+
 ## Despliegue
 Ver `server/DESPLIEGUE.md`.
 

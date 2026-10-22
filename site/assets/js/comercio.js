@@ -312,11 +312,31 @@
         }).join('') + '</tbody></table></div>';
       });
     }
+    var ESTADOS_LEAD = { nuevo: 'Nuevo', contactado: 'Contactado', cotizado: 'Cotizado', ganado: 'Ganado', perdido: 'Perdido' };
+    var filtroLead = { estado: '', q: '' };
+    function leads() {
+      var qs = '?estado=' + encodeURIComponent(filtroLead.estado) + '&q=' + encodeURIComponent(filtroLead.q);
+      return api('GET', '/api/admin/leads' + qs).then(function (r) {
+        var barra = '<div class="btn-row" style="margin-bottom:14px;align-items:center"><select class="sel" id="lead-estado"><option value="">Todos los estados</option>' + Object.keys(ESTADOS_LEAD).map(function (e) { return '<option value="' + e + '"' + (e === filtroLead.estado ? ' selected' : '') + '>' + ESTADOS_LEAD[e] + (r.cuentas[e] ? ' (' + r.cuentas[e] + ')' : '') + '</option>'; }).join('') + '</select>' +
+          '<input id="lead-q" type="search" placeholder="Buscar nombre, empresa, teléfono…" value="' + esc(filtroLead.q) + '" style="max-width:280px"><a class="btn btn--sm" href="/api/admin/leads.csv' + qs + '">Descargar CSV</a></div>';
+        if (!r.leads.length) return barra + '<p class="muted">No hay contactos con ese filtro.</p>';
+        return barra + '<div class="scroll"><table class="tabla"><thead><tr><th>Fecha</th><th>Solicitud</th><th>Contacto</th><th>Ciudad</th><th>Detalle</th><th>Estado</th><th>Nota</th></tr></thead><tbody>' + r.leads.map(function (l) {
+          var det = Object.keys(l.datos).map(function (k) { return '<span class="muted">' + esc(k) + ':</span> ' + esc(l.datos[k]); }).join('<br>');
+          var wa = l.celular ? waUrl(l.celular.replace(/\D/g, '').replace(/^591/, ''), 'Hola ' + l.nombre + ', somos INCERPAZ. Recibimos tu solicitud: ' + l.asunto + '.') : '';
+          return '<tr><td>' + esc(l.creado_en.slice(0, 16)) + '</td><td><b>' + esc(l.asunto) + '</b></td><td><b>' + esc(l.nombre) + '</b>' + (l.empresa ? '<br><span class="muted">' + esc(l.empresa) + '</span>' : '') + (l.celular ? '<br><a href="' + wa + '" target="_blank" rel="noopener">' + esc(l.celular) + '</a>' : '') + (l.correo ? '<br><a href="mailto:' + esc(l.correo) + '">' + esc(l.correo) + '</a>' : '') + '</td><td>' + esc(NOMBRE_CIUDAD[l.ciudad] || 'Otra ciudad') + '</td><td>' + (det || '—') + '</td><td><select class="sel" data-lead-estado="' + l.id + '">' + Object.keys(ESTADOS_LEAD).map(function (e) { return '<option value="' + e + '"' + (e === l.estado ? ' selected' : '') + '>' + ESTADOS_LEAD[e] + '</option>'; }).join('') + '</select></td><td><input data-lead-nota="' + l.id + '" value="' + esc(l.nota || '') + '" maxlength="500" style="min-width:160px" aria-label="Nota"></td></tr>';
+        }).join('') + '</tbody></table></div>';
+      });
+    }
     function pintar() {
-      app.innerHTML = '<div class="seg" role="group" aria-label="Sección"><button type="button" data-tab="cuentas" aria-pressed="' + (tab === 'cuentas') + '">Cuentas por verificar</button><button type="button" data-tab="pedidos" aria-pressed="' + (tab === 'pedidos') + '">Pedidos</button></div><p class="muted" style="margin-top:12px">' + esc(u.nombre) + ' · ' + (u.rol === 'admin' ? 'todas las ciudades · <a href="' + BASE + 'admin.html"><b>Administrar el sitio</b></a>' : esc(NOMBRE_CIUDAD[u.ciudad])) + '</p><div id="panel" style="margin-top:18px">Cargando…</div>';
+      app.innerHTML = '<div class="seg" role="group" aria-label="Sección"><button type="button" data-tab="cuentas" aria-pressed="' + (tab === 'cuentas') + '">Cuentas por verificar</button><button type="button" data-tab="pedidos" aria-pressed="' + (tab === 'pedidos') + '">Pedidos</button><button type="button" data-tab="leads" aria-pressed="' + (tab === 'leads') + '">Contactos<span id="lead-nuevos"></span></button></div><p class="muted" style="margin-top:12px">' + esc(u.nombre) + ' · ' + (u.rol === 'admin' ? 'todas las ciudades · <a href="' + BASE + 'admin.html"><b>Administrar el sitio</b></a>' : esc(NOMBRE_CIUDAD[u.ciudad])) + '</p><div id="panel" style="margin-top:18px">Cargando…</div>';
       $$('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { tab = b.getAttribute('data-tab'); pintar(); }); });
-      (tab === 'cuentas' ? cuentas() : pedidos()).then(function (html) {
+      api('GET', '/api/admin/leads?estado=nuevo').then(function (r) { var n = r.leads.length; if (n) $('#lead-nuevos').textContent = ' (' + n + ' nuevos)'; }).catch(function () { /* sin contador */ });
+      (tab === 'cuentas' ? cuentas() : tab === 'pedidos' ? pedidos() : leads()).then(function (html) {
         $('#panel').innerHTML = html;
+        var fe = $('#lead-estado'); if (fe) fe.addEventListener('change', function () { filtroLead.estado = fe.value; pintar(); });
+        var fq = $('#lead-q'); if (fq) fq.addEventListener('keydown', function (e) { if (e.key === 'Enter') { filtroLead.q = fq.value.trim(); pintar(); } });
+        $$('[data-lead-estado]').forEach(function (sl) { sl.addEventListener('change', function () { api('POST', '/api/admin/leads/' + sl.getAttribute('data-lead-estado'), { estado: sl.value }).then(function () { aviso('Estado actualizado'); }).catch(function (e) { aviso(e.message); }); }); });
+        $$('[data-lead-nota]').forEach(function (i) { i.addEventListener('change', function () { api('POST', '/api/admin/leads/' + i.getAttribute('data-lead-nota'), { nota: i.value }).then(function () { aviso('Nota guardada'); }).catch(function (e) { aviso(e.message); }); }); });
         $$('[data-ver]').forEach(function (b) { b.addEventListener('click', function () { var id = b.getAttribute('data-ver'); api('POST', '/api/admin/cuentas/' + id, { accion: 'verificar', lista_precios: $('[data-lista="' + id + '"]').value }).then(function () { aviso('Cuenta verificada'); pintar(); }).catch(function (e) { aviso(e.message); }); }); });
         $$('[data-rech]').forEach(function (b) { b.addEventListener('click', function () { api('POST', '/api/admin/cuentas/' + b.getAttribute('data-rech'), { accion: 'rechazar' }).then(function () { aviso('Cuenta rechazada'); pintar(); }).catch(function (e) { aviso(e.message); }); }); });
         $$('[data-estado]').forEach(function (sl) { sl.addEventListener('change', function () { api('POST', '/api/admin/pedidos/' + sl.getAttribute('data-estado') + '/estado', { estado: sl.value }).then(function () { aviso('Estado actualizado'); }).catch(function (e) { aviso(e.message); }); }); });

@@ -76,6 +76,7 @@ const medidaTexto = (p) => (p.largo && p.ancho && p.alto) ? `${num(p.largo)} × 
 const NAV = [
   ['catalogo.html', 'Productos'],
   ['proyectos.html', 'Proyectos'],
+  ['guias.html', 'Guías'],
   ['pavic.html', 'PAVIC'],
   ['donde-estamos.html', 'Dónde estamos'],
   ['empresa.html', 'Empresa']
@@ -84,7 +85,7 @@ const ciudadDefecto = sitio.ciudades[0];
 function layout({ file, base = '', title, desc, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '' }) {
   const url = `${sitio.dominio}/${file === 'index.html' ? '' : file}`;
   const nav = NAV.map(([href, label]) => `<a href="${base}${href}"${file === href ? ' aria-current="page"' : ''}>${label}</a>`).join('');
-  const cfg = JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || '' });
+  const cfg = JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || (config.comercio ? '/api/leads' : '') });
   return `<!doctype html>
 <html lang="es-BO">
 <head>
@@ -107,7 +108,7 @@ ${jsonld}
 <a class="skip" href="#contenido">Saltar al contenido</a>
 <div class="topbar"><div class="wrap">
   <span>Servicio al cliente <a href="tel:${sitio.servicio_cliente.tel}"><strong>${sitio.servicio_cliente.texto}</strong></a></span>
-  <span>${config.comercio ? `<span data-acct><a href="${base}presupuesto.html">Presupuesto (<span data-bcount>0</span>)</a> · <a href="${base}ingresar.html">Ingresar</a></span> · ` : ''}<a href="${sitio.enlaces_externos.exportaciones}" rel="noopener">Exportaciones</a> · <a href="${sitio.enlaces_externos.promotores}" rel="noopener">Promotores</a></span>
+  <span>${config.comercio ? `<span data-acct><a href="${base}presupuesto.html">Presupuesto (<span data-bcount>0</span>)</a> · <a href="${base}ingresar.html">Ingresar</a></span> · ` : ''}<a href="${base}exportaciones.html">Exportaciones</a> · <a href="${sitio.enlaces_externos.promotores}" rel="noopener">Promotores</a></span>
 </div></div>
 <header class="site-header"><div class="wrap">
   <a class="brand" href="${base || './'}" aria-label="INCERPAZ, inicio"><img src="${base}assets/img/logo-header.png" alt="INCERPAZ" width="235" height="38"></a>
@@ -638,12 +639,65 @@ for (const pr of proyectosData.proyectos) {
   }));
 }
 
+/* ============================ GUÍAS (contenido para atraer y orientar) ============================ */
+const guiasData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/guias.json'), 'utf8')).guias;
+const fechaLarga = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('es-BO', { day: 'numeric', month: 'long', year: 'numeric' });
+write('guias.html', layout({
+  file: 'guias.html', pagina: 'guias', title: 'Guías para construir con cerámica | INCERPAZ',
+  desc: 'Guías prácticas: cuántos ladrillos necesitas por m², cómo elegir, cómo colocar enchape, qué pedir en un pavimento cerámico y cómo cuidar el ladrillo visto.',
+  body: `<section class="section"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Aprende antes de comprar</span><h1 style="font-size:clamp(36px,5vw,60px)">Guías para construir con cerámica</h1><p class="lead">Respuestas claras a las preguntas más comunes de quien construye, remodela o proyecta.</p></div>
+  <div class="proys">${guiasData.map((g) => `<a class="cat" href="guias/${g.slug}.html" style="grid-column:auto"><img src="${g.imagen}" alt="" loading="lazy" width="600" height="400"><div><h3>${esc(g.titulo)}</h3><span>${esc(g.resumen)}</span><span style="display:block;margin-top:8px">${g.minutos} min de lectura</span></div></a>`).join('')}</div>
+</div></section>`
+}));
+for (const g of guiasData) {
+  const b = '../', fix = (h) => (/^https?:/.test(h) ? h : b + h);
+  const cuerpo = g.cuerpo.map((x) => x.t === 'h2' ? `<h2 style="margin:32px 0 10px;font-size:28px">${esc(x.x)}</h2>` : x.t === 'p' ? `<p style="margin-bottom:14px;max-width:68ch">${esc(x.x)}</p>` : x.t === 'ul' ? `<ul class="lista" style="margin-bottom:14px;max-width:68ch">${x.x.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : `<p style="margin:28px 0"><a class="btn btn--red" href="${fix(x.href)}">${esc(x.x)}</a></p>`).join('');
+  const ld = { '@context': 'https://schema.org', '@type': 'Article', headline: g.titulo, description: g.resumen, datePublished: g.fecha, image: `${sitio.dominio}/${g.imagen}`, author: { '@type': 'Organization', name: 'INCERPAZ' }, publisher: { '@type': 'Organization', name: 'INCERPAZ', logo: { '@type': 'ImageObject', url: `${sitio.dominio}/assets/img/logo-header.png` } } };
+  write(`guias/${g.slug}.html`, layout({
+    file: `guias/${g.slug}.html`, base: b, pagina: 'guia', title: `${g.titulo} | INCERPAZ`, desc: g.resumen, og: g.imagen,
+    jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`,
+    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../guias.html">Guías</a> › ${esc(g.titulo)}</nav></div>
+<article class="section" style="padding-top:12px"><div class="wrap">
+  <span class="eyebrow">Guía · ${g.minutos} min de lectura</span><h1 style="font-size:clamp(34px,5vw,56px);margin-block:12px 12px">${esc(g.titulo)}</h1>
+  <p class="lead">${esc(g.resumen)}</p><p class="muted" style="margin:10px 0 24px">Equipo INCERPAZ · ${fechaLarga(g.fecha)}</p>
+  ${cuerpo}
+  ${g.relacionados.length ? `<h2 style="margin:32px 0 10px;font-size:24px">Sigue leyendo</h2><ul class="lista">${g.relacionados.map((r) => `<li><a href="${fix(r[0])}">${esc(r[1])}</a></li>`).join('')}</ul>` : ''}
+</div></article>
+<section class="section section--grey"><div class="wrap split">
+  <div><span class="eyebrow">¿Tienes dudas?</span><h2 style="margin-block:12px 18px">Habla con un ejecutivo de tu ciudad</h2><p class="lead">Cuéntanos qué vas a construir y te ayudamos a elegir la pieza y calcular el material.</p></div>
+  <div>${leadForm({ asunto: `Consulta desde guía: ${g.titulo}`, boton: 'Enviar consulta', campos: field('Nombre', 'nombre', 'required autocomplete="name"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel"') + selectCities('ciudad') + '<label class="full">¿Qué necesitas?<textarea name="consulta" rows="3" maxlength="500"></textarea></label>' })}</div>
+</div></section>`
+  }));
+}
+
+/* ============================ EXPORTACIONES (español e inglés) ============================ */
+write('exportaciones.html', layout({
+  file: 'exportaciones.html', pagina: 'exportaciones', title: 'Exportaciones | Cerámica boliviana INCERPAZ',
+  desc: 'INCERPAZ exporta cerámica fabricada en Bolivia. Consulta de exportación para importadores y distribuidores. Export inquiries for importers and distributors.',
+  body: `<section class="section"><div class="wrap split">
+  <div><span class="eyebrow">Exportaciones</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 18px">Cerámica boliviana para el mundo</h1>
+    <p class="lead">${esc(sitio.somos)}</p>
+    <p style="margin-top:16px;max-width:60ch">Si eres importador, distribuidor o constructor fuera de Bolivia, cuéntanos qué producto buscas y el volumen aproximado. El equipo de exportaciones te responde con disponibilidad, condiciones y plazos.</p>
+    <p class="muted" style="margin-top:14px">Fábricas en Cochabamba, Santa Cruz y Oruro.</p>
+    <div lang="en" style="margin-top:32px;padding-top:24px;border-top:2px solid var(--line)"><h2 style="font-size:28px;margin-bottom:10px">Made in Bolivia, shipped worldwide</h2>
+      <p style="max-width:60ch">INCERPAZ manufactures ceramic bricks, facing bricks, roof tiles and PAVIC ceramic pavers in Bolivia. Importers and distributors: tell us the product, destination and approximate volume, and our export team will reply with availability, terms and lead times.</p></div>
+    <p style="margin-top:24px"><a class="btn btn--sm" href="${sitio.enlaces_externos.exportaciones}" rel="noopener">Sitio de exportaciones actual</a></p>
+  </div>
+  <div>${leadForm({ asunto: 'Consulta de exportación', boton: 'Enviar consulta / Send inquiry', campos:
+    field('Nombre / Name', 'nombre', 'required autocomplete="name"') + field('Empresa / Company', 'empresa', 'required autocomplete="organization"') + field('Correo / Email', 'correo', 'type="email" required autocomplete="email"') + field('Teléfono o WhatsApp / Phone', 'celular', 'type="tel" autocomplete="tel"') +
+    field('País de destino / Destination country', 'pais', 'required') + field('Volumen aproximado / Approx. volume', 'volumen', 'placeholder="m², piezas o contenedores / m², pieces or containers"') +
+    `<label class="full">Producto de interés / Product<select name="producto"><option>Ladrillos y bloques / Bricks and blocks</option><option>Ladrillo visto y enchape / Facing bricks</option><option>Tejas / Roof tiles</option><option>PAVIC (pavimento) / PAVIC pavers</option><option>Refractarios / Refractory</option><option>Otro / Other</option></select></label>` +
+    '<label class="full">Mensaje / Message<textarea name="mensaje" rows="3" maxlength="500"></textarea></label>' })}</div>
+</div></section>`
+}));
+
 /* ============================ 404, sitemap, robots ============================ */
 write('404.html', layout({
   file: '404.html', title: 'Página no encontrada | INCERPAZ', desc: 'La página que buscas no existe.',
   body: `<section class="section"><div class="wrap"><h1>No encontramos esa página</h1><p class="lead" style="margin-block:16px 28px">Puede que el enlace haya cambiado. Prueba desde el inicio o el catálogo.</p><div class="btn-row"><a class="btn btn--red" href="${sitio.dominio}/">Ir al inicio</a><a class="btn" href="${sitio.dominio}/catalogo.html">Ver productos</a></div></div></section>`
 }));
-const urls = ['', 'catalogo.html', 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
+const urls = ['', 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
 if (config.interno) {
   fs.rmSync(path.join(OUT, 'sitemap.xml'), { force: true });
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');

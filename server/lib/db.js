@@ -111,6 +111,23 @@ CREATE TABLE IF NOT EXISTS cambios (
   detalle TEXT NOT NULL,
   creado_en TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS leads (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  creado_en TEXT NOT NULL DEFAULT (datetime('now')),
+  asunto TEXT NOT NULL,
+  ciudad TEXT NOT NULL DEFAULT 'otra',
+  nombre TEXT NOT NULL,
+  empresa TEXT,
+  correo TEXT,
+  celular TEXT,
+  datos TEXT,
+  pagina TEXT,
+  estado TEXT NOT NULL DEFAULT 'nuevo' CHECK (estado IN ('nuevo','contactado','cotizado','ganado','perdido')),
+  nota TEXT,
+  atendido_por INTEGER REFERENCES usuarios(id),
+  actualizado_en TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS ix_leads_estado ON leads(estado, ciudad);
 CREATE INDEX IF NOT EXISTS ix_pedidos_usuario ON pedidos(usuario_id);
 CREATE INDEX IF NOT EXISTS ix_presupuestos_usuario ON presupuestos(usuario_id);
 `);

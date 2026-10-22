@@ -59,3 +59,9 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - Falta el detalle del confinamiento lateral y de tránsito (peatonal, vehicular liviano, pesado) con el paquete estructural recomendado por INCERPAZ.
 - Obras de referencia PAVIC (ciudad, año, superficie, fotos) y manual de instalación en PDF.
 - Biblioteca BIM/CAD más completa (bloques DWG, texturas para renders, patrones de aparejo).
+
+## Guías, exportaciones y leads
+- Las 5 guías son textos nuevos escritos con los datos de las fichas del catálogo; un técnico o el área comercial debe revisarlas antes de publicar (en especial recomendaciones sobre hidrofugantes, mortero y uso estructural).
+- Exportaciones: faltan países de destino atendidos, productos que se exportan, volúmenes mínimos, condiciones (Incoterms), certificaciones de exportación y el contacto responsable. Hoy la página solo capta la consulta y enlaza al sitio de exportaciones actual.
+- Leads: los formularios del sitio se guardan en el servidor y se ven en Equipo → Contactos (cada ejecutivo ve los de su ciudad; los de otras ciudades y la lista de espera los ve el administrador). Falta definir quién atiende exportaciones y PAVIC, y conectar avisos por correo o WhatsApp cuando entra un contacto nuevo (hoy solo se ve el contador en el panel).
+- Falta fotografía propia para las guías (hoy usan fotos de producto) y más guías (instalación de PAVIC, techos con teja, refractarios para hornos).

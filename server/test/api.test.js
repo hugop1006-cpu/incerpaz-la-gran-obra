@@ -219,3 +219,35 @@ test('panel de administración: solo el administrador edita precios, productos, 
   assert.equal((await adm.post('/api/admin/restaurar', { version: '../../etc/passwd' })).status, 400);
   cerrar(servidor);
 });
+
+test('leads: los formularios públicos se guardan y el equipo los atiende según su ciudad', async () => {
+  const { db, servidor, base } = await levantar(); const pub = cliente(base), ej = cliente(base), ejSC = cliente(base), adm = cliente(base);
+  const cuenta = (rol, correo, ciudad) => db.prepare("INSERT INTO usuarios (rol, estado, tipo, nombre, ciudad, celular, correo, pass_hash) VALUES (?, 'verificado','empresa','Persona',?,'70000009',?,?)").run(rol, ciudad, correo, hashPassword('clave-larga-123'));
+  cuenta('ejecutivo', 'ej@incerpaz.test', 'cochabamba'); cuenta('ejecutivo', 'sc@incerpaz.test', 'santa-cruz'); cuenta('admin', 'a@incerpaz.test', 'cochabamba');
+  for (const [c, u] of [[ej, 'ej'], [ejSC, 'sc'], [adm, 'a']]) await c.post('/api/login', { correo: `${u}@incerpaz.test`, password: 'clave-larga-123' });
+
+  assert.equal((await pub.post('/api/leads', { asunto: 'Cotización', nombre: '' })).status, 400, 'sin nombre no se guarda');
+  assert.equal((await pub.post('/api/leads', { asunto: 'Cotización', nombre: 'Luis' })).status, 400, 'sin celular ni correo no se guarda');
+  assert.equal((await pub.post('/api/leads', { asunto: 'Cotización', nombre: 'Luis', correo: 'malo' })).status, 400);
+  assert.equal((await pub.raw('POST', '/api/leads', { asunto: 'x', nombre: 'Luis', celular: '70000000' }, { 'X-Requested-With': '' })).status, 403, 'exige la cabecera del sitio');
+  const ok = await pub.post('/api/leads', { asunto: 'Cotización de proyecto PAVIC', nombre: 'Luis Rojas', empresa: 'Constructora X', celular: '70011122', ciudad: 'Santa Cruz', superficie: '5000', pagina: '/pavic.html' });
+  assert.equal(ok.status, 201);
+  assert.equal((await pub.post('/api/leads', { asunto: 'Contacto', nombre: 'Bot', celular: '70011122', web: 'http://spam' })).status, 200, 'el campo trampa responde bien pero no guarda');
+  await pub.post('/api/leads', { asunto: 'Lista de espera: ciudad sin agencia', nombre: 'Ana', celular: '70055566', ciudad: 'Otra ciudad', ciudad_otra: 'Tarija' });
+  await pub.post('/api/leads', { asunto: 'Contacto', nombre: '=HYPERLINK("x")', correo: 'q@ejemplo.com', ciudad: 'Cochabamba' });
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM leads').get().n, 3);
+
+  assert.equal((await pub.get('/api/admin/leads')).status, 401);
+  assert.equal((await ej.get('/api/admin/leads')).json.leads.length, 1, 'el ejecutivo de Cochabamba solo ve el suyo');
+  const sc = (await ejSC.get('/api/admin/leads')).json; assert.equal(sc.leads.length, 1); assert.equal(sc.leads[0].datos.superficie, '5000'); assert.equal(sc.cuentas.nuevo, 1);
+  assert.equal((await adm.get('/api/admin/leads')).json.leads.length, 3, 'el administrador ve todos, incluidas otras ciudades');
+  assert.equal((await adm.get('/api/admin/leads?q=Rojas')).json.leads.length, 1, 'búsqueda por nombre');
+  const id = sc.leads[0].id;
+  assert.equal((await ej.post(`/api/admin/leads/${id}`, { estado: 'contactado' })).status, 404, 'otra ciudad no lo toca');
+  assert.equal((await ejSC.post(`/api/admin/leads/${id}`, { estado: 'inventado' })).status, 400);
+  assert.equal((await ejSC.post(`/api/admin/leads/${id}`, { estado: 'cotizado', nota: 'Envié la cotización' })).status, 200);
+  const dsp = (await ejSC.get('/api/admin/leads?estado=cotizado')).json.leads[0]; assert.equal(dsp.nota, 'Envié la cotización');
+  const csv = await adm.raw('GET', '/api/admin/leads.csv'); assert.equal(csv.status, 200); assert.match(csv.headers.get('content-type'), /text\/csv/);
+  assert.ok(csv.texto.includes('Constructora X') && csv.texto.includes("'=HYPERLINK"), 'el CSV neutraliza fórmulas');
+  cerrar(servidor);
+});

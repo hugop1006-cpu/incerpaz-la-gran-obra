@@ -131,7 +131,7 @@
       var asunto = f.getAttribute('data-lead'), lines = ['*' + asunto + '*'];
       var city = currentCity(), citySel = f.querySelector('[name="ciudad"]');
       if (citySel) city = CFG.ciudades.filter(function (c) { return c.nombre === citySel.value; })[0] || city;
-      var data = { asunto: asunto, ciudad: citySel ? citySel.value : city.nombre, pagina: location.pathname };
+      var data = { asunto: asunto, ciudad: citySel ? citySel.value : (asunto.indexOf('Lista de espera') === 0 ? 'Otra ciudad' : city.nombre), pagina: location.pathname };
       $$('input, select, textarea', f).forEach(function (el) {
         if (!el.name || el.closest('.hp') || el.type === 'submit') return;
         var label = el.closest('label') ? el.closest('label').firstChild.textContent.trim() : el.name;
@@ -140,8 +140,8 @@
       });
       var done = function (texto) { if (msgBox) { msgBox.textContent = texto; msgBox.hidden = false; } f.reset(); };
       if (CFG.leadEndpoint) {
-        fetch(CFG.leadEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-          .then(function (r) { if (!r.ok) throw new Error(r.status); done('Recibimos tu solicitud. Un ejecutivo de ' + city.nombre + ' te contactará.'); })
+        fetch(CFG.leadEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'incerpaz' }, body: JSON.stringify(data) })
+          .then(function (r) { if (!r.ok) throw new Error(r.status); done(asunto.indexOf('Lista de espera') === 0 ? 'Listo, te avisaremos cuando lleguemos a tu ciudad.' : 'Recibimos tu solicitud. Un ejecutivo de ' + city.nombre + ' te contactará.'); })
           .catch(function () { window.open(waUrl(city.whatsapp, lines.join('\n')), '_blank', 'noopener'); done('No pudimos enviar el formulario. Abrimos WhatsApp para que nos escribas directamente.'); });
       } else {
         window.open(waUrl(f.getAttribute('data-wa-num') || city.whatsapp, lines.join('\n')), '_blank', 'noopener');
