@@ -138,6 +138,7 @@ ${body}
 <script>window.INCERPAZ=${cfg};</script>
 <script src="${base}assets/js/site.js" defer></script>
 ${config.comercio ? `<script src="${base}assets/js/comercio.js" defer></script>` : ''}
+${pagina === 'pavic-recursos' ? `<script src="${base}assets/js/pavic.js" defer></script>` : ''}
 ${pagina === 'proyecto' ? `<script src="${base}assets/js/proyectos.js" defer></script>` : ''}
 ${config.comercio && pagina === 'admin' ? `<script src="${base}assets/js/admin.js" defer></script>` : ''}
 </body>
@@ -338,7 +339,7 @@ write('pavic.html', layout({
 <section class="pavic-hero"><img src="assets/img/productos/pavic-tabaco-2.jpg" alt="" width="800" height="800">
 <div class="wrap"><span class="badge">PAVIC</span><h1>Pavimento cerámico para proyectos</h1>
   <p class="lead" style="color:#e6e1db">Calles, plazas, veredas y urbanizaciones. Una marca de INCERPAZ con certificados de calidad, ensayos de laboratorio y certificación ISO.</p>
-  <div class="btn-row"><a class="btn btn--red" href="#cotizar">Cotizar mi proyecto</a><a class="btn btn--ghost" style="color:#fff" href="#calidad">Solicitar documentación técnica</a></div></div></section>
+  <div class="btn-row"><a class="btn btn--red" href="#cotizar">Cotizar mi proyecto</a><a class="btn btn--ghost" style="color:#fff" href="#calidad">Solicitar documentación técnica</a><a class="btn btn--ghost" style="color:#fff" href="pavic-recursos.html">Recursos para proyectistas</a></div></div></section>
 
 <section class="section"><div class="wrap">
   <div class="section-head"><span class="eyebrow">Para quién</span><h2>Hecho para obras que se miden en miles de metros</h2></div>
@@ -349,7 +350,7 @@ write('pavic.html', layout({
   </div>
 </div></section>
 
-<section class="section section--grey"><div class="wrap">
+<section class="section section--grey" id="productos"><div class="wrap">
   <div class="section-head"><span class="eyebrow">Productos PAVIC</span><h2>Líneas de pavimento</h2><p class="lead">Cada fábrica publica sus propias medidas y pesos. Elige el catálogo de tu ciudad.</p></div>
   ${Object.entries(CIUDAD_CATALOGO).map(([c, n]) => `<h3 style="margin:8px 0 14px">Catálogo de ${n}</h3><div class="grid-products" style="margin-bottom:32px">${pavic.filter((p) => p.ciudad === c).map((p) => productCard(p)).join('')}</div>`).join('')}
 </div></section>
@@ -382,6 +383,83 @@ write('pavic.html', layout({
     `<label>Tipo de obra<select name="tipo"><option>Privada</option><option>Estatal</option></select></label>` + selectCities('ciudad') +
     field('Superficie aproximada (m²)', 'superficie', 'inputmode="decimal"') + field('Inicio de obra', 'inicio', 'placeholder="Mes y año"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel"') + field('Correo', 'correo', 'type="email" autocomplete="email"') })}</div>
 </div></section>`
+}));
+
+/* ============================ PAVIC: recursos técnicos para proyectistas ============================ */
+const DOCS_PAVIC = [
+  { t: 'Certificados de calidad', d: 'Certificados vigentes de las líneas PAVIC, para licitaciones y fiscalización.', estado: 'solicitud' },
+  { t: 'Ensayos de laboratorio', d: 'Informes de ensayos de las piezas PAVIC emitidos por laboratorio.', estado: 'solicitud' },
+  { t: 'Certificación ISO', d: 'Alcance y vigencia de la certificación ISO de INCERPAZ.', estado: 'solicitud' },
+  { t: 'Fichas técnicas', d: 'Medidas, peso y rendimiento de cada pieza, por catálogo de fábrica.', estado: 'aqui', href: 'pavic.html#productos' },
+  { t: 'Texto para pliegos', d: 'Especificación de la pieza lista para copiar a tu pliego o memoria.', estado: 'aqui', href: '#pliego' },
+  { t: 'Detalle en DXF', d: 'Planta y elevación de la pieza a escala real para tu plano en CAD.', estado: 'aqui', href: '#dxf' }
+];
+const piezasPavic = pavic.map((p) => {
+  const v = p.variantes.find((x) => x.unidad === 'm2') || null;
+  return { ciudad: p.ciudad, slug: p.slug, nombre: p.nombre, codigo: p.codigo || '', linea: p.linea, color: p.color || '', descripcion: p.descripcion || '', alto: p.alto, largo: p.largo, ancho: p.ancho, peso: p.peso,
+    variantes: p.variantes.filter((x) => x.unidad === 'm2').map((x) => ({ rend: x.rend, etiqueta: x.etiqueta })), m2: !!v };
+});
+write('pavic-recursos.html', layout({
+  file: 'pavic-recursos.html', pagina: 'pavic-recursos', title: 'Recursos técnicos PAVIC para proyectistas | INCERPAZ',
+  desc: 'Calculadora de obra, detalle en sección, texto para pliegos, DXF y documentación técnica del pavimento cerámico PAVIC para proyectistas, constructoras y entidades.',
+  og: 'assets/img/productos/pavic-peatonal-2.jpg',
+  body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="pavic.html">PAVIC</a> › Recursos técnicos</nav></div>
+<section class="section" style="padding-top:12px"><div class="wrap">
+  <span class="eyebrow">PAVIC · Para proyectistas</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 12px">Recursos técnicos</h1>
+  <p class="lead">Herramientas y documentación para especificar, calcular y licitar obras con pavimento cerámico PAVIC. Cada fábrica (Santa Cruz y Cochabamba) tiene sus propias medidas: elige la tuya.</p>
+</div></section>
+
+<section class="section section--grey"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">1 · Pieza</span><h2>Ficha de la pieza</h2></div>
+  <div class="calc" style="display:block"><div class="fields">
+    <label>Catálogo de fábrica<select id="pv-ciudad"><option value="cochabamba">Cochabamba</option><option value="santa-cruz">Santa Cruz</option></select></label>
+    <label>Pieza<select id="pv-pieza"></select></label>
+  </div></div>
+  <div id="pv-ficha" style="margin-top:20px"></div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">2 · Cantidades</span><h2>Calculadora de obra</h2><p class="lead">Piezas, peso y volúmenes de base y cama de arena para tu superficie. Ajusta los espesores a tu diseño y estudio de suelos.</p></div>
+  <div class="proy">
+    <div class="calc" style="display:block"><div class="fields">
+      <label class="full">Superficie (m²)<input id="pv-area" type="number" inputmode="decimal" min="1" step="any" value="1000"></label>
+      <label class="full">Aparejo o disposición<select id="pv-var"></select></label>
+      <label>Merma<select id="pv-merma"><option value="0.03">3 %</option><option value="0.05" selected>5 %</option><option value="0.08">8 %</option></select></label>
+      <label>Espesor de la base (cm)<input id="pv-base" type="number" inputmode="decimal" min="0" step="1" value="15"></label>
+      <label>Espesor de la cama de arena (cm)<input id="pv-cama" type="number" inputmode="decimal" min="0" step="0.5" value="4"></label>
+    </div><p class="muted" style="font-size:15px;margin-top:14px">Los espesores son valores de partida editables, no una recomendación de diseño.</p></div>
+    <figure class="plano" id="pv-seccion" aria-label="Sección típica del pavimento"></figure>
+  </div>
+  <div id="pv-resultado" style="margin-top:24px"></div>
+  <div class="btn-row" style="margin-top:20px" id="pv-acciones"></div>
+</div></section>
+
+<section class="section section--grey" id="pliego"><div class="wrap split">
+  <div><span class="eyebrow">3 · Pliegos</span><h2 style="margin-block:12px 18px">Texto para pliegos y memorias</h2>
+    <p class="lead">Descripción de la pieza con los datos publicados de la ficha. Los valores de ensayo se adjuntan con los certificados que solicites.</p>
+    <div class="btn-row" style="margin-top:20px"><button class="btn" type="button" id="pv-copiar">Copiar texto</button><button class="btn" type="button" id="pv-txt">Descargar .txt</button></div></div>
+  <div><textarea id="pv-pliego" rows="12" readonly style="width:100%;font:15px/1.5 var(--body);padding:14px;border:2px solid var(--ink);background:var(--white)"></textarea></div>
+</div></section>
+
+<section class="section" id="dxf"><div class="wrap split">
+  <div><span class="eyebrow">4 · CAD</span><h2 style="margin-block:12px 18px">Detalle de la pieza en DXF</h2>
+    <p class="lead">Planta y elevación de la pieza elegida a escala real, en centímetros, para insertar en tu plano.</p>
+    <div class="btn-row" style="margin-top:20px"><button class="btn btn--red" type="button" id="pv-dxf">Descargar DXF</button></div></div>
+  <div><figure class="plano" id="pv-pieza-svg" aria-label="Planta y elevación de la pieza"></figure></div>
+</div></section>
+
+<section class="section section--grey" id="documentos"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">5 · Documentación</span><h2>Certificados, ensayos e ISO</h2><p class="lead">Respaldo técnico para licitaciones y fiscalización. Un ejecutivo de proyectos te lo envía.</p></div>
+  <div class="three" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${DOCS_PAVIC.map((d) => `<div><h3>${esc(d.t)}</h3><p class="muted" style="margin:8px 0 12px">${esc(d.d)}</p>${d.estado === 'aqui' ? `<a class="btn btn--sm" href="${d.href}">Disponible aquí</a>` : `<button class="btn btn--sm btn--wa" type="button" data-doc="${esc(d.t)}">Solicitar</button>`}</div>`).join('')}</div>
+</div></section>
+
+<section class="section dark" id="solicitar"><div class="wrap split">
+  <div><span class="eyebrow">Solicitud</span><h2 style="margin-block:12px 18px">Pide la documentación de tu proyecto</h2><p class="lead">Cuéntanos qué necesitas y para qué obra. Te respondemos desde el equipo de proyectos.</p></div>
+  <div>${leadForm({ asunto: 'Solicitud de documentación técnica PAVIC', boton: 'Solicitar documentación', campos:
+    field('Nombre', 'nombre', 'required autocomplete="name"') + field('Empresa o entidad', 'empresa', 'required autocomplete="organization"') + field('Correo', 'correo', 'type="email" required autocomplete="email"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel"') +
+    `<label class="full">Documentos<select name="documentos" id="pv-docsel"><option>Todo lo anterior</option>${DOCS_PAVIC.filter((d) => d.estado === 'solicitud').map((d) => `<option>${esc(d.t)}</option>`).join('')}</select></label>` + selectCities('ciudad') + field('Obra o licitación', 'obra', '', 'full') })}</div>
+</div></section>
+<script type="application/json" id="datos-pavic">${JSON.stringify({ piezas: piezasPavic, ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })) }).replace(/</g, '\\u003c')}</script>`
 }));
 
 /* ============================ DÓNDE ESTAMOS ============================ */
@@ -565,7 +643,7 @@ write('404.html', layout({
   file: '404.html', title: 'Página no encontrada | INCERPAZ', desc: 'La página que buscas no existe.',
   body: `<section class="section"><div class="wrap"><h1>No encontramos esa página</h1><p class="lead" style="margin-block:16px 28px">Puede que el enlace haya cambiado. Prueba desde el inicio o el catálogo.</p><div class="btn-row"><a class="btn btn--red" href="${sitio.dominio}/">Ir al inicio</a><a class="btn" href="${sitio.dominio}/catalogo.html">Ver productos</a></div></div></section>`
 }));
-const urls = ['', 'catalogo.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
+const urls = ['', 'catalogo.html', 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
 if (config.interno) {
   fs.rmSync(path.join(OUT, 'sitemap.xml'), { force: true });
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');

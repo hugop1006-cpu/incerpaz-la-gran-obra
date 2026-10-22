@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es-BO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recursos técnicos PAVIC para proyectistas | INCERPAZ</title>
+<meta name="description" content="Calculadora de obra, detalle en sección, texto para pliegos, DXF y documentación técnica del pavimento cerámico PAVIC para proyectistas, constructoras y entidades.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://www.incerpaz.com/pavic-recursos.html">
+<meta property="og:type" content="website"><meta property="og:locale" content="es_BO"><meta property="og:site_name" content="INCERPAZ">
+<meta property="og:title" content="Recursos técnicos PAVIC para proyectistas | INCERPAZ"><meta property="og:description" content="Calculadora de obra, detalle en sección, texto para pliegos, DXF y documentación técnica del pavimento cerámico PAVIC para proyectistas, constructoras y entidades."><meta property="og:url" content="https://www.incerpaz.com/pavic-recursos.html"><meta property="og:image" content="https://www.incerpaz.com/assets/img/productos/pavic-peatonal-2.jpg">
+<meta name="theme-color" content="#b5121b">
+<link rel="icon" href="assets/img/logo-icono.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/css/site.css">
+
+</head>
+<body data-base="" data-pagina="pavic-recursos">
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<div class="topbar"><div class="wrap">
+  <span>Servicio al cliente <a href="tel:800108810"><strong>800-10-8810</strong></a></span>
+  <span><span data-acct><a href="presupuesto.html">Presupuesto (<span data-bcount>0</span>)</a> · <a href="ingresar.html">Ingresar</a></span> · <a href="https://exportaciones.incerpaz.com" rel="noopener">Exportaciones</a> · <a href="https://prospeccion.cbba.tienda.incerpaz.com/login.php" rel="noopener">Promotores</a></span>
+</div></div>
+<header class="site-header"><div class="wrap">
+  <a class="brand" href="./" aria-label="INCERPAZ, inicio"><img src="assets/img/logo-header.png" alt="INCERPAZ" width="235" height="38"></a>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav" type="button">Menú</button>
+  <nav class="nav" id="nav" aria-label="Principal"><a href="catalogo.html">Productos</a><a href="proyectos.html">Proyectos</a><a href="pavic.html">PAVIC</a><a href="donde-estamos.html">Dónde estamos</a><a href="empresa.html">Empresa</a></nav>
+  <div class="city"><label for="citySel" style="flex-direction:row;align-items:center;font-weight:500;white-space:nowrap">Tu ciudad</label><select id="citySel" aria-label="Tu ciudad"><option>Cochabamba</option></select></div>
+</div></header>
+<main id="contenido">
+<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="pavic.html">PAVIC</a> › Recursos técnicos</nav></div>
+<section class="section" style="padding-top:12px"><div class="wrap">
+  <span class="eyebrow">PAVIC · Para proyectistas</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 12px">Recursos técnicos</h1>
+  <p class="lead">Herramientas y documentación para especificar, calcular y licitar obras con pavimento cerámico PAVIC. Cada fábrica (Santa Cruz y Cochabamba) tiene sus propias medidas: elige la tuya.</p>
+</div></section>
+
+<section class="section section--grey"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">1 · Pieza</span><h2>Ficha de la pieza</h2></div>
+  <div class="calc" style="display:block"><div class="fields">
+    <label>Catálogo de fábrica<select id="pv-ciudad"><option value="cochabamba">Cochabamba</option><option value="santa-cruz">Santa Cruz</option></select></label>
+    <label>Pieza<select id="pv-pieza"></select></label>
+  </div></div>
+  <div id="pv-ficha" style="margin-top:20px"></div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">2 · Cantidades</span><h2>Calculadora de obra</h2><p class="lead">Piezas, peso y volúmenes de base y cama de arena para tu superficie. Ajusta los espesores a tu diseño y estudio de suelos.</p></div>
+  <div class="proy">
+    <div class="calc" style="display:block"><div class="fields">
+      <label class="full">Superficie (m²)<input id="pv-area" type="number" inputmode="decimal" min="1" step="any" value="1000"></label>
+      <label class="full">Aparejo o disposición<select id="pv-var"></select></label>
+      <label>Merma<select id="pv-merma"><option value="0.03">3 %</option><option value="0.05" selected>5 %</option><option value="0.08">8 %</option></select></label>
+      <label>Espesor de la base (cm)<input id="pv-base" type="number" inputmode="decimal" min="0" step="1" value="15"></label>
+      <label>Espesor de la cama de arena (cm)<input id="pv-cama" type="number" inputmode="decimal" min="0" step="0.5" value="4"></label>
+    </div><p class="muted" style="font-size:15px;margin-top:14px">Los espesores son valores de partida editables, no una recomendación de diseño.</p></div>
+    <figure class="plano" id="pv-seccion" aria-label="Sección típica del pavimento"></figure>
+  </div>
+  <div id="pv-resultado" style="margin-top:24px"></div>
+  <div class="btn-row" style="margin-top:20px" id="pv-acciones"></div>
+</div></section>
+
+<section class="section section--grey" id="pliego"><div class="wrap split">
+  <div><span class="eyebrow">3 · Pliegos</span><h2 style="margin-block:12px 18px">Texto para pliegos y memorias</h2>
+    <p class="lead">Descripción de la pieza con los datos publicados de la ficha. Los valores de ensayo se adjuntan con los certificados que solicites.</p>
+    <div class="btn-row" style="margin-top:20px"><button class="btn" type="button" id="pv-copiar">Copiar texto</button><button class="btn" type="button" id="pv-txt">Descargar .txt</button></div></div>
+  <div><textarea id="pv-pliego" rows="12" readonly style="width:100%;font:15px/1.5 var(--body);padding:14px;border:2px solid var(--ink);background:var(--white)"></textarea></div>
+</div></section>
+
+<section class="section" id="dxf"><div class="wrap split">
+  <div><span class="eyebrow">4 · CAD</span><h2 style="margin-block:12px 18px">Detalle de la pieza en DXF</h2>
+    <p class="lead">Planta y elevación de la pieza elegida a escala real, en centímetros, para insertar en tu plano.</p>
+    <div class="btn-row" style="margin-top:20px"><button class="btn btn--red" type="button" id="pv-dxf">Descargar DXF</button></div></div>
+  <div><figure class="plano" id="pv-pieza-svg" aria-label="Planta y elevación de la pieza"></figure></div>
+</div></section>
+
+<section class="section section--grey" id="documentos"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">5 · Documentación</span><h2>Certificados, ensayos e ISO</h2><p class="lead">Respaldo técnico para licitaciones y fiscalización. Un ejecutivo de proyectos te lo envía.</p></div>
+  <div class="three" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))"><div><h3>Certificados de calidad</h3><p class="muted" style="margin:8px 0 12px">Certificados vigentes de las líneas PAVIC, para licitaciones y fiscalización.</p><button class="btn btn--sm btn--wa" type="button" data-doc="Certificados de calidad">Solicitar</button></div><div><h3>Ensayos de laboratorio</h3><p class="muted" style="margin:8px 0 12px">Informes de ensayos de las piezas PAVIC emitidos por laboratorio.</p><button class="btn btn--sm btn--wa" type="button" data-doc="Ensayos de laboratorio">Solicitar</button></div><div><h3>Certificación ISO</h3><p class="muted" style="margin:8px 0 12px">Alcance y vigencia de la certificación ISO de INCERPAZ.</p><button class="btn btn--sm btn--wa" type="button" data-doc="Certificación ISO">Solicitar</button></div><div><h3>Fichas técnicas</h3><p class="muted" style="margin:8px 0 12px">Medidas, peso y rendimiento de cada pieza, por catálogo de fábrica.</p><a class="btn btn--sm" href="pavic.html#productos">Disponible aquí</a></div><div><h3>Texto para pliegos</h3><p class="muted" style="margin:8px 0 12px">Especificación de la pieza lista para copiar a tu pliego o memoria.</p><a class="btn btn--sm" href="#pliego">Disponible aquí</a></div><div><h3>Detalle en DXF</h3><p class="muted" style="margin:8px 0 12px">Planta y elevación de la pieza a escala real para tu plano en CAD.</p><a class="btn btn--sm" href="#dxf">Disponible aquí</a></div></div>
+</div></section>
+
+<section class="section dark" id="solicitar"><div class="wrap split">
+  <div><span class="eyebrow">Solicitud</span><h2 style="margin-block:12px 18px">Pide la documentación de tu proyecto</h2><p class="lead">Cuéntanos qué necesitas y para qué obra. Te respondemos desde el equipo de proyectos.</p></div>
+  <div><div class="form-box"><form data-lead="Solicitud de documentación técnica PAVIC" >
+  <div class="form-grid"><label class="">Nombre<input name="nombre" required autocomplete="name"></label><label class="">Empresa o entidad<input name="empresa" required autocomplete="organization"></label><label class="">Correo<input name="correo" type="email" required autocomplete="email"></label><label class="">Celular<input name="celular" type="tel" required autocomplete="tel"></label><label class="full">Documentos<select name="documentos" id="pv-docsel"><option>Todo lo anterior</option><option>Certificados de calidad</option><option>Ensayos de laboratorio</option><option>Certificación ISO</option></select></label><label>Ciudad<select name="ciudad"><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option><option>Otra ciudad</option></select></label><label class="full">Obra o licitación<input name="obra" ></label></div>
+  <div class="hp" aria-hidden="true"><label>No llenar<input type="text" name="web" tabindex="-1" autocomplete="off"></label></div>
+  <div class="btn-row" style="margin-top:18px"><button class="btn btn--red" type="submit">Solicitar documentación</button></div>
+</form><p class="form-msg" role="status" hidden style="margin-top:16px"></p></div></div>
+</div></section>
+<script type="application/json" id="datos-pavic">{"piezas":[{"ciudad":"cochabamba","slug":"pavic-estandar","nombre":"PAVIC estándar","codigo":"PVC STD","linea":"Pavic","color":"Naranja Natural","descripcion":"Cerámica rectangular macizo rústico en todos los lados y biselado en la cara superior","alto":6.6,"largo":20,"ancho":10,"peso":2.65,"variantes":[{"rend":50,"etiqueta":""}],"m2":true},{"ciudad":"cochabamba","slug":"pavic-peatonal","nombre":"PAVIC peatonal biselado","codigo":"PVC PE B 45","linea":"Pavic","color":"Naranja Natural","descripcion":"Cerámica rectangular macizo rústico en todos los lados y biselado en la cara superior","alto":4.5,"largo":20,"ancho":10,"peso":1.63,"variantes":[{"rend":50,"etiqueta":""}],"m2":true},{"ciudad":"cochabamba","slug":"pavic-tabaco","nombre":"PAVIC estándar con tetones","codigo":"PVC STD T","linea":"Pavic","color":"Naranja Natural","descripcion":"Cerámica rectangular macizo rústico en todos los lados y con tetones en 3 lados","alto":6.6,"largo":20,"ancho":10,"peso":2.65,"variantes":[{"rend":50,"etiqueta":""}],"m2":true},{"ciudad":"santa-cruz","slug":"pavic-estandar","nombre":"PAVIC estándar (alto tráfico)","codigo":"PVC STD","linea":"Pavic","color":"Naranja","descripcion":"Pieza cerámica para acabados que demandan resistencias y durabilidad muy altas, rústico por sus cuatro caras","alto":6.5,"largo":20,"ancho":10,"peso":2.6,"variantes":[{"rend":50,"etiqueta":""}],"m2":true},{"ciudad":"santa-cruz","slug":"pavic-estandar-mitad","nombre":"PAVIC estándar mitad","codigo":"PVC STD 1/2","linea":"Pavic","color":"Naranja rojizo","descripcion":"Pieza cerámica para acabados que demandan resistencias y durabilidad muy altas, rústico por sus cuatro caras","alto":6.5,"largo":10,"ancho":10,"peso":1.3,"variantes":[],"m2":false},{"ciudad":"santa-cruz","slug":"pavic-peatonal","nombre":"PAVIC peatonal","codigo":"PVC PE","linea":"Pavic","color":"Naranja","descripcion":"Pieza cerámica para acabados que demandan resistencias y durabilidad altas, rústico por sus cuatro caras","alto":4.5,"largo":20,"ancho":10,"peso":2.2,"variantes":[{"rend":50,"etiqueta":""}],"m2":true}],"ciudades":[{"slug":"cochabamba","nombre":"Cochabamba","whatsapp":"70750963"},{"slug":"santa-cruz","nombre":"Santa Cruz","whatsapp":"70009021"},{"slug":"oruro","nombre":"Oruro","whatsapp":"60400608"},{"slug":"sucre","nombre":"Sucre","whatsapp":"70213846"}]}</script>
+</main>
+<footer class="site-footer"><div class="wrap">
+  <div class="cols">
+    <div><a class="brand" href="./"><img src="assets/img/logo-header.png" alt="INCERPAZ" width="210" height="34"></a>
+      <p style="margin-top:14px;max-width:34ch">Cerámica para construir tu hogar. Fabricamos en Bolivia y atendemos desde Cochabamba, Santa Cruz, Oruro y Sucre.</p></div>
+    <div><h4>Sitio</h4><ul><li><a href="catalogo.html">Productos</a></li><li><a href="proyectos.html">Proyectos</a></li><li><a href="pavic.html">PAVIC</a></li><li><a href="donde-estamos.html">Dónde estamos</a></li><li><a href="empresa.html">Empresa</a></li></ul></div>
+    <div><h4>Contacto</h4><ul>
+      <li><a href="tel:800108810">Servicio al cliente 800-10-8810</a></li>
+      <li><a href="mailto:ventas.cbba@incerpaz.com">ventas.cbba@incerpaz.com</a></li>
+      <li><a href="https://wa.me/59170750963?text=Hola%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%2C%20por%20favor." data-wa="Hola, quisiera más información, por favor." rel="noopener">WhatsApp de tu ciudad</a></li></ul></div>
+    <div><h4>Síguenos</h4><ul>
+      <li><a href="https://www.facebook.com/IncerpazBolivia" rel="noopener">Facebook</a></li>
+      <li><a href="https://www.instagram.com/incerpaz_bolivia/" rel="noopener">Instagram</a></li>
+      <li><a href="https://www.youtube.com/channel/UCV_NSHg8AlckFjGgDszLXtg" rel="noopener">YouTube</a></li></ul></div>
+  </div>
+  <div class="legal"><span>© 2026 INCERPAZ. Todos los derechos reservados.</span><span>Bolivia</span></div>
+</div></footer>
+<a class="wa-float" href="https://wa.me/59170750963?text=Hola%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%2C%20por%20favor." data-wa="Hola, quisiera más información, por favor." rel="noopener">WhatsApp</a>
+<script>window.INCERPAZ={"ciudades":[{"slug":"cochabamba","nombre":"Cochabamba","whatsapp":"70750963"},{"slug":"santa-cruz","nombre":"Santa Cruz","whatsapp":"70009021"},{"slug":"oruro","nombre":"Oruro","whatsapp":"60400608"},{"slug":"sucre","nombre":"Sucre","whatsapp":"70213846"}],"leadEndpoint":""};</script>
+<script src="assets/js/site.js" defer></script>
+<script src="assets/js/comercio.js" defer></script>
+<script src="assets/js/pavic.js" defer></script>
+
+
+</body>
+</html>

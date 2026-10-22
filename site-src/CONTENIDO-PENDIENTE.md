@@ -51,3 +51,11 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - Biscocho y brick estándar solo existen en el catálogo de Cochabamba; en Santa Cruz el churrasquero avisa que se consulte con la agencia.
 - Los esquemas son referenciales. Falta decidir si se ofrecen planos descargables en PDF (requiere dibujos de un proyectista).
 - Faltan más proyectos (muro de jardín, piso de patio con PAVIC, fachada con celosía) y fotos reales de obra.
+
+## PAVIC: recursos técnicos
+- Los **certificados, informes de ensayo y la certificación ISO** no están cargados: hoy se piden por formulario. Para publicarlos como PDF descargables hacen falta los archivos (y su vigencia).
+- Valores de desempeño (resistencia a la compresión, absorción, abrasión, resistencia al deslizamiento) y la norma con que se ensayan: faltan para incluirlos en la ficha y en el texto de pliegos.
+- Espesores de partida de base (15 cm) y cama de arena (4 cm) de la calculadora: valores genéricos editables; confirmar con el equipo de proyectos si conviene otro valor por defecto.
+- Falta el detalle del confinamiento lateral y de tránsito (peatonal, vehicular liviano, pesado) con el paquete estructural recomendado por INCERPAZ.
+- Obras de referencia PAVIC (ciudad, año, superficie, fotos) y manual de instalación en PDF.
+- Biblioteca BIM/CAD más completa (bloques DWG, texturas para renders, patrones de aparejo).
