@@ -168,6 +168,9 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
 .mini.on { background: var(--fg); color: var(--bg); }
 .qty { width: 90px; font: 400 14px var(--body); background: var(--surface); color: var(--fg); border: 1.5px solid var(--line-strong); padding: 4px 6px; text-align: right; }
 .done { border: 2px solid var(--ok); padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+/* más páginas */
+.sel { font: 400 13px var(--body); background: var(--surface); color: var(--fg); border: 1.5px solid var(--line-strong); padding: 4px 6px; }
+.lead { font-size: 15px; color: var(--muted); max-width: 62ch; }
 /* dónde estamos */
 .loc-list { display: flex; flex-direction: column; border: 1.5px solid var(--line-strong); max-height: 440px; overflow: auto; background: var(--surface); }
 .loc { display: grid; gap: 2px; text-align: left; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; font: 400 14px var(--body); }
@@ -190,7 +193,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
   <header class="sheet-head">
     <div>
       <h1>Wireframes INCERPAZ</h1>
-      <p>Diez pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
+      <p>Catorce pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
     </div>
     <div class="stamp">
       <div><b>Lámina</b> 01 · borrador para revisión</div>
@@ -212,6 +215,7 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     <a href="#empresa" data-tab="empresa">Empresa</a>
     <a href="#catalogo" data-tab="catalogo">Catálogo y búsqueda</a>
     <a href="#pedido" data-tab="pedido">Presupuesto y pedido</a>
+    <a href="#paginas" data-tab="paginas">Más páginas</a>
   </nav>
 
   <!-- ============ PLATAFORMA ============ -->
@@ -1507,18 +1511,259 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
       <ol class="notes">
         <li><div><b>Cuatro pasos</b><span>Prueba el prototipo: navega por los pasos y mira cómo cambian los botones según la sesión. El carrito actual se reemplaza por este flujo.</span></div></li>
         <li><div><b>Presupuesto editable</b><span>Cantidades, obra y notas. El visitante ve cantidades sin precios. El cliente verificado ve precios y total de las tarifas del ERP.</span></div></li>
-        <li><div><b>Entrega</b><span>Retiro en una agencia de la ciudad elegida o envío a obra. Cada ciudad tiene sus propios montos y políticas de envío: se cargan por ciudad y se muestran según la ciudad elegida (cambia la ciudad y mira el texto).</span></div></li>
+        <li><div><b>Entrega</b><span>Retiro en una agencia de la ciudad elegida o envío a obra. Cada ciudad tiene sus propios montos y políticas de envío: se cargan a mano en el CMS por ciudad y se muestran según la ciudad elegida (cambia la ciudad y mira el texto).</span></div></li>
         <li><div><b>Datos</b><span>El visitante deja nombre y celular: es un lead. El cliente verificado trae sus datos de facturación del ERP y elige cómo paga.</span></div></li>
         <li><div><b>Resumen y envío</b><span>El visitante solicita una cotización que llega al ejecutivo de la ciudad. El cliente envía un pedido que baja al ERP y puede seguir por estado.</span></div></li>
       </ol>
-      <p class="muted">Los pasos son una propuesta mía. Las formas de pago (transferencia, QR y en agencia) están confirmadas. Los montos y las políticas de envío de cada ciudad los carga INCERPAZ. Precios y NIT son de ejemplo.</p>
+      <p class="muted">Los pasos son una propuesta mía. Las formas de pago (transferencia, QR y en agencia) están confirmadas. Los montos y las políticas de envío de cada ciudad los carga INCERPAZ a mano en el CMS. Precios y NIT son de ejemplo.</p>
+    </div>
+  </section>
+
+  <!-- ============ MÁS PÁGINAS ============ -->
+  <section class="view" id="v-paginas" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Página</span>
+      <div class="seg" role="group" aria-label="Página">
+        <button type="button" data-mp="proy" aria-pressed="true">Proyectos</button>
+        <button type="button" data-mp="exp" aria-pressed="false">Exportaciones</button>
+        <button type="button" data-mp="blog" aria-pressed="false">Blog y revista</button>
+        <button type="button" data-mp="prom" aria-pressed="false">Promotores</button>
+      </div>
+    </div>
+
+    <div id="mp-proy" style="display:flex;flex-direction:column;gap:22px">
+      <div class="wf">
+        <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/proyectos</span></div>
+        <div class="canvas">
+          <div class="blk">
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <h2 style="font-size:clamp(32px,5vw,46px)">Proyectos para construir</h2>
+              <p class="lead">Cada proyecto trae su lista de materiales, el costo estimado, los planos y los pasos. Agrégalo al presupuesto con un clic.</p>
+              <div class="row"><span class="mono muted">Dificultad</span>
+                <div class="seg" role="group" aria-label="Dificultad"><button type="button" data-dif="todas" aria-pressed="true">Todas</button><button type="button" data-dif="baja" aria-pressed="false">Baja</button><button type="button" data-dif="media" aria-pressed="false">Media</button></div></div>
+              <i class="pin" style="top:-4px;right:-4px">1</i>
+            </div>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="grid g3" id="mpProyGrid">
+              <div class="card" data-d="media"><div class="ph"><b>foto</b></div><b>Churrasquero de patio</b><span class="sub">Dificultad media · 2 días · exterior</span><a class="btn" href="#proyecto" style="align-self:flex-start">Ver proyecto</a></div>
+              <div class="card" data-d="media"><div class="ph"><b>foto</b></div><b>Mesón de cocina</b><span class="sub">Dificultad media · 3 días · interior o exterior</span><a class="btn" href="#proyecto" style="align-self:flex-start">Ver proyecto</a></div>
+              <div class="card" data-d="baja"><div class="ph"><b>foto</b></div><b>Pared con enchape</b><span class="sub">Dificultad baja · 1 a 2 días · interior o exterior</span><a class="btn" href="#proyecto" style="align-self:flex-start">Ver proyecto</a></div>
+              <div class="card" data-d="baja"><div class="ph"><b>foto</b></div><b>Piso de patio</b><span class="sub">Con PAVIC. Por producir <i class="pin in" title="Pendiente">!</i></span></div>
+              <div class="card" data-d="baja"><div class="ph"><b>foto</b></div><b>Vereda peatonal</b><span class="sub">Con PAVIC. Por producir <i class="pin in" title="Pendiente">!</i></span></div>
+              <div class="card" data-d="media"><div class="ph"><b>foto</b></div><b>Kit churrasquero en combo</b><span class="sub">Hoy se vende como combo en Santa Cruz</span><span class="btn ghost" style="align-self:flex-start">Ver combo</span></div>
+            </div>
+            <i class="pin">2</i>
+          </div>
+          <div class="blk">
+            <div class="split">
+              <div class="card"><b>¿Quieres un proyecto que no está?</b><span class="sub">Cuéntanos qué quieres construir y un asesor de tu ciudad te orienta.</span><span class="btn primary" style="align-self:flex-start">Escribir por WhatsApp</span></div>
+              <div class="card"><b>¿Prefieres que lo hagamos?</b><span class="sub">Presupuesto con instalación o un maestro recomendado de tu ciudad.</span><span class="btn" style="align-self:flex-start">Pedir presupuesto</span></div>
+            </div>
+            <i class="pin">3</i>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Notas del listado de proyectos</h2>
+        <ol class="notes">
+          <li><div><b>Filtro por dificultad</b><span>Prueba el prototipo: separa los proyectos fáciles de los medios. Más adelante se suman filtros por lugar (interior o exterior) y por producto.</span></div></li>
+          <li><div><b>Tarjetas</b><span>Los tres primeros ya tienen wireframe completo en la pestaña Proyectos. Piso de patio y vereda se arman con PAVIC y quedan por producir. El kit churrasquero ya se vende como combo en Santa Cruz.</span></div></li>
+          <li><div><b>Salidas de venta</b><span>Quien no encuentra su proyecto escribe por WhatsApp, y quien no quiere construir pide presupuesto con instalación.</span></div></li>
+        </ol>
+      </div>
+    </div>
+
+    <div id="mp-exp" hidden style="flex-direction:column;gap:22px">
+      <div class="wf">
+        <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/exportaciones</span></div>
+        <div class="canvas">
+          <div class="blk row" style="justify-content:space-between">
+            <span class="logo">INCERPAZ</span>
+            <div class="seg" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+            <i class="pin">1</i>
+          </div>
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <h2 style="font-size:clamp(32px,5vw,50px)" data-es="Cerámica boliviana para tu mercado" data-en="Bolivian ceramics for your market">Cerámica boliviana para tu mercado</h2>
+                <p class="lead" data-es="Ladrillos, pisos, techos y revestimientos cerámicos fabricados en Bolivia. Cotizamos por volumen y exportamos a tu país." data-en="Ceramic bricks, flooring, roofing and cladding made in Bolivia. We quote by volume and export to your country.">Ladrillos, pisos, techos y revestimientos cerámicos fabricados en Bolivia. Cotizamos por volumen y exportamos a tu país.</p>
+                <div class="row"><span class="btn primary" data-es="Pedir cotización" data-en="Request a quote">Pedir cotización</span><span class="btn" data-es="Descargar catálogo" data-en="Download catalog">Descargar catálogo</span></div>
+              </div>
+              <div class="ph hero"><b>foto: despacho o contenedor</b></div>
+            </div>
+            <i class="pin">2</i>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="blk-title"><h3 data-es="Líneas de producto" data-en="Product lines">Líneas de producto</h3><small data-es="productos hoy en el sitio de exportaciones" data-en="products today on the export site">productos hoy en el sitio de exportaciones</small></div>
+            <div class="grid">
+              <div class="card"><b data-es="Muros" data-en="Walls">Muros</b><span class="sub">11</span></div>
+              <div class="card"><b data-es="Piezas especiales" data-en="Special pieces">Piezas especiales</b><span class="sub">9</span></div>
+              <div class="card"><b data-es="Techos y tejados" data-en="Roofing">Techos y tejados</b><span class="sub">6</span></div>
+              <div class="card"><b data-es="Pavimentos y pisos" data-en="Paving and flooring">Pavimentos y pisos</b><span class="sub">2</span></div>
+              <div class="card"><b data-es="Revestimientos" data-en="Cladding">Revestimientos</b><span class="sub">2</span></div>
+              <div class="card"><b data-es="Refractarios" data-en="Refractory">Refractarios</b><span class="sub">1</span></div>
+            </div>
+            <i class="pin">3</i>
+          </div>
+          <div class="blk">
+            <div class="blk-title"><h3 data-es="Cómo exportamos" data-en="How we export">Cómo exportamos</h3><small>por validar con exportaciones</small></div>
+            <div class="steps">
+              <div><span><b data-es="Consulta" data-en="Inquiry">Consulta</b><span data-es="Nos cuentas producto, volumen y destino." data-en="Tell us the product, volume and destination.">Nos cuentas producto, volumen y destino.</span></span></div>
+              <div><span><b data-es="Cotización" data-en="Quote">Cotización</b><span data-es="Precio por volumen y condiciones de entrega." data-en="Price by volume and delivery terms.">Precio por volumen y condiciones de entrega.</span></span></div>
+              <div><span><b data-es="Muestras" data-en="Samples">Muestras</b><span data-es="Piezas para aprobar color y calidad." data-en="Pieces to approve color and quality.">Piezas para aprobar color y calidad.</span></span></div>
+              <div><span><b data-es="Embarque y documentos" data-en="Shipping and documents">Embarque y documentos</b><span data-es="Condiciones y puertos por definir." data-en="Terms and ports to be defined.">Condiciones y puertos por definir.</span></span></div>
+            </div>
+            <span class="mono muted" style="display:block;margin-top:8px">Incoterms y puertos por definir <i class="pin in" title="Pendiente">!</i></span>
+            <i class="pin">4</i>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="blk-title"><h3 data-es="Calidad" data-en="Quality">Calidad</h3></div>
+            <div class="row"><span class="chip">ISO (norma por indicar)</span><span class="chip" data-es="Ensayos de laboratorio" data-en="Lab tests">Ensayos de laboratorio</span><span class="chip" data-es="Certificados de calidad" data-en="Quality certificates">Certificados de calidad</span></div>
+            <i class="pin">5</i>
+          </div>
+          <div class="blk">
+            <div class="blk-title"><h3 data-es="Cotiza tu pedido" data-en="Quote your order">Cotiza tu pedido</h3></div>
+            <div class="grid">
+              <label class="field"><span data-es="Empresa" data-en="Company">Empresa</span><input type="text"></label>
+              <label class="field"><span data-es="País" data-en="Country">País</span><input type="text"></label>
+              <label class="field"><span data-es="Producto" data-en="Product">Producto</span><select><option>Muros</option><option>Techos y tejados</option><option>Pavimentos y pisos</option><option>Otro</option></select></label>
+              <label class="field"><span data-es="Volumen aproximado" data-en="Approximate volume">Volumen aproximado</span><input type="text"></label>
+              <label class="field"><span data-es="Correo" data-en="Email">Correo</span><input type="text"></label>
+            </div>
+            <div class="row" style="margin-top:12px"><span class="btn primary" data-es="Enviar" data-en="Send">Enviar</span><span class="mono muted">WhatsApp de exportaciones: +591 70619526</span></div>
+            <i class="pin">6</i>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Notas de Exportaciones</h2>
+        <ol class="notes">
+          <li><div><b>Español e inglés</b><span>Prueba el prototipo: el botón ES / EN cambia los textos. Hoy el sitio de exportaciones mezcla idiomas y muestra errores técnicos públicos.</span></div></li>
+          <li><div><b>Hero para importadores</b><span>Habla a un comprador de volumen, con la cotización como salida principal.</span></div></li>
+          <li><div><b>Líneas de producto</b><span>Los conteos salen del sitio actual. En exportación se cotiza, no se vende por carrito.</span></div></li>
+          <li><div><b>Cómo exportamos</b><span>Propuesta mía, por validar con quien exporta. Incoterms y puertos quedan pendientes.</span></div></li>
+          <li><div><b>Calidad</b><span>La misma base de ISO, ensayos y certificados de PAVIC y de la empresa.</span></div></li>
+          <li><div><b>Formulario</b><span>Empresa, país, producto y volumen permiten priorizar. Va al CRM del responsable de exportaciones.</span></div></li>
+        </ol>
+      </div>
+    </div>
+
+    <div id="mp-blog" hidden style="flex-direction:column;gap:22px">
+      <div class="wf">
+        <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/blog</span></div>
+        <div class="canvas">
+          <div class="blk">
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <h2 style="font-size:clamp(32px,5vw,46px)">Blog y revista</h2>
+              <div class="row" id="mpBlogChips"><button type="button" class="mini on" data-bc="todas">Todo</button><button type="button" class="mini" data-bc="obra">Historias de obra</button><button type="button" class="mini" data-bc="guia">Guías de instalación</button><button type="button" class="mini" data-bc="producto">Producto</button><button type="button" class="mini" data-bc="sost">Sostenibilidad</button></div>
+              <i class="pin" style="top:-4px;right:-4px">1</i>
+            </div>
+          </div>
+          <div class="blk">
+            <div class="split">
+              <div class="ph hero"><b>foto del artículo destacado</b></div>
+              <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+                <span class="chip" style="align-self:flex-start">Destacado</span>
+                <h3 style="font-size:28px">Título del artículo destacado (ejemplo)</h3>
+                <div class="bar"></div><div class="bar s"></div>
+                <span class="btn" style="align-self:flex-start">Leer</span>
+                <i class="pin">2</i>
+              </div>
+            </div>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="grid g3" id="mpBlogGrid">
+              <div class="card" data-c="guia"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cómo colocar enchape de ladrillo (ejemplo)</b><span class="sub">Guía de instalación</span></div>
+              <div class="card" data-c="obra"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Un patio con PAVIC (ejemplo)</b><span class="sub">Historia de obra</span></div>
+              <div class="card" data-c="producto"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Diferencias entre ladrillos de 6 y 18 huecos (ejemplo)</b><span class="sub">Producto</span></div>
+              <div class="card" data-c="sost"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Construcción sostenible (ejemplo)</b><span class="sub">Sostenibilidad. Hoy hay un artículo de 2021 en esta categoría</span></div>
+              <div class="card" data-c="guia"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cómo instalar un techo de teja (ejemplo)</b><span class="sub">Guía de instalación</span></div>
+              <div class="card" data-c="obra"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Obra de una plaza con PAVIC (ejemplo)</b><span class="sub">Historia de obra</span></div>
+            </div>
+            <i class="pin">3</i>
+          </div>
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+                <h3>Revista digital</h3>
+                <div class="ph" style="min-height:160px"><b>portada de la edición actual</b></div>
+                <span class="btn" style="align-self:flex-start">Leer la edición</span>
+                <i class="pin">4</i>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+                <h3>Recibe novedades y promociones</h3>
+                <span class="sub">Hoy el sitio ya tiene una suscripción para promociones.</span>
+                <div class="grid"><label class="field">Correo<input type="text" placeholder="correo@ejemplo.com"></label><label class="field">Ciudad<select><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option></select></label></div>
+                <span class="btn primary" style="align-self:flex-start">Suscribirme</span>
+                <i class="pin">5</i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Notas del blog y la revista</h2>
+        <ol class="notes">
+          <li><div><b>Temas editoriales</b><span>Prueba el prototipo: los chips filtran los artículos. Las categorías actuales son genéricas (construcción, tecnología, mobiliario). Propongo cuatro que venden: obra, guías, producto y sostenibilidad.</span></div></li>
+          <li><div><b>Artículo destacado</b><span>Un espacio para lo más importante de la semana o del mes.</span></div></li>
+          <li><div><b>Tarjetas</b><span>Los títulos son ejemplos. Las guías de instalación atraen búsquedas y se enlazan desde las fichas.</span></div></li>
+          <li><div><b>Revista digital</b><span>Ya existe en el sitio actual. Pasa a tener su propio espacio.</span></div></li>
+          <li><div><b>Suscripción</b><span>Capta correo y ciudad, para enviar promociones por ciudad.</span></div></li>
+        </ol>
+        <p class="muted">Las notas actuales del blog son de 2021 y tratan temas generales. Conviene archivarlas y empezar con contenido de producto y de obra.</p>
+      </div>
+    </div>
+
+    <div id="mp-prom" hidden style="flex-direction:column;gap:22px">
+      <div class="wf">
+        <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/promotores</span></div>
+        <div class="canvas">
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+                <h2 style="font-size:clamp(32px,5vw,46px)">Promotores INCERPAZ</h2>
+                <p class="lead">Acceso al portal de prospección para el equipo de promotores.</p>
+                <div class="grid"><label class="field">Usuario<input type="text"></label><label class="field">Contraseña<input type="password"></label></div>
+                <span class="btn primary" style="align-self:flex-start">Ingresar</span>
+                <i class="pin">1</i>
+              </div>
+              <div class="card flat" style="position:relative">
+                <h3>¿Quieres ser promotor? <i class="pin in" title="Pendiente">!</i></h3>
+                <span class="sub">Beneficios y requisitos por definir con ventas.</span>
+                <div class="grid"><label class="field">Nombre<input type="text"></label><label class="field">Ciudad<select><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option></select></label><label class="field">Celular<input type="text"></label></div>
+                <span class="btn" style="align-self:flex-start">Enviar</span>
+                <i class="pin">2</i>
+              </div>
+            </div>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="blk-title"><h3>Mis leads</h3><small>vista del promotor, datos de ejemplo</small></div>
+            <div class="row" style="margin-bottom:10px" id="mpLeadSum"></div>
+            <div class="scroll"><table>
+              <thead><tr><th>Cliente</th><th>Qué pidió</th><th>Ciudad</th><th>Origen</th><th>Estado</th></tr></thead>
+              <tbody id="mpLeads"></tbody>
+            </table></div>
+            <i class="pin">3</i>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Notas de Promotores</h2>
+        <ol class="notes">
+          <li><div><b>Acceso al portal</b><span>Hoy el portal de prospección es una dirección aparte con inicio de sesión. Aquí se enlaza desde la página principal.</span></div></li>
+          <li><div><b>Captación de promotores</b><span>Un formulario corto para sumar promotores. Los beneficios y requisitos quedan pendientes con pin.</span></div></li>
+          <li><div><b>Mis leads</b><span>Prueba el prototipo: cambia el estado de un lead y mira el resumen. Es la propuesta para cerrar el ciclo: los formularios, descargas y presupuestos del sitio llegan al promotor o ejecutivo de la ciudad, con su origen.</span></div></li>
+        </ol>
+        <p class="muted">No tengo visibilidad de lo que hace el portal actual, así que esta vista es una propuesta basada en el CRM del plan y los nombres son de ejemplo. Hay que revisarla con quienes lo usan.</p>
+      </div>
     </div>
   </section>
 </div>
 
 <script>
 (function () {
-  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'techos', 'constructor', 'donde', 'empresa', 'catalogo', 'pedido'];
+  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'techos', 'constructor', 'donde', 'empresa', 'catalogo', 'pedido', 'paginas'];
   function show() {
     var h = (location.hash || '').replace('#', '');
     if (tabs.indexOf(h) < 0) h = 'plataforma';
@@ -1941,6 +2186,45 @@ svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
     document.getElementById('ppDoneS').textContent = client ? 'Tu ejecutivo lo confirma y puedes seguir su estado en Mi cuenta.' : 'Un ejecutivo de ' + document.getElementById('ppCiudad').value + ' te contactará por WhatsApp.';
   });
   renderPed();
+
+  /* más páginas */
+  document.querySelectorAll('[data-mp]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-mp');
+      document.querySelectorAll('[data-mp]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      ['proy', 'exp', 'blog', 'prom'].forEach(function (n) { var e = document.getElementById('mp-' + n); e.hidden = n !== k; e.style.display = n === k ? 'flex' : 'none'; });
+    });
+  });
+  document.querySelectorAll('[data-dif]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-dif');
+      document.querySelectorAll('[data-dif]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.querySelectorAll('#mpProyGrid [data-d]').forEach(function (c) { c.hidden = k !== 'todas' && c.getAttribute('data-d') !== k; });
+    });
+  });
+  document.querySelectorAll('[data-lang]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var l = b.getAttribute('data-lang');
+      document.querySelectorAll('[data-lang]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.querySelectorAll('#mp-exp [data-es]').forEach(function (e) { e.textContent = e.getAttribute('data-' + l); });
+    });
+  });
+  document.getElementById('mpBlogChips').addEventListener('click', function (e) {
+    var k = e.target.getAttribute && e.target.getAttribute('data-bc');
+    if (!k) return;
+    document.querySelectorAll('#mpBlogChips .mini').forEach(function (o) { o.classList.toggle('on', o === e.target); });
+    document.querySelectorAll('#mpBlogGrid [data-c]').forEach(function (c) { c.hidden = k !== 'todas' && c.getAttribute('data-c') !== k; });
+  });
+  var LEADS = [['Constructora Ejemplo', 'Cotizar 2.500 m² de PAVIC', 'Santa Cruz', 'Portada PAVIC', 0], ['María (ejemplo)', 'Churrasquero mediano', 'Cochabamba', 'Proyecto', 0], ['Ferretería Ejemplo', 'Lista de precios de muros', 'Oruro', 'Registro de cuenta', 1], ['Entidad pública (ejemplo)', 'Ficha técnica de PAVIC', 'Cochabamba', 'Descarga con datos', 2]];
+  var ESTADOS = ['Nuevo', 'Contactado', 'Cotizado', 'Pedido'];
+  function renderLeads() {
+    document.getElementById('mpLeads').innerHTML = LEADS.map(function (r, i) {
+      return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td><span class="chip">' + r[3] + '</span></td><td><select class="sel" data-l="' + i + '" aria-label="Estado de ' + r[0] + '">' + ESTADOS.map(function (e, j) { return '<option value="' + j + '"' + (j === r[4] ? ' selected' : '') + '>' + e + '</option>'; }).join('') + '</select></td></tr>';
+    }).join('');
+    document.getElementById('mpLeadSum').innerHTML = ESTADOS.map(function (e, j) { return '<span class="chip' + (j === 0 ? ' on' : '') + '">' + e + ': ' + LEADS.filter(function (r) { return r[4] === j; }).length + '</span>'; }).join('');
+  }
+  document.getElementById('mpLeads').addEventListener('change', function (e) { var i = e.target.getAttribute('data-l'); if (i !== null) { LEADS[+i][4] = parseInt(e.target.value, 10); renderLeads(); } });
+  renderLeads();
 
   /* tema */
   var modes = ['auto', 'light', 'dark'], mi = 0, tb = document.getElementById('themeBtn');
