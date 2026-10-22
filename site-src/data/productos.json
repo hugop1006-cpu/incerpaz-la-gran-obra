@@ -1,0 +1,706 @@
+[
+ {
+  "slug": "18-h",
+  "nombre": "18 HUECOS",
+  "codigo": "18H",
+  "linea": "BRICK LISO",
+  "descripcion": "Cerámica rectangular con 18 huecos redondos en la cara superior y liso en sus caras.",
+  "color": "Naranja",
+  "acabado": "Textura lisa en los laterales de la pieza",
+  "alto": 7.0,
+  "largo": 25.0,
+  "ancho": 12.0,
+  "peso": 2.35,
+  "rendimiento": 45.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/18-h-1.jpg",
+   "assets/img/productos/18-h-2.jpg"
+  ]
+ },
+ {
+  "slug": "18-h-1-2",
+  "nombre": "18 HUECOS MEDIOS",
+  "codigo": "18H 1/2",
+  "linea": "BRICK LISO",
+  "descripcion": "Cerámica rectangular con 18 huecos redondos en la cara superior y liso en sus caras laterales.",
+  "color": "Naranja",
+  "acabado": "Textura Lisa en los laterales de la pieza",
+  "alto": 7.0,
+  "largo": 12.5,
+  "ancho": 12.0,
+  "peso": 1.25,
+  "rendimiento": 84.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/18-h-1-2-1.jpg"
+  ]
+ },
+ {
+  "slug": "18-huecos-luis-xv-2",
+  "nombre": "18 HUECOS LXV",
+  "codigo": "18H LXV",
+  "linea": "BRICK LISO",
+  "descripcion": "Cerámica rectangular con 16 huecos, liso en sus caras.",
+  "color": "Naranja",
+  "acabado": "Textura lisa en los laterales de la pieza",
+  "alto": 7.0,
+  "largo": 25.0,
+  "ancho": 12.5,
+  "peso": 2.35,
+  "rendimiento": 12.0,
+  "rendimiento_unidad": "Pzas/ML",
+  "categorias": [
+   "muros",
+   "piezas-especiales",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/18-huecos-luis-xv-2-1.jpg",
+   "assets/img/productos/18-huecos-luis-xv-2-2.jpg"
+  ]
+ },
+ {
+  "slug": "3-huecos-economico-rayado",
+  "nombre": "3 HUECOS ECONÓMICO RAYADO",
+  "codigo": "3HER",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 3 huecos cuadrados en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías en todas sus caras",
+  "alto": 15.0,
+  "largo": 25.0,
+  "ancho": 0.7,
+  "peso": 1.95,
+  "rendimiento": 23.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/3-huecos-economico-rayado-1.jpg",
+   "assets/img/productos/3-huecos-economico-rayado-2.jpg"
+  ]
+ },
+ {
+  "slug": "3-huecos-economico-rayado-mitad",
+  "nombre": "3 HUECOS ECONÓMICO RAYADO MEDIOS",
+  "codigo": "3HER 1/2",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Ladrillo Estructural, presenta 3 huecos rayado por sus caras superior e inferior, liso por sus lados.",
+  "color": "Terracota",
+  "acabado": "Rayado",
+  "alto": 15.0,
+  "largo": 12.5,
+  "ancho": 7.0,
+  "peso": 0.975,
+  "rendimiento": 43.0,
+  "rendimiento_unidad": "Pzas/m2 (Tizón)",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/3-huecos-economico-rayado-mitad-1.jpg"
+  ]
+ },
+ {
+  "slug": "6-huecos-big-rayado",
+  "nombre": "6 HUECOS ECONÓMICO RAYADO",
+  "codigo": "6HER",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 6 huecos cuadrados en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías en todas sus caras",
+  "alto": 15.0,
+  "largo": 25.0,
+  "ancho": 10.0,
+  "peso": 2.7,
+  "rendimiento": 23.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/6-huecos-big-rayado-1.jpg",
+   "assets/img/productos/6-huecos-big-rayado-2.jpg"
+  ]
+ },
+ {
+  "slug": "6-huecos-big-rayado-mitad",
+  "nombre": "6 HUECOS ECONÓMICO RAYADO MEDIOS",
+  "codigo": "6HER 1/2",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 6 huecos cuadrados en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrias en todas sus caras",
+  "alto": 15.0,
+  "largo": 12.5,
+  "ancho": 10.0,
+  "peso": 1.4,
+  "rendimiento": 43.0,
+  "rendimiento_unidad": "Pzas/m2 (Posición tabique), 62 Pzas/m2 (Posición soguilla o carga)",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/6-huecos-big-rayado-mitad-1.jpg"
+  ]
+ },
+ {
+  "slug": "6-huecos-redondo",
+  "nombre": "6 HUECOS REDONDO",
+  "codigo": "6H-R",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 6 huecos circulares en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías y ranuras circulares en todas sus caras",
+  "alto": 15.0,
+  "largo": 25.0,
+  "ancho": 10.0,
+  "peso": 3.5,
+  "rendimiento": 23.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/6-huecos-redondo-1.jpg",
+   "assets/img/productos/6-huecos-redondo-2.jpg"
+  ]
+ },
+ {
+  "slug": "6-huecos-redondo-medios",
+  "nombre": "6 HUECOS REDONDO MEDIOS",
+  "codigo": "6H-R 1/2",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 6 huecos circulares en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías y ranuras circulares en todas sus caras",
+  "alto": 15.0,
+  "largo": 12.5,
+  "ancho": 10.0,
+  "peso": 1.8,
+  "rendimiento": 43.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/6-huecos-redondo-medios-1.jpg"
+  ]
+ },
+ {
+  "slug": "8-huecos-economico-rayado",
+  "nombre": "8 HUECOS ECONÓMICO RAYADO",
+  "codigo": "8HER",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías en todas sus caras",
+  "alto": 19.0,
+  "largo": 25.0,
+  "ancho": 8.0,
+  "peso": 2.75,
+  "rendimiento": 18.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/8-huecos-economico-rayado-1.jpg",
+   "assets/img/productos/8-huecos-economico-rayado-2.jpg"
+  ]
+ },
+ {
+  "slug": "8-huecos-economico-rayado-constructor",
+  "nombre": "8 HUECOS ECONÓMICO RAYADO CONSTRUCTOR",
+  "codigo": "8HER C",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías en todas sus caras",
+  "alto": 19.0,
+  "largo": 25.0,
+  "ancho": 10.0,
+  "peso": 3.35,
+  "rendimiento": 19.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/8-huecos-economico-rayado-constructor-1.jpg",
+   "assets/img/productos/8-huecos-economico-rayado-constructor-2.jpg"
+  ]
+ },
+ {
+  "slug": "8-huecos-economico-rayado-constructor-medios",
+  "nombre": "8 HUECOS ECONÓMICO RAYADO CONSTRUCTOR MEDIOS",
+  "codigo": "8HER C 1/2",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías en todas sus caras",
+  "alto": 19.0,
+  "largo": 12.5,
+  "ancho": 10.0,
+  "peso": 1.75,
+  "rendimiento": 35.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/8-huecos-economico-rayado-constructor-medios-1.jpg"
+  ]
+ },
+ {
+  "slug": "8-huecos-economico-rayado-medios",
+  "nombre": "8 HUECOS ECONÓMICO RAYADO MEDIOS",
+  "codigo": "8HER 1/2",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 8 huecos cuadrados en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías en todas sus caras",
+  "alto": 19.0,
+  "largo": 12.5,
+  "ancho": 8.0,
+  "peso": 1.4,
+  "rendimiento": 35.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/8-huecos-economico-rayado-medios-1.jpg"
+  ]
+ },
+ {
+  "slug": "9-huecos-economico-rayado",
+  "nombre": "9 HUECOS ECONÓMICO RAYADO",
+  "codigo": "9HER",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 9 huecos cuadrados en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías en todas sus caras",
+  "alto": 15.0,
+  "largo": 25.0,
+  "ancho": 15.0,
+  "peso": 4.1,
+  "rendimiento": 23.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/9-huecos-economico-rayado-1.jpg",
+   "assets/img/productos/9-huecos-economico-rayado-2.jpg"
+  ]
+ },
+ {
+  "slug": "9-huecos-economico-rayado-medios",
+  "nombre": "9 HUECOS ECONÓMICO RAYADO MEDIOS",
+  "codigo": "9HER 1/2",
+  "linea": "CLÁSICA TABIQUERIA",
+  "descripcion": "Cerámica rectangular con 9 huecos cuadrados en la cara frontal.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías en todas sus caras",
+  "alto": 15.0,
+  "largo": 12.5,
+  "ancho": 15.0,
+  "peso": 2.0,
+  "rendimiento": 42.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros"
+  ],
+  "imagenes": [
+   "assets/img/productos/9-huecos-economico-rayado-medios-1.jpg"
+  ]
+ },
+ {
+  "slug": "biscocho",
+  "nombre": "BISCOCHO",
+  "codigo": "RB-210",
+  "linea": "REFRACTARIO",
+  "descripcion": "Cerámica refractaria rectangular rayado en la cara superior y liso en las otras caras.",
+  "color": "Naranja blanquesino",
+  "acabado": "Rústico en una cara – Liso en las otras caras",
+  "alto": 1.2,
+  "largo": 20.0,
+  "ancho": 10.0,
+  "peso": 0.5,
+  "rendimiento": 50.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "refractarios",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/biscocho-1.jpg",
+   "assets/img/productos/biscocho-2.jpg"
+  ]
+ },
+ {
+  "slug": "biscocho-213",
+  "nombre": "BISCOCHO-213",
+  "codigo": "RB-213",
+  "linea": "REFRACTARIO",
+  "descripcion": "Cerámica refractaria rectangular rayado en la cara superior y liso en las otras caras.",
+  "color": "Naranja blanquesino",
+  "acabado": "Rústico en una cara – Liso en las otras caras",
+  "alto": 1.8,
+  "largo": 24.2,
+  "ancho": 12.2,
+  "peso": 0.865,
+  "rendimiento": 32.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "refractarios",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/biscocho-213-1.jpg"
+  ]
+ },
+ {
+  "slug": "bloque-ceramico-9-cm",
+  "nombre": "BLOQUE CERÁMICO 9 CM",
+  "codigo": "BC 9",
+  "linea": "CLÁSICA VARIEDAD",
+  "descripcion": "Cerámica rectangular, con 8 huecos en la cara frontal, rayado en las caras superior e inferior.",
+  "color": "Naranja",
+  "acabado": "Textura de la superficie con estrías en todas sus caras",
+  "alto": 9.0,
+  "largo": 25.0,
+  "ancho": 43.0,
+  "peso": 6.6,
+  "rendimiento": 8.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "piezas-especiales"
+  ],
+  "imagenes": []
+ },
+ {
+  "slug": "botaguas-de-1-caida",
+  "nombre": "BOTAGUAS DE 1 CAÍDA",
+  "codigo": "BOT 1C",
+  "linea": "CLÁSICA VARIEDADES",
+  "descripcion": "Cerámica rectangular, con 4 huecos de diferentes tamaños en la cara frontal, liso todas las caras.",
+  "color": "Naranja",
+  "acabado": "Textura lisa en los laterales de la pieza",
+  "alto": 9.0,
+  "largo": 25.0,
+  "ancho": 18.5,
+  "peso": 3.1,
+  "rendimiento": 4.0,
+  "rendimiento_unidad": "Pzas/ML",
+  "categorias": [
+   "piezas-especiales"
+  ],
+  "imagenes": [
+   "assets/img/productos/botaguas-de-1-caida-1.jpg",
+   "assets/img/productos/botaguas-de-1-caida-2.jpg"
+  ]
+ },
+ {
+  "slug": "botaguas-de-2-caida",
+  "nombre": "BOTAGUAS DE 2 CAÍDAS",
+  "codigo": "BOT 2C",
+  "linea": "CLÁSICA VARIEDADES",
+  "descripcion": "Cerámica rectangular, con 5 huecos en la cara frontal, liso todas las caras.",
+  "color": "Natural",
+  "acabado": "Textura lisa en los laterales de las piezas",
+  "alto": 9.0,
+  "largo": 25.0,
+  "ancho": 25.5,
+  "peso": 4.3,
+  "rendimiento": 4.0,
+  "rendimiento_unidad": "Pzas/ML",
+  "categorias": [
+   "piezas-especiales"
+  ],
+  "imagenes": [
+   "assets/img/productos/botaguas-de-2-caida-1.jpg",
+   "assets/img/productos/botaguas-de-2-caida-2.jpg"
+  ]
+ },
+ {
+  "slug": "brick-cornisa-punta-bosel",
+  "nombre": "BRICK CORNISA CURVA DOBLE",
+  "codigo": "BRK CD",
+  "linea": "BRICK RÚSTICO",
+  "descripcion": "Cerámica rectangular macizo acabado rústico en todos los lados con una curva doble en una cara.",
+  "color": "Engobado – Naranja",
+  "acabado": "Textura rústico",
+  "alto": 6.6,
+  "largo": 20.0,
+  "ancho": 10.0,
+  "peso": 2.2,
+  "rendimiento": 13.0,
+  "rendimiento_unidad": "Pzas/ML",
+  "categorias": [
+   "muros",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/brick-cornisa-punta-bosel-1.jpg",
+   "assets/img/productos/brick-cornisa-punta-bosel-2.jpg"
+  ]
+ },
+ {
+  "slug": "brick-enchape-ancho",
+  "nombre": "BRICK ENCHAPE ANCHO",
+  "codigo": "BRK EA",
+  "linea": "BRICK RÚSTICO",
+  "descripcion": "Cerámica rectangular, acabado rústico en todos los lados.",
+  "color": "Engobado – Naranja",
+  "acabado": "Textura rústico",
+  "alto": 2.0,
+  "largo": 20.0,
+  "ancho": 10.0,
+  "peso": 0.75,
+  "rendimiento": 50.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/brick-enchape-ancho-1.jpg",
+   "assets/img/productos/brick-enchape-ancho-2.jpg"
+  ]
+ },
+ {
+  "slug": "brick-enchape-corto",
+  "nombre": "BRICK ENCHAPE CORTO",
+  "codigo": "BRK EC",
+  "linea": "BRICK RÚSTICO",
+  "descripcion": "Cerámica rectangular, acabado rústico en todos los lados.",
+  "color": "Engobado – Naranja",
+  "acabado": "Textura rústico",
+  "alto": 2.0,
+  "largo": 20.0,
+  "ancho": 6.6,
+  "peso": 0.5,
+  "rendimiento": 76.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/brick-enchape-corto-1.jpg",
+   "assets/img/productos/brick-enchape-corto-2.jpg"
+  ]
+ },
+ {
+  "slug": "brick-estandar",
+  "nombre": "BRICK ESTANDAR",
+  "codigo": "BRK STD",
+  "linea": "BRICK RÚSTICO",
+  "descripcion": "Cerámica rectangular macizo acabado rústico en todos los lados.",
+  "color": "Engobe – Naranja",
+  "acabado": "Textura rústico",
+  "alto": 6.6,
+  "largo": 20.0,
+  "ancho": 10.0,
+  "peso": 2.65,
+  "rendimiento": 50.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/brick-estandar-1.jpg",
+   "assets/img/productos/brick-estandar-2.jpg"
+  ]
+ },
+ {
+  "slug": "brick-estandar-aligerado",
+  "nombre": "BRICK ESTANDAR ALIGERADO",
+  "codigo": "BRK SA",
+  "linea": "BRICK RÚSTICO",
+  "descripcion": "Cerámica rectangular macizo acabado rústico en todos los lados con 3 huecos en la cara superior.",
+  "color": "Engobe – Naranja",
+  "acabado": "Textura rústico",
+  "alto": 6.6,
+  "largo": 20.0,
+  "ancho": 10.0,
+  "peso": 2.2,
+  "rendimiento": 50.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros",
+   "pisos-y-pavimentos",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/brick-estandar-aligerado-1.jpg",
+   "assets/img/productos/brick-estandar-aligerado-2.jpg"
+  ]
+ },
+ {
+  "slug": "brick-gambote-rustico-22",
+  "nombre": "BRICK GAMBOTE RÚSTICO 22",
+  "codigo": "BRK GR22",
+  "linea": "BRICK RÚSTICO",
+  "descripcion": "Cerámica rectangular, macizo acabado rústico en todos los lados.",
+  "color": "Naranja Natural",
+  "acabado": "Textura rústico",
+  "alto": 5.1,
+  "largo": 22.0,
+  "ancho": 11.0,
+  "peso": 2.5,
+  "rendimiento": 63.0,
+  "rendimiento_unidad": "Pzas/M2",
+  "categorias": [
+   "muros",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/brick-gambote-rustico-22-2.jpg"
+  ]
+ },
+ {
+  "slug": "brick-gambote-rustico18",
+  "nombre": "BRICK GAMBOTE RÚSTICO 18",
+  "codigo": "BRK GR18",
+  "linea": "BRICK RÚSTICO",
+  "descripcion": "Cerámica rectangular, macizo acabado rústico en todos los lados.",
+  "color": "Naranja Natural",
+  "acabado": "Textura rústico",
+  "alto": 5.1,
+  "largo": 18.0,
+  "ancho": 12.0,
+  "peso": 2.2,
+  "rendimiento": 75.0,
+  "rendimiento_unidad": "Pzas/M2",
+  "categorias": [
+   "muros",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/brick-gambote-rustico18-2.jpg"
+  ]
+ },
+ {
+  "slug": "brick-terminacion-grada",
+  "nombre": "BRICK PUNTA REDONDA",
+  "codigo": "BRK RD",
+  "linea": "BRICK RÚSTICO",
+  "descripcion": "Cerámica rectangular punta redonda, macizo acabado rústico en todos los lados.",
+  "color": "Engabado – Naranja",
+  "acabado": "Textura rústico",
+  "alto": 6.6,
+  "largo": 19.5,
+  "ancho": 10.0,
+  "peso": 2.65,
+  "rendimiento": 13.0,
+  "rendimiento_unidad": "Pzas/ML",
+  "categorias": [
+   "muros",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/brick-terminacion-grada-1.jpg",
+   "assets/img/productos/brick-terminacion-grada-2.jpg"
+  ]
+ },
+ {
+  "slug": "celosia",
+  "nombre": "CELOCIA",
+  "codigo": "CEL",
+  "linea": "CLÁSICA VARIADADES",
+  "descripcion": "Cerámica cuadrada con 5 huecos en la cara lateral, en forma de estrella.",
+  "color": "Naranja",
+  "acabado": "Textura lisa en los laterales de la pieza",
+  "alto": 12.0,
+  "largo": 17.0,
+  "ancho": 17.0,
+  "peso": 2.35,
+  "rendimiento": 29.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "muros",
+   "piezas-especiales",
+   "revestimientos-y-decorativos"
+  ],
+  "imagenes": [
+   "assets/img/productos/celosia-1.jpg",
+   "assets/img/productos/celosia-2.jpg"
+  ]
+ },
+ {
+  "slug": "pavic-estandar",
+  "nombre": "PAVIC ESTÁNDAR",
+  "codigo": "PVC STD",
+  "linea": "PAVIC",
+  "descripcion": "Cerámica rectangular macizo rústico en todos los lados y biselado en la cara superior.",
+  "color": "Naranja Natural",
+  "acabado": "Textura rústico",
+  "alto": 6.6,
+  "largo": 20.0,
+  "ancho": 10.0,
+  "peso": 2.65,
+  "rendimiento": 50.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "pisos-y-pavimentos"
+  ],
+  "imagenes": [
+   "assets/img/productos/pavic-estandar-1.jpg",
+   "assets/img/productos/pavic-estandar-2.jpg"
+  ]
+ },
+ {
+  "slug": "pavic-peatonal",
+  "nombre": "PAVIC PEATONAL BISELADO",
+  "codigo": "PVC PE B 45",
+  "linea": "PAVIC",
+  "descripcion": "Cerámica rectangular macizo rústico en todos los lados y biselado en la cara superior.",
+  "color": "Naranja Natural",
+  "acabado": "Textura rústico",
+  "alto": 4.5,
+  "largo": 20.0,
+  "ancho": 10.0,
+  "peso": 1.63,
+  "rendimiento": 50.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "pisos-y-pavimentos"
+  ],
+  "imagenes": [
+   "assets/img/productos/pavic-peatonal-1.jpg",
+   "assets/img/productos/pavic-peatonal-2.jpg"
+  ]
+ },
+ {
+  "slug": "pavic-tabaco",
+  "nombre": "PAVIC ESTÁNDAR CON TETONES",
+  "codigo": "PVC STD T",
+  "linea": "PAVIC",
+  "descripcion": "Cerámica rectangular macizo rústico en todos los lados y con tetones en 3 lados.",
+  "color": "Naranja Natural",
+  "acabado": "Textura rústico",
+  "alto": 6.6,
+  "largo": 20.0,
+  "ancho": 10.0,
+  "peso": 2.65,
+  "rendimiento": 50.0,
+  "rendimiento_unidad": "Pzas/m2",
+  "categorias": [
+   "pisos-y-pavimentos"
+  ],
+  "imagenes": [
+   "assets/img/productos/pavic-tabaco-1.jpg",
+   "assets/img/productos/pavic-tabaco-2.jpg"
+  ]
+ }
+]

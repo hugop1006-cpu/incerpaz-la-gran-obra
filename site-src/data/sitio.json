@@ -1,0 +1,63 @@
+{
+  "dominio": "https://www.incerpaz.com",
+  "servicio_cliente": { "texto": "800-10-8810", "tel": "800108810" },
+  "correo": "ventas.cbba@incerpaz.com",
+  "redes": {
+    "facebook": "https://www.facebook.com/IncerpazBolivia",
+    "instagram": "https://www.instagram.com/incerpaz_bolivia/",
+    "youtube": "https://www.youtube.com/channel/UCV_NSHg8AlckFjGgDszLXtg"
+  },
+  "enlaces_externos": {
+    "exportaciones": "https://exportaciones.incerpaz.com",
+    "promotores": "https://prospeccion.cbba.tienda.incerpaz.com/login.php",
+    "tienda_cochabamba": "https://cbba.tienda.incerpaz.com/",
+    "tienda_santa_cruz": "https://scz.tienda.incerpaz.com/"
+  },
+  "ciudades": [
+    { "slug": "cochabamba", "nombre": "Cochabamba", "whatsapp": "70750963" },
+    { "slug": "santa-cruz", "nombre": "Santa Cruz", "whatsapp": "70009021" },
+    { "slug": "oruro", "nombre": "Oruro", "whatsapp": "60400608" },
+    { "slug": "sucre", "nombre": "Sucre", "whatsapp": "70213846" }
+  ],
+  "categorias": [
+    { "slug": "muros", "nombre": "Muros", "descripcion": "Ladrillos huecos y macizos para levantar muros y tabiques.", "imagen": "assets/img/productos/6-huecos-big-rayado-2.jpg" },
+    { "slug": "revestimientos-y-decorativos", "nombre": "Revestimientos y decorativos", "descripcion": "Enchapes y piezas de ladrillo visto para fachadas e interiores.", "imagen": "assets/img/productos/brick-enchape-ancho-2.jpg" },
+    { "slug": "pisos-y-pavimentos", "nombre": "Pisos y pavimentos", "descripcion": "Pavimento cerámico para patios, veredas, plazas y calles.", "imagen": "assets/img/productos/pavic-peatonal-2.jpg" },
+    { "slug": "piezas-especiales", "nombre": "Piezas especiales", "descripcion": "Botaguas, bloques y piezas de remate para terminar la obra.", "imagen": "assets/img/productos/botaguas-de-1-caida-2.jpg" },
+    { "slug": "refractarios", "nombre": "Refractarios", "descripcion": "Piezas resistentes al calor para hornos, parrilleros y chimeneas.", "imagen": "assets/img/productos/biscocho-2.jpg" }
+  ],
+  "agencias": {
+    "cochabamba": [
+      { "nombre": "Fábrica", "tipo": "fabrica", "direccion": "Av. Villazón Km 7 1/2, zona Esmeralda Sud", "telefonos": ["4-4271684", "4-4271685"], "whatsapp": "70305319" },
+      { "nombre": "Central, oficina central", "tipo": "agencia", "direccion": "Av. Circunvalación y Calle Miguel de Cervantes N° 181, de Semapa una cuadra al este", "telefonos": ["4-4287067", "4-4669420"], "whatsapp": "70750963" },
+      { "nombre": "Quillacollo", "tipo": "agencia", "direccion": "Av. Blanco Galindo Km 10 1/2", "telefonos": ["4-4265309"], "whatsapp": "70349291" },
+      { "nombre": "Petrolera", "tipo": "agencia", "direccion": "Av. Petrolera Km 2 1/2, calle Coronel Juan L. Muñoz, lado surtidor Ticti", "telefonos": ["4-4216286"], "whatsapp": "70787648" },
+      { "nombre": "Sacaba", "tipo": "agencia", "direccion": "Av. Barrientos Km 12 acera norte, camino a Santa Cruz, zona Ulincate", "telefonos": ["4-4709201"], "whatsapp": "70348697" },
+      { "nombre": "Vinto", "tipo": "agencia", "direccion": "Av. Albina Patiño Km 16 acera norte, zona Las Manzanas, frente a la Alcaldía de Vinto", "telefonos": ["4-4536895"], "whatsapp": "70719774" },
+      { "nombre": "Tiquipaya", "tipo": "agencia", "direccion": "Av. Simón López casi esq. calle Nisedo Rodríguez N° 1823, zona Colquiri Sud", "telefonos": ["4-4012445"], "whatsapp": "70719312" },
+      { "nombre": "Beijing", "tipo": "agencia", "direccion": "Av. Beijing N° 177, frente al parque Demetrio Canelas", "telefonos": ["4-4424445"], "whatsapp": "65350059" },
+      { "nombre": "Castillo", "tipo": "agencia", "direccion": "Av. Villazón Km 3.5 N° 04259, lado empresa Virmegraf", "telefonos": ["4-4724248"], "whatsapp": "" }
+    ],
+    "santa-cruz": [
+      { "nombre": "Fábrica", "tipo": "fabrica", "direccion": "Carretera Warnes–Montero Km 37 1/2", "telefonos": [], "whatsapp": "70818053" },
+      { "nombre": "Banzer", "tipo": "agencia", "direccion": "Av. Banzer, 3er anillo externo, frente al surtidor Genex", "telefonos": ["3-3441918"], "whatsapp": "70009021" },
+      { "nombre": "Cotoca", "tipo": "agencia", "direccion": "Av. Virgen de Cotoca y 4to anillo", "telefonos": ["3-3490279"], "whatsapp": "70816205" },
+      { "nombre": "Satélite", "tipo": "agencia", "direccion": "Av. Principal de Satélite esq. coliseo Ignacio Warnes", "telefonos": [], "whatsapp": "70885302" },
+      { "nombre": "Patio", "tipo": "agencia", "direccion": "Av. Doble vía La Guardia esq. 6to anillo, diagonal a Unitel", "telefonos": ["3-3544088"], "whatsapp": "70818060" },
+      { "nombre": "Santos Dumont", "tipo": "agencia", "direccion": "Av. Santos Dumont entre 5to y 6to anillo, casi esq. Av. 16 de Noviembre", "telefonos": [], "whatsapp": "60802416" },
+      { "nombre": "Plan 3000", "tipo": "agencia", "direccion": "Av. Principal Plan 3000, calle Toro Toro, lado Banco Económico", "telefonos": ["3-3700257"], "whatsapp": "70930384" },
+      { "nombre": "Montecristo", "tipo": "agencia", "direccion": "Av. Virgen de Cotoca Km 4 1/2 entre 7mo y 8vo anillo", "telefonos": [], "whatsapp": "70053778" }
+    ],
+    "oruro": [
+      { "nombre": "Fábrica", "tipo": "fabrica", "direccion": "Carretera Oruro–La Paz Km 31", "telefonos": [], "whatsapp": "70410344" },
+      { "nombre": "Patio", "tipo": "agencia", "direccion": "Av. Circunvalación entre Av. del Valle y Casco del Minero, urbanización Milenium", "telefonos": ["2-5252523", "2-5233080"], "whatsapp": "60400608" },
+      { "nombre": "Tacna", "tipo": "agencia", "direccion": "Calle Tacna N° 600 entre Caro y Av. del Ejército", "telefonos": ["2-5272237"], "whatsapp": "70415110" }
+    ],
+    "sucre": [
+      { "nombre": "Terminal", "tipo": "agencia", "direccion": "Av. Ostria Gutiérrez N° 525, zona Terminal de Buses", "telefonos": ["4-6444344"], "whatsapp": "70213846" }
+    ]
+  },
+  "valores": ["Calidad", "Amabilidad", "Liderazgo", "Innovación", "Disciplina", "Autonomía", "Dedicación"],
+  "mision": "Contribuir al desarrollo del país proveyendo productos cerámicos destinados al mercado de la construcción local e internacional, ofreciendo los mejores productos y servicios.",
+  "somos": "Somos INCERPAZ y queremos ayudarte a construir tu hogar. Trabajamos día a día comprometidos con la mejora continua a través del sistema integrado de gestión en todos nuestros procesos. Tenemos el objetivo de superar siempre las expectativas de nuestros clientes y los logramos otorgando productos y servicios de calidad."
+}

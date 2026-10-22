@@ -89,3 +89,9 @@ Un robot juega cada nivel hasta la meta (y vence al jefe) y avisa si aparece un 
 4. En un minuto el juego estará en `https://TU-USUARIO.github.io/NOMBRE-DEL-REPOSITORIO/`.
 
 Funciona en celular: abre el enlace y juega con los botones en pantalla (mejor en horizontal).
+
+## Sitio de marca (primera entrega)
+
+Además del juego, este repositorio contiene el rediseño de incerpaz.com en `site/` (código fuente y datos en `site-src/`).
+Se abre en `/site/` y no afecta al juego. Guía de uso, edición y publicación: [`site-src/README.md`](site-src/README.md).
+Lo que falta confirmar antes de publicar: [`site-src/CONTENIDO-PENDIENTE.md`](site-src/CONTENIDO-PENDIENTE.md).
