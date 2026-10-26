@@ -33,6 +33,9 @@ function cookie(nombre, valor, { maxAge, seguro }) {
   return `${nombre}=${encodeURIComponent(valor)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${seguro ? '; Secure' : ''}`;
 }
 function ip(req) {
+  /* detrás de Cloudflare (CLOUDFLARE=1) la IP real viene en CF-Connecting-IP, que Cloudflare siempre reescribe;
+     X-Forwarded-For lo puede falsear el visitante, así que no se usa en ese caso */
+  if (process.env.CLOUDFLARE === '1' && req.headers['cf-connecting-ip']) return String(req.headers['cf-connecting-ip']).trim();
   const xf = process.env.TRUST_PROXY === '1' ? (req.headers['x-forwarded-for'] || '').split(',')[0].trim() : '';
   return xf || req.socket.remoteAddress || 'desconocida';
 }

@@ -271,3 +271,31 @@ test('respaldos: copia la base y el contenido y conserva solo los últimos', () 
   crearRespaldo(db, { carpeta, contenidoDir: cont, max: 2 });
   assert.equal(fs.readdirSync(carpeta).length, 2, 'se borran los más antiguos');
 });
+
+test('detrás de Cloudflare: IP real, candado de origen y política CSP ampliable', async () => {
+  const { servidor, base } = await levantar(); const c = cliente(base);
+  const previo = { CLOUDFLARE: process.env.CLOUDFLARE, ORIGEN_SECRETO: process.env.ORIGEN_SECRETO, CSP_SCRIPT_EXTRA: process.env.CSP_SCRIPT_EXTRA };
+  try {
+    process.env.CLOUDFLARE = '1';
+    /* el límite de intentos usa CF-Connecting-IP y no el X-Forwarded-For que puede falsear el visitante */
+    let ultimo = 0;
+    for (let i = 0; i < 12; i++) ultimo = (await c.raw('POST', '/api/login', { correo: 'a@ejemplo.com', password: 'x-clave-larga' }, { 'CF-Connecting-IP': '203.0.113.7', 'X-Forwarded-For': `198.51.100.${i}` })).status;
+    assert.equal(ultimo, 429, 'cambiar X-Forwarded-For no evita el bloqueo');
+    assert.equal((await c.raw('POST', '/api/login', { correo: 'a@ejemplo.com', password: 'x-clave-larga' }, { 'CF-Connecting-IP': '203.0.113.99' })).status, 401, 'otra IP real no queda bloqueada');
+
+    process.env.ORIGEN_SECRETO = 'secreto-de-prueba-123';
+    assert.equal((await fetch(`${base}/index.html`)).status, 403, 'sin la cabecera de Cloudflare no se atiende');
+    assert.equal((await fetch(`${base}/index.html`, { headers: { 'X-Origen-Secreto': 'otro-valor-distinto' } })).status, 403);
+    assert.equal((await fetch(`${base}/api/salud`)).status, 200, 'la verificación de salud queda abierta');
+    assert.equal((await fetch(`${base}/api/salud`, { headers: { 'X-Origen-Secreto': 'secreto-de-prueba-123' } })).status, 200);
+    const ok = await fetch(`${base}/api/yo`, { headers: { 'X-Origen-Secreto': 'secreto-de-prueba-123' } }); assert.equal(ok.status, 200, 'con el secreto correcto se atiende');
+    assert.ok(!/cloudflareinsights/.test(ok.headers.get('content-security-policy')));
+
+    process.env.CSP_SCRIPT_EXTRA = 'https://static.cloudflareinsights.com';
+    const conExtra = await fetch(`${base}/api/yo`, { headers: { 'X-Origen-Secreto': 'secreto-de-prueba-123' } });
+    assert.match(conExtra.headers.get('content-security-policy'), /script-src 'self' https:\/\/static\.cloudflareinsights\.com;/);
+  } finally {
+    for (const [k, v] of Object.entries(previo)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+    cerrar(servidor);
+  }
+});

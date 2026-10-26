@@ -17,6 +17,9 @@ Node 22+ sin dependencias (`http` + `node:sqlite`). Sirve el sitio estático de 
 | PUBLICO | — | `1` hace el sitio indexable (ver DESPLIEGUE.md) |
 | CANONICAL_HOST | — | Dominio principal; otros dominios se redirigen a él |
 | RESPALDO_DIARIO / RESPALDOS_MAX / BACKUP_DIR | — / 14 / /datos/respaldos | Respaldo diario de la base y el contenido |
+| CLOUDFLARE | — | `1` toma la IP real de CF-Connecting-IP (límites de intentos) |
+| ORIGEN_SECRETO | — | Si se define, solo se atiende lo que trae la cabecera `X-Origen-Secreto` igual a este valor (candado para que todo pase por Cloudflare; `/api/salud` queda abierto) |
+| CSP_SCRIPT_EXTRA / CSP_CONNECT_EXTRA | — | Hosts extra permitidos por la política de seguridad (herramientas de medición) |
 | SEMBRAR_DEMO | — | `1` crea la cuenta de prueba ejecutivo.prueba@incerpaz.test (clave Prueba-Incerpaz-2026 o DEMO_PASSWORD). No la actives en producción |
 | SEASOFT_URL / SEASOFT_TOKEN | — | Acceso al ERP (ver ERP.md) |
 | COOKIE_SECURE | 0 | `1` detrás de HTTPS |

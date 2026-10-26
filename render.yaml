@@ -22,5 +22,8 @@ services:
         value: Hugo
       - key: PUBLICO
         value: "0"           # cambia a "1" el día de la salida pública
-      - key: CANONICAL_HOST
-        sync: false          # al salir: www.incerpaz.com
+      - key: CLOUDFLARE
+        value: "1"           # la IP real del visitante viene de Cloudflare
+# Se agregan a mano en Environment cuando corresponda (ver server/DESPLIEGUE.md):
+#   CANONICAL_HOST=www.incerpaz.com   ORIGEN_SECRETO=<valor largo>
+#   CSP_SCRIPT_EXTRA / CSP_CONNECT_EXTRA (solo si activas Cloudflare Web Analytics)

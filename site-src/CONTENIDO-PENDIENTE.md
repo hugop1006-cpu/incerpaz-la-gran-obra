@@ -72,3 +72,5 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - Imagen para compartir en redes (1200 × 630) propia de la marca: hoy se usa una foto de producto por página.
 - Texto legal: términos de uso y política de privacidad (el sitio guarda cuentas y contactos) y el aviso de datos personales; faltan las páginas.
 - Definir el momento del corte: redirecciones 301 de las tiendas (`site-src/redirecciones-tiendas.csv`) y qué pasa con `exportaciones.incerpaz.com`.
+- Si se activa Cloudflare Web Analytics, actualizar el texto de `privacidad.html` (hoy dice que no hay herramientas de medición).
+- Lista de registros DNS actuales de `incerpaz.com` (correo, ERP, tiendas, subdominios) antes de pasar el dominio a Cloudflare.

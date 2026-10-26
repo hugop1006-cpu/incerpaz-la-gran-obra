@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const zlib = require('node:zlib');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const { ErrorHttp, falla, leerJson, responder, cookies, cookie, ip, limitador } = require('./http');
 const auth = require('./auth');
 const { copiaTemporal } = require('./respaldo');
@@ -20,7 +21,9 @@ const ESTADOS_PEDIDO = ['recibido', 'confirmado', 'en_despacho', 'entregado', 'a
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8' };
 
 const COMPRIMIBLES = new Set(['.html', '.css', '.js', '.json', '.svg', '.xml', '.txt']);
-const CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
+/* CSP_SCRIPT_EXTRA y CSP_CONNECT_EXTRA (hosts separados por espacio) permiten añadir una herramienta de medición,
+   por ejemplo Cloudflare Web Analytics: static.cloudflareinsights.com y https://cloudflareinsights.com */
+const csp = () => `default-src 'self'; script-src 'self'${process.env.CSP_SCRIPT_EXTRA ? ' ' + process.env.CSP_SCRIPT_EXTRA : ''}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'${process.env.CSP_CONNECT_EXTRA ? ' ' + process.env.CSP_CONNECT_EXTRA : ''}; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`;
 const txt = (v, max, nombre, { obligatorio = false } = {}) => {
   const s = v == null ? '' : String(v).trim();
   if (obligatorio && !s) falla(400, `Falta ${nombre}`);
@@ -562,9 +565,16 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    res.setHeader('Content-Security-Policy', CSP);
+    res.setHeader('Content-Security-Policy', csp());
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     if (seguro) res.setHeader('Strict-Transport-Security', 'max-age=31536000');
+    /* ORIGEN_SECRETO: solo se atiende lo que llega desde Cloudflare, que añade este valor en la cabecera X-Origen-Secreto
+       (Transform Rule). Así nadie salta la protección entrando directo a la dirección de Render. La salud queda abierta. */
+    const secreto = process.env.ORIGEN_SECRETO;
+    if (secreto && req.url !== '/api/salud') {
+      const recibido = Buffer.from(String(req.headers['x-origen-secreto'] || '')); const esperado = Buffer.from(secreto);
+      if (recibido.length !== esperado.length || !crypto.timingSafeEqual(recibido, esperado)) { res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8', 'Content-Length': 22 }); return res.end('Acceso no autorizado.\n'); }
+    }
     /* en producción: un solo dominio (CANONICAL_HOST, ej. www.incerpaz.com) y siempre https detrás del proxy */
     const host = String(req.headers.host || '').toLowerCase(); const canon = (process.env.CANONICAL_HOST || '').toLowerCase();
     const http = process.env.TRUST_PROXY === '1' && req.headers['x-forwarded-proto'] === 'http';
