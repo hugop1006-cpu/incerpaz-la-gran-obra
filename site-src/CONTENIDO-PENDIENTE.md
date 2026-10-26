@@ -65,3 +65,10 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - Exportaciones: faltan países de destino atendidos, productos que se exportan, volúmenes mínimos, condiciones (Incoterms), certificaciones de exportación y el contacto responsable. Hoy la página solo capta la consulta y enlaza al sitio de exportaciones actual.
 - Leads: los formularios del sitio se guardan en el servidor y se ven en Equipo → Contactos (cada ejecutivo ve los de su ciudad; los de otras ciudades y la lista de espera los ve el administrador). Falta definir quién atiende exportaciones y PAVIC, y conectar avisos por correo o WhatsApp cuando entra un contacto nuevo (hoy solo se ve el contador en el panel).
 - Falta fotografía propia para las guías (hoy usan fotos de producto) y más guías (instalación de PAVIC, techos con teja, refractarios para hornos).
+
+## Publicación pública
+- Decidir las herramientas de medición (Google Analytics, Search Console, Meta Pixel) y el aviso de cookies que correspondan.
+- Crear o reclamar los perfiles de Negocio de Google de cada agencia y fábrica; confirmar que dirección y teléfono coinciden con los del sitio.
+- Imagen para compartir en redes (1200 × 630) propia de la marca: hoy se usa una foto de producto por página.
+- Texto legal: términos de uso y política de privacidad (el sitio guarda cuentas y contactos) y el aviso de datos personales; faltan las páginas.
+- Definir el momento del corte: redirecciones 301 de las tiendas (`site-src/redirecciones-tiendas.csv`) y qué pasa con `exportaciones.incerpaz.com`.

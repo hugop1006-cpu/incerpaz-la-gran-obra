@@ -27,7 +27,7 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await p.goto(BASE + 'guias.html'); ok((await p.locator('.proys a.cat').count()) === 5, 'el listado muestra las 5 guías');
     await p.goto(BASE + 'guias/cuantos-ladrillos-por-metro-cuadrado.html');
     ok(/497/.test(await p.textContent('article')), 'la guía trae el ejemplo calculado (497 piezas)');
-    ok((await p.locator('script[type="application/ld+json"]').count()) === 1 && !/@context/.test((await p.textContent('main')) || ''), 'el marcado para Google no se muestra como texto');
+    ok((await p.locator('script[type="application/ld+json"]').count()) >= 2 && !/@context/.test((await p.textContent('main')) || ''), 'el marcado para Google no se muestra como texto');
     await p.fill('.form-box [name="nombre"]', 'Luis Rojas'); await p.fill('.form-box [name="celular"]', '70011122'); await p.selectOption('.form-box [name="ciudad"]', 'Santa Cruz');
     await p.fill('.form-box [name="consulta"]', 'Necesito 500 ladrillos'); await p.click('.form-box button[type="submit"]');
     await p.waitForSelector('.form-msg:not([hidden])');

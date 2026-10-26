@@ -17,6 +17,9 @@ const sitio = JSON.parse(fs.readFileSync(path.join(DATA, 'sitio.json'), 'utf8'))
 let productos = JSON.parse(fs.readFileSync(path.join(DATA, 'productos.json'), 'utf8'));
 const config = Object.assign({ leadEndpoint: '', interno: true, comercio: true }, fs.existsSync(path.join(__dirname, 'config.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')) : {});
 
+/* PUBLICO=1 publica el sitio: indexable, con sitemap y robots abiertos (ver server/DESPLIEGUE.md) */
+if (process.env.PUBLICO === '1') config.interno = false;
+
 const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const num = (n) => Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 });
 const waHref = (numero, msg) => `https://wa.me/591${numero}?text=${encodeURIComponent(msg)}`;
@@ -82,10 +85,20 @@ const NAV = [
   ['empresa.html', 'Empresa']
 ];
 const ciudadDefecto = sitio.ciudades[0];
-function layout({ file, base = '', title, desc, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '' }) {
+/* config.js: ciudades y destino de los formularios. Va como archivo (no en línea) para poder usar una política CSP estricta. */
+const HASHES = {};
+function versionado(archivo) {
+  if (!HASHES[archivo]) { try { HASHES[archivo] = require('crypto').createHash('sha1').update(fs.readFileSync(path.join(OUT, archivo))).digest('hex').slice(0, 8); } catch { HASHES[archivo] = '0'; } }
+  return `${archivo}?v=${HASHES[archivo]}`;
+}
+const recortar = (t, max) => (t.length <= max ? t : t.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[,:;.\s]+$/, '') + '…');
+fs.mkdirSync(path.join(OUT, 'assets/js'), { recursive: true });
+fs.writeFileSync(path.join(OUT, 'assets/js/config.js'), `window.INCERPAZ=${JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || (config.comercio ? '/api/leads' : '') })};\n`);
+
+function layout({ file, base = '', title: titulo, desc: descripcion, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '' }) {
+  const title = recortar(titulo, 62), desc = recortar(descripcion, 158);
   const url = `${sitio.dominio}/${file === 'index.html' ? '' : file}`;
   const nav = NAV.map(([href, label]) => `<a href="${base}${href}"${file === href ? ' aria-current="page"' : ''}>${label}</a>`).join('');
-  const cfg = JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || (config.comercio ? '/api/leads' : '') });
   return `<!doctype html>
 <html lang="es-BO">
 <head>
@@ -97,11 +110,12 @@ ${config.interno || ['ingresar','registro','presupuesto','cuenta','equipo','admi
 <link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:locale" content="es_BO"><meta property="og:site_name" content="INCERPAZ">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${sitio.dominio}/${og}">
+<meta property="og:image:alt" content="INCERPAZ, cerámica para construir tu hogar"><meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#b5121b">
 <link rel="icon" href="${base}assets/img/logo-icono.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="${base}assets/css/site.css">
+<link rel="stylesheet" href="${base}${versionado('assets/css/site.css')}">
 ${jsonld}
 </head>
 <body data-base="${base}" data-pagina="${pagina}">
@@ -133,19 +147,20 @@ ${body}
       <li><a href="${sitio.redes.instagram}" rel="noopener">Instagram</a></li>
       <li><a href="${sitio.redes.youtube}" rel="noopener">YouTube</a></li></ul></div>
   </div>
-  <div class="legal"><span>© ${new Date().getFullYear()} INCERPAZ. Todos los derechos reservados.</span><span>Bolivia</span></div>
+  <div class="legal"><span>© ${new Date().getFullYear()} INCERPAZ. Todos los derechos reservados. · <a href="${base}privacidad.html">Privacidad y cookies</a></span><span>Bolivia</span></div>
 </div></footer>
 <a class="wa-float" href="${waHref(ciudadDefecto.whatsapp, 'Hola, quisiera más información, por favor.')}" data-wa="Hola, quisiera más información, por favor." rel="noopener">WhatsApp</a>
-<script>window.INCERPAZ=${cfg};</script>
-<script src="${base}assets/js/site.js" defer></script>
-${config.comercio ? `<script src="${base}assets/js/comercio.js" defer></script>` : ''}
-${pagina === 'pavic-recursos' ? `<script src="${base}assets/js/pavic.js" defer></script>` : ''}
-${pagina === 'proyecto' ? `<script src="${base}assets/js/proyectos.js" defer></script>` : ''}
-${config.comercio && pagina === 'admin' ? `<script src="${base}assets/js/admin.js" defer></script>` : ''}
+<script src="${base}${versionado('assets/js/config.js')}" defer></script>
+<script src="${base}${versionado('assets/js/site.js')}" defer></script>
+${config.comercio ? `<script src="${base}${versionado('assets/js/comercio.js')}" defer></script>` : ''}
+${pagina === 'pavic-recursos' ? `<script src="${base}${versionado('assets/js/pavic.js')}" defer></script>` : ''}
+${pagina === 'proyecto' ? `<script src="${base}${versionado('assets/js/proyectos.js')}" defer></script>` : ''}
+${config.comercio && pagina === 'admin' ? `<script src="${base}${versionado('assets/js/admin.js')}" defer></script>` : ''}
 </body>
 </html>`;
 }
 
+const migas = (items) => `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items.map(([nombre, ruta], i) => ({ '@type': 'ListItem', position: i + 1, name: nombre, item: `${sitio.dominio}/${ruta}` })) }).replace(/</g, '\\u003c')}</script>`;
 const orgLd = `<script type="application/ld+json">${JSON.stringify({
   '@context': 'https://schema.org', '@type': 'Organization', name: 'INCERPAZ', url: sitio.dominio,
   logo: `${sitio.dominio}/assets/img/logo-header.png`, sameAs: Object.values(sitio.redes),
@@ -265,7 +280,7 @@ write('index.html', layout({
 /* ============================ CATÁLOGO ============================ */
 write('catalogo.html', layout({
   file: 'catalogo.html',
-  title: 'Productos | INCERPAZ',
+  title: 'Catálogo de productos cerámicos | INCERPAZ',
   desc: 'Catálogo de ladrillos, techos, revestimientos, pisos y piezas especiales de INCERPAZ, con dimensiones, peso y rendimiento por m². Catálogos de Cochabamba y Santa Cruz.',
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
@@ -301,9 +316,9 @@ for (const p of productos) {
   const base = '../../';
   write(`productos/${p.ciudad}/${p.slug}.html`, layout({
     file: `productos/${p.ciudad}/${p.slug}.html`, base,
-    title: `${p.nombre} | INCERPAZ`,
-    desc: `${p.nombre}${p.descripcion ? ': ' + p.descripcion.replace(/\.$/, '') + '.' : ''} Dimensiones, peso y rendimiento. Cotiza por WhatsApp en tu ciudad.`,
-    og: imgs[0] || 'assets/img/logo-header.png', jsonld: ld,
+    title: `${p.nombre} en ${CIUDAD_CATALOGO[p.ciudad]} | INCERPAZ`,
+    desc: `${p.nombre}${p.descripcion ? ': ' + p.descripcion.replace(/\.$/, '') + '.' : ''} Medidas, peso y rendimiento. Catálogo de ${CIUDAD_CATALOGO[p.ciudad]}.`,
+    og: imgs[0] || 'assets/img/logo-header.png', jsonld: ld + migas([['Inicio', ''], ['Productos', `catalogo.html?ciudad=${p.ciudad}`], [p.nombre, `productos/${p.ciudad}/${p.slug}.html`]]),
     body: `
 <div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="${base}index.html">Inicio</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}">Productos</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}&amp;cat=${p.cat}">${esc(CAT_NOMBRE[p.cat] || '')}</a> › ${esc(p.nombre)}</nav></div>
 <section class="wrap" style="padding-bottom:64px"><div class="prod">
@@ -403,7 +418,7 @@ const piezasPavic = pavic.map((p) => {
 write('pavic-recursos.html', layout({
   file: 'pavic-recursos.html', pagina: 'pavic-recursos', title: 'Recursos técnicos PAVIC para proyectistas | INCERPAZ',
   desc: 'Calculadora de obra, detalle en sección, texto para pliegos, DXF y documentación técnica del pavimento cerámico PAVIC para proyectistas, constructoras y entidades.',
-  og: 'assets/img/productos/pavic-peatonal-2.jpg',
+  og: 'assets/img/productos/pavic-peatonal-2.jpg', jsonld: migas([['Inicio', ''], ['PAVIC', 'pavic.html'], ['Recursos técnicos', 'pavic-recursos.html']]),
   body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="pavic.html">PAVIC</a> › Recursos técnicos</nav></div>
 <section class="section" style="padding-top:12px"><div class="wrap">
   <span class="eyebrow">PAVIC · Para proyectistas</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 12px">Recursos técnicos</h1>
@@ -476,6 +491,7 @@ write('donde-estamos.html', layout({
   file: 'donde-estamos.html',
   title: 'Dónde estamos | Agencias y fábricas | INCERPAZ',
   desc: 'Encuentra la agencia INCERPAZ más cercana en Cochabamba, Santa Cruz, Oruro y Sucre, con dirección, teléfono, WhatsApp y cómo llegar.',
+  jsonld: `<script type="application/ld+json">${JSON.stringify(sitio.ciudades.flatMap((c) => sitio.agencias[c.slug].map((a) => ({ '@context': 'https://schema.org', '@type': 'LocalBusiness', name: `INCERPAZ ${a.nombre}`, parentOrganization: { '@type': 'Organization', name: 'INCERPAZ' }, url: `${sitio.dominio}/donde-estamos.html#${c.slug}`, image: `${sitio.dominio}/assets/img/logo-header.png`, telephone: a.telefonos[0] ? '+591' + a.telefonos[0].replace(/\D/g, '') : '+591' + a.whatsapp, address: { '@type': 'PostalAddress', streetAddress: a.direccion, addressLocality: c.nombre, addressCountry: 'BO' } })))).replace(/</g, '\\u003c')}</script>`,
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
   <span class="eyebrow">Dónde estamos</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Agencias y fábricas</h1>
@@ -608,8 +624,8 @@ for (const pr of proyectosData.proyectos) {
   const datos = { proyecto: pr, catalogos, ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })) };
   const ld = { '@context': 'https://schema.org', '@type': 'HowTo', name: pr.titulo, description: pr.resumen, tool: pr.herramientas.map((h) => ({ '@type': 'HowToTool', name: h })), step: pr.pasos.map((x, i) => ({ '@type': 'HowToStep', position: i + 1, name: x.titulo, text: x.texto })) };
   write(`proyectos/${pr.slug}.html`, layout({
-    file: `proyectos/${pr.slug}.html`, base: '../', pagina: 'proyecto', title: `${pr.titulo}: materiales, costos y pasos | INCERPAZ`, desc: `${pr.resumen} Calcula la lista de materiales y sigue los pasos.`,
-    og: pr.imagen, jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`,
+    file: `proyectos/${pr.slug}.html`, base: '../', pagina: 'proyecto', title: `${pr.titulo}: materiales y pasos | INCERPAZ`, desc: `${pr.resumen} Calcula la lista de materiales y sigue los pasos.`,
+    og: pr.imagen, jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>` + migas([['Inicio', ''], ['Proyectos', 'proyectos.html'], [pr.titulo, `proyectos/${pr.slug}.html`]]),
     body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../proyectos.html">Proyectos</a> › ${esc(pr.titulo)}</nav></div>
 <section class="section" style="padding-top:12px"><div class="wrap">
   <span class="eyebrow">Proyecto</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 12px">${esc(pr.titulo)}</h1>
@@ -656,7 +672,7 @@ for (const g of guiasData) {
   const ld = { '@context': 'https://schema.org', '@type': 'Article', headline: g.titulo, description: g.resumen, datePublished: g.fecha, image: `${sitio.dominio}/${g.imagen}`, author: { '@type': 'Organization', name: 'INCERPAZ' }, publisher: { '@type': 'Organization', name: 'INCERPAZ', logo: { '@type': 'ImageObject', url: `${sitio.dominio}/assets/img/logo-header.png` } } };
   write(`guias/${g.slug}.html`, layout({
     file: `guias/${g.slug}.html`, base: b, pagina: 'guia', title: `${g.titulo} | INCERPAZ`, desc: g.resumen, og: g.imagen,
-    jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`,
+    jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>` + migas([['Inicio', ''], ['Guías', 'guias.html'], [g.titulo, `guias/${g.slug}.html`]]),
     body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../guias.html">Guías</a> › ${esc(g.titulo)}</nav></div>
 <article class="section" style="padding-top:12px"><div class="wrap">
   <span class="eyebrow">Guía · ${g.minutos} min de lectura</span><h1 style="font-size:clamp(34px,5vw,56px);margin-block:12px 12px">${esc(g.titulo)}</h1>
@@ -692,17 +708,39 @@ write('exportaciones.html', layout({
 </div></section>`
 }));
 
+/* ============================ PRIVACIDAD ============================ */
+write('privacidad.html', layout({
+  file: 'privacidad.html', pagina: 'privacidad', title: 'Privacidad y cookies | INCERPAZ',
+  desc: 'Qué datos personales recoge este sitio, para qué los usamos, con quién los compartimos y cómo puedes pedir su corrección o eliminación.',
+  body: `<section class="section"><div class="wrap" style="max-width:820px">
+  <span class="eyebrow">Legal</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 18px">Privacidad y cookies</h1>
+  <p class="lead">Cuidamos tus datos. Aquí explicamos qué guardamos cuando usas este sitio y qué puedes pedirnos.</p>
+  <h2 style="margin:30px 0 10px;font-size:28px">Qué datos recogemos</h2>
+  <ul class="lista" style="margin-bottom:14px"><li><b>Cuenta:</b> nombre, tipo de cliente, razón social y NIT (si eres empresa), ciudad, celular, correo y contraseña (guardada cifrada).</li><li><b>Formularios de contacto y cotización:</b> nombre, empresa, celular, correo, ciudad, el mensaje o los datos de tu proyecto y la página desde la que escribiste.</li><li><b>Presupuestos y pedidos:</b> los productos y cantidades, la forma de entrega y de pago, y los datos de facturación que nos indiques.</li></ul>
+  <h2 style="margin:30px 0 10px;font-size:28px">Para qué los usamos</h2>
+  <ul class="lista" style="margin-bottom:14px"><li>Verificar tu cuenta y mostrarte los precios que te corresponden.</li><li>Atender tus consultas, cotizaciones y pedidos.</li><li>Contactarte por teléfono, WhatsApp o correo sobre lo que pediste.</li></ul>
+  <h2 style="margin:30px 0 10px;font-size:28px">Con quién los compartimos</h2>
+  <p style="max-width:68ch">Solo con el equipo de INCERPAZ que atiende tu ciudad, con los sistemas internos de la empresa que procesan tus pedidos y con el proveedor que aloja este sitio. No vendemos tus datos. Si eliges escribirnos por WhatsApp, esa conversación se rige además por las condiciones de WhatsApp.</p>
+  <h2 style="margin:30px 0 10px;font-size:28px">Cookies y almacenamiento en tu navegador</h2>
+  <ul class="lista" style="margin-bottom:14px"><li><b>Sesión (necesaria):</b> una cookie para mantener tu ingreso. Se elimina al salir o vence en unos días.</li><li><b>Preferencias:</b> guardamos en tu navegador la ciudad que elegiste y tu presupuesto en curso.</li><li>Hoy no usamos cookies de publicidad ni de seguimiento. Si más adelante añadimos herramientas de medición, actualizaremos esta página.</li></ul>
+  <h2 style="margin:30px 0 10px;font-size:28px">Tus derechos</h2>
+  <p style="max-width:68ch">Puedes pedirnos ver, corregir o eliminar tus datos escribiendo a <a href="mailto:${sitio.correo}">${sitio.correo}</a> o por el WhatsApp de tu ciudad. Responderemos a la brevedad.</p>
+  <p class="price-note" style="margin-top:28px">Texto base de INCERPAZ. Está pendiente de revisión por el asesor legal de la empresa.</p>
+</div></section>`
+}));
+
 /* ============================ 404, sitemap, robots ============================ */
 write('404.html', layout({
   file: '404.html', title: 'Página no encontrada | INCERPAZ', desc: 'La página que buscas no existe.',
   body: `<section class="section"><div class="wrap"><h1>No encontramos esa página</h1><p class="lead" style="margin-block:16px 28px">Puede que el enlace haya cambiado. Prueba desde el inicio o el catálogo.</p><div class="btn-row"><a class="btn btn--red" href="${sitio.dominio}/">Ir al inicio</a><a class="btn" href="${sitio.dominio}/catalogo.html">Ver productos</a></div></div></section>`
 }));
-const urls = ['', 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
+const urls = ['', 'privacidad.html', 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
 if (config.interno) {
   fs.rmSync(path.join(OUT, 'sitemap.xml'), { force: true });
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
 } else {
-  fs.writeFileSync(path.join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${sitio.dominio}/${u}</loc></url>`).join('\n')}\n</urlset>\n`);
-  fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${sitio.dominio}/sitemap.xml\n`);
+  const hoy = new Date().toISOString().slice(0, 10);
+  fs.writeFileSync(path.join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${sitio.dominio}/${u}</loc><lastmod>${hoy}</lastmod></url>`).join('\n')}\n</urlset>\n`);
+  fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${sitio.dominio}/sitemap.xml\n`);
 }
 console.log(`Sitio generado: ${urls.length} páginas en ${path.relative(ROOT, OUT)}/ (${config.interno ? 'interno, sin indexar' : 'público, indexable'})`);

@@ -55,7 +55,8 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await t.locator('[name="nombre"]').fill('Agencia Prueba'); await t.locator('[name="direccion"]').fill('Av. Prueba 100'); await t.locator('[name="telefonos"]').fill('2-5230000');
     await aviso(() => p.click('#guardar'), 'Cambios publicados');
     const donde = await (await fetch(BASE + 'donde-estamos.html')).text();
-    ok(donde.includes('Agencia Prueba') && donde.includes('71234567'), 'la agencia nueva y el WhatsApp aparecen en Dónde estamos');
+    const cfg = await (await fetch(BASE + 'assets/js/config.js')).text();
+    ok(donde.includes('Agencia Prueba') && cfg.includes('71234567'), 'la agencia nueva y el WhatsApp aparecen en Dónde estamos');
 
     await p.click('[data-tab="agencias"]'); await p.waitForSelector('[data-del="oruro:2"], [data-lista="oruro"] [data-del]');
     await p.locator('[data-lista="oruro"] [data-del]').last().click(); await aviso(() => p.click('#guardar'), 'Cambios publicados');

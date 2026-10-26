@@ -1,0 +1,1 @@
+window.INCERPAZ={"ciudades":[{"slug":"cochabamba","nombre":"Cochabamba","whatsapp":"70750963"},{"slug":"santa-cruz","nombre":"Santa Cruz","whatsapp":"70009021"},{"slug":"oruro","nombre":"Oruro","whatsapp":"60400608"},{"slug":"sucre","nombre":"Sucre","whatsapp":"70213846"}],"leadEndpoint":"/api/leads"};

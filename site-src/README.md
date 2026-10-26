@@ -49,3 +49,6 @@ El dominio previsto es https://www.incerpaz.com (campo `dominio` de `data/sitio.
 
 ## Modo comercio
 Con `"comercio": true` (por defecto) el sitio carga `comercio.js` y necesita el servidor de `server/` (ver `server/README.md`) para cuentas, precios y pedidos.
+
+## Publicación pública
+`PUBLICO=1 node site-src/build.js` genera el sitio indexable (o `"interno": false` en `config.json`). Los archivos `site.css` y los scripts se enlazan con `?v=hash` para poder cachearlos un año. `assets/js/config.js` lo genera el build (ciudades y destino de los formularios). Verificación: `node tools/probar-publico.js`.

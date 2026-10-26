@@ -2,6 +2,7 @@
 /* Aplicación web de INCERPAZ: sirve el sitio estático (/site) y la API de cuentas, precios, presupuestos y pedidos.
    Sin dependencias externas. Los precios solo salen de aquí para cuentas verificadas. */
 const fs = require('node:fs');
+const zlib = require('node:zlib');
 const path = require('node:path');
 const { ErrorHttp, falla, leerJson, responder, cookies, cookie, ip, limitador } = require('./http');
 const auth = require('./auth');
@@ -17,6 +18,8 @@ const ESTADOS_LEAD = ['nuevo', 'contactado', 'cotizado', 'ganado', 'perdido'];
 const ESTADOS_PEDIDO = ['recibido', 'confirmado', 'en_despacho', 'entregado', 'anulado'];
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8' };
 
+const COMPRIMIBLES = new Set(['.html', '.css', '.js', '.json', '.svg', '.xml', '.txt']);
+const CSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
 const txt = (v, max, nombre, { obligatorio = false } = {}) => {
   const s = v == null ? '' : String(v).trim();
   if (obligatorio && !s) falla(400, `Falta ${nombre}`);
@@ -501,8 +504,9 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
   });
 
   /* ---------- servidor de archivos del sitio ---------- */
+  const comprimidos = new Map();
   function servirEstatico(req, res, url) {
-    let p = decodeURIComponent(url.pathname);
+    let p; try { p = decodeURIComponent(url.pathname); } catch { return responder(res, 400, { error: 'Solicitud inválida' }); }
     if (p.includes('\0')) return responder(res, 400, { error: 'Solicitud inválida' });
     if (p === '/' || p === '') p = '/index.html';
     else if (!path.extname(p)) p = fs.existsSync(path.join(SITIO, p + '.html')) ? p + '.html' : p;
@@ -519,7 +523,25 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
         res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': html.length }); return res.end(req.method === 'HEAD' ? undefined : html);
       }
       const ext = path.extname(archivo).toLowerCase();
-      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Content-Length': st.size, 'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=3600' });
+      /* html se revalida siempre (barato con ETag); css y js llevan ?v=hash y no cambian; las imágenes duran una semana */
+      const cache = ext === '.html' ? 'no-cache' : (['.css', '.js'].includes(ext) && url.searchParams.has('v')) ? 'public, max-age=31536000, immutable' : /^\.(jpe?g|png|webp|svg|ico)$/.test(ext) ? 'public, max-age=604800' : 'public, max-age=300, must-revalidate';
+      const etag = `W/"${st.size.toString(16)}-${Math.floor(st.mtimeMs).toString(16)}"`;
+      const cab = { 'Content-Type': MIME[ext] || 'application/octet-stream', ETag: etag, 'Cache-Control': cache, Vary: 'Accept-Encoding' };
+      if (req.headers['if-none-match'] === etag) { res.writeHead(304, cab); return res.end(); }
+      const ae = String(req.headers['accept-encoding'] || '');
+      const enc = COMPRIMIBLES.has(ext) && st.size > 512 ? (/\bbr\b/.test(ae) ? 'br' : /\bgzip\b/.test(ae) ? 'gzip' : null) : null;
+      if (enc) {
+        const clave = `${archivo}|${st.mtimeMs}|${enc}`; let buf = comprimidos.get(clave);
+        if (!buf) {
+          const crudo = fs.readFileSync(archivo);
+          buf = enc === 'br' ? zlib.brotliCompressSync(crudo, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 5 } }) : zlib.gzipSync(crudo, { level: 9 });
+          if (comprimidos.size > 400) comprimidos.clear();
+          comprimidos.set(clave, buf);
+        }
+        res.writeHead(200, Object.assign(cab, { 'Content-Encoding': enc, 'Content-Length': buf.length }));
+        return res.end(req.method === 'HEAD' ? undefined : buf);
+      }
+      res.writeHead(200, Object.assign(cab, { 'Content-Length': st.size }));
       if (req.method === 'HEAD') return res.end();
       fs.createReadStream(archivo).pipe(res);
     });
@@ -530,6 +552,15 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Content-Security-Policy', CSP);
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    if (seguro) res.setHeader('Strict-Transport-Security', 'max-age=31536000');
+    /* en producción: un solo dominio (CANONICAL_HOST, ej. www.incerpaz.com) y siempre https detrás del proxy */
+    const host = String(req.headers.host || '').toLowerCase(); const canon = (process.env.CANONICAL_HOST || '').toLowerCase();
+    const http = process.env.TRUST_PROXY === '1' && req.headers['x-forwarded-proto'] === 'http';
+    if (req.url !== '/api/salud' && ((canon && host !== canon && !/^(localhost|127\.|\[::1\])/.test(host)) || (seguro && http))) {
+      res.writeHead(301, { Location: `${seguro ? 'https' : 'http'}://${canon || host}${req.url}`, 'Content-Length': 0 }); return res.end();
+    }
     const url = new URL(req.url, 'http://localhost');
     try {
       if (!url.pathname.startsWith('/api/')) {
