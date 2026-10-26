@@ -1,5 +1,18 @@
 .git
+.gitignore
 wireframes
+tools
+node_modules
 server/data/incerpaz.db*
 server/data/contenido
-node_modules
+server/data/respaldos
+server/test
+# archivos del juego que comparten el repositorio
+index.html
+js
+icons
+levels.js
+config.js
+style.css
+manifest.json
+*.md

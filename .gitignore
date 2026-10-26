@@ -3,3 +3,4 @@ server/data/incerpaz.db*
 *.db-wal
 *.db-shm
 server/data/contenido/
+.env

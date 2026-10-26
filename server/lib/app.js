@@ -6,6 +6,7 @@ const zlib = require('node:zlib');
 const path = require('node:path');
 const { ErrorHttp, falla, leerJson, responder, cookies, cookie, ip, limitador } = require('./http');
 const auth = require('./auth');
+const { copiaTemporal } = require('./respaldo');
 
 const RAIZ = path.resolve(__dirname, '..', '..');
 const SITIO = path.join(RAIZ, 'site');
@@ -108,7 +109,7 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
   const rutas = [];
   const ruta = (metodo, patron, fn) => rutas.push({ metodo, re: new RegExp(`^${patron.replace(/:(\w+)/g, '(?<$1>[^/]+)')}$`), fn });
 
-  ruta('GET', '/api/salud', async () => ({ ok: true, erp: erp.nombre }));
+  ruta('GET', '/api/salud', async () => { try { db.prepare('SELECT 1').get(); } catch { falla(503, 'Base de datos no disponible'); } if (!fs.existsSync(path.join(SITIO, 'index.html'))) falla(503, 'El sitio aún no está generado'); return { ok: true, erp: erp.nombre }; });
 
   ruta('POST', '/api/registro', async ({ req, body }) => {
     if (!limRegistro(ip(req))) falla(429, 'Demasiados intentos. Prueba más tarde.');
@@ -474,6 +475,15 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
     return { ok: true };
   });
 
+  /* descarga de la base (solo administradores): copia consistente, queda registrada */
+  ruta('GET', '/api/admin/respaldo', async ({ usuario }) => {
+    requerirAdmin(usuario);
+    const archivo = copiaTemporal(db, path.join(contenido.dir, 'tmp'));
+    registrar(usuario, 'respaldo', 'Descargó una copia de la base de datos');
+    const buf = fs.readFileSync(archivo); fs.rmSync(archivo, { force: true });
+    return { crudo: buf, cabeceras: { 'Content-Type': 'application/octet-stream', 'Content-Disposition': `attachment; filename="incerpaz-${new Date().toISOString().slice(0, 10)}.db"`, 'Cache-Control': 'no-store' } };
+  });
+
   ruta('GET', '/api/admin/equipo', async ({ usuario }) => {
     requerirAdmin(usuario);
     return { equipo: db.prepare("SELECT id, rol, estado, nombre, ciudad, correo, creado_en FROM usuarios WHERE rol IN ('admin','ejecutivo') ORDER BY rol, id").all() };
@@ -580,7 +590,7 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
         if (!m) continue;
         const body = cambia && req.method !== 'DELETE' ? await leerJson(req, url.pathname === '/api/admin/imagenes' ? 6_000_000 : undefined) : {};
         const salida = await r.fn({ req, res, url, usuario, params: m.groups || {}, body });
-        if (salida && salida.crudo !== undefined) { const buf = Buffer.from(salida.crudo, 'utf8'); res.writeHead(200, Object.assign({ 'Content-Length': buf.length }, salida.cabeceras)); return res.end(buf); }
+        if (salida && salida.crudo !== undefined) { const buf = Buffer.isBuffer(salida.crudo) ? salida.crudo : Buffer.from(salida.crudo, 'utf8'); res.writeHead(200, Object.assign({ 'Content-Length': buf.length }, salida.cabeceras)); return res.end(buf); }
         if (salida && salida.status) return responder(res, salida.status, salida.cuerpo);
         return responder(res, 200, salida);
       }

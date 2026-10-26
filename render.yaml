@@ -1,0 +1,26 @@
+# Blueprint de Render: crea el servicio de INCERPAZ con disco persistente.
+# En Render: New → Blueprint → elige este repositorio. Detalles en server/DESPLIEGUE.md.
+services:
+  - type: web
+    name: incerpaz
+    runtime: docker
+    plan: starter            # el disco persistente exige un plan de pago
+    region: oregon
+    numInstances: 1          # SQLite: una sola instancia
+    healthCheckPath: /api/salud
+    autoDeploy: true
+    disk:
+      name: datos
+      mountPath: /datos
+      sizeGB: 2
+    envVars:
+      - key: ADMIN_PASSWORD
+        generateValue: true  # Render crea una clave; léela en Environment del servicio
+      - key: ADMIN_CORREO
+        value: hugop1006@gmail.com
+      - key: ADMIN_NOMBRE
+        value: Hugo
+      - key: PUBLICO
+        value: "0"           # cambia a "1" el día de la salida pública
+      - key: CANONICAL_HOST
+        sync: false          # al salir: www.incerpaz.com

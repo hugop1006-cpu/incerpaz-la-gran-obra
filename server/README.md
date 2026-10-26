@@ -14,6 +14,9 @@ Node 22+ sin dependencias (`http` + `node:sqlite`). Sirve el sitio estático de 
 | ERP_ADAPTER | local | `local` (precios y pedidos en este servidor, editables desde el panel), `mock` (precios ficticios) o `seasoft` |
 | CONTENT_DIR | server/data/contenido | Contenido editable (productos, agencias…), imágenes subidas e historial |
 | ADMIN_CORREO / ADMIN_NOMBRE / ADMIN_PASSWORD | hugop1006@gmail.com / Hugo / (al azar) | Administrador inicial; sin ADMIN_PASSWORD se genera una clave y se imprime una sola vez en el registro |
+| PUBLICO | — | `1` hace el sitio indexable (ver DESPLIEGUE.md) |
+| CANONICAL_HOST | — | Dominio principal; otros dominios se redirigen a él |
+| RESPALDO_DIARIO / RESPALDOS_MAX / BACKUP_DIR | — / 14 / /datos/respaldos | Respaldo diario de la base y el contenido |
 | SEMBRAR_DEMO | — | `1` crea la cuenta de prueba ejecutivo.prueba@incerpaz.test (clave Prueba-Incerpaz-2026 o DEMO_PASSWORD). No la actives en producción |
 | SEASOFT_URL / SEASOFT_TOKEN | — | Acceso al ERP (ver ERP.md) |
 | COOKIE_SECURE | 0 | `1` detrás de HTTPS |

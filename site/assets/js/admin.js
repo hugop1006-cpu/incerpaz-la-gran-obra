@@ -210,7 +210,8 @@
   function vistaHistorial() {
     marco('<p class="muted">Cargando…</p>');
     api('GET', '/api/admin/historial').then(function (r) {
-      marco('<h2 style="font-size:26px;margin-bottom:12px">Últimos cambios</h2><div class="scroll"><table class="tabla"><thead><tr><th>Fecha (UTC)</th><th>Quién</th><th>Qué</th></tr></thead><tbody>' +
+      marco('<div class="form-box" style="margin-bottom:28px"><h2 style="font-size:24px;margin-bottom:8px">Copia de seguridad</h2><p class="muted" style="margin-bottom:12px">Descarga una copia de la base de datos (cuentas, pedidos, contactos y precios). Guárdala en un lugar seguro: contiene datos personales.</p><a class="btn" href="/api/admin/respaldo">Descargar copia de la base</a></div>' +
+        '<h2 style="font-size:26px;margin-bottom:12px">Últimos cambios</h2><div class="scroll"><table class="tabla"><thead><tr><th>Fecha (UTC)</th><th>Quién</th><th>Qué</th></tr></thead><tbody>' +
         (r.cambios.map(function (c) { return '<tr><td>' + esc(c.creado_en) + '</td><td>' + esc(c.autor || '—') + '</td><td>' + esc(c.entidad) + ': ' + esc(c.detalle) + '</td></tr>'; }).join('') || '<tr><td colspan="3" class="muted">Todavía no hay cambios.</td></tr>') + '</tbody></table></div>' +
         '<h2 style="font-size:26px;margin:32px 0 8px">Versiones anteriores del contenido</h2><p class="muted" style="margin-bottom:12px">Cada guardado conserva la versión previa. Restaurar vuelve a publicar esa versión (los precios no se ven afectados).</p><div class="scroll"><table class="tabla"><tbody>' +
         r.versiones.map(function (v) { return '<tr><td>' + esc(v) + '</td><td><button class="btn btn--sm" data-rest="' + esc(v) + '" type="button">Restaurar</button></td></tr>'; }).join('') + '</tbody></table></div>');

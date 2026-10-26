@@ -13,6 +13,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { crearContenido } = require('../lib/contenido');
 const { crear: crearLocal } = require('../lib/erp/local');
+const { crearRespaldo } = require('../lib/respaldo');
 
 function levantar(erp = erpMock) {
   const db = abrir(':memory:');
@@ -30,7 +31,7 @@ function cliente(base) {
     const texto = await r.text(); let json = null; try { json = JSON.parse(texto); } catch { /* no es JSON */ }
     return { status: r.status, json, texto, headers: r.headers };
   };
-  return { get: (r) => llamar('GET', r), put: (r, b = {}) => llamar('PUT', r, b), post: (r, b = {}) => llamar('POST', r, b), del: (r) => llamar('DELETE', r), raw: llamar };
+  return { cookie: () => cookie, get: (r) => llamar('GET', r), put: (r, b = {}) => llamar('PUT', r, b), post: (r, b = {}) => llamar('POST', r, b), del: (r) => llamar('DELETE', r), raw: llamar };
 }
 const registro = (o = {}) => Object.assign({ tipo: 'empresa', nombre: 'Ana Ejemplo', razon_social: 'Constructora Ejemplo SRL', nit: '1234567012', ciudad: 'cochabamba', celular: '70000001', correo: 'ana@ejemplo.com', password: 'clave-segura-1' }, o);
 const items = [{ ciudad: 'cochabamba', slug: 'pavic-estandar', cantidad: 1000 }, { ciudad: 'cochabamba', slug: '18-h', cantidad: 500 }];
@@ -210,6 +211,12 @@ test('panel de administración: solo el administrador edita precios, productos, 
   assert.equal((await fetch(`${base}/${sube.json.ruta}`)).status, 200);
   assert.equal((await adm.post('/api/admin/imagenes', { datos: Buffer.from('<script>').toString('base64') })).status, 400);
 
+  /* respaldo: solo el administrador descarga una copia válida de la base */
+  assert.equal((await ej.raw('GET', '/api/admin/respaldo')).status, 403);
+  const rs = await fetch(`${base}/api/admin/respaldo`, { headers: { cookie: adm.cookie() } });
+  assert.equal(rs.status, 200); assert.match(rs.headers.get('content-disposition'), /incerpaz-.*\.db/);
+  assert.equal(Buffer.from(await rs.arrayBuffer()).subarray(0, 15).toString(), 'SQLite format 3', 'la descarga es una base SQLite');
+
   /* equipo, historial y restauración */
   assert.equal((await adm.post('/api/admin/equipo', { nombre: 'Nuevo Ejecutivo', correo: 'nuevo@incerpaz.test', rol: 'ejecutivo', ciudad: 'santa-cruz', password: 'corta' })).status, 400);
   assert.equal((await adm.post('/api/admin/equipo', { nombre: 'Nuevo Ejecutivo', correo: 'nuevo@incerpaz.test', rol: 'ejecutivo', ciudad: 'santa-cruz', password: 'una-clave-larga' })).status, 201);
@@ -250,4 +257,17 @@ test('leads: los formularios públicos se guardan y el equipo los atiende según
   const csv = await adm.raw('GET', '/api/admin/leads.csv'); assert.equal(csv.status, 200); assert.match(csv.headers.get('content-type'), /text\/csv/);
   assert.ok(csv.texto.includes('Constructora X') && csv.texto.includes("'=HYPERLINK"), 'el CSV neutraliza fórmulas');
   cerrar(servidor);
+});
+
+test('respaldos: copia la base y el contenido y conserva solo los últimos', () => {
+  const db = abrir(':memory:'); db.prepare("INSERT INTO ajustes (clave, valor) VALUES ('x', 'dato')").run();
+  const raiz = fs.mkdtempSync(path.join(os.tmpdir(), 'inc-resp-')); const cont = path.join(raiz, 'cont'); fs.mkdirSync(path.join(cont, 'imagenes'), { recursive: true }); fs.writeFileSync(path.join(cont, 'sitio.json'), '{}'); fs.writeFileSync(path.join(cont, 'imagenes', 'a.png'), 'png');
+  const carpeta = path.join(raiz, 'respaldos');
+  const d = crearRespaldo(db, { carpeta, contenidoDir: cont, max: 2 });
+  assert.ok(fs.existsSync(path.join(d, 'contenido', 'imagenes', 'a.png')) && fs.existsSync(path.join(d, 'contenido', 'sitio.json')));
+  const { DatabaseSync } = require('node:sqlite'); const copia = new DatabaseSync(path.join(d, 'incerpaz.db'));
+  assert.equal(copia.prepare("SELECT valor FROM ajustes WHERE clave = 'x'").get().valor, 'dato', 'la copia contiene los datos'); copia.close();
+  for (const n of ['20200101-0000', '20200102-0000', '20200103-0000']) fs.mkdirSync(path.join(carpeta, n));
+  crearRespaldo(db, { carpeta, contenidoDir: cont, max: 2 });
+  assert.equal(fs.readdirSync(carpeta).length, 2, 'se borran los más antiguos');
 });

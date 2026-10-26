@@ -8,6 +8,8 @@ const { elegir } = require('./lib/erp');
 const { crearContenido } = require('./lib/contenido');
 const { sembrarCuentas } = require('./lib/semilla');
 const auth = require('./lib/auth');
+const path = require('node:path');
+const { crearRespaldo } = require('./lib/respaldo');
 const { crearApp } = require('./lib/app');
 
 const db = abrir();
@@ -40,3 +42,12 @@ if (erp.nombre === 'seasoft') {
   }, Number(process.env.SYNC_MS || 300_000)).unref();
 }
 for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => (servidor ? servidor.close(() => process.exit(0)) : process.exit(0)));
+
+/* respaldo diario en el mismo disco (RESPALDO_DIARIO=1): protege de errores y cambios malos; para proteger de la pérdida del
+   disco, descarga una copia desde el panel o programa un respaldo externo (ver server/DESPLIEGUE.md) */
+if (process.env.RESPALDO_DIARIO === '1') {
+  const carpeta = process.env.BACKUP_DIR || path.join(path.dirname(process.env.DB_PATH || path.join(__dirname, 'data', 'incerpaz.db')), 'respaldos');
+  const hacer = () => { try { console.log('[respaldo]', crearRespaldo(db, { carpeta, contenidoDir: contenido.dir })); } catch (e) { console.error('[respaldo]', e.message); } };
+  setTimeout(hacer, 60_000).unref();
+  setInterval(hacer, 24 * 3600_000).unref();
+}
