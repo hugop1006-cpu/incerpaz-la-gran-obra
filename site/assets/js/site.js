@@ -138,6 +138,7 @@
         data[el.name] = el.value;
         if (el.value) lines.push(label + ': ' + el.value);
       });
+      if (CFG.demo) { var dm = $('.form-msg', f.parentNode) || $('.form-msg', f); if (dm) { dm.textContent = 'Esto es una demostración: en el sitio real tu solicitud llegaría a un ejecutivo de ' + city.nombre + '.'; dm.hidden = false; } return; }
       var done = function (texto) { if (msgBox) { msgBox.textContent = texto; msgBox.hidden = false; } f.reset(); };
       if (CFG.leadEndpoint) {
         fetch(CFG.leadEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'incerpaz' }, body: JSON.stringify(data) })

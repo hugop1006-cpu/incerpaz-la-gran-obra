@@ -19,6 +19,9 @@ const config = Object.assign({ leadEndpoint: '', interno: true, comercio: true }
 
 /* PUBLICO=1 publica el sitio: indexable, con sitemap y robots abiertos (ver server/DESPLIEGUE.md) */
 if (process.env.PUBLICO === '1') config.interno = false;
+/* DEMO=1 genera una versión de demostración sin comercio (sin cuentas, precios ni envío de formularios) y con aviso visible */
+const DEMO = process.env.DEMO === '1';
+if (DEMO || process.env.COMERCIO === '0') config.comercio = false;
 
 const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const num = (n) => Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 });
@@ -93,7 +96,7 @@ function versionado(archivo) {
 }
 const recortar = (t, max) => (t.length <= max ? t : t.slice(0, max - 1).replace(/\s+\S*$/, '').replace(/[,:;.\s]+$/, '') + '…');
 fs.mkdirSync(path.join(OUT, 'assets/js'), { recursive: true });
-fs.writeFileSync(path.join(OUT, 'assets/js/config.js'), `window.INCERPAZ=${JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || (config.comercio ? '/api/leads' : '') })};\n`);
+fs.writeFileSync(path.join(OUT, 'assets/js/config.js'), `window.INCERPAZ=${JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || (config.comercio ? '/api/leads' : ''), demo: DEMO })};\n`);
 
 function layout({ file, base = '', title: titulo, desc: descripcion, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '' }) {
   const title = recortar(titulo, 62), desc = recortar(descripcion, 158);
@@ -120,6 +123,7 @@ ${jsonld}
 </head>
 <body data-base="${base}" data-pagina="${pagina}">
 <a class="skip" href="#contenido">Saltar al contenido</a>
+${DEMO ? '<div style="background:#b5121b;color:#fff;font:600 14px/1.4 Barlow,sans-serif;padding:8px 16px;text-align:center">Demostración del rediseño, no es el sitio oficial. Cuentas, precios y pedidos no están activos y los formularios no envían nada. Los botones de WhatsApp sí abren el WhatsApp real de la agencia.</div>' : ''}
 <div class="topbar"><div class="wrap">
   <span>Servicio al cliente <a href="tel:${sitio.servicio_cliente.tel}"><strong>${sitio.servicio_cliente.texto}</strong></a></span>
   <span>${config.comercio ? `<span data-acct><a href="${base}presupuesto.html">Presupuesto (<span data-bcount>0</span>)</a> · <a href="${base}ingresar.html">Ingresar</a></span> · ` : ''}<a href="${base}exportaciones.html">Exportaciones</a> · <a href="${sitio.enlaces_externos.promotores}" rel="noopener">Promotores</a></span>
