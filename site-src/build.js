@@ -73,7 +73,21 @@ productos = productos.map((p) => {
 });
 /* catálogo confiable para el servidor: valida pedidos y presupuestos sin fiarse del navegador */
 fs.mkdirSync(path.dirname(CATALOGO_OUT), { recursive: true });
-fs.writeFileSync(CATALOGO_OUT, JSON.stringify(productos.map((p) => ({ ciudad: p.ciudad, slug: p.slug, codigo: p.codigo || null, nombre: p.nombre })), null, 1));
+/* ---- promociones: novedades (concursos, sorteos, eventos, cursos…) y combos por ciudad ---- */
+const promoRaw = fs.existsSync(path.join(DATA, 'promociones.json')) ? JSON.parse(fs.readFileSync(path.join(DATA, 'promociones.json'), 'utf8')) : { novedades: [], combos: [] };
+/* los contenidos de ejemplo solo se ven en el sitio interno: al publicar no salen */
+const publicable = (x) => x.estado === 'publicada' && !(x.ejemplo && !config.interno);
+const novedades = (promoRaw.novedades || []).filter(publicable);
+const combos = (promoRaw.combos || []).filter(publicable);
+if (!config.interno && ((promoRaw.novedades || []).concat(promoRaw.combos || [])).some((x) => x.ejemplo && x.estado === 'publicada')) console.log('Aviso: hay promociones de ejemplo; no se publican en el sitio público.');
+const TIPO_NOMBRE = { concurso: 'Concurso', sorteo: 'Sorteo', evento: 'Evento', curso: 'Curso', proyecto: 'Proyecto nuevo', noticia: 'Noticia', combo: 'Combo' };
+const GRUPO_TIPO = { concurso: 'concursos', sorteo: 'concursos', evento: 'eventos', curso: 'eventos', proyecto: 'novedades', noticia: 'novedades', combo: 'combos' };
+const fechaCorta = (iso) => new Date(iso + 'T12:00:00').toLocaleDateString('es-BO', { day: 'numeric', month: 'short', year: 'numeric' });
+const nombreCiudades = (lista) => (!lista || !lista.length ? 'todas las ciudades' : lista.map((c) => (sitio.ciudades.find((x) => x.slug === c) || { nombre: c }).nombre).join(', '));
+const comboProductos = (c) => c.componentes.map((x) => (x.tipo === 'catalogo' ? { ...x, producto: productos.find((p) => p.ciudad === c.catalogo && p.slug === x.slug) } : x));
+const comboImagen = (c) => c.imagen || ((comboProductos(c).find((x) => x.producto && x.producto.imagenes[0]) || {}).producto || { imagenes: [] }).imagenes[0] || '';
+fs.writeFileSync(CATALOGO_OUT, JSON.stringify(productos.map((p) => ({ ciudad: p.ciudad, slug: p.slug, codigo: p.codigo || null, nombre: p.nombre })).concat(combos.map((c) => ({ ciudad: c.catalogo, slug: `combo-${c.id}`, codigo: `COMBO-${c.id.toUpperCase().slice(0, 24)}`, nombre: c.titulo, combo: true,
+  componentes: comboProductos(c).map((x) => (x.tipo === 'catalogo' ? { codigo: x.producto ? x.producto.codigo || null : null, nombre: x.producto ? x.producto.nombre : x.slug, cantidad: x.cantidad } : { nombre: x.nombre, cantidad: x.cantidad })) }))), null, 1));
 const pavic = productos.filter((p) => /pavic/i.test(p.linea) || /^pavic/.test(p.slug));
 const purl = (p, base = '') => `${base}productos/${p.ciudad}/${p.slug}.html`;
 const medidaTexto = (p) => (p.largo && p.ancho && p.alto) ? `${num(p.largo)} × ${num(p.ancho)} × ${num(p.alto)} cm` : (p.medidas.length ? p.medidas.slice(0, 2).map(([l, v]) => `${l.toLowerCase()} ${num(v)} cm`).join(' · ') : (p.codigo ? `Código ${p.codigo}` : ''));
@@ -81,6 +95,7 @@ const medidaTexto = (p) => (p.largo && p.ancho && p.alto) ? `${num(p.largo)} × 
 /* ---- plantilla ---- */
 const NAV = [
   ['catalogo.html', 'Productos'],
+  ['promociones.html', 'Promociones'],
   ['proyectos.html', 'Proyectos'],
   ['guias.html', 'Guías'],
   ['pavic.html', 'PAVIC'],
@@ -157,6 +172,7 @@ ${body}
 <script src="${base}${versionado('assets/js/config.js')}" defer></script>
 <script src="${base}${versionado('assets/js/site.js')}" defer></script>
 ${config.comercio ? `<script src="${base}${versionado('assets/js/comercio.js')}" defer></script>` : ''}
+${['inicio', 'promociones', 'promocion', 'combo'].includes(pagina) ? `<script src="${base}${versionado('assets/js/promos.js')}" defer></script>` : ''}
 ${pagina === 'pavic-recursos' ? `<script src="${base}${versionado('assets/js/pavic.js')}" defer></script>` : ''}
 ${pagina === 'proyecto' ? `<script src="${base}${versionado('assets/js/proyectos.js')}" defer></script>` : ''}
 ${config.comercio && pagina === 'admin' ? `<script src="${base}${versionado('assets/js/admin.js')}" defer></script>` : ''}
@@ -179,6 +195,28 @@ function productCard(p, base = '') {
   <div class="img">${im ? `<img src="${base}${im}" alt="${esc(p.nombre)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
   <div class="body"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>
   ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir</button></div>` : ''}</article>`;
+}
+
+/* ---- promociones: tarjetas y datos públicos ---- */
+const novedadUrl = (n, base = '') => `${base}promociones/${n.id}.html`;
+const comboUrl = (c, base = '') => `${base}combos/${c.catalogo}/${c.id}.html`;
+function promosPublicas() {
+  return novedades.map((n) => ({ id: n.id, tipo: n.tipo, grupo: GRUPO_TIPO[n.tipo], titulo: n.titulo, resumen: n.resumen, url: novedadUrl(n), imagen: n.imagen, ciudades: n.ciudades, inicio: n.inicio, fin: n.fin }))
+    .concat(combos.map((c) => ({ id: c.id, tipo: 'combo', grupo: 'combos', titulo: c.titulo, resumen: c.descripcion, url: comboUrl(c), imagen: comboImagen(c), ciudades: c.ciudades, inicio: c.inicio, fin: c.fin })));
+}
+function promoCard(x, base = '') {
+  return `<a class="promo-card" href="${base}${x.url}" data-grupo="${x.grupo}" data-ciudades="${x.ciudades.join(' ')}" data-inicio="${x.inicio}" data-fin="${x.fin}">
+  <div class="img">${x.imagen ? `<img src="${base}${x.imagen}" alt="" loading="lazy" width="600" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:30%;opacity:.25">`}</div>
+  <div class="body"><span class="tag${x.tipo === 'combo' ? ' tag--combo' : ''}">${TIPO_NOMBRE[x.tipo]}</span><h3>${esc(x.titulo)}</h3><p>${esc(x.resumen)}</p><span class="meta">Hasta el ${fechaCorta(x.fin)} · ${esc(nombreCiudades(x.ciudades))}</span></div></a>`;
+}
+function comboCard(c, base = '') {
+  const im = comboImagen(c);
+  return `<article class="pcard pcard--combo" data-ciudad="${c.catalogo}" data-cats="combos" data-name="${esc(c.titulo)}" data-ciudades="${c.ciudades.join(' ')}" data-inicio="${c.inicio}" data-fin="${c.fin}">
+  <a class="pcard-link" href="${comboUrl(c, base)}">
+  <div class="img">${im ? `<img src="${base}${im}" alt="${esc(c.titulo)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
+  <div class="body"><span class="tag tag--combo">Combo</span><h3>${esc(c.titulo)}</h3><span class="meta">${c.componentes.length} componentes · hasta el ${fechaCorta(c.fin)}</span></div></a>
+  ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${c.catalogo}" data-slug="combo-${c.id}">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="${c.catalogo}" data-slug="combo-${c.id}" data-nombre="${esc(c.titulo)}" data-codigo="COMBO">Añadir</button></div>` : ''}
+</article>`;
 }
 function calcOptions(list) {
   const grupos = {};
@@ -218,12 +256,14 @@ function write(file, html) {
 }
 /* borra las páginas de producto anteriores para no dejar archivos huérfanos */
 fs.rmSync(path.join(OUT, 'productos'), { recursive: true, force: true });
+fs.rmSync(path.join(OUT, 'promociones'), { recursive: true, force: true });
+fs.rmSync(path.join(OUT, 'combos'), { recursive: true, force: true });
 
 /* ============================ HOME ============================ */
 const mosaico = ['18-h', 'brick-enchape-corto', '9-huecos-economico-rayado', 'brick-estandar', 'pavic-peatonal', 'biscocho']
   .map((s) => `assets/img/productos/${s}-2.jpg`);
 write('index.html', layout({
-  file: 'index.html',
+  file: 'index.html', pagina: 'inicio',
   title: 'INCERPAZ | Cerámica para construir tu hogar',
   desc: 'Ladrillos, pisos, techos, revestimientos y pavimentos cerámicos fabricados en Bolivia. Calcula tus piezas, encuentra tu agencia y cotiza por WhatsApp en Cochabamba, Santa Cruz, Oruro y Sucre.',
   jsonld: orgLd,
@@ -245,6 +285,11 @@ write('index.html', layout({
   <a href="donde-estamos.html"><b>Dónde comprar</b><span>Agencias y WhatsApp por ciudad</span></a>
   <a href="pavic.html"><b>PAVIC</b><span>Pavimentos para proyectos</span></a>
 </div></section>
+
+<section class="section section--grey" id="promos-home" hidden><div class="wrap">
+  <div class="section-head"><div class="row"><div><span class="eyebrow">Promociones</span><h2 style="margin-top:12px">Vigentes en <span data-city-name>tu ciudad</span></h2></div><a class="btn" href="promociones.html">Ver todas</a></div></div>
+  <div class="promo-grid" id="promos-home-lista"></div>
+</div><script type="application/json" id="datos-promos">${JSON.stringify(promosPublicas())}</script></section>
 
 <section class="section"><div class="wrap">
   <div class="section-head"><span class="eyebrow">Productos</span><h2>Todo para levantar y terminar tu obra</h2></div>
@@ -294,12 +339,12 @@ write('catalogo.html', layout({
 <section class="wrap" style="padding-bottom:72px">
   <div class="filters">
     <div><span class="mono-label">Catálogo de</span><div class="chips" role="group" aria-label="Catálogo por ciudad">${Object.entries(CIUDAD_CATALOGO).map(([s, n]) => `<button class="chip" data-catalogo="${s}" type="button" aria-pressed="false">${n}</button>`).join('')}</div></div>
-    <div style="flex:1 1 100%"><span class="mono-label">Categoría</span><div class="chips" role="group" aria-label="Categorías"><button class="chip" data-cat="todas" type="button" aria-pressed="true">Todas</button>${sitio.categorias.map((c) => `<button class="chip" data-cat="${c.slug}" type="button" aria-pressed="false">${esc(c.nombre)}</button>`).join('')}</div></div>
+    <div style="flex:1 1 100%"><span class="mono-label">Categoría</span><div class="chips" role="group" aria-label="Categorías"><button class="chip" data-cat="todas" type="button" aria-pressed="true">Todas</button>${combos.length ? '<button class="chip" data-cat="combos" type="button" aria-pressed="false">Combos del mes</button>' : ''}${sitio.categorias.map((c) => `<button class="chip" data-cat="${c.slug}" type="button" aria-pressed="false">${esc(c.nombre)}</button>`).join('')}</div></div>
     <label class="search">Buscar<input id="q" type="search" placeholder="Ej. 6 huecos, enchape, teja" autocomplete="off"></label>
     <span id="count" class="muted" aria-live="polite"></span>
   </div>
   <p class="price-note" id="catNota" hidden></p>
-  <div class="grid-products" id="grid">${productos.map((p) => productCard(p)).join('')}</div>
+  <div class="grid-products" id="grid">${combos.map((c) => comboCard(c)).join('')}${productos.map((p) => productCard(p)).join('')}</div>
   <div class="empty" id="empty" hidden><b>No encontramos ese producto en este catálogo.</b><p class="muted" style="margin-top:6px">Prueba otra palabra, cambia de catálogo o escríbenos por WhatsApp y te ayudamos.</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--wa" data-wa="Hola, busco un producto que no encuentro en el catálogo. Estoy en {ciudad}." href="${waHref(ciudadDefecto.whatsapp, 'Hola, busco un producto que no encuentro en el catálogo.')}" rel="noopener">Escribir por WhatsApp</a></div></div>
 </section>`
 }));
@@ -733,12 +778,78 @@ write('privacidad.html', layout({
 </div></section>`
 }));
 
+/* ============================ PROMOCIONES ============================ */
+const FILTROS_PROMO = [['todas', 'Todas'], ['combos', 'Combos'], ['concursos', 'Concursos y sorteos'], ['eventos', 'Eventos y cursos'], ['novedades', 'Novedades']];
+write('promociones.html', layout({
+  file: 'promociones.html', pagina: 'promociones', title: 'Promociones, combos y eventos | INCERPAZ',
+  desc: 'Combos del mes, concursos, sorteos, eventos, cursos y proyectos nuevos de INCERPAZ en tu ciudad.',
+  body: `<section class="section"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Promociones</span><h1 style="font-size:clamp(36px,5vw,60px)">Lo que hay en <span data-city-name>tu ciudad</span></h1><p class="lead">Combos del mes, concursos, eventos y cursos. Cambia de ciudad arriba para ver las de otra agencia.</p></div>
+  <div class="chips" role="group" aria-label="Tipo de promoción" style="margin-bottom:28px">${FILTROS_PROMO.map(([k, n], i) => `<button class="chip" type="button" data-grupo="${k}" aria-pressed="${i === 0}">${n}</button>`).join('')}</div>
+  <div class="promo-grid" id="promos-lista">${promosPublicas().map((x) => promoCard(x)).join('')}</div>
+  <div class="empty" id="promos-vacio" hidden><b>No hay promociones vigentes en <span data-city-name>tu ciudad</span> por ahora.</b><p class="muted" style="margin-top:6px">Escríbenos y te contamos qué viene.</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--wa" data-wa="Hola, quisiera saber qué promociones hay en {ciudad}." href="${waHref(ciudadDefecto.whatsapp, 'Hola, quisiera saber qué promociones hay en Cochabamba.')}" rel="noopener">Preguntar por WhatsApp</a></div></div>
+</div></section>`
+}));
+const estadoPromoHtml = (x) => `<p id="promo-estado" class="price-note" data-promo data-inicio="${x.inicio}" data-fin="${x.fin}" data-ciudades="${(x.ciudades || []).join(' ')}" aria-live="polite">Vigente hasta el ${fechaCorta(x.fin)} · ${esc(nombreCiudades(x.ciudades))}</p>`;
+for (const n of novedades) {
+  const waTxt = `Hola, quiero participar en "${n.titulo}" en {ciudad}.`;
+  const cta = n.cta.tipo === 'whatsapp' ? `<a class="btn btn--wa" data-wa="${esc(waTxt)}" href="${waHref(ciudadDefecto.whatsapp, waTxt.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">${esc(n.cta.texto || 'Escribir por WhatsApp')}</a>`
+    : n.cta.tipo === 'enlace' ? `<a class="btn btn--red" href="${esc(n.cta.url)}" rel="noopener">${esc(n.cta.texto || 'Más información')}</a>`
+    : n.cta.tipo === 'inscripcion' ? leadForm({ asunto: `Inscripción: ${n.titulo}`, boton: n.cta.texto || 'Inscribirme', campos: `<input type="hidden" name="campana" value="${esc(n.id)}">` + field('Nombre', 'nombre', 'required autocomplete="name"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel"') + field('Correo', 'correo', 'type="email" autocomplete="email"') + selectCities('ciudad') }) : '';
+  const ld = ['evento', 'curso'].includes(n.tipo) && n.fecha_evento ? `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: n.titulo, description: n.resumen, startDate: n.fecha_evento, eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled', ...(n.lugar ? { location: { '@type': 'Place', name: n.lugar, address: n.lugar } } : {}), organizer: { '@type': 'Organization', name: 'INCERPAZ', url: sitio.dominio } }).replace(/</g, '\\u003c')}</script>` : '';
+  write(`promociones/${n.id}.html`, layout({
+    file: `promociones/${n.id}.html`, base: '../', pagina: 'promocion', title: `${n.titulo} | INCERPAZ`, desc: n.resumen, og: n.imagen || 'assets/img/productos/pavic-tabaco-2.jpg',
+    jsonld: ld + migas([['Inicio', ''], ['Promociones', 'promociones.html'], [n.titulo, `promociones/${n.id}.html`]]),
+    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../promociones.html">Promociones</a> › ${esc(n.titulo)}</nav></div>
+<section class="section" style="padding-top:12px"><div class="wrap split">
+  <div>
+    <span class="tag${''}">${TIPO_NOMBRE[n.tipo]}</span>
+    <h1 style="font-size:clamp(34px,5vw,56px);margin-block:12px 14px">${esc(n.titulo)}</h1>
+    <p class="lead">${esc(n.resumen)}</p>
+    ${estadoPromoHtml(n)}
+    ${n.texto ? n.texto.split(/\n+/).map((t) => `<p style="margin-bottom:14px;max-width:62ch">${esc(t)}</p>`).join('') : ''}
+    ${(n.fecha_evento || n.lugar || n.cupo) ? `<table class="specs"><tbody>${n.fecha_evento ? `<tr><th scope="row">Fecha</th><td>${fechaCorta(n.fecha_evento)}</td></tr>` : ''}${n.lugar ? `<tr><th scope="row">Lugar</th><td>${esc(n.lugar)}</td></tr>` : ''}${n.cupo ? `<tr><th scope="row">Cupo</th><td>${n.cupo} personas</td></tr>` : ''}</tbody></table>` : ''}
+    ${n.bases ? `<details style="margin-top:18px"><summary style="cursor:pointer;font-weight:600">Bases y condiciones</summary><p style="margin-top:10px;max-width:62ch">${esc(n.bases).replace(/\n+/g, '<br>')}</p></details>` : ''}
+    ${cta ? `<div data-promo-cta style="margin-top:24px">${cta}</div>` : ''}
+  </div>
+  ${n.imagen ? `<div class="gallery"><div class="main"><img src="../${n.imagen}" alt="" width="800" height="800"></div></div>` : ''}
+</div></section>`
+  }));
+}
+for (const c of combos) {
+  const filas = comboProductos(c).map((x) => `<tr><td>${x.tipo === 'catalogo' && x.producto ? `<a href="../../productos/${c.catalogo}/${x.slug}.html">${esc(x.producto.nombre)}</a>` : esc(x.nombre || x.slug)}${x.nota ? `<br><span class="muted" style="font-size:15px">${esc(x.nota)}</span>` : ''}</td><td class="num">${num(x.cantidad)}</td><td>${x.tipo === 'catalogo' ? 'Producto INCERPAZ' : 'Incluido en el combo'}</td></tr>`).join('');
+  const waTxt = `Hola, quiero el combo "${c.titulo}" en {ciudad}.`;
+  const im = comboImagen(c);
+  write(`combos/${c.catalogo}/${c.id}.html`, layout({
+    file: `combos/${c.catalogo}/${c.id}.html`, base: '../../', pagina: 'combo', title: `${c.titulo} | INCERPAZ`, desc: c.descripcion || `Combo con ${c.componentes.length} componentes. Vigente hasta el ${fechaCorta(c.fin)}.`, og: im || 'assets/img/productos/pavic-tabaco-2.jpg',
+    jsonld: migas([['Inicio', ''], ['Promociones', 'promociones.html'], [c.titulo, `combos/${c.catalogo}/${c.id}.html`]]),
+    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../../index.html">Inicio</a> › <a href="../../promociones.html">Promociones</a> › ${esc(c.titulo)}</nav></div>
+<section class="wrap" style="padding-bottom:48px"><div class="prod">
+  <div class="gallery"><div class="main">${im ? `<img src="../../${im}" alt="${esc(c.titulo)}" width="800" height="800">` : `<img src="../../assets/img/logo-icono.png" alt="" style="width:30%;opacity:.25">`}</div></div>
+  <div>
+    <div class="btn-row" style="gap:8px"><span class="tag tag--combo">Combo</span><span class="tag">${esc(nombreCiudades(c.ciudades))}</span></div>
+    <h1>${esc(c.titulo)}</h1>
+    ${c.descripcion ? `<p class="lead">${esc(c.descripcion)}</p>` : ''}
+    ${estadoPromoHtml(c)}
+    <h2 style="font-size:28px;margin:22px 0 8px">Qué incluye</h2>
+    <div class="scroll"><table class="tabla"><thead><tr><th>Componente</th><th class="num">Cantidad</th><th>Origen</th></tr></thead><tbody>${filas}</tbody></table></div>
+    <div data-promo-cta>
+    ${config.comercio ? `<div class="buy-box"><p class="precio-big" data-precio data-ciudad="${c.catalogo}" data-slug="combo-${c.id}">Precio con sesión</p>
+      <div class="buy-row"><label>Cantidad de combos<input id="qty" type="number" min="1" step="1" value="1"></label><button class="btn btn--red" type="button" data-add data-qty-from="#qty" data-ciudad="${c.catalogo}" data-slug="combo-${c.id}" data-nombre="${esc(c.titulo)}" data-codigo="COMBO">Añadir al presupuesto</button></div>
+      <p class="muted" style="font-size:15px;margin-top:10px">El precio se ve con una cuenta verificada. Los productos que no son de INCERPAZ vienen incluidos en el combo.</p></div>` : `<p class="price-note"><strong>Precio:</strong> lo confirma la agencia de tu ciudad. Escríbenos y te cotizamos.</p>`}
+    <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waTxt)}" href="${waHref(ciudadDefecto.whatsapp, waTxt.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Pedir por WhatsApp</a><a class="btn" href="../../donde-estamos.html">Dónde comprar</a></div>
+    </div>
+  </div>
+</div></section>`
+  }));
+}
+
 /* ============================ 404, sitemap, robots ============================ */
 write('404.html', layout({
   file: '404.html', title: 'Página no encontrada | INCERPAZ', desc: 'La página que buscas no existe.',
   body: `<section class="section"><div class="wrap"><h1>No encontramos esa página</h1><p class="lead" style="margin-block:16px 28px">Puede que el enlace haya cambiado. Prueba desde el inicio o el catálogo.</p><div class="btn-row"><a class="btn btn--red" href="${sitio.dominio}/">Ir al inicio</a><a class="btn" href="${sitio.dominio}/catalogo.html">Ver productos</a></div></div></section>`
 }));
-const urls = ['', 'privacidad.html', 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
+const urls = ['', 'privacidad.html', 'promociones.html', ...novedades.map((n) => `promociones/${n.id}.html`), ...combos.map((c) => `combos/${c.catalogo}/${c.id}.html`), 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
 if (config.interno) {
   fs.rmSync(path.join(OUT, 'sitemap.xml'), { force: true });
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');

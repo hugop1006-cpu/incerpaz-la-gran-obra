@@ -299,3 +299,52 @@ test('detrás de Cloudflare: IP real, candado de origen y política CSP ampliabl
     cerrar(servidor);
   }
 });
+
+test('promociones: combos con productos fuera del catálogo y flujo borrador, revisión y publicación por ciudad', async () => {
+  const db = abrir(':memory:'); const erp = crearLocal(db);
+  const contenido = crearContenido({ dir: fs.mkdtempSync(path.join(os.tmpdir(), 'inc-promo-')), construir: false });
+  const servidor = http.createServer(crearApp({ db, erp, contenido }));
+  await new Promise((ok) => servidor.listen(0, '127.0.0.1', ok));
+  const base = `http://127.0.0.1:${servidor.address().port}`; const adm = cliente(base), ejC = cliente(base), ejS = cliente(base), cli = cliente(base);
+  const cuenta = (rol, correo, ciudad) => db.prepare("INSERT INTO usuarios (rol, estado, tipo, nombre, ciudad, celular, correo, pass_hash) VALUES (?, 'verificado','empresa','Persona',?,'70000009',?,?)").run(rol, ciudad, correo, hashPassword('clave-larga-123'));
+  cuenta('admin', 'a@incerpaz.test', 'cochabamba'); cuenta('ejecutivo', 'c@incerpaz.test', 'cochabamba'); cuenta('ejecutivo', 's@incerpaz.test', 'santa-cruz');
+  for (const [c, u] of [[adm, 'a'], [ejC, 'c'], [ejS, 's']]) await c.post('/api/login', { correo: `${u}@incerpaz.test`, password: 'clave-larga-123' });
+  await cli.post('/api/registro', registro()); await cli.post('/api/login', { correo: 'ana@ejemplo.com', password: 'clave-segura-1' });
+  assert.equal((await cli.get('/api/admin/promos')).status, 403, 'un cliente no entra');
+  assert.equal((await ejC.get('/api/admin/promos')).json.combos.length, 0, 'el ejecutivo no ve lo de otros');
+  assert.equal((await adm.get('/api/admin/promos')).json.combos.length, 2, 'el administrador ve los ejemplos');
+
+  const combo = { id: 'combo-prueba', titulo: 'Combo de prueba', descripcion: 'Con ollas y cubiertos', catalogo: 'cochabamba', ciudades: ['cochabamba'], inicio: '2026-11-01', fin: '2026-11-30', estado: 'borrador', precios: { general: 1500, constructor: 1400 },
+    componentes: [{ tipo: 'catalogo', slug: 'brick-estandar', cantidad: 200 }, { tipo: 'otro', nombre: 'Olla de aluminio', cantidad: 2 }, { tipo: 'otro', nombre: 'Juego de cubiertos', cantidad: 1, nota: '24 piezas' }] };
+  assert.equal((await ejC.post('/api/admin/combos', { ...combo, estado: 'publicada' })).status, 403, 'un ejecutivo no publica');
+  assert.equal((await ejC.post('/api/admin/combos', { ...combo, ciudades: ['santa-cruz'] })).status, 403, 'solo su ciudad');
+  assert.equal((await ejC.post('/api/admin/combos', { ...combo, ciudades: [] })).status, 403);
+  assert.equal((await ejC.post('/api/admin/combos', { ...combo, componentes: [{ tipo: 'catalogo', slug: 'no-existe', cantidad: 1 }] })).status, 400, 'producto inexistente');
+  assert.equal((await ejC.post('/api/admin/combos', { ...combo, componentes: [{ tipo: 'otro', nombre: '', cantidad: 1 }] })).status, 400, 'un producto ajeno necesita nombre');
+  assert.equal((await ejC.post('/api/admin/combos', { ...combo, componentes: [] })).status, 400);
+  assert.equal((await ejC.post('/api/admin/combos', { ...combo, fin: '2026-10-01' })).status, 400, 'fin antes del inicio');
+  assert.equal((await ejC.post('/api/admin/combos', combo)).status, 201);
+  assert.equal((await ejC.post('/api/admin/combos', combo)).status, 409, 'no se repite el identificador');
+  let mio = (await ejC.get('/api/admin/promos')).json.combos; assert.equal(mio.length, 1); assert.equal(mio[0].autor_ciudad, 'cochabamba'); assert.equal(mio[0].precios.general, 1500);
+  assert.equal(mio[0].componentes.filter((x) => x.tipo === 'otro').length, 2, 'guarda los productos que no son del catálogo');
+  assert.equal((await ejS.put('/api/admin/combos/combo-prueba', combo)).status, 404, 'otra ciudad no lo toca');
+  assert.equal((await ejC.put('/api/admin/combos/combo-prueba', { ...combo, estado: 'revision', titulo: 'Combo de prueba v2', precios: { general: 1600, constructor: null } })).status, 200);
+  mio = (await ejC.get('/api/admin/promos')).json.combos; assert.equal(mio[0].estado, 'revision'); assert.equal(mio[0].precios.general, 1600); assert.equal(Object.hasOwn(mio[0].precios, 'constructor'), false, 'null borra el precio');
+  assert.equal((await adm.put('/api/admin/combos/combo-prueba', { ...combo, estado: 'publicada', titulo: 'Combo de prueba v2' })).status, 200, 'el administrador publica');
+  assert.equal((await ejC.put('/api/admin/combos/combo-prueba', { ...combo, estado: 'borrador' })).status, 403, 'publicada: solo el administrador edita');
+  assert.equal((await ejC.raw('DELETE', '/api/admin/combos/combo-prueba')).status, 403);
+
+  const nov = { id: 'sorteo-prueba', tipo: 'sorteo', titulo: 'Sorteo de prueba', resumen: 'Un sorteo', texto: '', ciudades: ['cochabamba'], inicio: '2026-11-01', fin: '2026-12-01', estado: 'revision', cta: { tipo: 'whatsapp', texto: 'Participar' } };
+  assert.equal((await ejC.post('/api/admin/novedades', nov)).status, 400, 'un sorteo sin bases no pasa a revisión');
+  assert.equal((await ejC.post('/api/admin/novedades', { ...nov, bases: 'Bases: participan mayores de edad con compra de cualquier producto.' })).status, 201);
+  assert.equal((await ejC.post('/api/admin/novedades', { ...nov, id: 'sorteo-otro', bases: 'Bases suficientes para el sorteo de prueba.', cta: { tipo: 'enlace', texto: 'Ir', url: 'http://inseguro.com' } })).status, 400, 'el enlace debe ser https');
+  assert.equal((await ejC.post('/api/admin/novedades', { ...nov, id: 'borrador-sin-bases', estado: 'borrador' })).status, 201, 'un borrador no exige las bases todavía');
+  assert.equal((await ejC.raw('DELETE', '/api/admin/novedades/borrador-sin-bases')).status, 200, 'el ejecutivo borra sus borradores');
+  assert.equal((await adm.raw('DELETE', '/api/admin/novedades/sorteo-prueba')).status, 200);
+  assert.equal((await adm.raw('DELETE', '/api/admin/combos/combo-prueba')).status, 200);
+  assert.equal((await adm.get('/api/admin/promos')).json.combos.length, 2);
+  const img = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47]), Buffer.alloc(40)]).toString('base64');
+  assert.equal((await ejC.post('/api/admin/imagenes', { datos: img })).status, 201, 'el ejecutivo sube imágenes para sus promociones');
+  assert.equal((await cli.post('/api/admin/imagenes', { datos: img })).status, 403);
+  cerrar(servidor);
+});

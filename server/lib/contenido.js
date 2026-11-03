@@ -11,6 +11,10 @@ const RAIZ = path.resolve(__dirname, '..', '..');
 const SEMILLA = path.join(RAIZ, 'site-src', 'data');
 const CIUDADES = ['cochabamba', 'santa-cruz', 'oruro', 'sucre'];
 const TIPOS_AGENCIA = ['agencia', 'fabrica'];
+const TIPOS_NOVEDAD = ['concurso', 'sorteo', 'evento', 'curso', 'proyecto', 'noticia'];
+const ESTADOS_PROMO = ['borrador', 'revision', 'publicada'];
+const CATALOGOS = ['cochabamba', 'santa-cruz'];
+const RE_IMAGEN = /^assets\/img\/(productos|subidas)\/[\w.-]+\.(jpg|jpeg|png|webp)$/i;
 
 const cad = (v, max, nombre, obligatorio = true) => {
   const s = v == null ? '' : String(v).replace(/\s+/g, ' ').trim();
@@ -22,7 +26,7 @@ const url = (v, nombre) => { const s = cad(v, 300, nombre, false); if (s && !/^h
 
 function crearContenido({ dir = process.env.CONTENT_DIR || path.join(RAIZ, 'server', 'data', 'contenido'), construir = true } = {}) {
   fs.mkdirSync(path.join(dir, 'historial'), { recursive: true });
-  for (const f of ['sitio.json', 'productos.json']) if (!fs.existsSync(path.join(dir, f))) fs.copyFileSync(path.join(SEMILLA, f), path.join(dir, f));
+  for (const f of ['sitio.json', 'productos.json', 'promociones.json']) if (!fs.existsSync(path.join(dir, f))) fs.copyFileSync(path.join(SEMILLA, f), path.join(dir, f));
   const leer = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
   function escribir(f, datos) {
     const destino = path.join(dir, f);
@@ -94,8 +98,70 @@ function crearContenido({ dir = process.env.CONTENT_DIR || path.join(RAIZ, 'serv
       medidas, peso, rendimiento: cad(p.rendimiento, 200, 'el rendimiento', false), a_pedido: !!p.a_pedido, categorias, imagenes };
   }
 
+  /* ---------- promociones: novedades (concursos, sorteos, eventos, cursos…) y combos ---------- */
+  const fecha = (v, nombre, obligatorio) => {
+    const t = String(v || '').trim();
+    if (!t) { if (obligatorio) falla(400, `Falta ${nombre}`); return ''; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(t) || Number.isNaN(Date.parse(t))) falla(400, `${nombre} no es una fecha válida`);
+    return t;
+  };
+  const ciudadesDe = (v) => [...new Set((Array.isArray(v) ? v : []).filter((c) => CIUDADES.includes(c)))];
+  const idPromo = (v) => { const t = String(v || '').trim(); if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(t) || t.length < 3 || t.length > 60) falla(400, 'El identificador usa minúsculas, números y guiones (3 a 60 caracteres)'); return t; };
+  const estadoPromo = (v) => { if (!ESTADOS_PROMO.includes(v)) falla(400, 'Estado inválido'); return v; };
+  const imagenPromo = (v) => { const t = String(v || '').trim(); if (t && !RE_IMAGEN.test(t)) falla(400, 'Imagen inválida'); return t; };
+  function normalizarNovedad(n, previo) {
+    const tipo = TIPOS_NOVEDAD.includes(n.tipo) ? n.tipo : falla(400, 'Tipo inválido');
+    const estado = estadoPromo(n.estado);
+    const inicio = fecha(n.inicio, 'la fecha de inicio', true), fin = fecha(n.fin, 'la fecha de fin', true);
+    if (fin < inicio) falla(400, 'La fecha de fin es anterior al inicio');
+    const bases = cad(n.bases, 3000, 'las bases', false);
+    if (['concurso', 'sorteo'].includes(tipo) && estado !== 'borrador' && bases.length < 20) falla(400, 'Un concurso o sorteo necesita sus bases escritas antes de enviarse a revisión');
+    const ctaTipo = ['whatsapp', 'inscripcion', 'enlace', 'ninguno'].includes(n.cta && n.cta.tipo) ? n.cta.tipo : 'ninguno';
+    const ctaUrl = ctaTipo === 'enlace' ? url(n.cta && n.cta.url, 'el enlace') : '';
+    if (ctaTipo === 'enlace' && !ctaUrl) falla(400, 'Falta el enlace del botón');
+    const cupo = n.cupo === '' || n.cupo == null ? 0 : Number(n.cupo);
+    if (!Number.isFinite(cupo) || cupo < 0 || cupo > 100000) falla(400, 'Cupo inválido');
+    return { id: previo ? previo.id : idPromo(n.id), tipo, titulo: cad(n.titulo, 120, 'el título'), resumen: cad(n.resumen, 200, 'el resumen'), texto: cad(n.texto, 3000, 'el texto', false),
+      imagen: imagenPromo(n.imagen), ciudades: ciudadesDe(n.ciudades), inicio, fin, estado, cta: { tipo: ctaTipo, texto: cad(n.cta && n.cta.texto, 40, 'el texto del botón', false), url: ctaUrl },
+      bases, fecha_evento: fecha(n.fecha_evento, 'la fecha del evento', false), lugar: cad(n.lugar, 120, 'el lugar', false), cupo: Math.round(cupo), autor_ciudad: previo ? previo.autor_ciudad : 'nacional', ejemplo: !!n.ejemplo };
+  }
+  function normalizarCombo(c, previo) {
+    const catalogo = CATALOGOS.includes(c.catalogo) ? c.catalogo : falla(400, 'Elige el catálogo (Cochabamba o Santa Cruz) del que salen los productos del combo');
+    const estado = estadoPromo(c.estado);
+    const inicio = fecha(c.inicio, 'la fecha de inicio', true), fin = fecha(c.fin, 'la fecha de fin', true);
+    if (fin < inicio) falla(400, 'La fecha de fin es anterior al inicio');
+    const ciudades = ciudadesDe(c.ciudades); if (!ciudades.length) falla(400, 'Elige al menos una ciudad donde se ofrece el combo');
+    const slugs = new Set(leer('productos.json').filter((p) => p.ciudad === catalogo).map((p) => p.slug));
+    const lista = Array.isArray(c.componentes) ? c.componentes : [];
+    if (!lista.length || lista.length > 20) falla(400, 'Un combo lleva entre 1 y 20 componentes');
+    const componentes = lista.map((x, i) => {
+      const cantidad = Number(x && x.cantidad);
+      if (!Number.isFinite(cantidad) || cantidad <= 0 || cantidad > 100000) falla(400, `Cantidad inválida en el componente ${i + 1}`);
+      if (x.tipo === 'catalogo') { if (!slugs.has(x.slug)) falla(400, `El componente ${i + 1} no existe en el catálogo de ${catalogo}`); return { tipo: 'catalogo', slug: x.slug, cantidad, nota: cad(x.nota, 120, 'la nota', false) }; }
+      if (x.tipo === 'otro') return { tipo: 'otro', nombre: cad(x.nombre, 80, `el nombre del componente ${i + 1}`), cantidad, nota: cad(x.nota, 120, 'la nota', false) };
+      return falla(400, `Tipo inválido en el componente ${i + 1}`);
+    });
+    return { id: previo ? previo.id : idPromo(c.id), titulo: cad(c.titulo, 100, 'el título'), descripcion: cad(c.descripcion, 600, 'la descripción', false), imagen: imagenPromo(c.imagen), catalogo, ciudades, inicio, fin, estado, componentes,
+      autor_ciudad: previo ? previo.autor_ciudad : 'nacional', ejemplo: !!c.ejemplo };
+  }
+  const leerPromos = () => { const p = leer('promociones.json'); return { novedades: p.novedades || [], combos: p.combos || [] }; };
+  function guardarPromo(lista, datos, { crear, autorCiudad }) {
+    const p = leerPromos(); const arr = p[lista]; const norm = lista === 'novedades' ? normalizarNovedad : normalizarCombo;
+    const i = crear ? -1 : arr.findIndex((x) => x.id === datos.id);
+    if (!crear && i < 0) falla(404, 'No existe esa publicación');
+    const previo = crear ? null : arr[i];
+    const item = norm(datos, previo);
+    if (crear) { if ([...p.novedades, ...p.combos].some((x) => x.id === item.id)) falla(409, 'Ya existe una publicación con ese identificador'); item.autor_ciudad = autorCiudad; arr.push(item); } else arr[i] = item;
+    escribir('promociones.json', p); return item;
+  }
+  function borrarPromo(lista, id) {
+    const p = leerPromos(); const n = p[lista].filter((x) => x.id !== id);
+    if (n.length === p[lista].length) falla(404, 'No existe esa publicación');
+    p[lista] = n; escribir('promociones.json', p);
+  }
+
   return {
-    dir, reconstruir,
+    dir, reconstruir, leerPromos, guardarPromo, borrarPromo,
     leer: () => ({ sitio: leer('sitio.json'), productos: leer('productos.json') }),
     guardarSitio(parcial) {
       const s = leer('sitio.json');
@@ -129,9 +195,9 @@ function crearContenido({ dir = process.env.CONTENT_DIR || path.join(RAIZ, 'serv
     },
     historial: () => fs.readdirSync(path.join(dir, 'historial')).sort().reverse().slice(0, 60),
     restaurar(nombre) {
-      if (!/^[\w.-]+-(sitio|productos)\.json$/.test(nombre)) falla(400, 'Versión inválida');
+      if (!/^[\w.-]+-(sitio|productos|promociones)\.json$/.test(nombre)) falla(400, 'Versión inválida');
       const origen = path.join(dir, 'historial', nombre); if (!fs.existsSync(origen)) falla(404, 'No existe esa versión');
-      const f = nombre.endsWith('-sitio.json') ? 'sitio.json' : 'productos.json';
+      const f = nombre.endsWith('-sitio.json') ? 'sitio.json' : nombre.endsWith('-promociones.json') ? 'promociones.json' : 'productos.json';
       JSON.parse(fs.readFileSync(origen, 'utf8')); escribir(f, JSON.parse(fs.readFileSync(origen, 'utf8')));
     }
   };

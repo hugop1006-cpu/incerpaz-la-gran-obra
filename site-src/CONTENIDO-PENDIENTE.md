@@ -74,3 +74,11 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - Definir el momento del corte: redirecciones 301 de las tiendas (`site-src/redirecciones-tiendas.csv`) y qué pasa con `exportaciones.incerpaz.com`.
 - Si se activa Cloudflare Web Analytics, actualizar el texto de `privacidad.html` (hoy dice que no hay herramientas de medición).
 - Lista de registros DNS actuales de `incerpaz.com` (correo, ERP, tiendas, subdominios) antes de pasar el dominio a Cloudflare.
+
+## Promociones y combos
+- Las 3 novedades y 2 combos que trae el sitio son **de ejemplo** (marcados "Ejemplo"). En el sitio público no se publican, pero hay que reemplazarlos por contenido real.
+- Quién aprueba cada tipo de publicación y quién puede crear qué (hoy: el ejecutivo crea borradores de su ciudad y un administrador publica).
+- Bases legales de concursos y sorteos: revisión legal y, si corresponde, autorización de la autoridad del juego antes de publicar.
+- Precio de los combos: hoy se carga a mano por quien lo crea; falta definir si saldrá del ERP.
+- Para vender combos con Seasoft: definir si cada combo lleva un código propio en el ERP o se envía desglosado (hoy el pedido lleva el detalle de componentes en los datos que van al ERP).
+- Aviso por correo o WhatsApp cuando una publicación queda en revisión (hoy se ve en el panel).

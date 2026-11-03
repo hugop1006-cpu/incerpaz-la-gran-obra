@@ -13,6 +13,7 @@
   function currentCity() { return cityBySlug(store(KEY)) || CFG.ciudades[0]; }
   function waUrl(num, msg) { return 'https://wa.me/591' + num + '?text=' + encodeURIComponent(msg); }
   function fmt(n) { return Math.round(n).toLocaleString('es-BO'); }
+  function hoyLocal() { var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
 
   /* ---- ciudad y enlaces de WhatsApp ---- */
   function updateWa() {
@@ -74,9 +75,14 @@
     var catCity = mc ? decodeURIComponent(mc[1]) : enCatalogo(currentCity().slug);
     function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
     function apply() {
-      var term = norm(q.value.trim()), n = 0;
+      var term = norm(q.value.trim()), n = 0, hoy = hoyLocal(), ciudadSel = currentCity().slug;
       cards.forEach(function (c) {
         var ok = c.getAttribute('data-ciudad') === catCity && (cat === 'todas' || c.getAttribute('data-cats').split(' ').indexOf(cat) >= 0) && norm(c.getAttribute('data-name')).indexOf(term) >= 0;
+        /* los combos solo se ven dentro de su vigencia y en las ciudades donde se ofrecen */
+        if (ok && c.hasAttribute('data-fin')) {
+          var ciu = (c.getAttribute('data-ciudades') || '').split(' ').filter(Boolean);
+          ok = c.getAttribute('data-inicio') <= hoy && hoy <= c.getAttribute('data-fin') && (!ciu.length || ciu.indexOf(ciudadSel) >= 0);
+        }
         c.hidden = !ok; if (ok) n++;
       });
       chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-cat') === cat)); });

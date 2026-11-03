@@ -26,9 +26,9 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     const errores = []; [cli, adm].forEach((p) => p.on('pageerror', (e) => errores.push(e.message)));
 
     await cli.goto(BASE + 'catalogo.html?ciudad=cochabamba');
-    await cli.waitForSelector('.pcard:not([hidden]) [data-precio] a');
+    await cli.waitForSelector('.pcard:not([hidden]):not(.pcard--combo) [data-precio] a');
     ok(true, 'el visitante ve "Precio con sesión" en el catálogo');
-    await cli.click('.pcard:not([hidden]) [data-add]');
+    await cli.click('.pcard:not([hidden]):not(.pcard--combo) [data-add]');
     ok((await cli.textContent('[data-bcount]')) === '1', 'añadir al presupuesto actualiza el contador');
 
     await cli.goto(BASE + 'productos/cochabamba/pavic-estandar.html');
@@ -45,10 +45,10 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await cli.goto(BASE + 'ingresar.html?volver=catalogo.html');
     await cli.fill('[name="correo"]', 'ana@ejemplo.com'); await cli.fill('[name="password"]', 'clave-segura-1');
     await cli.click('#form-ingreso button[type="submit"]'); await cli.waitForURL('**/catalogo.html');
-    await cli.waitForSelector('.pcard:not([hidden]) .precio');
-    await cli.waitForFunction(() => /verifiques|verificar tu cuenta/i.test(document.querySelector('.pcard:not([hidden]) .precio').textContent));
+    await cli.waitForSelector('.pcard:not([hidden]):not(.pcard--combo) .precio');
+    await cli.waitForFunction(() => /verifiques|verificar tu cuenta/i.test(document.querySelector('.pcard:not([hidden]):not(.pcard--combo) .precio').textContent));
     ok(true, 'con la cuenta pendiente no se ven precios');
-    ok(!/\d+[.,]\d{2}/.test(await cli.textContent('.pcard:not([hidden]) .precio')), 'sin cifras en el precio');
+    ok(!/\d+[.,]\d{2}/.test(await cli.textContent('.pcard:not([hidden]):not(.pcard--combo) .precio')), 'sin cifras en el precio');
 
     await adm.goto(BASE + 'ingresar.html?volver=equipo.html');
     await adm.fill('[name="correo"]', 'equipo@incerpaz.test'); await adm.fill('[name="password"]', 'equipo-clave-1');
@@ -58,8 +58,8 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await adm.waitForFunction(() => /No hay cuentas por verificar/.test(document.querySelector('#panel').textContent));
     ok(true, 'el equipo verifica la cuenta y le asigna la lista de precios');
 
-    await cli.reload(); await cli.waitForFunction(() => /Bs\s*\d/.test(document.querySelector('.pcard:not([hidden]) .precio').textContent));
-    ok(/ejemplo/.test(await cli.textContent('.pcard:not([hidden]) .precio')), 'la cuenta verificada ve precios (marcados como de ejemplo)');
+    await cli.reload(); await cli.waitForFunction(() => /Bs\s*\d/.test(document.querySelector('.pcard:not([hidden]):not(.pcard--combo) .precio').textContent));
+    ok(/ejemplo/.test(await cli.textContent('.pcard:not([hidden]):not(.pcard--combo) .precio')), 'la cuenta verificada ve precios (marcados como de ejemplo)');
 
     await cli.goto(BASE + 'presupuesto.html'); await cli.waitForSelector('[data-q]');
     ok((await cli.locator('[data-q]').count()) === 2, 'el presupuesto conserva los productos añadidos');

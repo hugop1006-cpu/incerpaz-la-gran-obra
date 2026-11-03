@@ -30,8 +30,8 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
     await ej.goto(BASE + 'ingresar.html'); await ej.fill('[name="correo"]', 'ejecutivo.prueba@incerpaz.test'); await ej.fill('[name="password"]', 'Prueba-Incerpaz-2026');
     await ej.click('#form-ingreso button[type="submit"]'); await ej.waitForURL('**/equipo.html');
-    await ej.goto(BASE + 'admin.html'); await ej.waitForSelector('text=solo para administradores');
-    ok(true, 'la cuenta de prueba (ejecutivo) no accede al panel de contenido');
+    await ej.goto(BASE + 'admin.html'); await ej.waitForSelector('[data-tab="promos"]');
+    ok((await ej.locator('[data-tab]').count()) === 1, 'el ejecutivo solo ve las promociones de su ciudad, no el resto del panel');
 
     await p.goto(BASE + 'admin.html'); await p.waitForSelector('text=Ingresa con tu cuenta');
     await p.goto(BASE + 'ingresar.html?volver=admin.html'); await p.fill('[name="correo"]', 'hugop1006@gmail.com'); await p.fill('[name="password"]', 'admin-clave-123');

@@ -44,6 +44,9 @@ Con `ERP_ADAPTER=local` los precios viven en la tabla `precios`. La primera vez 
 ## Contactos (leads)
 Los formularios del sitio envían a `POST /api/leads` (límite de 15 por hora y por IP, campo trampa anti-bots). El equipo los ve en `equipo.html` → Contactos, con estado (nuevo, contactado, cotizado, ganado, perdido), nota y exportación a CSV. Cada ejecutivo ve los de su ciudad; el administrador ve todos. Si el servidor no responde, el sitio abre WhatsApp con el mensaje armado.
 
+## Promociones y combos
+`admin.html` → Promociones. Dos tipos de publicación: **novedades** (concurso, sorteo, evento, curso, proyecto nuevo, noticia) y **combos por ciudad**. Un combo mezcla productos del catálogo con cualquier otro producto (ollas, herramientas, cubiertos…). Cada publicación tiene ciudades, fechas de inicio y fin, y estado: borrador, en revisión o publicada. El administrador publica; un ejecutivo solo crea y edita borradores de su ciudad y los envía a revisión. Lo vencido se oculta solo. El precio del combo se guarda en la tabla `precios` (clave `combo-<id>`) y solo lo ven las cuentas verificadas. Los contenidos de ejemplo no salen cuando `PUBLICO=1`.
+
 ## Despliegue
 Ver `server/DESPLIEGUE.md`.
 

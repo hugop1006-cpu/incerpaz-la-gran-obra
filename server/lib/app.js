@@ -48,6 +48,7 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
   const verificado = (u) => u && (u.estado === 'verificado' || u.rol !== 'cliente');
   function requerirUsuario(u) { if (!u) falla(401, 'Inicia sesión para continuar'); return u; }
   function requerirVerificado(u) { requerirUsuario(u); if (!verificado(u)) falla(403, 'Tu cuenta está en revisión. Un ejecutivo la verificará pronto.'); return u; }
+  function requerirStaffContenido(u) { requerirStaff(u); if (!contenido) falla(501, 'El panel de contenido no está activo en este servidor'); return u; }
   function requerirAdmin(u) { requerirUsuario(u); if (u.rol !== 'admin') falla(403, 'Solo un administrador puede hacer este cambio'); if (!contenido) falla(501, 'El panel de contenido no está activo en este servidor'); return u; }
   function requerirStaff(u) { requerirUsuario(u); if (u.rol === 'cliente') falla(403, 'No tienes permiso para esta acción'); return u; }
 
@@ -62,7 +63,7 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
       if (!Number.isFinite(cantidad) || cantidad <= 0 || cantidad > 10_000_000) falla(400, `Cantidad inválida para ${p.nombre}`);
       if (vistos.has(`${p.ciudad}:${p.slug}`)) falla(400, `${p.nombre} está repetido`);
       vistos.add(`${p.ciudad}:${p.slug}`);
-      return { ciudad: p.ciudad, slug: p.slug, codigo: p.codigo, nombre: p.nombre, cantidad };
+      return { ciudad: p.ciudad, slug: p.slug, codigo: p.codigo, nombre: p.nombre, cantidad, componentes: p.componentes };
     });
   }
   async function preciosDe(items, usuario) {
@@ -262,7 +263,7 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
     const pedido = pedidoDe(usuario, id, false);
     try {
       const r = await erp.enviarPedido({ numero: pedido.numero, cliente: { erp_id: usuario.erp_id, nit: usuario.nit, razon_social: usuario.razon_social || usuario.nombre, nombre: usuario.nombre, celular: usuario.celular, correo: usuario.correo },
-        ciudad: ciudadCatalogo, entrega: { tipo: tipoEntrega, agencia, direccion, fecha: e.fecha || null }, pago, notas, total: totalPedido, items: lineas.map((l) => ({ codigo: l.codigo, nombre: l.nombre, cantidad: l.cantidad, precio: l.precio_unitario })) });
+        ciudad: ciudadCatalogo, entrega: { tipo: tipoEntrega, agencia, direccion, fecha: e.fecha || null }, pago, notas, total: totalPedido, items: lineas.map((l) => ({ codigo: l.codigo, nombre: l.nombre, cantidad: l.cantidad, precio: l.precio_unitario, ...(l.componentes ? { componentes: l.componentes } : {}) })) });
       db.prepare("UPDATE pedidos SET erp_ref = ?, erp_error = NULL WHERE id = ?").run(r.erpRef, id);
     } catch (err) {
       /* el pedido queda guardado; un ejecutivo lo reenvía al ERP desde el panel */
@@ -455,7 +456,7 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
   });
 
   ruta('POST', '/api/admin/imagenes', async ({ usuario, body }) => {
-    requerirAdmin(usuario);
+    requerirStaffContenido(usuario);
     const datos = Buffer.from(String(body.datos || ''), 'base64');
     if (!datos.length || datos.length > 4_000_000) falla(400, 'La imagen debe pesar menos de 4 MB');
     const ext = datos.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff])) ? 'jpg' : datos.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47])) ? 'png' : (datos.subarray(0, 4).toString() === 'RIFF' && datos.subarray(8, 12).toString() === 'WEBP') ? 'webp' : null;
@@ -477,6 +478,73 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
     await publicar();
     return { ok: true };
   });
+
+  /* ---------- promociones: novedades y combos ---------- */
+  const SLUG_COMBO = (id) => `combo-${id}`;
+  /* El administrador puede todo. Un ejecutivo solo trabaja con lo de su ciudad y solo hasta "revisión": publica el administrador. */
+  function reglasPromo(usuario, datos, existente) {
+    if (usuario.rol === 'admin') return existente ? existente.autor_ciudad : 'nacional';
+    if (existente && existente.autor_ciudad !== usuario.ciudad) falla(404, 'No encontramos esa publicación');
+    if (existente && existente.estado === 'publicada') falla(403, 'Una publicación que ya está en línea solo la modifica un administrador');
+    if (!['borrador', 'revision'].includes(datos.estado)) falla(403, 'Tu cuenta deja la publicación en borrador o en revisión; un administrador la publica');
+    const ciudades = Array.isArray(datos.ciudades) ? datos.ciudades : [];
+    if (ciudades.length !== 1 || ciudades[0] !== usuario.ciudad) falla(403, 'Solo puedes crear publicaciones para tu ciudad');
+    return usuario.ciudad;
+  }
+  const preciosCombo = (combo) => {
+    const f = db.prepare('SELECT lista, precio FROM precios WHERE ciudad = ? AND slug = ?').all(combo.catalogo, SLUG_COMBO(combo.id));
+    return Object.fromEntries(f.map((x) => [x.lista, x.precio]));
+  };
+  function guardarPreciosCombo(usuario, combo, precios) {
+    if (!precios || typeof precios !== 'object') return;
+    for (const lista of LISTAS) {
+      if (!Object.hasOwn(precios, lista)) continue;
+      const v = precios[lista];
+      if (v === null || v === '') { db.prepare('DELETE FROM precios WHERE ciudad = ? AND slug = ? AND lista = ?').run(combo.catalogo, SLUG_COMBO(combo.id), lista); continue; }
+      const n = Number(v); if (!Number.isFinite(n) || n < 0 || n > 1_000_000) falla(400, 'Precio inválido');
+      db.prepare("INSERT INTO precios (ciudad, slug, lista, precio, actualizado_por) VALUES (?, ?, ?, ?, ?) ON CONFLICT(ciudad, slug, lista) DO UPDATE SET precio = excluded.precio, actualizado_en = datetime('now'), actualizado_por = excluded.actualizado_por").run(combo.catalogo, SLUG_COMBO(combo.id), lista, Math.round(n * 100) / 100, usuario.id);
+    }
+  }
+  ruta('GET', '/api/admin/promos', async ({ usuario }) => {
+    requerirStaffContenido(usuario);
+    const ver = (x) => usuario.rol === 'admin' || x.autor_ciudad === usuario.ciudad;
+    const p = contenido.leerPromos();
+    return { rol: usuario.rol, ciudad: usuario.ciudad, novedades: p.novedades.filter(ver), combos: p.combos.filter(ver).map((c) => ({ ...c, precios: preciosCombo(c) })),
+      productos: contenido.leer().productos.map((x) => ({ ciudad: x.ciudad, slug: x.slug, nombre: x.titulo })) };
+  });
+  for (const [lista, nombreRuta] of [['novedades', 'novedades'], ['combos', 'combos']]) {
+    ruta('POST', `/api/admin/${nombreRuta}`, async ({ usuario, body }) => {
+      requerirStaffContenido(usuario);
+      const autorCiudad = reglasPromo(usuario, body, null);
+      const item = contenido.guardarPromo(lista, body, { crear: true, autorCiudad: usuario.rol === 'admin' ? 'nacional' : autorCiudad });
+      if (lista === 'combos') guardarPreciosCombo(usuario, item, body.precios);
+      registrar(usuario, 'promocion', `Creó ${lista === 'combos' ? 'el combo' : 'la novedad'} ${item.id} (${item.estado})`);
+      if (item.estado === 'publicada') await publicar();
+      return { status: 201, cuerpo: { item } };
+    });
+    ruta('PUT', `/api/admin/${nombreRuta}/:id`, async ({ usuario, params, body }) => {
+      requerirStaffContenido(usuario);
+      const existente = contenido.leerPromos()[lista].find((x) => x.id === params.id);
+      if (!existente) falla(404, 'No encontramos esa publicación');
+      reglasPromo(usuario, body, existente);
+      const item = contenido.guardarPromo(lista, { ...body, id: params.id }, { crear: false });
+      if (lista === 'combos') guardarPreciosCombo(usuario, item, body.precios);
+      registrar(usuario, 'promocion', `Editó ${params.id} (${existente.estado} → ${item.estado})`);
+      if (existente.estado === 'publicada' || item.estado === 'publicada') await publicar();
+      return { item };
+    });
+    ruta('DELETE', `/api/admin/${nombreRuta}/:id`, async ({ usuario, params }) => {
+      requerirStaffContenido(usuario);
+      const existente = contenido.leerPromos()[lista].find((x) => x.id === params.id);
+      if (!existente) falla(404, 'No encontramos esa publicación');
+      if (usuario.rol !== 'admin' && (existente.autor_ciudad !== usuario.ciudad || existente.estado === 'publicada')) falla(403, 'No puedes eliminar esta publicación');
+      contenido.borrarPromo(lista, params.id);
+      if (lista === 'combos') db.prepare('DELETE FROM precios WHERE ciudad = ? AND slug = ?').run(existente.catalogo, SLUG_COMBO(existente.id));
+      registrar(usuario, 'promocion', `Eliminó ${params.id}`);
+      if (existente.estado === 'publicada') await publicar();
+      return { ok: true };
+    });
+  }
 
   /* descarga de la base (solo administradores): copia consistente, queda registrada */
   ruta('GET', '/api/admin/respaldo', async ({ usuario }) => {

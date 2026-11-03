@@ -14,7 +14,7 @@
 <link rel="icon" href="assets/img/logo-icono.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/css/site.css?v=a2f518b2">
+<link rel="stylesheet" href="assets/css/site.css?v=75fcb170">
 
 </head>
 <body data-base="" data-pagina="">
@@ -27,7 +27,7 @@
 <header class="site-header"><div class="wrap">
   <a class="brand" href="./" aria-label="INCERPAZ, inicio"><img src="assets/img/logo-header.png" alt="INCERPAZ" width="235" height="38"></a>
   <button class="nav-toggle" aria-expanded="false" aria-controls="nav" type="button">Menú</button>
-  <nav class="nav" id="nav" aria-label="Principal"><a href="catalogo.html" aria-current="page">Productos</a><a href="proyectos.html">Proyectos</a><a href="guias.html">Guías</a><a href="pavic.html">PAVIC</a><a href="donde-estamos.html">Dónde estamos</a><a href="empresa.html">Empresa</a></nav>
+  <nav class="nav" id="nav" aria-label="Principal"><a href="catalogo.html" aria-current="page">Productos</a><a href="promociones.html">Promociones</a><a href="proyectos.html">Proyectos</a><a href="guias.html">Guías</a><a href="pavic.html">PAVIC</a><a href="donde-estamos.html">Dónde estamos</a><a href="empresa.html">Empresa</a></nav>
   <div class="city"><label for="citySel" style="flex-direction:row;align-items:center;font-weight:500;white-space:nowrap">Tu ciudad</label><select id="citySel" aria-label="Tu ciudad"><option>Cochabamba</option></select></div>
 </div></header>
 <main id="contenido">
@@ -39,12 +39,22 @@
 <section class="wrap" style="padding-bottom:72px">
   <div class="filters">
     <div><span class="mono-label">Catálogo de</span><div class="chips" role="group" aria-label="Catálogo por ciudad"><button class="chip" data-catalogo="cochabamba" type="button" aria-pressed="false">Cochabamba</button><button class="chip" data-catalogo="santa-cruz" type="button" aria-pressed="false">Santa Cruz</button></div></div>
-    <div style="flex:1 1 100%"><span class="mono-label">Categoría</span><div class="chips" role="group" aria-label="Categorías"><button class="chip" data-cat="todas" type="button" aria-pressed="true">Todas</button><button class="chip" data-cat="muros" type="button" aria-pressed="false">Muros</button><button class="chip" data-cat="techos" type="button" aria-pressed="false">Techos y tejados</button><button class="chip" data-cat="revestimientos-y-decorativos" type="button" aria-pressed="false">Revestimientos y decorativos</button><button class="chip" data-cat="pisos-y-pavimentos" type="button" aria-pressed="false">Pisos y pavimentos</button><button class="chip" data-cat="piezas-especiales" type="button" aria-pressed="false">Piezas especiales</button><button class="chip" data-cat="refractarios" type="button" aria-pressed="false">Refractarios</button></div></div>
+    <div style="flex:1 1 100%"><span class="mono-label">Categoría</span><div class="chips" role="group" aria-label="Categorías"><button class="chip" data-cat="todas" type="button" aria-pressed="true">Todas</button><button class="chip" data-cat="combos" type="button" aria-pressed="false">Combos del mes</button><button class="chip" data-cat="muros" type="button" aria-pressed="false">Muros</button><button class="chip" data-cat="techos" type="button" aria-pressed="false">Techos y tejados</button><button class="chip" data-cat="revestimientos-y-decorativos" type="button" aria-pressed="false">Revestimientos y decorativos</button><button class="chip" data-cat="pisos-y-pavimentos" type="button" aria-pressed="false">Pisos y pavimentos</button><button class="chip" data-cat="piezas-especiales" type="button" aria-pressed="false">Piezas especiales</button><button class="chip" data-cat="refractarios" type="button" aria-pressed="false">Refractarios</button></div></div>
     <label class="search">Buscar<input id="q" type="search" placeholder="Ej. 6 huecos, enchape, teja" autocomplete="off"></label>
     <span id="count" class="muted" aria-live="polite"></span>
   </div>
   <p class="price-note" id="catNota" hidden></p>
-  <div class="grid-products" id="grid"><article class="pcard" data-ciudad="cochabamba" data-cats="muros muros" data-name="18 huecos 18H">
+  <div class="grid-products" id="grid"><article class="pcard pcard--combo" data-ciudad="cochabamba" data-cats="combos" data-name="Ejemplo: combo parrillero del mes" data-ciudades="cochabamba" data-inicio="2026-11-01" data-fin="2026-11-30">
+  <a class="pcard-link" href="combos/cochabamba/ejemplo-combo-parrillero.html">
+  <div class="img"><img src="assets/img/productos/brick-estandar-2.jpg" alt="Ejemplo: combo parrillero del mes" loading="lazy" width="400" height="400"></div>
+  <div class="body"><span class="tag tag--combo">Combo</span><h3>Ejemplo: combo parrillero del mes</h3><span class="meta">4 componentes · hasta el 30 nov 2026</span></div></a>
+  <div class="pcard-buy"><span class="precio" data-precio data-ciudad="cochabamba" data-slug="combo-ejemplo-combo-parrillero">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="cochabamba" data-slug="combo-ejemplo-combo-parrillero" data-nombre="Ejemplo: combo parrillero del mes" data-codigo="COMBO">Añadir</button></div>
+</article><article class="pcard pcard--combo" data-ciudad="santa-cruz" data-cats="combos" data-name="Ejemplo: combo pared con enchape" data-ciudades="santa-cruz" data-inicio="2026-11-01" data-fin="2026-11-30">
+  <a class="pcard-link" href="combos/santa-cruz/ejemplo-combo-pared-enchape.html">
+  <div class="img"><img src="assets/img/productos/scz-brick-enchape-corto-2.jpg" alt="Ejemplo: combo pared con enchape" loading="lazy" width="400" height="400"></div>
+  <div class="body"><span class="tag tag--combo">Combo</span><h3>Ejemplo: combo pared con enchape</h3><span class="meta">3 componentes · hasta el 30 nov 2026</span></div></a>
+  <div class="pcard-buy"><span class="precio" data-precio data-ciudad="santa-cruz" data-slug="combo-ejemplo-combo-pared-enchape">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="santa-cruz" data-slug="combo-ejemplo-combo-pared-enchape" data-nombre="Ejemplo: combo pared con enchape" data-codigo="COMBO">Añadir</button></div>
+</article><article class="pcard" data-ciudad="cochabamba" data-cats="muros muros" data-name="18 huecos 18H">
   <a class="pcard-link" href="productos/cochabamba/18-h.html">
   <div class="img"><img src="assets/img/productos/18-h-1.jpg" alt="18 huecos" loading="lazy" width="400" height="400"></div>
   <div class="body"><span class="tag">Muros</span><h3>18 huecos</h3><span class="meta">25 × 12 × 7 cm</span></div></a>
@@ -280,7 +290,7 @@
   <div class="cols">
     <div><a class="brand" href="./"><img src="assets/img/logo-header.png" alt="INCERPAZ" width="210" height="34"></a>
       <p style="margin-top:14px;max-width:34ch">Cerámica para construir tu hogar. Fabricamos en Bolivia y atendemos desde Cochabamba, Santa Cruz, Oruro y Sucre.</p></div>
-    <div><h4>Sitio</h4><ul><li><a href="catalogo.html">Productos</a></li><li><a href="proyectos.html">Proyectos</a></li><li><a href="guias.html">Guías</a></li><li><a href="pavic.html">PAVIC</a></li><li><a href="donde-estamos.html">Dónde estamos</a></li><li><a href="empresa.html">Empresa</a></li></ul></div>
+    <div><h4>Sitio</h4><ul><li><a href="catalogo.html">Productos</a></li><li><a href="promociones.html">Promociones</a></li><li><a href="proyectos.html">Proyectos</a></li><li><a href="guias.html">Guías</a></li><li><a href="pavic.html">PAVIC</a></li><li><a href="donde-estamos.html">Dónde estamos</a></li><li><a href="empresa.html">Empresa</a></li></ul></div>
     <div><h4>Contacto</h4><ul>
       <li><a href="tel:800108810">Servicio al cliente 800-10-8810</a></li>
       <li><a href="mailto:ventas.cbba@incerpaz.com">ventas.cbba@incerpaz.com</a></li>
@@ -294,8 +304,9 @@
 </div></footer>
 <a class="wa-float" href="https://wa.me/59170750963?text=Hola%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n%2C%20por%20favor." data-wa="Hola, quisiera más información, por favor." rel="noopener">WhatsApp</a>
 <script src="assets/js/config.js?v=a36379d7" defer></script>
-<script src="assets/js/site.js?v=063c757d" defer></script>
-<script src="assets/js/comercio.js?v=1d9047f5" defer></script>
+<script src="assets/js/site.js?v=41c19a57" defer></script>
+<script src="assets/js/comercio.js?v=cf9b08e6" defer></script>
+
 
 
 

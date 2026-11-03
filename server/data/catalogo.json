@@ -340,5 +340,54 @@
   "slug": "tsc",
   "codigo": "TSC 50",
   "nombre": "Teja colonial tapa"
+ },
+ {
+  "ciudad": "cochabamba",
+  "slug": "combo-ejemplo-combo-parrillero",
+  "codigo": "COMBO-EJEMPLO-COMBO-PARRILLERO",
+  "nombre": "Ejemplo: combo parrillero del mes",
+  "combo": true,
+  "componentes": [
+   {
+    "codigo": "BRK STD",
+    "nombre": "Brick estándar",
+    "cantidad": 300
+   },
+   {
+    "codigo": "RB-210",
+    "nombre": "Biscocho",
+    "cantidad": 60
+   },
+   {
+    "nombre": "Parrilla de acero",
+    "cantidad": 1
+   },
+   {
+    "nombre": "Set de utensilios de asador",
+    "cantidad": 1
+   }
+  ]
+ },
+ {
+  "ciudad": "santa-cruz",
+  "slug": "combo-ejemplo-combo-pared-enchape",
+  "codigo": "COMBO-EJEMPLO-COMBO-PARED-ENCH",
+  "nombre": "Ejemplo: combo pared con enchape",
+  "combo": true,
+  "componentes": [
+   {
+    "codigo": "BRK EC",
+    "nombre": "Brick enchape angosto",
+    "cantidad": 400
+   },
+   {
+    "nombre": "Llana dentada",
+    "cantidad": 1
+   },
+   {
+    "nombre": "Adhesivo cerámico de 25 kg",
+    "cantidad": 4
+   }
+  ]
  }
 ]

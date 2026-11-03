@@ -27,14 +27,17 @@
   function recargar() { return api('GET', '/api/admin/contenido').then(function (d) { est.datos = d; }); }
 
   /* ---------- estructura ---------- */
-  var TABS = [['productos', 'Productos'], ['precios', 'Precios'], ['agencias', 'Agencias y contacto'], ['equipo', 'Equipo'], ['historial', 'Historial']];
+  var TABS_ADMIN = [['productos', 'Productos'], ['precios', 'Precios'], ['promos', 'Promociones'], ['agencias', 'Agencias y contacto'], ['equipo', 'Equipo'], ['historial', 'Historial']];
+  var TABS_EJECUTIVO = [['promos', 'Promociones de tu ciudad']];
   function marco(contenido) {
+    var TABS = est.rol === 'admin' ? TABS_ADMIN : TABS_EJECUTIVO;
     raiz.innerHTML = '<div class="seg" role="tablist" style="margin-bottom:24px">' + TABS.map(function (t) { return '<button type="button" data-tab="' + t[0] + '" aria-pressed="' + (est.tab === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</div><div id="vista">' + contenido + '</div>';
     $$('[data-tab]', raiz).forEach(function (b) { b.addEventListener('click', function () { est.tab = b.getAttribute('data-tab'); est.editando = null; pintar(); }); });
   }
   function pintar() {
     if (est.tab === 'productos') return est.editando ? formProducto() : listaProductos();
     if (est.tab === 'precios') return vistaPrecios();
+    if (est.tab === 'promos') return vistaPromos();
     if (est.tab === 'agencias') return vistaAgencias();
     if (est.tab === 'equipo') return vistaEquipo();
     return vistaHistorial();
@@ -219,11 +222,138 @@
     }).catch(function (e) { aviso(e.message); });
   }
 
+  /* ---------- promociones: combos y novedades ---------- */
+  var TIPOS_NOV = [['concurso', 'Concurso'], ['sorteo', 'Sorteo'], ['evento', 'Evento'], ['curso', 'Curso'], ['proyecto', 'Proyecto nuevo'], ['noticia', 'Noticia']];
+  var ESTADO_NOMBRE = { borrador: 'Borrador', revision: 'En revisión', publicada: 'Publicada' };
+  var ESTADO_CLASE = { borrador: '', revision: ' warn', publicada: ' ok' };
+  est.sub = 'combos'; est.promos = null; est.editPromo = null;
+  function hoyIso() { var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  function nuevoItem(lista) {
+    var ciu = est.rol === 'admin' ? [] : [est.ciudadUsuario];
+    if (lista === 'combos') return { id: '', titulo: '', descripcion: '', imagen: '', catalogo: est.ciudadUsuario === 'santa-cruz' ? 'santa-cruz' : 'cochabamba', ciudades: ciu, inicio: hoyIso(), fin: '', estado: 'borrador', componentes: [{ tipo: 'catalogo', slug: '', cantidad: 1, nota: '' }], precios: {} };
+    return { id: '', tipo: 'sorteo', titulo: '', resumen: '', texto: '', imagen: '', ciudades: ciu, inicio: hoyIso(), fin: '', estado: 'borrador', cta: { tipo: 'whatsapp', texto: '', url: '' }, bases: '', fecha_evento: '', lugar: '', cupo: 0 };
+  }
+  function vistaPromos() {
+    if (est.editPromo) return formPromo();
+    marco('<p class="muted">Cargando…</p>');
+    api('GET', '/api/admin/promos').then(function (d) { est.promos = d; listaPromos(); }).catch(function (e) { aviso(e.message); });
+  }
+  function listaPromos() {
+    var d = est.promos, esC = est.sub === 'combos', items = esC ? d.combos : d.novedades, admin = est.rol === 'admin';
+    var pend = d.combos.concat(d.novedades).filter(function (x) { return x.estado === 'revision'; }).length;
+    marco('<div class="btn-row" style="margin-bottom:16px;align-items:center"><div class="seg"><button type="button" data-sub="combos" aria-pressed="' + esC + '">Combos (' + d.combos.length + ')</button><button type="button" data-sub="novedades" aria-pressed="' + !esC + '">Novedades, concursos y eventos (' + d.novedades.length + ')</button></div><button class="btn btn--red btn--sm" id="nuevo-promo" type="button">' + (esC ? 'Nuevo combo' : 'Nueva novedad') + '</button></div>' +
+      '<p class="muted" style="margin-bottom:12px">' + (admin ? (pend ? '<b>' + pend + ' esperan tu revisión.</b> ' : '') + 'Los ejecutivos envían a revisión y un administrador publica.' : 'Creas borradores de tu ciudad y los envías a revisión; un administrador los publica.') + '</p>' +
+      (items.length ? '<div class="scroll"><table class="tabla"><thead><tr><th>Título</th><th>' + (esC ? 'Productos' : 'Tipo') + '</th><th>Ciudades</th><th>Vigencia</th><th>Estado</th><th></th></tr></thead><tbody>' + items.map(function (x) {
+        var ciu = x.ciudades.length ? x.ciudades.map(function (c) { return CIUDADES[c]; }).join(', ') : 'Todas';
+        return '<tr><td><b>' + esc(x.titulo) + '</b>' + (x.ejemplo ? ' <span class="chip warn">Ejemplo</span>' : '') + '</td><td>' + (esC ? x.componentes.length + ' componentes' : esc((TIPOS_NOV.filter(function (t) { return t[0] === x.tipo; })[0] || [0, x.tipo])[1])) + '</td><td>' + esc(ciu) + '</td><td>' + esc(x.inicio) + '<br><span class="muted">a ' + esc(x.fin) + '</span></td><td><span class="chip' + ESTADO_CLASE[x.estado] + '">' + ESTADO_NOMBRE[x.estado] + '</span></td><td><button class="btn btn--sm" type="button" data-edit-promo="' + esc(x.id) + '">' + (admin || x.estado !== 'publicada' ? 'Editar' : 'Ver') + '</button></td></tr>';
+      }).join('') + '</tbody></table></div>' : '<div class="empty"><b>' + (esC ? 'Todavía no hay combos.' : 'Todavía no hay novedades.') + '</b><p class="muted" style="margin-top:6px">Crea la primera con el botón de arriba.</p></div>'));
+    $$('[data-sub]').forEach(function (b) { b.addEventListener('click', function () { est.sub = b.getAttribute('data-sub'); listaPromos(); }); });
+    $('#nuevo-promo').addEventListener('click', function () { est.editPromo = { nuevo: true, lista: est.sub, item: nuevoItem(est.sub) }; vistaPromos(); });
+    $$('[data-edit-promo]').forEach(function (b) { b.addEventListener('click', function () { var it = items.filter(function (x) { return x.id === b.getAttribute('data-edit-promo'); })[0]; est.editPromo = { nuevo: false, lista: est.sub, item: JSON.parse(JSON.stringify(it)) }; vistaPromos(); window.scrollTo(0, 0); }); });
+  }
+  function bloqueCiudades(it, lista) {
+    var admin = est.rol === 'admin';
+    return '<div class="full"><b>' + (lista === 'combos' ? 'Ciudades donde se ofrece' : 'Ciudades') + '</b><div class="chips" style="margin-top:8px">' + Object.keys(CIUDADES).map(function (c) {
+      return '<label class="chip" style="display:inline-flex;flex-direction:row;gap:8px;align-items:center"><input type="checkbox" data-ciu="' + c + '"' + (it.ciudades.indexOf(c) >= 0 ? ' checked' : '') + (admin ? '' : ' disabled') + ' style="width:auto"> ' + CIUDADES[c] + '</label>'; }).join('') + '</div>' +
+      (lista === 'novedades' && admin ? '<p class="muted" style="font-size:15px;margin-top:6px">Sin ciudades marcadas, aplica a todas.</p>' : '') + (admin ? '' : '<p class="muted" style="font-size:15px;margin-top:6px">Como ejecutivo solo publicas para tu ciudad.</p>') + '</div>';
+  }
+  function filaComp(x, i, cat) {
+    var prods = est.promos.productos.filter(function (p) { return p.ciudad === cat; });
+    return '<div class="btn-row" style="gap:10px;margin-bottom:12px;align-items:flex-end" data-comp="' + i + '">' +
+      '<label>Tipo<select data-c="tipo"><option value="catalogo"' + (x.tipo === 'catalogo' ? ' selected' : '') + '>Producto del catálogo</option><option value="otro"' + (x.tipo === 'otro' ? ' selected' : '') + '>Otro producto</option></select></label>' +
+      (x.tipo === 'catalogo'
+        ? '<label style="flex:1;min-width:230px">Producto<select data-c="slug"><option value="">Elige…</option>' + prods.map(function (p) { return '<option value="' + esc(p.slug) + '"' + (p.slug === x.slug ? ' selected' : '') + '>' + esc(p.nombre) + '</option>'; }).join('') + '</select></label>'
+        : '<label style="flex:1;min-width:230px">Nombre<input data-c="nombre" value="' + esc(x.nombre || '') + '" maxlength="80" placeholder="Ej. olla de aluminio, juego de cubiertos"></label>') +
+      '<label>Cantidad<input data-c="cantidad" type="number" step="any" min="0" value="' + esc(x.cantidad) + '" style="width:110px"></label>' +
+      '<label style="flex:1;min-width:150px">Nota (opcional)<input data-c="nota" value="' + esc(x.nota || '') + '" maxlength="120"></label>' +
+      '<button type="button" class="btn btn--sm btn--ghost" data-delc="' + i + '">Quitar</button></div>';
+  }
+  function formPromo() {
+    var e = est.editPromo, it = e.item, esC = e.lista === 'combos', admin = est.rol === 'admin';
+    var soloVer = !admin && !e.nuevo && it.estado === 'publicada';
+    var estados = admin ? [['borrador', 'Borrador'], ['revision', 'En revisión'], ['publicada', 'Publicada en el sitio']] : [['borrador', 'Borrador'], ['revision', 'Enviar a revisión']];
+    var img = it.imagen ? '<img src="/' + esc(it.imagen) + '" alt="" width="120" height="120" style="object-fit:cover;display:block;margin-bottom:8px"><button type="button" class="btn btn--sm btn--ghost" id="quitar-img">Quitar imagen</button>' : '<p class="muted" style="margin-bottom:8px">' + (esC ? 'Sin imagen: se usará la foto del primer producto del catálogo.' : 'Sin imagen.') + '</p>';
+    var cuerpo = '<div class="form-grid">' + campo('Título', 'titulo', it.titulo, 'required maxlength="' + (esC ? 100 : 120) + '"') +
+      (e.nuevo ? campo('Identificador (para la dirección web)', 'id', it.id, 'required pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="ej. combo-parrillero-nov"') : '<label>Identificador<input value="' + esc(it.id) + '" disabled></label>') +
+      (esC
+        ? '<label class="full">Descripción<textarea name="descripcion" rows="3" maxlength="600">' + esc(it.descripcion) + '</textarea></label>' +
+          '<label>Catálogo del que salen los productos<select name="catalogo" id="catalogo">' + Object.keys(CATALOGOS).map(function (c) { return '<option value="' + c + '"' + (it.catalogo === c ? ' selected' : '') + '>' + CATALOGOS[c] + '</option>'; }).join('') + '</select></label>'
+        : '<label>Tipo<select name="tipo" id="tipo-nov">' + TIPOS_NOV.map(function (t) { return '<option value="' + t[0] + '"' + (it.tipo === t[0] ? ' selected' : '') + '>' + t[1] + '</option>'; }).join('') + '</select></label>' +
+          '<label class="full">Resumen (una frase)<input name="resumen" value="' + esc(it.resumen) + '" required maxlength="200"></label>' +
+          '<label class="full">Texto<textarea name="texto" rows="5" maxlength="3000">' + esc(it.texto) + '</textarea></label>') +
+      bloqueCiudades(it, e.lista) +
+      '<label>Inicio<input type="date" name="inicio" value="' + esc(it.inicio) + '" required></label><label>Fin<input type="date" name="fin" value="' + esc(it.fin) + '" required></label>' +
+      '<div class="full"><b>Imagen</b><div id="imgbox" style="margin-top:8px">' + img + '</div><label class="btn btn--sm" style="cursor:pointer;display:inline-block">Subir imagen<input id="subir" type="file" accept="image/jpeg,image/png,image/webp" hidden></label></div>' + '</div>';
+    if (esC) {
+      cuerpo += '<h3 style="margin:22px 0 8px">Qué incluye el combo</h3><p class="muted" style="margin-bottom:12px">Mezcla productos del catálogo con cualquier otro producto: ollas, herramientas, cubiertos…</p><div id="comps">' + it.componentes.map(function (x, i) { return filaComp(x, i, it.catalogo); }).join('') + '</div><button type="button" class="btn btn--sm" id="add-comp">Agregar componente</button>' +
+        '<h3 style="margin:22px 0 8px">Precio del combo (Bs)</h3><div class="form-grid" style="max-width:560px"><label>Lista general<input name="precio_general" type="number" step="0.01" min="0" value="' + esc(it.precios && it.precios.general != null ? it.precios.general : '') + '"></label><label>Lista constructor (opcional)<input name="precio_constructor" type="number" step="0.01" min="0" value="' + esc(it.precios && Object.prototype.hasOwnProperty.call(it.precios, 'constructor') ? it.precios['constructor'] : '') + '"></label></div><p class="muted" style="font-size:15px;margin-top:6px">Solo lo ven los clientes con cuenta verificada. Vacío = "precio por cotizar".</p>';
+    } else {
+      cuerpo += '<h3 style="margin:22px 0 8px">Botón de acción</h3><div class="form-grid"><label>Qué hace<select name="cta_tipo" id="cta-tipo"><option value="whatsapp"' + (it.cta.tipo === 'whatsapp' ? ' selected' : '') + '>Abrir WhatsApp de la ciudad</option><option value="inscripcion"' + (it.cta.tipo === 'inscripcion' ? ' selected' : '') + '>Formulario de inscripción</option><option value="enlace"' + (it.cta.tipo === 'enlace' ? ' selected' : '') + '>Enlace externo</option><option value="ninguno"' + (it.cta.tipo === 'ninguno' ? ' selected' : '') + '>Sin botón</option></select></label>' +
+        campo('Texto del botón', 'cta_texto', it.cta.texto, 'maxlength="40"') + (it.cta.tipo === 'enlace' ? '<label class="full">Dirección del enlace (https://…)<input name="cta_url" value="' + esc(it.cta.url) + '"></label>' : '<input type="hidden" name="cta_url" value="">') + '</div>' +
+        '<h3 style="margin:22px 0 8px">Evento o curso</h3><div class="form-grid">' + campo('Fecha del evento', 'fecha_evento', it.fecha_evento, 'type="date"') + campo('Lugar', 'lugar', it.lugar, 'maxlength="120"') + campo('Cupo (personas)', 'cupo', it.cupo || '', 'type="number" min="0"') + '</div>' +
+        '<h3 style="margin:22px 0 8px">Bases y condiciones</h3><label class="full">' + (['concurso', 'sorteo'].indexOf(it.tipo) >= 0 ? 'Obligatorias en concursos y sorteos antes de enviar a revisión. Revísalas con el área legal.' : 'Solo para concursos y sorteos (opcional en los demás).') + '<textarea name="bases" rows="4" maxlength="3000">' + esc(it.bases) + '</textarea></label>';
+    }
+    cuerpo += '<div class="form-grid" style="margin-top:22px"><label>Estado<select name="estado">' + estados.map(function (s) { return '<option value="' + s[0] + '"' + (it.estado === s[0] ? ' selected' : '') + '>' + s[1] + '</option>'; }).join('') + '</select></label>' +
+      (admin ? '<label class="full" style="display:flex;flex-direction:row;align-items:center;gap:10px"><input type="checkbox" name="ejemplo"' + (it.ejemplo ? ' checked' : '') + ' style="width:auto"> Contenido de ejemplo (no se publica cuando el sitio sea público)</label>' : '') + '</div>';
+    marco('<h2 style="font-size:28px;margin-bottom:16px">' + (e.nuevo ? (esC ? 'Nuevo combo' : 'Nueva novedad') : 'Editar: ' + esc(it.titulo)) + '</h2>' + (soloVer ? '<p class="price-note">Esta publicación ya está en línea: solo un administrador la modifica.</p>' : '') +
+      '<form id="f" class="form-box"><fieldset style="border:0;padding:0;margin:0"' + (soloVer ? ' disabled' : '') + '>' + cuerpo + '</fieldset><div class="btn-row" style="margin-top:28px">' + (soloVer ? '' : '<button class="btn btn--red" type="submit">' + (e.nuevo ? 'Crear' : 'Guardar cambios') + '</button>') + '<button class="btn" type="button" id="cancelar-promo">' + (soloVer ? 'Volver' : 'Cancelar') + '</button>' + (e.nuevo || soloVer ? '' : '<button class="btn btn--ghost" type="button" id="duplicar-promo">Duplicar como nuevo</button><button class="btn btn--ghost" type="button" id="borrar-promo">Eliminar</button>') + '</div></form>');
+
+    function leer() {
+      var f = $('#f'), g = function (n) { return f.elements[n] ? f.elements[n].value : ''; };
+      ['titulo', 'descripcion', 'resumen', 'texto', 'inicio', 'fin', 'bases', 'fecha_evento', 'lugar', 'tipo', 'estado', 'catalogo'].forEach(function (k) { if (f.elements[k] && !f.elements[k].disabled) it[k] = g(k); });
+      if (e.nuevo) it.id = g('id').trim();
+      it.ciudades = admin ? $$('[data-ciu]', f).filter(function (c) { return c.checked; }).map(function (c) { return c.getAttribute('data-ciu'); }) : [est.ciudadUsuario];
+      if (esC) {
+        it.componentes = $$('[data-comp]', f).map(function (row) {
+          var v = function (k) { var el = $('[data-c="' + k + '"]', row); return el ? el.value : ''; };
+          return v('tipo') === 'catalogo' ? { tipo: 'catalogo', slug: v('slug'), cantidad: Number(v('cantidad')), nota: v('nota') } : { tipo: 'otro', nombre: v('nombre'), cantidad: Number(v('cantidad')), nota: v('nota') };
+        });
+        it.precios = { general: g('precio_general') === '' ? null : Number(g('precio_general')), constructor: g('precio_constructor') === '' ? null : Number(g('precio_constructor')) };
+      } else {
+        it.cta = { tipo: g('cta_tipo'), texto: g('cta_texto'), url: g('cta_url') }; it.cupo = g('cupo') === '' ? 0 : Number(g('cupo'));
+      }
+      if (admin && f.elements.ejemplo) it.ejemplo = f.elements.ejemplo.checked;
+      return it;
+    }
+    function redibujar() { leer(); formPromo(); }
+    if (esC) {
+      $('#add-comp').addEventListener('click', function () { leer(); it.componentes.push({ tipo: 'catalogo', slug: '', cantidad: 1, nota: '' }); formPromo(); });
+      $$('[data-delc]').forEach(function (b) { b.addEventListener('click', function () { leer(); it.componentes.splice(+b.getAttribute('data-delc'), 1); formPromo(); }); });
+      $$('[data-c="tipo"]').forEach(function (s) { s.addEventListener('change', redibujar); });
+      $('#catalogo').addEventListener('change', function () { leer(); it.componentes = it.componentes.map(function (x) { return x.tipo === 'catalogo' ? { tipo: 'catalogo', slug: '', cantidad: x.cantidad, nota: x.nota } : x; }); formPromo(); });
+    } else {
+      $('#tipo-nov').addEventListener('change', redibujar); $('#cta-tipo').addEventListener('change', redibujar);
+    }
+    var quitar = $('#quitar-img'); if (quitar) quitar.addEventListener('click', function () { leer(); it.imagen = ''; formPromo(); });
+    $('#subir').addEventListener('change', function (ev) {
+      var a = ev.target.files[0]; if (!a) return;
+      if (a.size > 3000000) return aviso('La imagen debe pesar menos de 3 MB');
+      var lector = new FileReader();
+      lector.onload = function () { api('POST', '/api/admin/imagenes', { datos: String(lector.result).split(',')[1] }).then(function (r) { leer(); it.imagen = r.ruta; formPromo(); aviso('Imagen subida'); }).catch(function (x) { aviso(x.message); }); };
+      lector.readAsDataURL(a);
+    });
+    $('#cancelar-promo').addEventListener('click', function () { est.editPromo = null; vistaPromos(); });
+    var dup = $('#duplicar-promo'); if (dup) dup.addEventListener('click', function () { var c = JSON.parse(JSON.stringify(leer())); c.id = ''; c.titulo = c.titulo + ' (copia)'; c.estado = 'borrador'; c.inicio = ''; c.fin = ''; c.ejemplo = false; est.editPromo = { nuevo: true, lista: e.lista, item: c }; formPromo(); window.scrollTo(0, 0); aviso('Copia lista: ajusta las fechas y guarda'); });
+    var borrar = $('#borrar-promo'); if (borrar) borrar.addEventListener('click', function () {
+      if (!confirm('¿Eliminar "' + it.titulo + '"? Esta acción no se puede deshacer.')) return;
+      guardando(borrar, api('DELETE', '/api/admin/' + e.lista + '/' + it.id), 'Eliminado').then(function () { est.editPromo = null; vistaPromos(); });
+    });
+    $('#f').addEventListener('submit', function (ev) {
+      ev.preventDefault(); var dato = leer(), ruta = '/api/admin/' + e.lista;
+      var envio = e.nuevo ? api('POST', ruta, dato) : api('PUT', ruta + '/' + dato.id, dato);
+      guardando($('#f button[type=submit]'), envio, dato.estado === 'publicada' ? 'Publicado en el sitio' : dato.estado === 'revision' ? 'Enviado a revisión' : 'Borrador guardado').then(function () { est.editPromo = null; vistaPromos(); });
+    });
+  }
+
   /* ---------- arranque ---------- */
   api('GET', '/api/yo').then(function (r) {
     var u = r.usuario;
     if (!u) { raiz.innerHTML = '<p class="lead">Ingresa con tu cuenta de administrador para editar el sitio.</p><p style="margin-top:16px"><a class="btn btn--red" href="' + BASE + 'ingresar.html?volver=admin.html">Ingresar</a></p>'; return; }
-    if (u.rol !== 'admin') { raiz.innerHTML = '<p class="lead">Esta sección es solo para administradores.</p><p style="margin-top:16px"><a class="btn" href="' + BASE + 'equipo.html">Ir al panel del equipo</a></p>'; return; }
+    if (u.rol === 'cliente') { raiz.innerHTML = '<p class="lead">Esta sección es solo para el equipo de INCERPAZ.</p><p style="margin-top:16px"><a class="btn" href="' + BASE + 'mi-cuenta.html">Ir a mi cuenta</a></p>'; return; }
+    est.rol = u.rol; est.ciudadUsuario = u.ciudad;
+    /* un ejecutivo solo trabaja con las promociones de su ciudad; el administrador ve todo el panel */
+    if (u.rol !== 'admin') { est.tab = 'promos'; return pintar(); }
+    if (location.hash === '#promociones') est.tab = 'promos';
     return recargar().then(pintar);
   }).catch(function () { raiz.innerHTML = '<p class="lead">No pudimos conectar con el servidor.</p>'; });
 })();
