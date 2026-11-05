@@ -18,4 +18,4 @@ Abrir `http://localhost:8000` en el móvil o el navegador y "Añadir a pantalla 
 Sesión guiada, plantillas editables, ejercicios propios, fotos de máquinas, gráficas y récords, copias de seguridad (automáticas, a tu nube vía compartir, restaurar), importación de historial y sincronización opcional.
 
 ## Pendiente
-Notificación de descanso en segundo plano, cifrado de extremo a extremo en la nube, publicación en tiendas.
+Cifrado de extremo a extremo en la nube, publicación en tiendas.

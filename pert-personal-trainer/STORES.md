@@ -28,7 +28,7 @@
 3. Crea una clave de API de App Store Connect y añádela a Codemagic como integración llamada `Personal T`.
 4. Lanza el flujo `ios` de `codemagic.yaml`: compila y sube a TestFlight. Prueba con TestFlight antes de enviar a revisión.
 5. **App Privacy** (etiquetas de privacidad): declara los datos que realmente usa la app (ver política). En las notas de revisión explica que la nube es opcional y cómo eliminar la cuenta (Ajustes → Nube → Eliminar mi cuenta).
-6. Riesgo conocido: la regla 4.2 rechaza apps que son solo una web. Mitiga con funciones nativas reales (cámara, compartir, aviso de descanso con la pantalla apagada: pendiente).
+6. Riesgo conocido: la regla 4.2 rechaza apps que son solo una web. La app incluye funciones nativas reales: cámara, compartir copias y aviso de descanso con la pantalla apagada (notificación local).
 
 ## Sitio de política y borrado de cuenta
 1. `cp site/config.example.json site/config.json` y pon **tu nombre legal** y un **correo de contacto** (se publicarán). Sin ellos, el script se niega a generar el sitio.
@@ -39,9 +39,14 @@
 6. Respuestas de los formularios de privacidad: ver `STORE-PRIVACY.md`. **Antes de publicar, que te revise la política alguien con criterio legal**: está redactada según lo que hace la app, pero no es asesoría jurídica.
 7. Si cambias lo que la app hace con los datos (por ejemplo, un servicio de nube propio), actualiza la política **antes**.
 
+## Aviso de descanso (notificación local)
+- Android: el aviso es **no exacto** (`setAndAllowWhileIdle`): puede retrasarse unos segundos, y más si el teléfono está en ahorro profundo de batería. Se evitó a propósito el permiso de alarmas exactas (Google Play lo restringe). Se quitaron `SCHEDULE_EXACT_ALARM` y `RECEIVE_BOOT_COMPLETED` del manifiesto.
+- El texto del aviso es genérico («Descanso terminado») para no mostrar datos en la pantalla de bloqueo.
+- Si el usuario deniega las notificaciones, la app avisa una vez y sigue con sonido y vibración con la app abierta.
+- **Sin probar en dispositivo real:** la lógica está probada con un plugin simulado y un reloj falso; la entrega real con la pantalla apagada (Android e iOS) hay que comprobarla en un teléfono.
+
 ## Antes del primer envío (pendiente)
 - Publicar el sitio de política y borrado (ver arriba) y rellenar los formularios (`STORE-PRIVACY.md`).
 - Decidir la arquitectura de la nube para el público general (ver `STORE-PRIVACY.md`).
-- Notificación de descanso en segundo plano (plugin de notificaciones locales).
 - Probar en dispositivos reales: cámara, compartir copia, sin conexión, cambio de cuenta.
 - Comprobar disponibilidad del nombre "Personal T" en ambas tiendas.

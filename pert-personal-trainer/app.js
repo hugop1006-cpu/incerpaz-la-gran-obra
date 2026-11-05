@@ -394,7 +394,7 @@ function privacyCard(base = LEGAL_BASE) {
     <p class="mut">Tus entrenamientos se guardan en este dispositivo. Sin anuncios, analíticas ni rastreadores.</p>
     <details><summary>Qué guarda y cómo borrarlo</summary><ul>
       <li>Guarda: tus series, pesos, esfuerzo y comentarios; la respuesta Sí/No de síntomas (dato de salud); plantillas, ejercicios propios y las fotos que elijas.</li>
-      <li>Cámara: solo al pulsar «Tomar foto». Internet: solo para la nube opcional.</li>
+      <li>Cámara: solo al pulsar «Tomar foto». Notificaciones: solo el aviso genérico de fin de descanso. Internet: solo para la nube opcional.</li>
       <li>Nube opcional: si la activas, tus datos van al proyecto de Supabase que configuras tú; el autor de la app no recibe nada. No hay cifrado de extremo a extremo.</li>
       <li>Borrar: <em>Tus datos → Borrar todos los datos</em> (este dispositivo) · <em>Nube → Eliminar mis datos en la nube</em> · <em>Nube → Eliminar mi cuenta</em>.</li>
       <li>Personal T es un registro y guía; no es un producto sanitario.</li></ul></details>
@@ -490,18 +490,52 @@ async function fillSnaps() {
 }
 
 /* ---------- Acciones ---------- */
-let rest = { t: null, left: 0 };
-function stopRest() { clearInterval(rest.t); rest.t = null; }
-function startRest() {
-  const ex = stepEx(); stopRest(); rest.left = planOf(ex).rest;
-  const el = $('#tval'); if (!el) return;
-  rest.t = setInterval(() => {
-    rest.left--; const e2 = $('#tval'); if (!e2) return stopRest();
-    e2.textContent = rest.left + ' s';
-    if (rest.left <= 0) { stopRest(); e2.textContent = '¡Listo!'; navigator.vibrate?.([200, 100, 200]); }
-  }, 1000);
-  el.textContent = rest.left + ' s';
+/* ---------- Descanso: cuenta atrás por hora de fin + aviso nativo con la pantalla apagada ---------- */
+// La cuenta usa la hora de fin (no un contador), así no se desfasa si el sistema pausa la app. En la app nativa se
+// programa además una notificación local que entrega el sistema aunque la app esté en segundo plano. En la web
+// (PWA) solo hay aviso con la app abierta (sonido + vibración).
+const LN = () => (window.Capacitor?.isNativePlatform?.() ? window.Capacitor.Plugins?.LocalNotifications : null);
+const REST_NOTIF = 7001;
+let rest = { t: null, endAt: 0, scheduled: false }, notifAsked = false, channelMade = false;
+function beep() {
+  try {
+    const C = window.AudioContext || window.webkitAudioContext, ctx = new C(), o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination); o.frequency.value = 880; g.gain.setValueAtTime(0.15, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+    o.start(); o.stop(ctx.currentTime + 0.5); setTimeout(() => ctx.close(), 800);
+  } catch { /* sin audio */ }
 }
+async function cancelRestNotif(removeDelivered = false) {
+  const ln = LN(); if (!ln || (!rest.scheduled && !removeDelivered)) return; rest.scheduled = false;
+  try { await ln.cancel({ notifications: [{ id: REST_NOTIF }] }); if (removeDelivered) await ln.removeDeliveredNotifications({ notifications: [{ id: REST_NOTIF }] }); } catch { /* el aviso es opcional */ }
+}
+async function scheduleRestNotif(endAt) {
+  const ln = LN(); if (!ln) return;
+  try {
+    let p = await ln.checkPermissions();
+    if (p.display === 'prompt' || p.display === 'prompt-with-rationale') p = await ln.requestPermissions();
+    if (p.display !== 'granted') { if (!notifAsked) { notifAsked = true; toast('Activa las notificaciones de Personal T en los ajustes del teléfono para recibir el aviso con la pantalla apagada.'); } return; }
+    if (!channelMade) { channelMade = true; try { await ln.createChannel({ id: 'rest', name: 'Descanso entre series', description: 'Aviso cuando termina el descanso', importance: 4, visibility: 0, vibration: true }); } catch { /* iOS no usa canales */ } }
+    if (rest.endAt !== endAt) return; // el descanso ya se paró o se reinició mientras se pedía el permiso
+    await ln.schedule({ notifications: [{ id: REST_NOTIF, title: 'Descanso terminado', body: 'Es hora de la siguiente serie.', channelId: 'rest',
+      schedule: { at: new Date(endAt), allowWhileIdle: true }, isExactNotification: false }] }); // no exacta: evita pedir el permiso de alarmas exactas
+    if (rest.endAt === endAt) rest.scheduled = true; else await ln.cancel({ notifications: [{ id: REST_NOTIF }] });
+  } catch { /* si falla, queda el aviso con la app abierta */ }
+}
+function tickRest() {
+  if (!rest.endAt) return;
+  const left = Math.max(0, Math.ceil((rest.endAt - Date.now()) / 1000)), el = $('#tval');
+  if (el) el.textContent = left > 0 ? left + ' s' : '¡Listo!';
+  if (left <= 0) {
+    clearInterval(rest.t); rest.t = null; rest.endAt = 0;
+    if (document.visibilityState === 'visible') { beep(); navigator.vibrate?.([200, 100, 200]); cancelRestNotif(true); } // con la app a la vista no hace falta la notificación
+  }
+}
+function stopRest() { clearInterval(rest.t); rest.t = null; rest.endAt = 0; cancelRestNotif(); }
+function startRest() {
+  const sec = planOf(stepEx()).rest; if (!sec) return;
+  stopRest(); rest.endAt = Date.now() + sec * 1000; rest.t = setInterval(tickRest, 500); tickRest(); scheduleRestNotif(rest.endAt);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') tickRest(); });
 function finish() {
   cloudSyncSoon(1500);
   const s = cur(); s.finished = new Date().toISOString(); delete s.idx;

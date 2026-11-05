@@ -4,7 +4,7 @@ Redactadas a partir del comportamiento real de la app (código en este repo). **
 
 ## Hechos que sustentan las respuestas
 - Los datos viven en el dispositivo. Sin anuncios, analíticas, rastreadores ni SDK de terceros de seguimiento.
-- Permisos: cámara (solo al pulsar «Tomar foto») e Internet (solo nube opcional y enlaces).
+- Permisos: cámara (solo al pulsar «Tomar foto»), notificaciones locales (aviso genérico de fin de descanso, programado en el dispositivo; sin datos personales en el texto) e Internet (solo nube opcional y enlaces). Android: INTERNET, POST_NOTIFICATIONS, WAKE_LOCK; sin alarmas exactas.
 - Nube opcional: el usuario introduce la URL y clave pública **de su propio proyecto de Supabase**; el autor no opera servidores ni recibe datos. Cifrado en tránsito (HTTPS); sin cifrado de extremo a extremo.
 - Borrado: dentro de la app (Ajustes → Nube → Eliminar mi cuenta / Eliminar mis datos en la nube / Borrar todos los datos) y página web `delete-account.html`.
 - Android: `allowBackup=false`. iOS: `ITSAppUsesNonExemptEncryption=false` (solo cifrado estándar del sistema/HTTPS).
