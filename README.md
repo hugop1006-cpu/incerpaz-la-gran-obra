@@ -25,6 +25,25 @@ Abre `index.html` en el navegador (doble clic). No necesita servidor.
 - **Nivel 5, La Tormenta**: la cámara avanza sola y la lluvia te empuja. Al final, **La Grieta** parte el suelo: párate junto a cada grieta abierta y pulsa *apilar* para sellarla con un ladrillo. Con 6 sellos la vences.
 - El progreso (niveles desbloqueados, récord, tejas) se guarda en `localStorage`. Para borrarlo, limpia los datos del sitio en el navegador.
 
+## Minijuego: Torre de Ladrillos (Tetris de obra)
+
+Se abre desde el menú de etapas con el botón **MINIJUEGO: TORRE** o la tecla **T**. Las piezas son materiales de obra (viga, bloque, ladrillo, cemento, teja, tablón y losa).
+
+| Acción | Teclado | Celular |
+|---|---|---|
+| Mover | ← → o A D | ◀ ▶ |
+| Bajar más rápido | ↓ o S | ▼ |
+| Girar | ↑ / X / W (horario), Z (antihorario) | GIRAR |
+| Caída instantánea | Espacio | CAER |
+| Guardar pieza | C / Shift / K | GUARDAR |
+| Pausa | P o Esc | II |
+
+- Rotación SRS con patadas, bolsa de 7 piezas, pieza fantasma, 3 siguientes, guardar pieza y bloqueo con retardo.
+- **La casa se construye**: cada 8 líneas sube una etapa de la obra (fondo incluido); a las 40 líneas la obra se termina (+5000) y puedes seguir.
+- **Demolición**: cada 8 líneas llega una pieza bomba (se ve venir en "Próximas") que borra un área de 3×3; los escombros caen y pueden completar líneas.
+- Puntaje: línea 100 · doble 300 · triple 500 · Tetris 800 (×nivel, ×1.5 si es seguido), combos, y puntos por caída. Récord guardado en el navegador.
+- Código: `js/tetris.js`. Prueba automática: `node tools/probar-tetris.js`.
+
 ## En el celular (vertical y pantalla completa)
 
 - Se juega en **vertical**: el juego ocupa toda la pantalla y los botones (◀ ▶, SALTO, APILAR, MURO) quedan abajo durante la partida. En horizontal también funciona.
@@ -45,6 +64,7 @@ js/font.js      fuente de píxeles (con tildes y ñ)
 js/audio.js     efectos y música (Web Audio API)
 js/sprites.js   arte dibujado por código
 js/game.js      motor: física, colisiones por tiles, enemigos, jefe, menús
+js/tetris.js    minijuego Torre de Ladrillos (Tetris con tema de obra)
 tools/          prueba automática (un robot juega cada nivel)
 ```
 

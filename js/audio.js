@@ -65,6 +65,14 @@
     thunder:() => { noise(1.2, 0.5, 350); tone(60, 0.9, 'sawtooth', 0.18, 0, 35); },
     clear:  () => { [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, 0.16, 'square', 0.2, i * 0.12)); },
     over:   () => { [392, 330, 262, 196].forEach((f, i) => tone(f, 0.3, 'triangle', 0.3, i * 0.25)); },
+    tmove:  () => tone(520, 0.03, 'square', 0.07),
+    trot:   () => tone(700, 0.05, 'square', 0.1, 0, 900),
+    thold:  () => { tone(420, 0.07, 'triangle', 0.18, 0, 620); tone(620, 0.07, 'triangle', 0.15, 0.06); },
+    tlock:  () => { noise(0.05, 0.22, 700); tone(160, 0.07, 'square', 0.16, 0, 100); },
+    thard:  () => { noise(0.09, 0.32, 600); tone(200, 0.1, 'square', 0.22, 0, 60); },
+    tline:  () => { tone(660, 0.08, 'square', 0.16); tone(880, 0.12, 'square', 0.16, 0.07); },
+    tline2: () => { [660, 880, 1047].forEach((f, i) => tone(f, 0.09, 'square', 0.17, i * 0.07)); },
+    ttetris:() => { [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => tone(f, 0.12, 'square', 0.18, i * 0.06)); noise(0.2, 0.2, 1500, 0.1); },
     win:    () => { [523, 659, 784, 1047, 1319, 1047, 1319, 1568, 2093].forEach((f, i) => tone(f, 0.2, 'square', 0.18, i * 0.14)); }
   };
 
@@ -84,6 +92,8 @@
       lead: '9 - 7 - 5 - 7 - 9 - - - 10 - 9 - 7 - 5 - 4 - 5 - 7 - - - - 4 - 5 - 7 - 9 - 7 - 5 - 4 - 2 - 4 - - - 0 - - -'.split(' ') },
     l5: { root: 57, scale: SC_MIN, bpm: 140, wave: 'sawtooth', prog: [0, 0, 3, 4], bassWave: 'square',
       lead: '7 - 7 - 5 7 - - 8 - 7 - 5 - 3 - 7 - 7 - 10 8 7 - - 5 - 3 - 2 - - - 3 5 7 - 5 3 - 5 7 - 8 7 - 5 - 3 5 3 2 - 0 - - -'.split(' ') },
+    tet: { root: 64, scale: SC_MIN, bpm: 128, wave: 'square', prog: [0, 3, 4, 0], bassWave: 'triangle',
+      lead: '7 - 5 7 - 8 7 - 5 - 3 - 5 - 7 - - 8 - 10 8 7 - 5 - 7 - 8 - 7 - - - 5 7 - 8 10 - 8 7 - 5 3 - 5 - 7 - 5 - 3 - 2 - - 7 - 5 - 3 - 2 -'.split(' ') },
     fin: { root: 60, scale: SC_MAJ, bpm: 92, wave: 'triangle', prog: [0, 3, 4, 0], bassWave: 'sine',
       lead: '4 - - - 7 - 9 - 10 - - - 9 - 7 - 5 - - - 7 - 9 - 7 - - - 4 - - - 7 - 9 - 10 - 12 - 10 - 9 - 7 - 9 - 10 - - - 14 - - -'.split(' ') },
     boss: { root: 52, scale: SC_MIN, bpm: 152, wave: 'sawtooth', prog: [0, 3, 0, 4], bassWave: 'square',
@@ -127,6 +137,7 @@
       if (!timer) timer = setInterval(schedule, 50);
     },
     hurry(on) { tempoMult = on ? 1.25 : 1; },
+    tempo(m) { tempoMult = m; },
     suspend() { if (ctx && ctx.state === 'running') ctx.suspend(); },
     resume() { if (ctx && ctx.state === 'suspended') ctx.resume(); },
     pauseMusic(p) { if (musicGain) musicGain.gain.value = p ? 0.08 : 0.28; },
