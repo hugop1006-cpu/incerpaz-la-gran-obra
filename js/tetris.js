@@ -6,7 +6,7 @@
 (() => {
   'use strict';
   const COLS = 10, ROWS = 22, HID = 2;           // 2 filas ocultas arriba
-  const NAMES = ['', 'VIGA', 'BLOQUE', 'LADRILLO', 'CEMENTO', 'TEJA', 'TABLÓN', 'LOSA', 'DEMOLICIÓN'];
+  const NAMES = ['', 'VIGA', 'BLOQUE', 'LADRILLO', 'CEMENTO', 'TEJA', 'TABLÓN', 'LOSA', 'DEMOLICIÓN', 'MACIZO'];
   // Formas (estado 0) en cajas SRS; y = hacia abajo
   const SHAPES = {
     1: { n: 4, c: [[0, 1], [1, 1], [2, 1], [3, 1]] },   // I
@@ -46,19 +46,23 @@
     5: ['#e8892b', '#ffc27a', '#a85a12'],   // teja
     6: ['#a9693a', '#dca06a', '#6e4223'],   // tablón
     7: ['#9aa0a8', '#dfe3e8', '#62676f'],   // losa de cemento
-    8: ['#2b2b33', '#6a6a78', '#111116']    // demolición
+    8: ['#2b2b33', '#6a6a78', '#111116'],   // demolición
+    9: ['#3f424a', '#7d828e', '#1b1c20']    // bloque macizo de cemento (indestructible por línea)
   };
 
   const GRAV = lv => Math.pow(0.8 - (Math.min(lv, 15) - 1) * 0.007, Math.min(lv, 15) - 1); // seg por fila
   const DAS = 0.16, ARR = 0.04, SOFT = 0.035, LOCK_DELAY = 0.5, LOCK_RESETS = 15, CLEAR_T = 0.4, READY_T = 2.4;
   const BOMB_EVERY = 8;       // cada cuántas líneas llega una pieza DEMOLICIÓN
+  const BOMB_EVERY_CEMENT = 5; // con bloques macizos en juego la demolición llega antes
+  const CEMENT = 9;           // tipo de celda: una fila con un bloque macizo no se borra; solo la demolición lo rompe
+  const bombEvery = () => (S.cement ? BOMB_EVERY_CEMENT : BOMB_EVERY);
   const POWER_MAX = 10;       // carga de la NIVELADORA (líneas + extras de combo/Tetris)
   const HOUSE_LINES = 8;      // líneas por etapa de la casa (5 etapas = 40 líneas)
 
   const MODES = [
     { id: 'classic', name: 'CLÁSICO', desc: 'SIN FIN · CASA Y DEMOLICIÓN' },
     { id: 'sprint', name: 'SPRINT 40', desc: '40 LÍNEAS EN EL MENOR TIEMPO' },
-    { id: 'escombros', name: 'ESCOMBROS', desc: 'SUBEN FILAS DE ESCOMBROS' },
+    { id: 'escombros', name: 'ESCOMBROS', desc: 'SUBEN ESCOMBROS Y BLOQUES MACIZOS' },
     { id: 'misiones', name: 'MISIONES', desc: '5 OBJETIVOS · LA OBRA POR ETAPAS' },
     { id: 'versus', name: 'VERSUS', desc: '2 JUGADORES O CONTRA LA CPU' }
   ];
@@ -70,9 +74,9 @@
   const MISSIONS = [
     { name: 'CIMIENTOS', theme: 0, desc: 'BORRA 10 LÍNEAS', kind: 'lines', goal: 10, level: 1, rows: 0, rubble: 0 },
     { name: 'MUROS', theme: 1, desc: 'HAZ 3 DOBLES O MÁS', kind: 'multi', goal: 3, level: 2, rows: 0, rubble: 0 },
-    { name: 'LOSA Y TECHO', theme: 2, desc: 'BORRA 12 LÍNEAS CON ESCOMBROS', kind: 'lines', goal: 12, level: 2, rows: 6, rubble: 0 },
+    { name: 'LOSA Y TECHO', theme: 2, desc: 'BORRA 12 LÍNEAS (HAY MACIZOS)', kind: 'lines', goal: 12, level: 2, rows: 6, rubble: 0, cement: true },
     { name: 'ACABADOS', theme: 3, desc: 'HAZ 2 TETRIS (4 LÍNEAS)', kind: 'tetris', goal: 2, level: 3, rows: 0, rubble: 0 },
-    { name: 'LA TORMENTA', theme: 4, desc: 'AGUANTA 75 S CON ESCOMBROS', kind: 'survive', goal: 75, level: 4, rows: 0, rubble: 6 }
+    { name: 'LA TORMENTA', theme: 4, desc: 'AGUANTA 75 S (HAY MACIZOS)', kind: 'survive', goal: 75, level: 4, rows: 0, rubble: 6, cement: true }
   ];
   const SPRINT_LINES = 40, RUBBLE_EVERY = 8; // piezas entre filas de escombros
   let cellPx = 12;            // tamaño de celda del último dibujo (para los gestos)
@@ -97,7 +101,7 @@
 
   function newState(mode, idx) {
     return {
-      mode, misIdx: idx, mis: mode === 'misiones' ? MISSIONS[idx] : null, mMulti: 0, mTet: 0, missionDone: false, rb: 0, power: 0, sel: 0, slowT: 0, time: 0, sprintDone: false, won: false, lastRot: false,
+      cc: 0, cement: mode === 'escombros' || !!(mode === 'misiones' && MISSIONS[idx] && MISSIONS[idx].cement), mode, misIdx: idx, mis: mode === 'misiones' ? MISSIONS[idx] : null, mMulti: 0, mTet: 0, missionDone: false, rb: 0, power: 0, sel: 0, slowT: 0, time: 0, sprintDone: false, won: false, lastRot: false,
       board: emptyBoard(), queue: [], cur: null, hold: 0, holdUsed: false,
       score: 0, lines: 0, level: 1, combo: -1, b2b: false, bombCharge: 0, bombsUsed: 0,
       phase: 'ready', t: 0, phaseT: 0, fall: 0, lockT: 0, lockResets: 0, lowest: 0,
@@ -114,6 +118,10 @@
     if (S.mis) {
       S.level = S.mis.level;
       for (let k = 0; k < S.mis.rows; k++) { const hole = Math.floor(Math.random() * COLS); S.board[ROWS - 1 - k] = Array.from({ length: COLS }, (_, x) => x === hole ? 0 : 7); }
+      if (S.mis.cement && S.mis.rows) { // 2 bloques macizos entre las filas de escombros
+        for (let n = 0; n < 2; n++) { const r = ROWS - 1 - (1 + 2 * n), cs = S.board[r].map((v, x) => v ? x : -1).filter(x => x >= 0); S.board[r][cs[Math.floor(Math.random() * cs.length)]] = CEMENT; }
+        S.banner = { text: 'BLOQUE MACIZO', sub: 'NO SE BORRA: ROMPELO CON DEMOLICIÓN', t: 5 };
+      }
     }
     env.Snd.music('tet');
     env.Snd.tempo(S.mis ? 1 + (S.level - 1) * 0.035 : 1);
@@ -191,9 +199,9 @@
     S.shake = Math.max(S.shake, 0.06);
     afterLock();
   }
-  function fullRows() {
+  function fullRows() { // una fila con un bloque macizo no cuenta, aunque esté llena
     const r = [];
-    for (let y = 0; y < ROWS; y++) if (S.board[y].every(v => v)) r.push(y);
+    for (let y = 0; y < ROWS; y++) if (S.board[y].every(v => v) && !S.board[y].includes(CEMENT)) r.push(y);
     return r;
   }
   function afterLock() {
@@ -251,7 +259,7 @@
     let removed = 0;
     for (let y = cy - 1; y <= cy + 1; y++) for (let x = cx - 1; x <= cx + 1; x++) {
       if (x < 0 || x >= COLS || y < 0 || y >= ROWS) continue;
-      if (S.board[y][x]) { burst(x, y, MAT[S.board[y][x]][0], 3, 110); removed++; }
+      if (S.board[y][x]) { burst(x, y, MAT[S.board[y][x]][0], 3, 110); removed += S.board[y][x] === CEMENT ? 3 : 1; }
       S.board[y][x] = 0;
     }
     for (let i = 0; i < 14; i++) burst(cx, cy, i % 2 ? '#ffb02e' : '#fff6e8', 1, 150);
@@ -308,8 +316,8 @@
     if (S.vs && S.garb > 0 && !addGarbage()) return;
     const rub = S.mode === 'escombros' ? RUBBLE_EVERY : (S.mis ? S.mis.rubble : 0);
     if (rub && ++S.rb >= rub) { S.rb = 0; if (!addRubble()) return; }
-    if (!S.vs && S.bombCharge >= BOMB_EVERY) { // la demolición llega como 3ª pieza para que se vea venir
-      S.bombCharge -= BOMB_EVERY; S.queue.splice(2, 0, 8); S.bombsUsed++;
+    if (!S.vs && S.bombCharge >= bombEvery()) { // la demolición llega como 3ª pieza para que se vea venir
+      S.bombCharge -= bombEvery(); S.queue.splice(2, 0, 8); S.bombsUsed++;
     }
     spawn();
   }
@@ -317,8 +325,13 @@
     if (S.board[0].some(v => v) || S.board[1].some(v => v)) { gameOver(); return false; }
     S.board.shift();
     const hole = Math.floor(Math.random() * COLS);
-    S.board.push(Array.from({ length: COLS }, (_, x) => x === hole ? 0 : 7));
-    for (let x = 0; x < COLS; x++) if (x !== hole) burst(x, ROWS - 1, MAT[7][0], 1, 60);
+    const row = Array.from({ length: COLS }, (_, x) => x === hole ? 0 : 7);
+    if (S.cement && ++S.cc % 3 === 0) { // cada 3ª fila de escombros trae un bloque macizo
+      let c; do { c = Math.floor(Math.random() * COLS); } while (c === hole); row[c] = CEMENT;
+      popup('¡BLOQUE MACIZO!', env.B.accent);
+    }
+    S.board.push(row);
+    for (let x = 0; x < COLS; x++) if (x !== hole) burst(x, ROWS - 1, MAT[row[x]][0], 1, 60);
     popup('¡ESCOMBROS!', env.B.danger); S.shake = 0.25; env.Snd.play('crack');
     return true;
   }
@@ -569,7 +582,7 @@
       while (fits({ ...p, y: p.y + 1 })) p.y++;
       const b = S.board.map(r => r.slice());
       cells(p).forEach(([cx, cy]) => { if (cy >= 0) b[cy][cx] = t; });
-      const keep = b.filter(r => !r.every(v => v)), lines = ROWS - keep.length;
+      const keep = b.filter(r => !r.every(v => v) || r.includes(CEMENT)), lines = ROWS - keep.length;
       while (keep.length < ROWS) keep.unshift(new Array(COLS).fill(0));
       let aggH = 0, holes = 0, bump = 0, prev = -1;
       for (let c = 0; c < COLS; c++) {
@@ -730,6 +743,9 @@
       case 2: g.fillRect(m, 2, 1, s - 4); g.fillRect(2, m, s - 4, 1); break;                            // cerámica: cruz de baldosa
       case 4: g.fillStyle = light; g.fillRect(3, 3, 1, 1); g.fillRect(s - 4, s - 4, 1, 1); g.fillRect(m, m + 1, 1, 1); break; // cemento fresco
       case 7: g.fillStyle = light; g.fillRect(2, 2, 2, 1); g.fillRect(s - 4, s - 3, 2, 1); break;       // losa: brillo
+      case 9: // macizo: hormigón con cruz y remaches
+        g.fillStyle = dark; for (let i = 2; i < s - 2; i++) { g.fillRect(i, i, 1, 1); g.fillRect(s - 1 - i, i, 1, 1); }
+        g.fillStyle = '#ff8a2e'; g.fillRect(2, 2, 2, 2); g.fillRect(s - 4, 2, 2, 2); g.fillRect(2, s - 4, 2, 2); g.fillRect(s - 4, s - 4, 2, 2); break;
       case 8: // bomba: chispa
         g.fillStyle = '#ff7a2e'; g.fillRect(m - 1, 1, 3, 2); g.fillStyle = '#ffe14a'; g.fillRect(m, 0, 1, 2);
         g.fillStyle = '#fff6e8'; g.fillRect(2, s - 5, 2, 2); break;
@@ -781,6 +797,9 @@
     const cy = r => by + (r - HID) * s;
     for (let r = HID; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
       const v = S.board[r][c]; if (v) drawCell(g, v, bx + c * s, cy(r), s);
+    }
+    for (let r = HID; r < ROWS; r++) { // fila llena pero bloqueada por un macizo: parpadea en rojo
+      if (S.board[r].includes(CEMENT) && S.board[r].every(v => v)) { g.fillStyle = 'rgba(226,61,61,' + (0.18 + 0.14 * Math.sin(S.t * 7)).toFixed(2) + ')'; g.fillRect(bx, cy(r), bw, s); }
     }
     if (S.phase === 'clearing') { // destello de las líneas completas
       const k = S.phaseT / CLEAR_T, a = Math.sin(Math.min(1, k) * Math.PI);
@@ -898,7 +917,7 @@
     env.hit(x, y - 2, w, 12, 't:psel'); // tocar la barra cambia de poder
   }
   function drawBombBar(g, x, y, w) {
-    const { B } = env, k = Math.min(1, S.bombCharge / BOMB_EVERY), queued = S.queue.slice(0, 3).includes(8) || (S.cur && S.cur.type === 8);
+    const { B } = env, k = Math.min(1, S.bombCharge / bombEvery()), queued = S.queue.slice(0, 3).includes(8) || (S.cur && S.cur.type === 8);
     g.fillStyle = B.dark; g.fillRect(x - 1, y - 1, w + 2, 10);
     g.fillStyle = '#3a2418'; g.fillRect(x, y, w, 8);
     g.fillStyle = queued ? (Math.floor(S.t * 6) % 2 ? B.danger : B.secondary) : B.danger; g.fillRect(x, y, Math.round(w * (queued ? 1 : k)), 8);
@@ -988,6 +1007,6 @@
     get active() { return !!S || !!VS; },
     _vs: () => VS,
     // utilidades para pruebas automáticas
-    _s: () => S, _cells: cells, _fits: fits, _hooks: { ROT, SHAPES, COLS, ROWS, HID, spawn, lockPiece, explode, nextPiece, rotate }
+    _s: () => S, _cells: cells, _fits: fits, _hooks: { ROT, SHAPES, COLS, ROWS, HID, spawn, lockPiece, explode, nextPiece, rotate, addRubble }
   };
 })();

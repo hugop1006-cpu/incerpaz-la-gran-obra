@@ -123,12 +123,33 @@ const assert = require('assert');
   assert.ok(await pg.evaluate(() => Tetris._s().board[21].filter(v => v === 7).length) >= 1 || await pg.evaluate(() => Tetris._s().phase) === 'over', 'aparecen escombros');
   await pg.evaluate(() => Tetris.action('quit'));
 
+  // Bloque macizo: una fila llena con macizo NO se borra; la demolición lo rompe
+  await key('KeyT'); for (let i = 0; i < 2; i++) await key('ArrowDown'); await key('Enter'); await step(160); // ESCOMBROS
+  await pg.evaluate(() => {
+    const S = Tetris._s(); S.board = Array.from({ length: 22 }, () => new Array(10).fill(0));
+    for (let x = 0; x < 10; x++) if (x < 4 || x > 5) S.board[21][x] = 3;
+    S.board[21][0] = 9;                                   // macizo en la fila
+    S.cur = { type: 2, rot: 0, x: 3, y: 10 }; S.lockT = 0;
+  });
+  const lc = await pg.evaluate(() => Tetris._s().lines);
+  await key('Space'); await step(40);
+  assert.equal(await pg.evaluate(() => Tetris._s().lines), lc, 'fila llena con macizo no se borra');
+  assert.ok(await pg.evaluate(() => Tetris._s().board[21].includes(9)), 'el macizo sigue ahí');
+  await pg.evaluate(() => { const S = Tetris._s(); S.cur = { type: 8, rot: 0, x: 1, y: 10 }; S.lockT = 0; });
+  await key('Space'); await step(40);
+  assert.ok(await pg.evaluate(() => !Tetris._s().board.some(r => r.includes(9))), 'la demolición rompe el macizo');
+  // los escombros traen un macizo cada 3 filas
+  const got = await pg.evaluate(() => { const S = Tetris._s(); S.board = Array.from({ length: 22 }, () => new Array(10).fill(0)); S.cc = 0; for (let i = 0; i < 3; i++) Tetris._hooks.addRubble(); return S.board.flat().filter(v => v === 9).length; });
+  assert.equal(got, 1, 'la 3ª fila de escombros trae un macizo');
+  await pg.evaluate(() => Tetris.action('quit'));
+
   // Misiones: menú de etapas, completar la 1ª, desbloquear la 2ª
   await key('KeyT'); await key('ArrowDown'); await key('ArrowDown'); await key('ArrowDown'); await key('Enter');
   await key('ArrowDown'); await key('Enter'); // la 2ª está bloqueada: no arranca
   assert.equal(await pg.evaluate(() => Tetris._s()), null, 'misión bloqueada no arranca');
   await key('ArrowUp'); await key('Enter'); await step(160);
   assert.equal(await pg.evaluate(() => Tetris._s().mis.name), 'CIMIENTOS');
+  assert.equal(await pg.evaluate(() => Tetris._s().cement), false, 'la misión 1 no tiene macizos');
   await pg.evaluate(() => {
     const S = Tetris._s(); S.lines = 9; S.board = Array.from({ length: 22 }, () => new Array(10).fill(0));
     for (let x = 0; x < 10; x++) if (x < 3 || x > 6) S.board[21][x] = 3;

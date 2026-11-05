@@ -52,6 +52,7 @@ Se abre desde el menú de etapas con el botón **MINIJUEGO: TORRE** o la tecla *
 - **Versus** (menú → VERSUS): dos tableros lado a lado con las mismas piezas para los dos. Borrar líneas manda **escombros** al rival (doble 1, triple 2, Tetris 4, T-spin el doble, +1 por combo o seguido; primero se cancela lo que te iba a llegar, y se ve como una barra roja junto al tablero). Pierde quien desborda la torre; hay revancha y marcador.
   - **2 jugadores** en el mismo teclado: J1 **A D** mover, **W** girar, **Q** girar al revés, **S** bajar, **E** guardar, **Espacio** caer · J2 **← →** mover, **↑** girar, **,** girar al revés, **↓** bajar, **.** guardar, **Enter** caer.
   - **Contra la CPU**: juegas con las flechas, WASD o los botones y gestos del celular; la CPU prueba todas las posiciones y elige la mejor.
+- **Bloque macizo** (cemento oscuro con esquinas naranjas): una fila que lo contiene **no se borra aunque esté llena** (parpadea en rojo). Solo la pieza **Demolición** lo rompe, así que con macizos en juego llega antes (cada 5 líneas en vez de 8). Aparece en **Escombros** (cada 3ª fila que sube) y en las misiones 3 y 5.
 - Puntaje: línea 100 · doble 300 · triple 500 · Tetris 800 (×nivel, ×1.5 si es seguido), combos, y puntos por caída. Récord guardado en el navegador.
 - Código: `js/tetris.js`. Prueba automática: `node tools/probar-tetris.js`.
 
