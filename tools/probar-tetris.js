@@ -147,6 +147,43 @@ const assert = require('assert');
   await pg.evaluate(() => { Tetris._s().time = 74.95; }); await step(10);
   assert.equal(await pg.evaluate(() => Tetris._s().won), true, 'sobrevivir 75 s cumple la misión');
   assert.equal(await pg.evaluate(() => INCERPAZ.Save.data.tetris.mis), 5);
+  await pg.evaluate(() => Tetris.action('quit'));
+
+  // Versus 2 jugadores: cada uno con sus teclas y la basura pasa de un tablero al otro
+  await key('KeyT'); for (let i = 0; i < 4; i++) await key('ArrowDown'); await key('Enter'); // VERSUS
+  await key('Enter'); await step(160);                                                        // 2 JUGADORES
+  assert.equal(await pg.evaluate(() => Tetris._vs().mode), 'vs2');
+  assert.equal(await pg.evaluate(() => Tetris._vs().p[0].stats.pieces + Tetris._vs().p[1].stats.pieces), 2, 'cada jugador recibe su pieza');
+  const seq = await pg.evaluate(() => Tetris._vs().p.map(P => P.cur.type));
+  assert.equal(seq[0], seq[1], 'misma primera pieza para los dos');
+  const x1 = await pg.evaluate(() => Tetris._vs().p.map(P => P.cur.x));
+  await pg.keyboard.down('KeyA'); await step(2); await pg.keyboard.up('KeyA');
+  await pg.keyboard.down('ArrowRight'); await step(2); await pg.keyboard.up('ArrowRight');
+  const x2 = await pg.evaluate(() => Tetris._vs().p.map(P => P.cur.x));
+  assert.ok(x2[0] < x1[0] && x2[1] > x1[1], 'J1 con A y J2 con flechas se mueven por separado');
+  await pg.evaluate(() => {
+    const [a] = Tetris._vs().p; a.board = Array.from({ length: 22 }, () => new Array(10).fill(0));
+    for (const y of [20, 21]) for (let x = 0; x < 10; x++) if (x < 4 || x > 5) a.board[y][x] = 3;   // hueco de 2 de ancho
+    a.cur = { type: 2, rot: 0, x: 3, y: 10 }; a.lockT = 0;                                          // la O cae justo ahí
+  });
+  await key('Space'); await step(2);
+  assert.ok(await pg.evaluate(() => Tetris._vs().p[0].lines) >= 1, 'J1 borra líneas con ESPACIO');
+  await step(40);
+  assert.ok(await pg.evaluate(() => Tetris._vs().p[1].garb + Tetris._vs().p[1].board.flat().filter(v => v === 7).length) > 0, 'una doble de J1 manda basura a J2');
+  await key('Enter'); await step(2); // J2 suelta con ENTER
+  await pg.evaluate(() => Tetris.action('quit'));
+
+  // Versus CPU: la CPU juega sola, borra líneas y J1 pierde si no hace nada
+  await key('KeyT'); for (let i = 0; i < 4; i++) await key('ArrowDown'); await key('Enter');
+  await key('ArrowDown'); await key('Enter'); await step(160);
+  assert.equal(await pg.evaluate(() => Tetris._vs().p[1].cpu), true);
+  let st = null;
+  for (let k = 0; k < 40 && !st; k++) { await step(180); st = await pg.evaluate(() => { const v = Tetris._vs(); return v.phase === 'over' ? { w: v.winner, l: v.p[1].lines } : null; }); }
+  const cpuLines = await pg.evaluate(() => Tetris._vs().p[1].lines);
+  assert.ok(cpuLines >= 3, 'la CPU borra líneas por sí sola (' + cpuLines + ')');
+  assert.ok(st, 'termina la partida');
+  await pg.evaluate(() => Tetris.action('quit'));
+  assert.equal(await pg.evaluate(() => INCERPAZ.G.state), 'select');
   assert.deepEqual(errs, [], 'sin errores en consola');
   console.log('Torre de Ladrillos: todo OK');
   await b.close();

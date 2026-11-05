@@ -54,7 +54,10 @@
     wall: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], pause: ['KeyP', 'Escape'], mute: ['KeyM'],
     confirm: ['Enter', 'NumpadEnter', 'Space'], back: ['Escape'],
     // minijuego Torre de Ladrillos
-    rotcw: ['ArrowUp', 'KeyX', 'KeyW'], rotccw: ['KeyZ'], hard: ['Space'], hold: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], soft: ['ArrowDown', 'KeyS'], mini: ['KeyT'], power: ['KeyV', 'KeyB'], powerSel: ['KeyE', 'KeyQ']
+    rotcw: ['ArrowUp', 'KeyX', 'KeyW'], rotccw: ['KeyZ'], hard: ['Space'], hold: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], soft: ['ArrowDown', 'KeyS'], mini: ['KeyT'], power: ['KeyV', 'KeyB'], powerSel: ['KeyE', 'KeyQ'],
+    // versus a 2 jugadores
+    p1left: ['KeyA'], p1right: ['KeyD'], p1soft: ['KeyS'], p1rot: ['KeyW'], p1rotccw: ['KeyQ'], p1hold: ['KeyE'], p1hard: ['Space'],
+    p2left: ['ArrowLeft'], p2right: ['ArrowRight'], p2soft: ['ArrowDown'], p2rot: ['ArrowUp'], p2rotccw: ['Comma'], p2hold: ['Period'], p2hard: ['Enter', 'NumpadEnter']
   };
   const keysDown = new Set(), keysPressed = new Set(), touchHeld = new Set(), touchPressed = new Set();
   const held = a => touchHeld.has(a) || BIND[a].some(k => keysDown.has(k));

@@ -49,6 +49,9 @@ Se abre desde el menú de etapas con el botón **MINIJUEGO: TORRE** o la tecla *
   - **Cemento** (cuesta 7): rellena los huecos tapados de las 6 filas de abajo, lo que puede completar líneas.
   - **Niveladora** (cuesta 10): aplana las 2 filas de abajo de la torre.
 - **Misiones** (modo del menú): 5 objetivos, uno por etapa de la obra, que se desbloquean en orden y guardan el progreso. 1 Cimientos: borra 10 líneas · 2 Muros: 3 dobles o más · 3 Losa y techo: 12 líneas empezando con escombros · 4 Acabados: 2 Tetris · 5 La Tormenta: aguanta 75 s mientras suben escombros. Cada misión tiene su nivel de velocidad y su fondo, y la casa del panel avanza con las misiones completadas.
+- **Versus** (menú → VERSUS): dos tableros lado a lado con las mismas piezas para los dos. Borrar líneas manda **escombros** al rival (doble 1, triple 2, Tetris 4, T-spin el doble, +1 por combo o seguido; primero se cancela lo que te iba a llegar, y se ve como una barra roja junto al tablero). Pierde quien desborda la torre; hay revancha y marcador.
+  - **2 jugadores** en el mismo teclado: J1 **A D** mover, **W** girar, **Q** girar al revés, **S** bajar, **E** guardar, **Espacio** caer · J2 **← →** mover, **↑** girar, **,** girar al revés, **↓** bajar, **.** guardar, **Enter** caer.
+  - **Contra la CPU**: juegas con las flechas, WASD o los botones y gestos del celular; la CPU prueba todas las posiciones y elige la mejor.
 - Puntaje: línea 100 · doble 300 · triple 500 · Tetris 800 (×nivel, ×1.5 si es seguido), combos, y puntos por caída. Récord guardado en el navegador.
 - Código: `js/tetris.js`. Prueba automática: `node tools/probar-tetris.js`.
 

@@ -59,7 +59,12 @@
     { id: 'classic', name: 'CLÁSICO', desc: 'SIN FIN · CASA Y DEMOLICIÓN' },
     { id: 'sprint', name: 'SPRINT 40', desc: '40 LÍNEAS EN EL MENOR TIEMPO' },
     { id: 'escombros', name: 'ESCOMBROS', desc: 'SUBEN FILAS DE ESCOMBROS' },
-    { id: 'misiones', name: 'MISIONES', desc: '5 OBJETIVOS · LA OBRA POR ETAPAS' }
+    { id: 'misiones', name: 'MISIONES', desc: '5 OBJETIVOS · LA OBRA POR ETAPAS' },
+    { id: 'versus', name: 'VERSUS', desc: '2 JUGADORES O CONTRA LA CPU' }
+  ];
+  const VERSUS = [
+    { id: 'vs2', name: '2 JUGADORES', desc: 'J1: A D S W Q E ESPACIO · J2: FLECHAS , . ENTER' },
+    { id: 'vscpu', name: 'CONTRA LA CPU', desc: 'JUEGA SOLO (TAMBIÉN EN CELULAR)' }
   ];
   // Misiones: una por etapa de la obra (se desbloquean en orden)
   const MISSIONS = [
@@ -74,7 +79,9 @@
   let G0 = null;              // gesto táctil en curso
   let M = null;               // menú de modos {cursor}
   let env = null;             // {ctx, C, B, Font, Art, Snd, Save, pressed, held, txt, panel, button, quit()}
-  let S = null;               // partida en curso
+  let S = null;               // partida en curso (en versus: el jugador que se está procesando/dibujando)
+  let VS = null;              // partida versus {mode, p:[J1,J2], phase, winner, wins}
+  let vsWins = [0, 0];
   const cellCache = new Map();
 
   /* ===================== Núcleo ===================== */
@@ -83,12 +90,13 @@
     for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
     return a;
   }
-  function fillQueue() { while (S.queue.length < 6) S.queue.push(...newBag()); }
+  const VSSEQ = [];           // secuencia de piezas compartida en versus (juego justo)
+  function vsBag() { while (VSSEQ.length <= S.si) VSSEQ.push(newBag()); return VSSEQ[S.si++]; }
+  function fillQueue() { while (S.queue.length < 6) S.queue.push(...(S.vs ? vsBag() : newBag())); }
   function emptyBoard() { return Array.from({ length: ROWS }, () => new Array(COLS).fill(0)); }
 
-  function start(mode, idx) {
-    mode = mode || (S && S.mode) || 'classic'; M = null; idx = idx || 0;
-    S = {
+  function newState(mode, idx) {
+    return {
       mode, misIdx: idx, mis: mode === 'misiones' ? MISSIONS[idx] : null, mMulti: 0, mTet: 0, missionDone: false, rb: 0, power: 0, sel: 0, slowT: 0, time: 0, sprintDone: false, won: false, lastRot: false,
       board: emptyBoard(), queue: [], cur: null, hold: 0, holdUsed: false,
       score: 0, lines: 0, level: 1, combo: -1, b2b: false, bombCharge: 0, bombsUsed: 0,
@@ -97,6 +105,11 @@
       clearRows: [], flash: [], particles: [], popups: [], shake: 0, banner: null, houseDone: false,
       newRecord: false, stats: { pieces: 0, tetrises: 0, bombs: 0 }
     };
+  }
+
+  function start(mode, idx) {
+    mode = mode || (S && S.mode) || 'classic'; M = null; idx = idx || 0;
+    S = newState(mode, idx);
     fillQueue();
     if (S.mis) {
       S.level = S.mis.level;
@@ -207,6 +220,7 @@
     const oldLines = S.lines;
     S.lines += n;
     S.bombCharge += n;
+    if (S.vs) sendGarbage(n, tet, ts);
     const pw0 = S.power; S.power = Math.min(POWER_MAX, S.power + n + (tet ? 2 : 0) + (S.combo > 0 ? 1 : 0));
     if (pw0 < POWER_MAX && S.power >= POWER_MAX) popup('¡CARGA AL MÁXIMO!', env.B.good);
     if (n >= 2) S.mMulti++;
@@ -291,9 +305,10 @@
   }
   function nextPiece() {
     if (S.phase === 'over') return;
+    if (S.vs && S.garb > 0 && !addGarbage()) return;
     const rub = S.mode === 'escombros' ? RUBBLE_EVERY : (S.mis ? S.mis.rubble : 0);
     if (rub && ++S.rb >= rub) { S.rb = 0; if (!addRubble()) return; }
-    if (S.bombCharge >= BOMB_EVERY) { // la demolición llega como 3ª pieza para que se vea venir
+    if (!S.vs && S.bombCharge >= BOMB_EVERY) { // la demolición llega como 3ª pieza para que se vea venir
       S.bombCharge -= BOMB_EVERY; S.queue.splice(2, 0, 8); S.bombsUsed++;
     }
     spawn();
@@ -317,6 +332,7 @@
     env.Save.write(); env.Snd.music(null); env.Snd.tempo(1); env.Snd.play('win');
   }
   function gameOver() {
+    if (S.vs) return vsOver();
     S.phase = 'over'; S.phaseT = 0; S.cur = null;
     const d = env.Save.data; d.tetris = d.tetris || { hi: 0, lines: 0, plays: 0 };
     const rk = recKey(S.mode);
@@ -331,6 +347,7 @@
   function update(dt) {
     dt = Math.min(dt, 0.05);
     const e = env;
+    if (VS) return updateVS(dt);
     if (!S) { if (M) menuUpdate(dt); return; }
     if (S.phase === 'play' || S.phase === 'clearing') S.time += dt;
     if (S.mis && S.mis.kind === 'survive' && S.phase === 'play' && S.time >= S.mis.goal) { win(); return; }
@@ -355,23 +372,26 @@
     }
     // ---- jugando ----
     if (e.pressed('pause')) { setPause(true); return; }
+    stepPlay(dt, e);
+  }
+  function stepPlay(dt, e) {
     if (!S.cur) return;
     // movimiento lateral con DAS/ARR
     const L = e.held('left'), R = e.held('right');
     const dir = L && R ? S.dasDir : (L ? -1 : (R ? 1 : 0));
     if (dir !== S.dasDir) {
       S.dasDir = dir; S.dasT = 0;
-      if (dir && tryMove(dir, 0)) e.Snd.play('tmove');
+      if (dir && tryMove(dir, 0)) env.Snd.play('tmove');
     } else if (dir) {
       S.dasT += dt;
-      while (S.dasT >= DAS + ARR) { S.dasT -= ARR; if (tryMove(dir, 0)) e.Snd.play('tmove'); else break; }
+      while (S.dasT >= DAS + ARR) { S.dasT -= ARR; if (tryMove(dir, 0)) env.Snd.play('tmove'); else break; }
     }
     if (S.gRot) { S.gRot = false; rotate(1); }
     if (e.pressed('rotcw')) rotate(1);
     if (e.pressed('rotccw')) rotate(-1);
     if (e.pressed('hold')) doHold();
-    if (e.pressed('power')) usePower();
-    if (e.pressed('powerSel')) cyclePower(1);
+    if (!S.vs && e.pressed('power')) usePower();
+    if (!S.vs && e.pressed('powerSel')) cyclePower(1);
     if (S.slowT > 0) S.slowT = Math.max(0, S.slowT - dt);
     if (!S.cur) return;
     if (!S.cur) return;
@@ -379,7 +399,7 @@
       let d = 0; while (tryMove(0, 1)) d++;
       S.score += d * 2; S.shake = Math.max(S.shake, 0.12);
       for (const [x, y] of cells(S.cur)) burst(x + 0.5, y + 1, MAT[S.cur.type][1], 2, 40);
-      e.Snd.play('thard'); lockPiece(); return;
+      env.Snd.play('thard'); lockPiece(); return;
     }
     // gravedad + caída suave
     const soft = e.held('soft') || S.gSoft;
@@ -395,7 +415,8 @@
       if (S.lockT >= LOCK_DELAY) lockPiece();
     } else S.lockT = 0;
   }
-  function updateFx(dt) {
+  function updateFx(dt, P) {
+    if (P) { const keep = S; S = P; updateFx(dt); S = keep; return; }
     S.particles.forEach(p => { p.t += dt; p.x += p.vx * dt / 12; p.y += p.vy * dt / 12; p.vy += 260 * dt; });
     S.particles = S.particles.filter(p => p.t < p.life);
     S.popups.forEach(p => { p.t += dt; });
@@ -405,23 +426,25 @@
     if (on && (S.phase === 'play' || S.phase === 'ready')) { S.prevPhase = S.phase; S.phase = 'paused'; env.Snd.pauseMusic(true); env.Snd.play('pause'); }
     else if (!on && S.phase === 'paused') { S.phase = S.prevPhase || 'play'; env.Snd.pauseMusic(false); env.Snd.play('pause'); }
   }
-  function quit() { env.Snd.pauseMusic(false); env.Snd.tempo(1); S = null; M = null; env.quit(); }
-  function open() { S = null; M = { cursor: 0, t: 0, page: 'modes' }; }
+  function quit() { env.Snd.pauseMusic(false); env.Snd.tempo(1); S = null; VS = null; M = null; env.quit(); }
+  function open() { S = null; VS = null; M = { cursor: 0, t: 0, page: 'modes' }; vsWins = [0, 0]; }
   const unlockedMis = () => Math.min(5, doneMissions() + 1);
   function menuPick(i) {
     if (M.page === 'missions') {
       if (i >= unlockedMis()) { env.Snd.play('no'); return; }
       env.Snd.play('ok'); start('misiones', i);
-    } else if (MODES[i].id === 'misiones') { env.Snd.play('ok'); M.page = 'missions'; M.cursor = Math.min(doneMissions(), 4); }
+    } else if (M.page === 'versus') { env.Snd.play('ok'); vsWins = [0, 0]; startVS(VERSUS[i].id); }
+    else if (MODES[i].id === 'misiones') { env.Snd.play('ok'); M.page = 'missions'; M.cursor = Math.min(doneMissions(), 4); }
+    else if (MODES[i].id === 'versus') { env.Snd.play('ok'); M.page = 'versus'; M.cursor = 0; }
     else { env.Snd.play('ok'); start(MODES[i].id); }
   }
   function menuBack() {
     env.Snd.play('select');
-    if (M.page === 'missions') { M.page = 'modes'; M.cursor = MODES.length - 1; } else { M = null; env.quit(); }
+    if (M.page !== 'modes') { M.cursor = M.page === 'missions' ? MODES.findIndex(m => m.id === 'misiones') : MODES.findIndex(m => m.id === 'versus'); M.page = 'modes'; } else { M = null; env.quit(); }
   }
   function menuUpdate(dt) {
     M.t += dt;
-    const n = M.page === 'missions' ? MISSIONS.length : MODES.length;
+    const n = M.page === 'missions' ? MISSIONS.length : M.page === 'versus' ? VERSUS.length : MODES.length;
     if (env.pressed('up')) { M.cursor = (M.cursor + n - 1) % n; env.Snd.play('select'); }
     if (env.pressed('down')) { M.cursor = (M.cursor + 1) % n; env.Snd.play('select'); }
     if (env.pressed('confirm')) menuPick(M.cursor);
@@ -429,6 +452,10 @@
   }
   /* Gestos táctiles sobre el tablero: deslizar = mover, tocar = girar, mantener abajo = bajar, deslizón rápido abajo = caer */
   function gesture(type, x, y) {
+    if (VS) { if (VS.mode !== 'vscpu' || VS.phase !== 'play') return; const keep = S; S = VS.p[0]; try { gestureCore(type, x, y); } finally { S = keep; } return; }
+    gestureCore(type, x, y);
+  }
+  function gestureCore(type, x, y) {
     if (!S || S.phase !== 'play') { if (type !== 'down') { G0 = null; if (S) S.gSoft = false; } return; }
     const c = cellPx, now = performance.now();
     if (type === 'down') { G0 = { x0: x, y0: y, ax: x, t0: now, moved: false, soft: false }; return; }
@@ -454,6 +481,12 @@
     }
   }
   function action(a) {
+    if (VS) {
+      if (a === 'resume' && VS.phase === 'paused') { VS.phase = 'play'; env.Snd.pauseMusic(false); env.Snd.play('pause'); }
+      else if (a === 'retry') { env.Snd.pauseMusic(false); env.Snd.play('ok'); startVS(VS.mode); }
+      else if (a === 'quit') quit();
+      return;
+    }
     if (!S) {
       if (!M) return;
       if (a === 'quit') menuBack(); else if (a.startsWith('mode')) menuPick(+a.slice(4)); else if (a.startsWith('mis')) { M.page = 'missions'; menuPick(+a.slice(3)); }
@@ -465,6 +498,211 @@
     else if (a === 'quit') quit();
     else if (a === 'pause') setPause(true);
     else if (a === 'psel') cyclePower(1);
+  }
+
+
+  /* ===================== Versus (2 jugadores / contra la CPU) ===================== */
+  const PK = [
+    { left: 'p1left', right: 'p1right', soft: 'p1soft', rotcw: 'p1rot', rotccw: 'p1rotccw', hold: 'p1hold', hard: 'p1hard' },
+    { left: 'p2left', right: 'p2right', soft: 'p2soft', rotcw: 'p2rot', rotccw: 'p2rotccw', hold: 'p2hold', hard: 'p2hard' }
+  ];
+  const NOINP = { pressed: () => false, held: () => false };
+  const SILENT = { play() {}, music() {}, tempo() {}, pauseMusic() {}, hurry() {} };
+  function inpFor(i) {
+    if (VS.p[i].cpu) return NOINP;
+    if (VS.mode === 'vscpu') return env;                       // J1: flechas/WASD/táctil
+    const m = PK[i];
+    return { pressed: a => (m[a] ? env.pressed(m[a]) : false), held: a => (m[a] ? env.held(m[a]) : false) };
+  }
+  function startVS(mode) {
+    M = null; S = null; VSSEQ.length = 0;
+    const p = [0, 1].map(i => {
+      const P = newState(mode, 0);
+      P.vs = true; P.pi = i; P.si = 0; P.garb = 0; P.cpu = mode === 'vscpu' && i === 1; P.ai = { t: 0, plan: null, piece: -1, fail: 0 };
+      P.phase = 'play';
+      S = P; fillQueue();
+      return P;
+    });
+    S = null;
+    VS = { mode, p, phase: 'ready', phaseT: 0, t: 0, winner: -1, wins: vsWins };
+    env.Snd.music('tet'); env.Snd.tempo(1);
+  }
+  function sendGarbage(n, tet, ts) {
+    let g = ts ? n * 2 : [0, 0, 1, 2, 4][Math.min(4, n)];
+    if (S.combo >= 2) g += 1;
+    if (S.b2b && tet && S.stats.tetrises > 1) g += 1;
+    const c = Math.min(S.garb, g); S.garb -= c; g -= c;     // primero se cancela la basura que te iba a llegar
+    if (g > 0) { VS.p[1 - S.pi].garb += g; popup('¡ENVÍAS ' + g + '!', env.B.danger); }
+  }
+  function addGarbage() { // sube filas de escombros (mismo hueco) al tablero; false si desborda
+    const n = S.garb; S.garb = 0;
+    const hole = Math.floor(Math.random() * COLS);
+    for (let k = 0; k < n; k++) {
+      if (S.board[0].some(v => v) || S.board[1].some(v => v)) { gameOver(); return false; }
+      S.board.shift(); S.board.push(Array.from({ length: COLS }, (_, x) => x === hole ? 0 : 7));
+    }
+    popup('¡ESCOMBROS x' + n + '!', env.B.danger); S.shake = 0.25; env.Snd.play('crack');
+    return true;
+  }
+  function vsOver() {
+    const loser = S.pi, w = 1 - loser;
+    VS.phase = 'over'; VS.phaseT = 0; VS.winner = w; vsWins[w]++;
+    VS.p.forEach(P => { P.cur = null; });
+    S.phase = 'over';
+    if (VS.mode === 'vscpu' && w === 0) { const d = env.Save.data; d.tetris = d.tetris || { hi: 0, lines: 0, plays: 0 }; d.tetris.cpuWins = (d.tetris.cpuWins || 0) + 1; env.Save.write(); }
+    env.Snd.music(null);
+    const real = env.Snd; if (real.play) real.play(VS.mode === 'vscpu' && w === 1 ? 'over' : 'win');
+  }
+  function hardDropNow() {
+    let d = 0; while (tryMove(0, 1)) d++;
+    S.score += d * 2;
+    for (const [x, y] of cells(S.cur)) burst(x + 0.5, y + 1, MAT[S.cur.type][1], 2, 40);
+    env.Snd.play('thard'); lockPiece();
+  }
+  /* ---- CPU: prueba todas las posiciones y elige la mejor (alturas, huecos, líneas y desniveles) ---- */
+  function aiPlan() {
+    const t = S.cur.type, rots = t === 2 ? [0] : (t === 1 || t === 4 || t === 5) ? [0, 1] : [0, 1, 2, 3];
+    let best = null;
+    for (const rot of rots) for (let x = -2; x < COLS; x++) {
+      const p = { type: t, rot, x, y: S.cur.y };
+      if (!fits(p)) continue;
+      while (fits({ ...p, y: p.y + 1 })) p.y++;
+      const b = S.board.map(r => r.slice());
+      cells(p).forEach(([cx, cy]) => { if (cy >= 0) b[cy][cx] = t; });
+      const keep = b.filter(r => !r.every(v => v)), lines = ROWS - keep.length;
+      while (keep.length < ROWS) keep.unshift(new Array(COLS).fill(0));
+      let aggH = 0, holes = 0, bump = 0, prev = -1;
+      for (let c = 0; c < COLS; c++) {
+        let h = 0, seen = false;
+        for (let r = 0; r < ROWS; r++) { if (keep[r][c]) { if (!seen) { h = ROWS - r; seen = true; } } else if (seen) holes++; }
+        aggH += h; if (prev >= 0) bump += Math.abs(h - prev); prev = h;
+      }
+      const score = -0.51 * aggH + 0.76 * lines * 3 - 0.36 * holes * 2 - 0.18 * bump;
+      if (!best || score > best.score) best = { rot, x, score };
+    }
+    return best;
+  }
+  function aiAct(dt) {
+    const A = S.ai; A.t -= dt;
+    if (A.piece !== S.stats.pieces) { A.piece = S.stats.pieces; A.plan = aiPlan(); A.t = 0.3; A.fail = 0; }
+    if (A.t > 0 || !S.cur) return;
+    A.t = 0.1;
+    const pl = A.plan;
+    if (!pl || A.fail > 2) return hardDropNow();
+    if (S.cur.rot !== pl.rot) { if (!rotate(1)) A.fail++; }
+    else if (S.cur.x < pl.x) { if (!tryMove(1, 0)) A.fail++; }
+    else if (S.cur.x > pl.x) { if (!tryMove(-1, 0)) A.fail++; }
+    else hardDropNow();
+  }
+
+  function updateVS(dt) {
+    const e = env;
+    VS.t += dt; VS.phaseT += dt;
+    if (VS.phase === 'ready') {
+      VS.p.forEach(P => { P.t += dt; updateFx(dt, P); });
+      if (VS.phaseT >= READY_T) { VS.phase = 'play'; VS.p.forEach(P => { S = P; nextPiece(); }); S = null; }
+      return;
+    }
+    if (VS.phase === 'paused') { if (e.pressed('pause') || e.pressed('confirm')) action('resume'); return; }
+    if (VS.phase === 'over') {
+      VS.p.forEach(P => { S = P; P.t += dt; P.shake = Math.max(0, P.shake - dt); updateFx(dt); }); S = null;
+      if (VS.phaseT > 0.6 && e.pressed('confirm')) { e.Snd.play('ok'); startVS(VS.mode); }
+      else if (VS.phaseT > 0.3 && e.pressed('back')) quit();
+      return;
+    }
+    if (e.pressed('pause')) { VS.phase = 'paused'; e.Snd.pauseMusic(true); e.Snd.play('pause'); return; }
+    const real = e.Snd;
+    for (let i = 0; i < 2 && VS.phase === 'play'; i++) {
+      const P = VS.p[i]; S = P;
+      if (P.cpu) e.Snd = SILENT;
+      try {
+        P.t += dt; P.phaseT += dt; P.time += dt; P.shake = Math.max(0, P.shake - dt); updateFx(dt);
+        if (P.phase === 'clearing') { if (P.phaseT >= CLEAR_T) finishClear(); }
+        else if (P.phase === 'play' && P.cur) {
+          if (P.cpu) aiAct(dt);
+          if (P.cur && P.phase === 'play') stepPlay(dt, inpFor(i));
+        }
+      } finally { e.Snd = real; }
+    }
+    S = null;
+  }
+  function vsPanel(g, P, x, y, w, s) {
+    const { B, txt } = env, hs = Math.max(5, Math.floor(s * 0.55)), nx = Math.max(80, 3 * s);
+    S = P;
+    box(g, x, y, w, 3 * s + 6, 'GUARDA'); if (P.hold) { g.globalAlpha = P.holdUsed ? 0.4 : 1; drawMini(g, P.hold, x + w / 2, y + 3 * s * 0.62 + 8, hs); g.globalAlpha = 1; }
+    const y2 = y + 3 * s + 12; box(g, x, y2, w, s * 8, 'PRÓX.');
+    for (let i = 0; i < 3; i++) drawMini(g, P.queue[i], x + w / 2, y2 + 22 + i * (s * 2.2), hs);
+    S = null;
+  }
+  function drawVS(W, H) {
+    const { ctx: g, B, Art, txt, button } = env, narrow = W < 400;
+    Art.drawBackground(g, 0, VS.t * 6, 0, VS.t, W, H, 0);
+    g.fillStyle = 'rgba(30,16,8,0.5)'; g.fillRect(0, 0, W, H);
+    let bx0, bx1, by, s0, s1, px0, px1, pw;
+    if (narrow) {
+      s1 = 7; s0 = Math.max(8, Math.min(Math.floor((H - 40) / 20), Math.floor((W - 12 - 70 - 50) / 10)));
+      by = Math.max(24, Math.floor((H - 20 * s0) / 2) + 6); bx0 = 4; bx1 = W - 4 - 10 * s1;
+      pw = bx1 - (bx0 + 10 * s0) - 10; px0 = bx0 + 10 * s0 + 5; px1 = -1;
+    } else {
+      s0 = s1 = Math.max(8, Math.min(Math.floor((H - 14) / 20), Math.floor((W - 16) / 28.2)));
+      pw = Math.round(2.6 * s0) + 8; const gap = Math.round(3.2 * s0), total = 2 * pw + 20 * s0 + gap;
+      px0 = Math.floor((W - total) / 2); bx0 = px0 + pw; bx1 = bx0 + 10 * s0 + gap; px1 = bx1 + 10 * s0; by = Math.floor((H - 20 * s0) / 2);
+    }
+    cellPx = s0;
+    [[bx0, s0], [bx1, s1]].forEach(([bx, s], i) => {
+      const P = VS.p[i]; S = P;
+      g.save();
+      if (P.shake > 0) g.translate(Math.round((Math.random() - 0.5) * P.shake * 12), Math.round((Math.random() - 0.5) * P.shake * 12));
+      drawBoard(g, bx, by, s);
+      const gh = Math.min(20, P.garb) * s; // barra roja = basura que te va a llegar
+      if (gh > 0) { g.fillStyle = B.danger; g.fillRect(bx - 5, by + 20 * s - gh, 3, gh); }
+      g.restore();
+      S = null;
+    });
+    if (!narrow) {
+      vsPanel(g, VS.p[0], px0, by, pw - 7, s0); vsPanel(g, VS.p[1], px1 + 7, by, pw - 7, s0);
+      const cx = (bx0 + 10 * s0 + bx1) / 2;
+      txt('VS', cx, by + 20, B.secondary, { align: 'center', scale: 2 });
+      txt(vsWins[0] + ' - ' + vsWins[1], cx, by + 46, B.light, { align: 'center' });
+      txt(VS.mode === 'vscpu' ? 'TÚ' : 'J1', px0 + (pw - 7) / 2, by + 20 * s0 - 12, B.secondaryLight, { align: 'center', scale: 2 });
+      txt(VS.mode === 'vscpu' ? 'CPU' : 'J2', px1 + 7 + (pw - 7) / 2, by + 20 * s0 - 12, B.secondaryLight, { align: 'center', scale: 2 });
+    } else {
+      vsPanel(g, VS.p[0], px0, by, pw, Math.min(s0, 10));
+      txt('TÚ', px0 + pw / 2, by + 20 * s0 - 40, B.secondaryLight, { align: 'center', scale: 1 });
+      txt(vsWins[0] + ' - ' + vsWins[1], px0 + pw / 2, by + 20 * s0 - 26, B.light, { align: 'center', scale: 1 });
+      txt('CPU', bx1 + 5 * s1, by - 10, B.secondaryLight, { align: 'center', scale: 1 });
+      txt('TORRE · VERSUS', W / 2, 6, B.secondary, { align: 'center', scale: 1 });
+    }
+    // ---- carteles ----
+    const cx = W / 2, cy = by + 10 * s0;
+    const bwid = Math.min(150, W - 40), bhgt = narrow ? 22 : 16;
+    if (VS.phase === 'ready') {
+      const n = 3 - Math.floor(VS.phaseT / (READY_T / 3));
+      g.fillStyle = 'rgba(15,8,4,0.55)'; g.fillRect(0, cy - 30, W, 80);
+      txt(n > 0 ? String(n) : '¡YA!', cx, cy - 24, B.secondary, { align: 'center', scale: 5 });
+      if (!document.body.classList.contains('touch')) {
+        if (VS.mode === 'vs2') { txt('J1: A D MOVER · W GIRAR · S BAJAR · ESPACIO CAER', cx, cy + 22, B.light, { align: 'center', scale: 1 }); txt('J2: ← → MOVER · ↑ GIRAR · ↓ BAJAR · ENTER CAER', cx, cy + 34, B.light, { align: 'center', scale: 1 }); }
+        else txt('← → MOVER · ↑ GIRAR · ↓ BAJAR · ESPACIO CAER', cx, cy + 28, B.light, { align: 'center', scale: 1 });
+      }
+    } else if (VS.phase === 'paused') {
+      g.fillStyle = 'rgba(15,8,4,0.85)'; g.fillRect(0, 0, W, H);
+      txt('PAUSA', cx, cy - 70, B.secondary, { align: 'center', scale: 3 });
+      button('CONTINUAR', cx - bwid / 2, cy - 40, bwid, bhgt, 't:resume', true);
+      button('REINICIAR', cx - bwid / 2, cy - 40 + bhgt + 6, bwid, bhgt, 't:retry', false);
+      button(env.mutedLabel(), cx - bwid / 2, cy - 40 + (bhgt + 6) * 2, bwid, bhgt, 'mute', false);
+      button('SALIR AL MENÚ', cx - bwid / 2, cy - 40 + (bhgt + 6) * 3, bwid, bhgt, 't:quit', false);
+    } else if (VS.phase === 'over') {
+      g.fillStyle = 'rgba(15,8,4,' + Math.min(0.8, VS.phaseT * 1.5).toFixed(2) + ')'; g.fillRect(0, 0, W, H);
+      if (VS.phaseT > 0.3) {
+        const w = VS.winner, msg = VS.mode === 'vscpu' ? (w === 0 ? '¡GANASTE!' : '¡GANA LA CPU!') : (w === 0 ? '¡GANA J1!' : '¡GANA J2!');
+        txt(msg, cx, cy - 56, VS.mode === 'vscpu' && w === 1 ? B.danger : B.good, { align: 'center', scale: narrow ? 2 : 3 });
+        txt('MARCADOR  ' + vsWins[0] + ' - ' + vsWins[1], cx, cy - 26, B.light, { align: 'center' });
+        if (VS.phaseT > 0.6) {
+          button('REVANCHA', cx - bwid / 2, cy - 4, bwid, bhgt, 't:retry', true);
+          button('SALIR AL MENÚ', cx - bwid / 2, cy - 4 + bhgt + 6, bwid, bhgt, 't:quit', false);
+        }
+      }
+    }
   }
 
   /* ===================== Dibujo ===================== */
@@ -529,19 +767,8 @@
     if (title) env.txt(title, x + w / 2, y + 3, B.secondary, { align: 'center', scale: 1 });
   }
 
-  function draw(W, H) {
-    const { ctx: g, B, Font, Art, txt } = env;
-    if (!S) return drawMenu(W, H);
-    const st = stage(), lay = layout(W, H), { cell: s, bx, by, narrow } = lay;
-    cellPx = s;
-    // fondo: cambia con la etapa de la obra
-    Art.drawBackground(g, S.mis ? S.mis.theme : Math.min(4, st), S.t * 6, 0, S.t, W, H, 0);
-    g.fillStyle = 'rgba(30,16,8,0.45)'; g.fillRect(0, 0, W, H);
-
-    g.save();
-    if (S.shake > 0) g.translate(Math.round((Math.random() - 0.5) * S.shake * 14), Math.round((Math.random() - 0.5) * S.shake * 14));
-
-    // ---- tablero ----
+  function drawBoard(g, bx, by, s) {
+    const { B, txt } = env;
     const bw = s * COLS, bh = s * 20;
     g.fillStyle = B.dark; g.fillRect(bx - 3, by - 3, bw + 6, bh + 6);
     g.fillStyle = B.secondary; g.fillRect(bx - 2, by - 2, bw + 4, bh + 4);
@@ -582,6 +809,23 @@
       const a = Math.min(1, (1.4 - p.t) * 2.5), yy = by + bh * 0.4 - p.t * 22 - (i % 3) * 12;
       g.globalAlpha = a; txt(p.text, bx + bw / 2, yy, p.color, { align: 'center', scale: 1 }); g.globalAlpha = 1;
     });
+
+  }
+  function draw(W, H) {
+    const { ctx: g, B, Font, Art, txt } = env;
+    if (VS) return drawVS(W, H);
+    if (!S) return drawMenu(W, H);
+    const st = stage(), lay = layout(W, H), { cell: s, bx, by, narrow } = lay;
+    cellPx = s;
+    // fondo: cambia con la etapa de la obra
+    Art.drawBackground(g, S.mis ? S.mis.theme : Math.min(4, st), S.t * 6, 0, S.t, W, H, 0);
+    g.fillStyle = 'rgba(30,16,8,0.45)'; g.fillRect(0, 0, W, H);
+
+    g.save();
+    if (S.shake > 0) g.translate(Math.round((Math.random() - 0.5) * S.shake * 14), Math.round((Math.random() - 0.5) * S.shake * 14));
+
+    const bw = s * COLS, bh = s * 20;
+    drawBoard(g, bx, by, s);
 
     // ---- paneles laterales ----
     const hs = Math.max(6, Math.floor(s * 0.62));
@@ -672,16 +916,17 @@
     for (let i = 0; i < 4; i++) drawCell(g, [3, 2, 1, 5][i], bx + 6 + (i % 2) * 11, y0 + 5 + (i >> 1) * 11, 10); // ladrillos del título
     txt('TORRE DE', bx + bw / 2 + 12, y0 + 6, B.light, { align: 'center', scale: 1 });
     txt('LADRILLOS', bx + bw / 2 + 12, y0 + 16, B.secondaryLight, { align: 'center', scale: 2 });
-    const mis = M.page === 'missions';
-    txt(mis ? 'MISIONES · ' + doneMissions() + ' / 5 COMPLETAS' : 'ELIGE UN MODO', W / 2, y0 + 42, B.light, { align: 'center' });
-    const list = mis ? MISSIONS : MODES;
-    const rh = narrow ? (mis ? 48 : 56) : (mis ? 30 : 34), bh = narrow ? 24 : 16, ys = y0 + (narrow ? 70 : 54);
+    const mis = M.page === 'missions', ver = M.page === 'versus';
+    txt(mis ? 'MISIONES · ' + doneMissions() + ' / 5 COMPLETAS' : ver ? 'VERSUS' : 'ELIGE UN MODO', W / 2, y0 + 42, B.light, { align: 'center' });
+    const list = mis ? MISSIONS : ver ? VERSUS : MODES;
+    const rh = narrow ? (mis || ver ? 48 : 50) : (mis || ver ? 30 : 30), bh = narrow ? 24 : 16, ys = y0 + (narrow ? 70 : 54);
     list.forEach((m, i) => {
       const y = ys + i * (rh + 6), sel = i === M.cursor, locked = mis && i >= unlockedMis();
       button(mis ? (locked ? (i + 1) + '. BLOQUEADA' : (i + 1) + '. ' + m.name) : m.name, bx, y, bw, bh, 'mode' + i, sel && !locked);
+      if (ver) { txt(m.desc, W / 2, y + bh + 4, B.light, { align: 'center', scale: 1 }); return; }
       if (mis) { txt(locked ? 'CUMPLE LA MISIÓN ANTERIOR' : m.desc + (i < doneMissions() ? ' *' : ''), W / 2, y + bh + 4, locked ? '#aa6a5a' : (i < doneMissions() ? B.good : B.light), { align: 'center', scale: 1 }); return; }
       txt(m.desc, W / 2, y + bh + 4, B.light, { align: 'center', scale: 1 });
-      const rec = m.id === 'sprint' ? (d.sprint ? 'MEJOR ' + fmtT(d.sprint) : 'SIN RÉCORD') : m.id === 'misiones' ? 'COMPLETAS ' + doneMissions() + ' / 5' : 'RÉCORD ' + pad(d[recKey(m.id)] || 0, 7);
+      const rec = m.id === 'versus' ? 'VICTORIAS CPU: ' + (d.cpuWins || 0) : m.id === 'sprint' ? (d.sprint ? 'MEJOR ' + fmtT(d.sprint) : 'SIN RÉCORD') : m.id === 'misiones' ? 'COMPLETAS ' + doneMissions() + ' / 5' : 'RÉCORD ' + pad(d[recKey(m.id)] || 0, 7);
       txt(rec, W / 2, y + bh + 14, B.secondaryLight, { align: 'center', scale: 1 });
     });
     button('VOLVER', 6, H - (narrow ? 30 : 24), narrow ? 90 : 60, narrow ? 24 : 16, 'quit', false);
@@ -738,9 +983,10 @@
 
   window.Tetris = {
     init(e) { env = e; },
-    open, start, update, draw, action, gesture, usePower, POWERS,
-    pause() { if (S) setPause(true); },
-    get active() { return !!S; },
+    open, start, startVS, update, draw, action, gesture, usePower, POWERS,
+    pause() { if (VS) { if (VS.phase === 'play') { VS.phase = 'paused'; env.Snd.pauseMusic(true); } } else if (S) setPause(true); },
+    get active() { return !!S || !!VS; },
+    _vs: () => VS,
     // utilidades para pruebas automáticas
     _s: () => S, _cells: cells, _fits: fits, _hooks: { ROT, SHAPES, COLS, ROWS, HID, spawn, lockPiece, explode, nextPiece, rotate }
   };
