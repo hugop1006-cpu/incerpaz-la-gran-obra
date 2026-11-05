@@ -1307,7 +1307,7 @@
     G.lives = C.START_LIVES; G.score = 0; G.coinsRun = 0; G.levelIndex = idx;
     loadLevel(idx); setState('intro');
   }
-  function startTetris() { Snd.play('ok'); Tetris.start(); setState('tetris'); }
+  function startTetris() { Snd.play('ok'); Tetris.open(); setState('tetris'); }
   function nextLevel() { G.levelIndex++; loadLevel(G.levelIndex); setState('intro'); }
   function toSelect() { G.cursor = clamp(Math.min(G.levelIndex, Save.data.unlocked - 1), 0, LEVELS.length - 1); setState('select'); }
 

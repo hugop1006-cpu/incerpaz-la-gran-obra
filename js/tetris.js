@@ -54,6 +54,13 @@
   const BOMB_EVERY = 8;       // cada cuántas líneas llega una pieza DEMOLICIÓN
   const HOUSE_LINES = 8;      // líneas por etapa de la casa (5 etapas = 40 líneas)
 
+  const MODES = [
+    { id: 'classic', name: 'CLÁSICO', desc: 'SIN FIN · CASA Y DEMOLICIÓN' },
+    { id: 'sprint', name: 'SPRINT 40', desc: '40 LÍNEAS EN EL MENOR TIEMPO' },
+    { id: 'escombros', name: 'ESCOMBROS', desc: 'SUBEN FILAS DE ESCOMBROS' }
+  ];
+  const SPRINT_LINES = 40, RUBBLE_EVERY = 8; // piezas entre filas de escombros
+  let M = null;               // menú de modos {cursor}
   let env = null;             // {ctx, C, B, Font, Art, Snd, Save, pressed, held, txt, panel, button, quit()}
   let S = null;               // partida en curso
   const cellCache = new Map();
@@ -67,8 +74,10 @@
   function fillQueue() { while (S.queue.length < 6) S.queue.push(...newBag()); }
   function emptyBoard() { return Array.from({ length: ROWS }, () => new Array(COLS).fill(0)); }
 
-  function start() {
+  function start(mode) {
+    mode = mode || (S && S.mode) || 'classic'; M = null;
     S = {
+      mode, rb: 0, time: 0, sprintDone: false, won: false, lastRot: false,
       board: emptyBoard(), queue: [], cur: null, hold: 0, holdUsed: false,
       score: 0, lines: 0, level: 1, combo: -1, b2b: false, bombCharge: 0, bombsUsed: 0,
       phase: 'ready', t: 0, phaseT: 0, fall: 0, lockT: 0, lockResets: 0, lowest: 0,
@@ -101,7 +110,7 @@
   function tryMove(dx, dy) {
     const p = { ...S.cur, x: S.cur.x + dx, y: S.cur.y + dy };
     if (!fits(p)) return false;
-    S.cur = p;
+    S.cur = p; S.lastRot = false;
     if (dy > 0 && p.y > S.lowest) { S.lowest = p.y; S.lockResets = 0; }
     bumpLock();
     return true;
@@ -112,7 +121,7 @@
     const to = (p.rot + dir + 4) % 4, kicks = (p.type === 1 ? K_I : K_JLSTZ)[p.rot + '>' + to];
     for (const [kx, ky] of kicks) {
       const q = { ...p, rot: to, x: p.x + kx, y: p.y - ky };
-      if (fits(q)) { S.cur = q; bumpLock(); env.Snd.play('trot'); return true; }
+      if (fits(q)) { S.cur = q; S.lastRot = true; bumpLock(); env.Snd.play('trot'); return true; }
     }
     return false;
   }
@@ -134,8 +143,14 @@
 
   function lockPiece() {
     const p = S.cur, cs = cells(p);
+    S.tspin = false;
     if (cs.every(([, y]) => y < HID) && p.type !== 8) return gameOver(); // bloqueo fuera de vista
     if (p.type === 8) return explode(cs[0][0], cs[0][1]);
+    if (p.type === 3 && S.lastRot) { // 3 de las 4 esquinas alrededor del centro ocupadas = T-spin
+      const occ = (x, y) => x < 0 || x >= COLS || y >= ROWS || (y >= 0 && S.board[y][x]);
+      const k = [[0, 0], [2, 0], [0, 2], [2, 2]].filter(([dx, dy]) => occ(p.x + dx, p.y + dy)).length;
+      S.tspin = k >= 3;
+    }
     cs.forEach(([x, y]) => { if (y >= 0) S.board[y][x] = p.type; });
     env.Snd.play('tlock');
     S.shake = Math.max(S.shake, 0.06);
@@ -149,15 +164,22 @@
   function afterLock() {
     S.cur = null;
     const rows = fullRows();
-    if (!rows.length) { S.combo = -1; return nextPiece(); }
+    if (!rows.length) {
+      S.combo = -1;
+      if (S.tspin) { S.score += 400 * S.level; popup('T-SPIN +' + 400 * S.level, env.B.accent); env.Snd.play('tline2'); }
+      return nextPiece();
+    }
     clearLines(rows);
   }
   function clearLines(rows) {
     const n = rows.length;
     S.combo++;
-    let pts = [0, 100, 300, 500, 800][Math.min(4, n)] * S.level;
-    const tet = n >= 4;
+    const ts = !!S.tspin;
+    let pts = (ts ? [0, 800, 1200, 1600, 1600] : [0, 100, 300, 500, 800])[Math.min(4, n)] * S.level;
+    const tet = n >= 4 || ts;
     if (tet) { if (S.b2b) pts = Math.floor(pts * 1.5); S.b2b = true; S.stats.tetrises++; } else S.b2b = false;
+    S.tspin = false;
+    if (S.mode === 'sprint' && S.lines + n >= SPRINT_LINES) S.sprintDone = true;
     pts += S.combo > 0 ? 50 * S.combo * S.level : 0;
     S.score += pts;
     const oldLines = S.lines;
@@ -166,7 +188,7 @@
     const lvOld = S.level; S.level = Math.min(15, 1 + Math.floor(S.lines / 10));
     S.clearRows = rows; S.phase = 'clearing'; S.phaseT = 0;
     rows.forEach(y => { for (let x = 0; x < COLS; x++) { burst(x, y, MAT[S.board[y][x]][0], 1, 90); } });
-    popup(tet ? '¡TETRIS! +' + pts : (['', 'LÍNEA', 'DOBLE', 'TRIPLE'][n] + ' +' + pts), tet ? env.B.secondary : env.B.light, tet);
+    popup(ts ? 'T-SPIN ' + ['', 'LÍNEA', 'DOBLE', 'TRIPLE'][Math.min(3, n)] + ' +' + pts : (tet ? '¡TETRIS! +' + pts : (['', 'LÍNEA', 'DOBLE', 'TRIPLE'][n] + ' +' + pts)), tet ? env.B.secondary : env.B.light, tet);
     if (S.combo > 0) popup('COMBO x' + S.combo, env.B.secondaryLight);
     if (S.b2b && tet && S.stats.tetrises > 1) popup('SEGUIDO ×1.5', env.B.good);
     env.Snd.play(tet ? 'ttetris' : (n >= 2 ? 'tline2' : 'tline'));
@@ -180,6 +202,7 @@
     rows.forEach(y => { S.board.splice(y, 1); S.board.unshift(new Array(COLS).fill(0)); });
     S.clearRows = [];
     S.phase = 'play';
+    if (S.sprintDone) return win();
     nextPiece();
   }
   function explode(cx, cy) {
@@ -206,16 +229,36 @@
   }
   function nextPiece() {
     if (S.phase === 'over') return;
+    if (S.mode === 'escombros' && ++S.rb >= RUBBLE_EVERY) { S.rb = 0; if (!addRubble()) return; }
     if (S.bombCharge >= BOMB_EVERY) { // la demolición llega como 3ª pieza para que se vea venir
       S.bombCharge -= BOMB_EVERY; S.queue.splice(2, 0, 8); S.bombsUsed++;
     }
     spawn();
   }
+  function addRubble() { // sube una fila de escombros con un hueco; false si la torre desborda
+    if (S.board[0].some(v => v) || S.board[1].some(v => v)) { gameOver(); return false; }
+    S.board.shift();
+    const hole = Math.floor(Math.random() * COLS);
+    S.board.push(Array.from({ length: COLS }, (_, x) => x === hole ? 0 : 7));
+    for (let x = 0; x < COLS; x++) if (x !== hole) burst(x, ROWS - 1, MAT[7][0], 1, 60);
+    popup('¡ESCOMBROS!', env.B.danger); S.shake = 0.25; env.Snd.play('crack');
+    return true;
+  }
+  function recKey(mode) { return mode === 'escombros' ? 'hiEsc' : 'hi'; }
+  function win() {
+    S.phase = 'over'; S.phaseT = 0; S.cur = null; S.won = true;
+    const d = env.Save.data; d.tetris = d.tetris || { hi: 0, lines: 0, plays: 0 };
+    S.newRecord = !d.tetris.sprint || S.time < d.tetris.sprint;
+    if (S.newRecord) d.tetris.sprint = S.time;
+    d.tetris.lines = Math.max(d.tetris.lines, S.lines); d.tetris.plays++;
+    env.Save.write(); env.Snd.music(null); env.Snd.tempo(1); env.Snd.play('win');
+  }
   function gameOver() {
     S.phase = 'over'; S.phaseT = 0; S.cur = null;
     const d = env.Save.data; d.tetris = d.tetris || { hi: 0, lines: 0, plays: 0 };
-    S.newRecord = S.score > d.tetris.hi;
-    if (S.newRecord) d.tetris.hi = S.score;
+    const rk = recKey(S.mode);
+    S.newRecord = S.mode !== 'sprint' && S.score > (d.tetris[rk] || 0);
+    if (S.newRecord) d.tetris[rk] = S.score;
     d.tetris.lines = Math.max(d.tetris.lines, S.lines); d.tetris.plays++;
     env.Save.write();
     env.Snd.music(null); env.Snd.tempo(1); env.Snd.play('over');
@@ -223,9 +266,10 @@
 
   /* ===================== Actualización ===================== */
   function update(dt) {
-    if (!S) start();
     dt = Math.min(dt, 0.05);
     const e = env;
+    if (!S) { if (M) menuUpdate(dt); return; }
+    if (S.phase === 'play' || S.phase === 'clearing') S.time += dt;
     S.t += dt; S.phaseT += dt;
     S.shake = Math.max(0, S.shake - dt);
     updateFx(dt);
@@ -237,7 +281,7 @@
       return;
     }
     if (S.phase === 'over') {
-      if (S.phaseT > 0.6 && e.pressed('confirm')) { e.Snd.play('ok'); start(); }
+      if (S.phaseT > 0.6 && e.pressed('confirm')) { e.Snd.play('ok'); start(S.mode); }
       else if (S.phaseT > 0.3 && e.pressed('back')) quit();
       return;
     }
@@ -292,11 +336,23 @@
     if (on && (S.phase === 'play' || S.phase === 'ready')) { S.prevPhase = S.phase; S.phase = 'paused'; env.Snd.pauseMusic(true); env.Snd.play('pause'); }
     else if (!on && S.phase === 'paused') { S.phase = S.prevPhase || 'play'; env.Snd.pauseMusic(false); env.Snd.play('pause'); }
   }
-  function quit() { env.Snd.pauseMusic(false); env.Snd.tempo(1); S = null; env.quit(); }
+  function quit() { env.Snd.pauseMusic(false); env.Snd.tempo(1); S = null; M = null; env.quit(); }
+  function open() { S = null; M = { cursor: 0, t: 0 }; }
+  function menuUpdate(dt) {
+    M.t += dt;
+    if (env.pressed('up')) { M.cursor = (M.cursor + MODES.length - 1) % MODES.length; env.Snd.play('select'); }
+    if (env.pressed('down')) { M.cursor = (M.cursor + 1) % MODES.length; env.Snd.play('select'); }
+    if (env.pressed('confirm')) { env.Snd.play('ok'); start(MODES[M.cursor].id); }
+    else if (env.pressed('back') || env.pressed('pause')) { M = null; env.Snd.play('select'); env.quit(); }
+  }
   function action(a) {
-    if (!S) return;
+    if (!S) {
+      if (!M) return;
+      if (a === 'quit') { M = null; env.quit(); } else if (a.startsWith('mode')) { env.Snd.play('ok'); start(MODES[+a.slice(4)].id); }
+      return;
+    }
     if (a === 'resume') setPause(false);
-    else if (a === 'retry') { env.Snd.pauseMusic(false); env.Snd.play('ok'); start(); }
+    else if (a === 'retry') { env.Snd.pauseMusic(false); env.Snd.play('ok'); start(S.mode); }
     else if (a === 'quit') quit();
     else if (a === 'pause') setPause(true);
   }
@@ -365,7 +421,7 @@
 
   function draw(W, H) {
     const { ctx: g, B, Font, Art, txt } = env;
-    if (!S) start();
+    if (!S) return drawMenu(W, H);
     const st = stage(), lay = layout(W, H), { cell: s, bx, by, narrow } = lay;
     // fondo: cambia con la etapa de la obra
     Art.drawBackground(g, Math.min(4, st), S.t * 6, 0, S.t, W, H, 0);
@@ -428,7 +484,9 @@
       txt('PUNTOS', lx + 6, by + 66, B.secondary, o1); txt(pad(S.score, 7), lx + 86, by + 77, B.light, { align: 'right', scale: 1 });
       txt('LÍNEAS', lx + 6, by + 94, B.secondary, o1); txt(String(S.lines), lx + 86, by + 105, B.light, { align: 'right', scale: 1 });
       txt('NIVEL', lx + 6, by + 122, B.secondary, o1); txt(String(S.level), lx + 86, by + 133, B.light, { align: 'right', scale: 1 });
-      txt('RÉCORD ' + pad(Math.max(S.score, hi()), 6), lx + 46, by + 160, B.secondaryLight, { align: 'center', scale: 1 });
+      if (S.mode !== 'sprint') txt('RÉCORD ' + pad(Math.max(S.score, hi()), 6), lx + 46, by + 160, B.secondaryLight, { align: 'center', scale: 1 });
+      if (S.mode === 'sprint') { box(g, lx, by + 160, 92, 62); txt('TIEMPO', lx + 6, by + 166, B.secondary, o1); txt(fmtT(S.time), lx + 86, by + 177, B.light, { align: 'right', scale: 1 }); txt('MEJOR ' + fmtT(bestT()), lx + 46, by + 193, B.secondaryLight, { align: 'center', scale: 1 }); txt('FALTAN ' + Math.max(0, SPRINT_LINES - S.lines), lx + 46, by + 207, B.light, { align: 'center', scale: 1 }); }
+      else if (S.mode === 'escombros') txt('ESCOMBROS EN ' + (RUBBLE_EVERY - S.rb), lx + 46, by + 172, S.rb >= RUBBLE_EVERY - 2 ? B.danger : B.light, { align: 'center', scale: 1 });
       // derecha: SIGUIENTES + casa
       box(g, rx, by, 92, 96, 'PRÓXIMAS');
       for (let i = 0; i < 3; i++) drawMini(g, S.queue[i], rx + 46, by + 24 + i * 25, hs);
@@ -444,6 +502,8 @@
       txt('PUNTOS', sx + 2, y, B.secondary, o1); txt(pad(S.score, 6), sx + sw - 2, y + 11, B.light, { align: 'right', scale: 1 }); y += 26;
       txt('LÍNEAS', sx + 2, y, B.secondary, o1); txt(String(S.lines), sx + sw - 2, y, B.light, { align: 'right', scale: 1 }); y += 14;
       txt('NIVEL', sx + 2, y, B.secondary, o1); txt(String(S.level), sx + sw - 2, y, B.light, { align: 'right', scale: 1 }); y += 14;
+      if (S.mode === 'sprint') { txt(fmtT(S.time), sx + sw / 2, y, B.light, { align: 'center', scale: 1 }); y += 11; txt('FALTAN ' + Math.max(0, SPRINT_LINES - S.lines), sx + sw / 2, y, B.secondaryLight, { align: 'center', scale: 1 }); y += 12; }
+      else if (S.mode === 'escombros') { txt('ESCOMBROS: ' + (RUBBLE_EVERY - S.rb), sx + sw / 2, y, S.rb >= RUBBLE_EVERY - 2 ? B.danger : B.light, { align: 'center', scale: 1 }); y += 12; }
       drawBombBar(g, sx, y, sw); y += 18;
       const hh = Math.min(70, by + bh - y);
       if (hh > 30) drawHouseBox(g, sx, y, sw, hh, st);
@@ -451,12 +511,14 @@
     g.restore();
 
     // título pequeño arriba (sólo si hay sitio)
-    if (narrow) txt('TORRE DE LADRILLOS', W / 2, 6, B.secondary, { align: 'center', scale: 1 });
+    if (narrow) txt('TORRE · ' + MODES.find(m => m.id === S.mode).name, W / 2, 6, B.secondary, { align: 'center', scale: 1 });
 
     drawOverlay(g, W, H, bx, by, bw, bh);
   }
+  const fmtT = t => { if (!t) return '--:--.--'; const m = Math.floor(t / 60), sec = t - m * 60; return String(m).padStart(2, '0') + ':' + sec.toFixed(2).padStart(5, '0'); };
+  const bestT = () => (env.Save.data.tetris && env.Save.data.tetris.sprint) || 0;
   const pad = (n, l) => String(Math.max(0, Math.floor(n))).padStart(l, '0');
-  const hi = () => (env.Save.data.tetris && env.Save.data.tetris.hi) || 0;
+  const hi = () => (env.Save.data.tetris && env.Save.data.tetris[recKey(S ? S.mode : 'classic')]) || 0;
 
   function drawHouseBox(g, x, y, w, h, st) {
     const { B, Art } = env;
@@ -476,6 +538,28 @@
     env.txt(queued ? 'DEMOLICIÓN!' : 'DEMOLICIÓN', x + w / 2, y + 1, B.light, { align: 'center', scale: 1 });
   }
 
+  function drawMenu(W, H) {
+    const { ctx: g, B, Art, txt, button } = env, narrow = W < 400, d = env.Save.data.tetris || {};
+    Art.drawBackground(g, 0, M.t * 8, 0, M.t, W, H, 0);
+    g.fillStyle = 'rgba(30,16,8,0.55)'; g.fillRect(0, 0, W, H);
+    const bw = Math.min(W - 24, 260), bx = Math.round((W - bw) / 2), y0 = Math.round(H * (narrow ? 0.16 : 0.05));
+    g.fillStyle = B.dark; g.fillRect(bx - 2, y0 - 2, bw + 4, 38); g.fillStyle = B.secondary; g.fillRect(bx - 1, y0 - 1, bw + 2, 36);
+    g.fillStyle = B.primary; g.fillRect(bx, y0, bw, 34);
+    for (let i = 0; i < 4; i++) drawCell(g, [3, 2, 1, 5][i], bx + 6 + (i % 2) * 11, y0 + 5 + (i >> 1) * 11, 10); // ladrillos del título
+    txt('TORRE DE', bx + bw / 2 + 12, y0 + 6, B.light, { align: 'center', scale: 1 });
+    txt('LADRILLOS', bx + bw / 2 + 12, y0 + 16, B.secondaryLight, { align: 'center', scale: 2 });
+    txt('ELIGE UN MODO', W / 2, y0 + 42, B.light, { align: 'center' });
+    const rh = narrow ? 56 : 40, bh = narrow ? 24 : 18, ys = y0 + (narrow ? 70 : 62);
+    MODES.forEach((m, i) => {
+      const y = ys + i * (rh + 6), sel = i === M.cursor;
+      button(m.name, bx, y, bw, bh, 'mode' + i, sel);
+      txt(m.desc, W / 2, y + bh + 5, B.light, { align: 'center', scale: 1 });
+      const rec = m.id === 'sprint' ? (d.sprint ? 'MEJOR ' + fmtT(d.sprint) : 'SIN RÉCORD') : 'RÉCORD ' + pad(d[recKey(m.id)] || 0, 7);
+      txt(rec, W / 2, y + bh + 17, B.secondaryLight, { align: 'center', scale: 1 });
+    });
+    button('VOLVER', 6, H - (narrow ? 30 : 24), narrow ? 90 : 60, narrow ? 24 : 16, 'quit', false);
+    if (!narrow) txt('↑ ↓ ELEGIR   ENTER JUGAR', W - 6, H - 14, B.secondary, { align: 'right', scale: 1 });
+  }
   function drawOverlay(g, W, H, bx, by, bw, bh) {
     const { B, txt, button } = env, narrow = W < 400, cx = bx + bw / 2;
     const dim = a => { g.fillStyle = 'rgba(15,8,4,' + a + ')'; g.fillRect(bx, by, bw, bh); };
@@ -506,13 +590,14 @@
     if (S.phase === 'over') {
       dim(Math.min(0.85, S.phaseT * 1.5));
       if (S.phaseT > 0.3) {
-        txt('¡LA TORRE', cx, by + 12, B.danger, { align: 'center', scale: 2 }); txt('SE CAYÓ!', cx, by + 32, B.danger, { align: 'center', scale: 2 });
+        if (S.won) { txt('¡TORRE', cx, by + 12, B.good, { align: 'center', scale: 2 }); txt('LISTA!', cx, by + 32, B.good, { align: 'center', scale: 2 }); }
+        else { txt('¡LA TORRE', cx, by + 12, B.danger, { align: 'center', scale: 2 }); txt('SE CAYÓ!', cx, by + 32, B.danger, { align: 'center', scale: 2 }); }
         const lh = narrow ? 14 : 11;
         txt('PUNTOS ' + pad(S.score, 7), cx, by + 66, B.light, { align: 'center' });
         txt('LÍNEAS ' + S.lines, cx, by + 66 + lh, B.light, { align: 'center' });
-        txt('NIVEL ' + S.level, cx, by + 66 + lh * 2, B.light, { align: 'center' });
-        txt('RÉCORD ' + pad(hi(), 7), cx, by + 66 + lh * 3, B.secondaryLight, { align: 'center' });
-        if (S.newRecord) txt('¡NUEVO RÉCORD!', cx, by + 66 + lh * 4, Math.floor(S.t * 4) % 2 ? B.secondary : B.light, { align: 'center' });
+        if (S.mode === 'sprint') { txt('TIEMPO ' + fmtT(S.time), cx, by + 66 + lh * 2, B.light, { align: 'center' }); txt('MEJOR ' + fmtT(bestT()), cx, by + 66 + lh * 3, B.secondaryLight, { align: 'center' }); }
+        else { txt('NIVEL ' + S.level, cx, by + 66 + lh * 2, B.light, { align: 'center' }); txt('RÉCORD ' + pad(hi(), 7), cx, by + 66 + lh * 3, B.secondaryLight, { align: 'center' }); }
+        if (S.newRecord) txt(S.mode === 'sprint' ? '¡MEJOR TIEMPO!' : '¡NUEVO RÉCORD!', cx, by + 66 + lh * 4, Math.floor(S.t * 4) % 2 ? B.secondary : B.light, { align: 'center' });
         if (S.phaseT > 0.6) {
           const bwid = Math.min(bw - 8, 130), bhgt = narrow ? 22 : 16, bxx = cx - bwid / 2, y0 = by + 66 + lh * 5 + 8;
           button('OTRA VEZ', bxx, y0, bwid, bhgt, 't:retry', true);
@@ -524,7 +609,7 @@
 
   window.Tetris = {
     init(e) { env = e; },
-    start, update, draw, action,
+    open, start, update, draw, action,
     pause() { if (S) setPause(true); },
     get active() { return !!S; },
     // utilidades para pruebas automáticas

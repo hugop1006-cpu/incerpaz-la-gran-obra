@@ -41,6 +41,8 @@ Se abre desde el menú de etapas con el botón **MINIJUEGO: TORRE** o la tecla *
 - Rotación SRS con patadas, bolsa de 7 piezas, pieza fantasma, 3 siguientes, guardar pieza y bloqueo con retardo.
 - **La casa se construye**: cada 8 líneas sube una etapa de la obra (fondo incluido); a las 40 líneas la obra se termina (+5000) y puedes seguir.
 - **Demolición**: cada 8 líneas llega una pieza bomba (se ve venir en "Próximas") que borra un área de 3×3; los escombros caen y pueden completar líneas.
+- **Modos** (se eligen al abrir el minijuego): **Clásico** (sin fin), **Sprint 40** (40 líneas en el menor tiempo; guarda el mejor tiempo) y **Escombros** (cada 8 piezas sube una fila de escombros con un hueco).
+- **T-spin**: girar la T para encajarla en un hueco (3 esquinas ocupadas) da bono extra (sencillo 800, doble 1200, triple 1600, ×nivel).
 - Puntaje: línea 100 · doble 300 · triple 500 · Tetris 800 (×nivel, ×1.5 si es seguido), combos, y puntos por caída. Récord guardado en el navegador.
 - Código: `js/tetris.js`. Prueba automática: `node tools/probar-tetris.js`.
 
