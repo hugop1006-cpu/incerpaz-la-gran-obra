@@ -8,3 +8,4 @@ build/
 Pods/
 site/dist/
 site/config.json
+dist-web/

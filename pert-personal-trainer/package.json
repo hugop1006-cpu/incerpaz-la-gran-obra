@@ -6,6 +6,7 @@
   "scripts": {
     "web": "python3 -m http.server 8000",
     "build:web": "node scripts/build-web.mjs",
+    "build:pwa": "node scripts/build-web.mjs --pwa",
     "sync": "npm run build:web && cap sync",
     "android": "npm run sync && cap open android",
     "ios": "npm run sync && cap open ios"

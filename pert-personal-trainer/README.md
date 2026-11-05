@@ -14,6 +14,10 @@ Abrir `http://localhost:8000` en el móvil o el navegador y "Añadir a pantalla 
 - Síntomas Sí/No con aviso de detener y buscar atención urgente. La app no diagnostica ni reduce la rutina automáticamente.
 - Sin datos personales en el repo: el catálogo trae solo propuestas genéricas. Exporta/importa tu historial en JSON/CSV.
 
+## Publicar
+- Web (PWA) en un hosting estático: `HOSTING.md` (`npm run build:pwa`).
+- Google Play y App Store: `STORES.md`.
+
 ## Funciones
 Sesión guiada, plantillas editables, ejercicios propios, fotos de máquinas, gráficas y récords, copias de seguridad (automáticas, a tu nube vía compartir, restaurar), importación de historial y sincronización opcional.
 
