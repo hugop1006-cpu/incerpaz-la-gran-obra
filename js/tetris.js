@@ -68,7 +68,9 @@
   ];
   const VERSUS = [
     { id: 'vs2', name: '2 JUGADORES', desc: 'J1: A D S W Q E ESPACIO · J2: FLECHAS , . ENTER' },
-    { id: 'vscpu', name: 'CONTRA LA CPU', desc: 'JUEGA SOLO (TAMBIÉN EN CELULAR)' }
+    { id: 'vscpu', diff: 0, name: 'CPU FÁCIL', desc: 'REACCIONA LENTO Y SE EQUIVOCA' },
+    { id: 'vscpu', diff: 1, name: 'CPU NORMAL', desc: 'RÁPIDA Y CASI SIN ERRORES' },
+    { id: 'vscpu', diff: 2, name: 'CPU DIFÍCIL', desc: 'MIRA LA PRÓXIMA PIEZA Y NO FALLA' }
   ];
   // Misiones: una por etapa de la obra (se desbloquean en orden)
   const MISSIONS = [
@@ -446,7 +448,7 @@
     if (M.page === 'missions') {
       if (i >= unlockedMis()) { env.Snd.play('no'); return; }
       env.Snd.play('ok'); start('misiones', i);
-    } else if (M.page === 'versus') { env.Snd.play('ok'); vsWins = [0, 0]; startVS(VERSUS[i].id); }
+    } else if (M.page === 'versus') { env.Snd.play('ok'); vsWins = [0, 0]; startVS(VERSUS[i].id, VERSUS[i].diff); }
     else if (MODES[i].id === 'misiones') { env.Snd.play('ok'); M.page = 'missions'; M.cursor = Math.min(doneMissions(), 4); }
     else if (MODES[i].id === 'versus') { env.Snd.play('ok'); M.page = 'versus'; M.cursor = 0; }
     else { env.Snd.play('ok'); start(MODES[i].id); }
@@ -496,7 +498,7 @@
   function action(a) {
     if (VS) {
       if (a === 'resume' && VS.phase === 'paused') { VS.phase = 'play'; env.Snd.pauseMusic(false); env.Snd.play('pause'); }
-      else if (a === 'retry') { env.Snd.pauseMusic(false); env.Snd.play('ok'); startVS(VS.mode); }
+      else if (a === 'retry') { env.Snd.pauseMusic(false); env.Snd.play('ok'); startVS(VS.mode, VS.diff); }
       else if (a === 'quit') quit();
       return;
     }
@@ -527,7 +529,7 @@
     const m = PK[i];
     return { pressed: a => (m[a] ? env.pressed(m[a]) : false), held: a => (m[a] ? env.held(m[a]) : false) };
   }
-  function startVS(mode) {
+  function startVS(mode, diff) {
     M = null; S = null; VSSEQ.length = 0;
     const p = [0, 1].map(i => {
       const P = newState(mode, 0);
@@ -537,7 +539,7 @@
       return P;
     });
     S = null;
-    VS = { mode, p, phase: 'ready', phaseT: 0, t: 0, winner: -1, wins: vsWins };
+    VS = { mode, diff: diff === undefined ? 1 : diff, p, phase: 'ready', phaseT: 0, t: 0, winner: -1, wins: vsWins };
     env.Snd.music('tet'); env.Snd.tempo(1);
   }
   function sendGarbage(n, tet, ts) {
@@ -562,7 +564,7 @@
     VS.phase = 'over'; VS.phaseT = 0; VS.winner = w; vsWins[w]++;
     VS.p.forEach(P => { P.cur = null; });
     S.phase = 'over';
-    if (VS.mode === 'vscpu' && w === 0) { const d = env.Save.data; d.tetris = d.tetris || { hi: 0, lines: 0, plays: 0 }; d.tetris.cpuWins = (d.tetris.cpuWins || 0) + 1; env.Save.write(); }
+    if (VS.mode === 'vscpu' && w === 0) { const d = env.Save.data; d.tetris = d.tetris || { hi: 0, lines: 0, plays: 0 }; d.tetris.cpuWins = (d.tetris.cpuWins || 0) + 1; d.tetris.cpuW = d.tetris.cpuW || [0, 0, 0]; d.tetris.cpuW[VS.diff] = (d.tetris.cpuW[VS.diff] || 0) + 1; env.Save.write(); }
     env.Snd.music(null);
     const real = env.Snd; if (real.play) real.play(VS.mode === 'vscpu' && w === 1 ? 'over' : 'win');
   }
@@ -573,16 +575,21 @@
     env.Snd.play('thard'); lockPiece();
   }
   /* ---- CPU: prueba todas las posiciones y elige la mejor (alturas, huecos, líneas y desniveles) ---- */
-  function aiPlan() {
-    const t = S.cur.type, rots = t === 2 ? [0] : (t === 1 || t === 4 || t === 5) ? [0, 1] : [0, 1, 2, 3];
-    let best = null;
+  const AI_LEVELS = [
+    { name: 'FÁCIL', delay: 0.5, step: 0.2, rank: 4, err: 0.3, look: false },    // lenta y a veces elige una posición mediocre
+    { name: 'NORMAL', delay: 0.35, step: 0.14, rank: 3, err: 0.1, look: false },
+    { name: 'DIFÍCIL', delay: 0.15, step: 0.07, rank: 1, err: 0, look: true }       // además mira la próxima pieza
+  ];
+  const boardFits = (b, p) => cells(p).every(([x, y]) => x >= 0 && x < COLS && y < ROWS && (y < 0 || !b[y][x]));
+  function aiCands(b, t, y0) { // todas las colocaciones posibles, de mejor a peor, con el tablero resultante
+    const out = [], rots = t === 2 ? [0] : (t === 1 || t === 4 || t === 5) ? [0, 1] : [0, 1, 2, 3];
     for (const rot of rots) for (let x = -2; x < COLS; x++) {
-      const p = { type: t, rot, x, y: S.cur.y };
-      if (!fits(p)) continue;
-      while (fits({ ...p, y: p.y + 1 })) p.y++;
-      const b = S.board.map(r => r.slice());
-      cells(p).forEach(([cx, cy]) => { if (cy >= 0) b[cy][cx] = t; });
-      const keep = b.filter(r => !r.every(v => v) || r.includes(CEMENT)), lines = ROWS - keep.length;
+      const p = { type: t, rot, x, y: y0 };
+      if (!boardFits(b, p)) continue;
+      while (boardFits(b, { ...p, y: p.y + 1 })) p.y++;
+      const nb = b.map(r => r.slice());
+      cells(p).forEach(([cx, cy]) => { if (cy >= 0) nb[cy][cx] = t; });
+      const keep = nb.filter(r => !r.every(v => v) || r.includes(CEMENT)), lines = ROWS - keep.length;
       while (keep.length < ROWS) keep.unshift(new Array(COLS).fill(0));
       let aggH = 0, holes = 0, bump = 0, prev = -1;
       for (let c = 0; c < COLS; c++) {
@@ -590,16 +597,26 @@
         for (let r = 0; r < ROWS; r++) { if (keep[r][c]) { if (!seen) { h = ROWS - r; seen = true; } } else if (seen) holes++; }
         aggH += h; if (prev >= 0) bump += Math.abs(h - prev); prev = h;
       }
-      const score = -0.51 * aggH + 0.76 * lines * 3 - 0.36 * holes * 2 - 0.18 * bump;
-      if (!best || score > best.score) best = { rot, x, score };
+      out.push({ rot, x, board: keep, score: -0.51 * aggH + 0.76 * lines * 3 - 0.36 * holes * 2 - 0.18 * bump });
     }
-    return best;
+    return out.sort((a, c) => c.score - a.score);
+  }
+  function aiPlan() {
+    const L = AI_LEVELS[VS.diff];
+    let c = aiCands(S.board, S.cur.type, S.cur.y);
+    if (!c.length) return null;
+    if (L.look && S.queue[0]) { // difícil: valora también la mejor jugada con la pieza siguiente
+      c = c.slice(0, 10);
+      c.forEach(x => { const n = aiCands(x.board, S.queue[0], 0); x.score += n.length ? 0.7 * n[0].score : -50; });
+      c.sort((a, b) => b.score - a.score);
+    }
+    return Math.random() < L.err ? c[Math.floor(Math.random() * Math.min(L.rank, c.length))] : c[0];
   }
   function aiAct(dt) {
-    const A = S.ai; A.t -= dt;
-    if (A.piece !== S.stats.pieces) { A.piece = S.stats.pieces; A.plan = aiPlan(); A.t = 0.3; A.fail = 0; }
+    const A = S.ai, L = AI_LEVELS[VS.diff]; A.t -= dt;
+    if (A.piece !== S.stats.pieces) { A.piece = S.stats.pieces; A.plan = aiPlan(); A.t = L.delay; A.fail = 0; }
     if (A.t > 0 || !S.cur) return;
-    A.t = 0.1;
+    A.t = L.step;
     const pl = A.plan;
     if (!pl || A.fail > 2) return hardDropNow();
     if (S.cur.rot !== pl.rot) { if (!rotate(1)) A.fail++; }
@@ -619,7 +636,7 @@
     if (VS.phase === 'paused') { if (e.pressed('pause') || e.pressed('confirm')) action('resume'); return; }
     if (VS.phase === 'over') {
       VS.p.forEach(P => { S = P; P.t += dt; P.shake = Math.max(0, P.shake - dt); updateFx(dt); }); S = null;
-      if (VS.phaseT > 0.6 && e.pressed('confirm')) { e.Snd.play('ok'); startVS(VS.mode); }
+      if (VS.phaseT > 0.6 && e.pressed('confirm')) { e.Snd.play('ok'); startVS(VS.mode, VS.diff); }
       else if (VS.phaseT > 0.3 && e.pressed('back')) quit();
       return;
     }
@@ -677,13 +694,14 @@
       const cx = (bx0 + 10 * s0 + bx1) / 2;
       txt('VS', cx, by + 20, B.secondary, { align: 'center', scale: 2 });
       txt(vsWins[0] + ' - ' + vsWins[1], cx, by + 46, B.light, { align: 'center' });
+      if (VS.mode === 'vscpu') txt(AI_LEVELS[VS.diff].name, cx, by + 62, B.secondaryLight, { align: 'center', scale: 1 });
       txt(VS.mode === 'vscpu' ? 'TÚ' : 'J1', px0 + (pw - 7) / 2, by + 20 * s0 - 12, B.secondaryLight, { align: 'center', scale: 2 });
       txt(VS.mode === 'vscpu' ? 'CPU' : 'J2', px1 + 7 + (pw - 7) / 2, by + 20 * s0 - 12, B.secondaryLight, { align: 'center', scale: 2 });
     } else {
       vsPanel(g, VS.p[0], px0, by, pw, Math.min(s0, 10));
       txt('TÚ', px0 + pw / 2, by + 20 * s0 - 40, B.secondaryLight, { align: 'center', scale: 1 });
       txt(vsWins[0] + ' - ' + vsWins[1], px0 + pw / 2, by + 20 * s0 - 26, B.light, { align: 'center', scale: 1 });
-      txt('CPU', bx1 + 5 * s1, by - 10, B.secondaryLight, { align: 'center', scale: 1 });
+      txt('CPU ' + AI_LEVELS[VS.diff].name, bx1 + 5 * s1, by - 10, B.secondaryLight, { align: 'center', scale: 1 });
       txt('TORRE · VERSUS', W / 2, 6, B.secondary, { align: 'center', scale: 1 });
     }
     // ---- carteles ----
@@ -942,7 +960,7 @@
     list.forEach((m, i) => {
       const y = ys + i * (rh + 6), sel = i === M.cursor, locked = mis && i >= unlockedMis();
       button(mis ? (locked ? (i + 1) + '. BLOQUEADA' : (i + 1) + '. ' + m.name) : m.name, bx, y, bw, bh, 'mode' + i, sel && !locked);
-      if (ver) { txt(m.desc, W / 2, y + bh + 4, B.light, { align: 'center', scale: 1 }); return; }
+      if (ver) { txt(m.desc, W / 2, y + bh + 4, B.light, { align: 'center', scale: 1 }); if (m.diff !== undefined) txt('GANADAS: ' + ((d.cpuW && d.cpuW[m.diff]) || 0), W / 2, y + bh + 14, B.secondaryLight, { align: 'center', scale: 1 }); return; }
       if (mis) { txt(locked ? 'CUMPLE LA MISIÓN ANTERIOR' : m.desc + (i < doneMissions() ? ' *' : ''), W / 2, y + bh + 4, locked ? '#aa6a5a' : (i < doneMissions() ? B.good : B.light), { align: 'center', scale: 1 }); return; }
       txt(m.desc, W / 2, y + bh + 4, B.light, { align: 'center', scale: 1 });
       const rec = m.id === 'versus' ? 'VICTORIAS CPU: ' + (d.cpuWins || 0) : m.id === 'sprint' ? (d.sprint ? 'MEJOR ' + fmtT(d.sprint) : 'SIN RÉCORD') : m.id === 'misiones' ? 'COMPLETAS ' + doneMissions() + ' / 5' : 'RÉCORD ' + pad(d[recKey(m.id)] || 0, 7);
@@ -1007,6 +1025,6 @@
     get active() { return !!S || !!VS; },
     _vs: () => VS,
     // utilidades para pruebas automáticas
-    _s: () => S, _cells: cells, _fits: fits, _hooks: { ROT, SHAPES, COLS, ROWS, HID, spawn, lockPiece, explode, nextPiece, rotate, addRubble }
+    _s: () => S, _cells: cells, _fits: fits, _ai: { AI_LEVELS, aiCands }, _hooks: { ROT, SHAPES, COLS, ROWS, HID, spawn, lockPiece, explode, nextPiece, rotate, addRubble }
   };
 })();

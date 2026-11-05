@@ -196,8 +196,9 @@ const assert = require('assert');
 
   // Versus CPU: la CPU juega sola, borra líneas y J1 pierde si no hace nada
   await key('KeyT'); for (let i = 0; i < 4; i++) await key('ArrowDown'); await key('Enter');
-  await key('ArrowDown'); await key('Enter'); await step(160);
+  await key('ArrowDown'); await key('ArrowDown'); await key('Enter'); await step(160);   // CPU NORMAL
   assert.equal(await pg.evaluate(() => Tetris._vs().p[1].cpu), true);
+  assert.equal(await pg.evaluate(() => Tetris._vs().diff), 1);
   let st = null;
   for (let k = 0; k < 40 && !st; k++) { await step(180); st = await pg.evaluate(() => { const v = Tetris._vs(); return v.phase === 'over' ? { w: v.winner, l: v.p[1].lines } : null; }); }
   const cpuLines = await pg.evaluate(() => Tetris._vs().p[1].lines);
