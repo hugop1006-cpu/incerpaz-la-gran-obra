@@ -52,7 +52,7 @@ function fmtSet(ex, e) {
   const w = [...new Set(done.map(s => s.weight))].join('/');
   const r = [...new Set(done.map(s => s.reps))].join('/');
   const u = db.settings.unit;
-  return `${done.length} × ${r || '?'} · ${w || '?'} ${u} ${MODES[e.mode] || ''} · esfuerzo ${e.effort}/10`;
+  return `${done.length} × ${r || '?'} · ${w || '?'} ${u} ${MODES[e.mode] || ''}${e.effort != null ? ` · esfuerzo ${e.effort}/10` : ' · esfuerzo no registrado'}`;
 }
 const fmtDate = iso => new Date(iso).toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -61,7 +61,7 @@ function proposal(ex) {
   const ref = reference(ex.id);
   if (!ref || ex.kind === 'cardio' || ex.mode === 'cuerpo') return null;
   const full = ref.e.sets.length >= planOf(ex).sets && ref.e.sets.every(s => s.done);
-  if (full && ref.e.effort <= 7 && ref.e.symptoms !== 'si') return 'Completaste todas las series con esfuerzo ≤7/10: puedes valorar subir un escalón pequeño de peso, o una repetición más.';
+  if (full && ref.e.effort != null && ref.e.effort <= 7 && ref.e.symptoms !== 'si') return 'Completaste todas las series con esfuerzo ≤7/10: puedes valorar subir un escalón pequeño de peso, o una repetición más.';
   if (ref.e.effort >= 9 || ref.e.symptoms === 'si') return 'La última vez el esfuerzo fue muy alto o hubo síntomas: mantén o reduce el peso y prioriza la técnica.';
   return 'Mantén el peso y busca completar todas las series con buena técnica antes de subir.';
 }
@@ -191,6 +191,18 @@ function cleanEx(r) {
     plan: cardio ? { minutes: clamp(r.plan?.minutes ?? 10, LIM.minutes) } : { sets: clamp(r.plan?.sets ?? 3, LIM.sets), reps: clamp(r.plan?.reps ?? 10, LIM.reps) },
     rest: cardio ? 0 : clamp(r.rest ?? 60, LIM.rest), custom: true };
   TEXTS.forEach(([k]) => (o[k] = txt(r[k]))); if (r.archived) o.archived = true; return o;
+}
+function cleanSession(r) {
+  if (!r || typeof r.id !== 'string' || !r.entries || typeof r.entries !== 'object' || isNaN(Date.parse(r.date))) return null;
+  const str = (v, n) => (v === '' || v == null ? '' : String(v).slice(0, n)), steps = (Array.isArray(r.steps) ? r.steps : []).filter(id => typeof id === 'string' && exById(id) && r.entries[id] && typeof r.entries[id] === 'object');
+  const entries = {};
+  steps.forEach(id => {
+    const e = r.entries[id], eff = Number(e.effort);
+    entries[id] = { skipped: e.skipped === true, mode: e.mode in MODES ? e.mode : null, effort: e.effort != null && eff >= 1 && eff <= 10 ? Math.round(eff) : null,
+      comment: str(e.comment, 400), symptoms: e.symptoms === 'si' || e.symptoms === 'no' ? e.symptoms : null,
+      sets: (Array.isArray(e.sets) ? e.sets : []).slice(0, 10).map(x => ({ done: x?.done === true, weight: str(x?.weight, 8), reps: str(x?.reps, 8), minutes: str(x?.minutes, 8), speed: str(x?.speed, 8) })) };
+  });
+  return steps.length ? { id: r.id.slice(0, 40), date: new Date(r.date).toISOString(), routine: str(r.routine, 60) || 'Sesión importada', steps, entries, finished: new Date(r.date).toISOString() } : null;
 }
 function registerEx(o) { const i = EXERCISES.findIndex(e => e.id === o.id); if (i >= 0) EXERCISES.splice(i, 1); EXERCISES.push(o); }
 function saveExDraft() {
@@ -326,7 +338,7 @@ function viewProg() {
   const first = pts[0], last = pts[pts.length - 1];
   const delta = pts.length > 1 ? Math.round((last.y - first.y) * 10) / 10 : null;
   const hasMode = kind === 'fuerza' ? ` · ${MODES[data[data.length - 1].mode]}` : '';
-  const rows = [...data].reverse().slice(0, 12).map(d => `<tr><td>${shortDate(d.date)}</td><td>${d.sets} s.</td><td>${d.maxW ?? '—'}${d.maxW != null ? ' ' + unit : ''}</td><td>${d.reps || d.minutes ? (kind === 'cardio' ? d.minutes + ' min' : d.reps + ' rep') : '—'}</td><td>${d.effort}/10</td></tr>`).join('');
+  const rows = [...data].reverse().slice(0, 12).map(d => `<tr><td>${shortDate(d.date)}</td><td>${d.sets} s.</td><td>${d.maxW ?? '—'}${d.maxW != null ? ' ' + unit : ''}</td><td>${d.reps || d.minutes ? (kind === 'cardio' ? d.minutes + ' min' : d.reps + ' rep') : '—'}</td><td>${d.effort != null ? d.effort + '/10' : '—'}</td></tr>`).join('');
   return `${week}
     <div class="card"><h2>Progreso por ejercicio</h2>
       <select data-act="pex" aria-label="Ejercicio">${withData.map(ex => `<option value="${ex.id}" ${ex.id === sel.id ? 'selected' : ''}>${esc(ex.name)}</option>`).join('')}</select>
@@ -443,12 +455,12 @@ document.addEventListener('change', async e => {
   if (a === 'import' && t.files[0]) {
     try { const d = JSON.parse(await t.files[0].text()); const ids = new Set(db.sessions.map(s => s.id));
       const eids = new Set(db.customExercises.map(x => x.id));
-      (d.customExercises || []).forEach(r => { const o = cleanEx(r); if (o && !eids.has(o.id) && !EXERCISES.some(e => e.id === o.id)) { registerEx(o); db.customExercises.push(o); } });
-      (d.sessions || []).filter(s => s.id && s.entries && !ids.has(s.id)).forEach(s => db.sessions.push(s));
+      (Array.isArray(d.customExercises) ? d.customExercises : []).forEach(r => { const o = cleanEx(r); if (o && !eids.has(o.id) && !EXERCISES.some(e => e.id === o.id)) { registerEx(o); db.customExercises.push(o); } });
+      let added = 0; (Array.isArray(d.sessions) ? d.sessions : []).forEach(r => { const c = cleanSession(r); if (c && !ids.has(c.id)) { db.sessions.push(c); ids.add(c.id); added++; } });
       const tids = new Set(db.templates.map(x => x.id));
-      (d.templates || []).filter(x => x.id && typeof x.name === 'string' && Array.isArray(x.items) && !tids.has(x.id))
-        .forEach(x => db.templates.push({ id: x.id, name: x.name.slice(0, 40), items: x.items.filter(i => exById(i.ex)).map(i => ({ ...itemOf(i.ex), ...Object.fromEntries(Object.keys(LIM).filter(k => k in itemOf(i.ex)).map(k => [k, clamp(i[k], LIM[k])])) })) }));
-      db.sessions.sort((x, y) => x.date.localeCompare(y.date)); save(); render(); toast('Datos importados'); }
+      (Array.isArray(d.templates) ? d.templates : []).filter(x => x && x.id && typeof x.name === 'string' && Array.isArray(x.items) && !tids.has(x.id))
+        .forEach(x => db.templates.push({ id: x.id, name: x.name.slice(0, 40), items: x.items.filter(i => i && exById(i.ex)).map(i => ({ ...itemOf(i.ex), ...Object.fromEntries(Object.keys(LIM).filter(k => k in itemOf(i.ex)).map(k => [k, clamp(i[k], LIM[k])])) })) }));
+      db.sessions.sort((x, y) => x.date.localeCompare(y.date)); save(); render(); toast(added ? `Importadas ${added} sesiones` : 'Datos importados (sin sesiones nuevas)'); }
     catch { toast('Archivo no válido'); } return;
   }
   if (!f || !cur()) return;
