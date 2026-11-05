@@ -74,3 +74,6 @@ input[type=range]{width:100%;accent-color:var(--acc);height:36px}
 .thumb{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--line);display:inline-flex;align-items:center;justify-content:center;flex:none;cursor:zoom-in}
 span.thumb{cursor:default;color:var(--mut)}
 .photo small{font-size:12px}
+
+input,textarea,select,button{font-family:inherit}
+input[type=radio]{accent-color:var(--acc)}

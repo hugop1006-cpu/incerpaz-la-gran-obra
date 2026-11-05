@@ -466,15 +466,16 @@ async function saveBackup() {
 }
 const unsaved = () => db.sessions.filter(s => Date.parse(s.finished || s.date) > (db.settings.lastBackup || 0)).length;
 const daysAgo = ms => Math.floor((Date.now() - ms) / 864e5);
+const agoTxt = ms => { const d = daysAgo(ms); return `hace ${d} ${d === 1 ? 'día' : 'días'}`; };
 function backupCard() {
   const n = unsaved(), lb = db.settings.lastBackup; if (!n || (lb && daysAgo(lb) < 7)) return '';
-  return `<div class="card safety"><strong>Copia de seguridad:</strong> ${n} sesión(es) sin respaldar ${lb ? `· última copia hace ${daysAgo(lb)} días` : '· aún no has guardado ninguna copia'}.
+  return `<div class="card safety"><strong>Copia de seguridad:</strong> ${n} sesión(es) sin respaldar ${lb ? `· última copia ${agoTxt(lb)}` : '· aún no has guardado ninguna copia'}.
     <button class="btn sm pri" data-act="bk-save" style="margin-top:8px">Guardar copia</button></div>`;
 }
 function backupSettings() {
   const lb = db.settings.lastBackup;
   return `<div class="card"><h3>Copia de seguridad</h3>
-    <p>${lb ? `Última copia: ${fmtDate(new Date(lb).toISOString())} (hace ${daysAgo(lb)} días)` : 'Todavía no has guardado ninguna copia.'}<br>Sesiones sin respaldar: <strong>${unsaved()}</strong></p>
+    <p>${lb ? `Última copia: ${fmtDate(new Date(lb).toISOString())} (${agoTxt(lb)})` : 'Todavía no has guardado ninguna copia.'}<br>Sesiones sin respaldar: <strong>${unsaved()}</strong></p>
     <button class="btn pri" data-act="bk-save" style="width:100%">Guardar copia (Drive, iCloud, Archivos…)</button>
     <label class="btn" style="display:block;text-align:center;margin-top:8px">Restaurar desde archivo<input type="file" accept="application/json" hidden data-act="restore"></label>
     <p class="mut">En el menú elige Google Drive, iCloud Drive, Archivos o tu correo. Si tu navegador no ofrece compartir, se descarga el archivo. La copia incluye sesiones, plantillas, ejercicios propios y fotos.</p>
@@ -486,7 +487,7 @@ async function fillSnaps() {
   const all = (await snapAll()).reverse(), el = $('#snaps'); if (!el) return;
   el.innerHTML = all.length ? all.map(r => `<div class="item row sp"><span>${new Date(r.ts).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })}<br><span class="mut">${esc(r.reason)} · ${r.sessions} sesiones</span></span><button class="btn sm" data-act="snap-restore" data-ts="${r.ts}">Restaurar</button></div>`).join('') : 'Aún no hay copias automáticas.';
   const p = $('#persist'), ok = await navigator.storage?.persisted?.();
-  if (p) p.textContent = ok ? 'Almacenamiento protegido por el navegador: sí.' : navigator.storage?.persisted ? 'Almacenamiento protegido: no garantizado. En iPhone instala la app en la pantalla de inicio: Safari puede borrar los datos de sitios que no usas.' : '';
+  if (p) p.textContent = ok ? 'Almacenamiento protegido por el navegador: sí.' : navigator.storage?.persisted && !window.Capacitor?.isNativePlatform?.() ? 'Almacenamiento protegido: no garantizado. En iPhone instala la app en la pantalla de inicio: Safari puede borrar los datos de sitios que no usas.' : '';
 }
 
 /* ---------- Acciones ---------- */
