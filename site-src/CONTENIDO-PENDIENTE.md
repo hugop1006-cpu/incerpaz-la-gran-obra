@@ -85,3 +85,6 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 
 ## 📌 En pausa: validación del mercado exportador
 Se dejó el plan de validación y las primeras cifras de importación (UN Comtrade, 5 nov 2026) en un documento. Se retoma después de la reunión con marketing. Siguiente paso concreto: consultar la subpartida estadounidense 6907.23.10 en USITC DataWeb para separar la terracota del total de 6907.23, confirmar qué pieza sería la baldosa tipo mexicana con las fábricas y fijar cantidades por pallet y contenedor.
+- Intento del 5 nov 2026: la API del Census (importaciones a 10 dígitos) exige la clave como parámetro `key=` en la dirección, y el proxy de la sesión solo la inyecta como encabezado, así que no funcionó. USITC DataWeb pide cuenta con Login.gov.
+- Para retomar: exportar desde DataWeb un CSV de importaciones de 6907.23.10 (HTS a 10 dígitos, todos los países, 2020–2024, valor aduanero y primera unidad de cantidad) y pasarlo. Con él se calcula tamaño del mercado, orígenes, precio por m² y la parte de baldosa pequeña (lado de 30 cm o menos).
+- Los sufijos estadísticos de 6907.23.10 y los aranceles vigentes (recargos incluidos) no están confirmados: verificarlos en USITC y CBP, no en sitios de terceros.
