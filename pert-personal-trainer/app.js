@@ -4,10 +4,11 @@ const KEY = 'pert.v1';
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const exById = id => EXERCISES.find(e => e.id === id);
+const active = () => EXERCISES.filter(e => !e.archived);
 const MODES = { lado: 'por lado', mano: 'por mano', total: 'totales', cuerpo: 'peso corporal' };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-const blank = () => ({ sessions: [], photos: {}, settings: { unit: 'lb' }, current: null, templates: [] });
+const blank = () => ({ sessions: [], photos: {}, settings: { unit: 'lb' }, current: null, templates: [], customExercises: [] });
 let db = (() => { try { return Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { return blank(); } })();
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(db)); return true; }
@@ -77,8 +78,8 @@ const SAFETY = `<div class="card safety"><strong>Seguridad:</strong> si aparece 
 function viewHoy() {
   if (!cur()) {
     const all = allTemplates(), picked = all.find(r => r.id === ui.picked)?.id ?? all[0].id;
-    const rows = all.map(r => `<label class="pick"><input type="radio" name="routine" value="${esc(r.id)}" ${picked === r.id ? 'checked' : ''}><span><strong>${esc(r.name)}</strong>${r.mine ? ' <span class="badge b-ref">Tuya</span>' : ''}<br><span class="mut">${r.items.length ? r.items.map(i => exById(i.ex).name).join(' · ') : 'Sin ejercicios'}</span></span></label>`).join('');
-    const custom = EXERCISES.map(e => `<label class="pick"><input type="checkbox" class="cx" value="${e.id}"><span>${esc(e.name)}</span></label>`).join('');
+    const rows = all.map(r => `<label class="pick"><input type="radio" name="routine" value="${esc(r.id)}" ${picked === r.id ? 'checked' : ''}><span><strong>${esc(r.name)}</strong>${r.mine ? ' <span class="badge b-ref">Tuya</span>' : ''}<br><span class="mut">${r.items.length ? esc(r.items.map(i => exById(i.ex).name).join(' · ')) : 'Sin ejercicios'}</span></span></label>`).join('');
+    const custom = active().map(e => `<label class="pick"><input type="checkbox" class="cx" value="${e.id}"><span>${esc(e.name)}</span></label>`).join('');
     return `${SAFETY}
       <div class="card"><h2>Nueva sesión</h2><p class="mut">Elige una plantilla. Las series y repeticiones de la plantilla son <span class="badge b-prop">Propuesta</span>: solo cuentan como realizadas cuando tú las marcas.</p>
       ${rows}<button class="btn pri" data-act="start" style="width:100%">Empezar sesión</button>
@@ -106,9 +107,9 @@ function viewHoy() {
       <div class="photo">${photo ? `<img src="${photo}" alt="${esc(ex.machine)}">` : `<span>📷 Sin foto de ${esc(ex.machine)}</span>`}
         <label class="btn sm" style="display:inline-block">${photo ? 'Cambiar foto' : 'Añadir foto de la máquina'}<input type="file" accept="image/*" hidden data-act="photo"></label></div></div>
     <div class="card"><details open><summary>Instrucciones</summary><dl>
-      <dt>Postura y ajustes</dt><dd>${esc(ex.setup)}</dd><dt>Manos y pies</dt><dd>${esc(ex.hands)}</dd>
-      <dt>Recorrido</dt><dd>${esc(ex.range)}</dd><dt>Respiración</dt><dd>${esc(ex.breath)}</dd>
-      <dt>Ritmo</dt><dd>${esc(ex.tempo)}</dd><dt>Ajuste de peso</dt><dd>${esc(ex.adjust)}</dd></dl></details></div>
+      <dt>Postura y ajustes</dt><dd>${esc(ex.setup || '—')}</dd><dt>Manos y pies</dt><dd>${esc(ex.hands || '—')}</dd>
+      <dt>Recorrido</dt><dd>${esc(ex.range || '—')}</dd><dt>Respiración</dt><dd>${esc(ex.breath || '—')}</dd>
+      <dt>Ritmo</dt><dd>${esc(ex.tempo || '—')}</dd><dt>Ajuste de peso</dt><dd>${esc(ex.adjust || '—')}</dd></dl></details></div>
     <div class="card"><h3>Datos previos</h3>
       ${ref ? `<p><span class="badge b-ref">Referencia confirmada</span> <span class="mut">${fmtDate(ref.date)}</span><br>${esc(fmtSet(ex, ref.e))}</p>${ex.kind !== 'cardio' ? '<button class="btn sm" data-act="useref">Rellenar con la referencia</button>' : ''}` : '<p class="mut">Sin referencia todavía: se creará con lo que confirmes hoy.</p>'}
       ${prop ? `<p><span class="badge b-prop">Propuesta</span> ${esc(prop)} <span class="mut">(no es un dato registrado)</span></p>` : ''}</div>
@@ -139,24 +140,78 @@ function viewHist() {
     const done = Object.entries(s.entries).filter(([, e]) => !e.skipped && e.sets.some(x => x.done));
     const open = ui.openSession === s.id;
     return `<div class="item"><div class="row sp"><div><strong>${esc(s.routine)}</strong><br><span class="mut">${fmtDate(s.date)} · ${done.length} ejercicios realizados</span></div>
-      <button class="btn sm" data-act="toggle" data-id="${s.id}">${open ? 'Cerrar' : 'Ver'}</button></div>
+      <button class="btn sm" data-act="toggle" data-id="${esc(s.id)}">${open ? 'Cerrar' : 'Ver'}</button></div>
       ${open ? `<ul>${s.steps.map(id => { const ex = exById(id), e = s.entries[id]; if (!ex) return '';
         if (e.skipped) return `<li>${esc(ex.name)} — <em>omitido</em></li>`;
         if (!e.sets.some(x => x.done)) return `<li>${esc(ex.name)} — <em>sin series confirmadas</em>${e.comment ? `<br><span class="mut">${esc(e.comment)}</span>` : ''}</li>`;
         return `<li>${esc(ex.name)}: ${esc(fmtSet(ex, e)) || '—'}${e.symptoms === 'si' ? ' · <strong>síntomas: sí</strong>' : ''}${e.comment ? `<br><span class="mut">${esc(e.comment)}</span>` : ''}</li>`; }).join('')}</ul>
-        <button class="btn sm danger" data-act="del" data-id="${s.id}">Borrar sesión</button>` : ''}</div>`;
+        <button class="btn sm danger" data-act="del" data-id="${esc(s.id)}">Borrar sesión</button>` : ''}</div>`;
   }).join('') || '<p class="mut">Aún no hay sesiones terminadas.</p>';
   return `<div class="card"><h2>Historial</h2><div class="list">${list}</div></div>
     <div class="card row"><button class="btn" data-act="export-json">Exportar JSON</button><button class="btn" data-act="export-csv">Exportar CSV</button>
       <label class="btn">Importar JSON<input type="file" accept="application/json" hidden data-act="import"></label></div>`;
 }
 function viewEx() {
-  return `<div class="card"><h2>Ejercicios</h2><div class="list">${EXERCISES.map(ex => {
+  if (ui.exDraft) return viewExForm();
+  return `<div class="card"><div class="row sp"><h2>Ejercicios</h2><button class="btn sm pri" data-act="ex-new">+ Nuevo ejercicio</button></div><div class="list">${active().map(ex => {
     const ref = reference(ex.id);
-    return `<div class="item"><strong>${esc(ex.name)}</strong> <span class="badge b-prop">Propuesta ${ex.kind === 'cardio' ? ex.plan.minutes + ' min' : ex.plan.sets + '×' + ex.plan.reps}</span>
-      <br>${ref ? `<span class="badge b-ref">Referencia</span> ${esc(fmtSet(ex, ref.e))} <span class="mut">(${fmtDate(ref.date)})</span>` : '<span class="mut">Sin referencia</span>'}</div>`;
+    return `<div class="item"><strong>${esc(ex.name)}</strong> ${ex.custom ? '<span class="badge b-ref">Propio</span>' : ''} <span class="badge b-prop">Propuesta ${ex.kind === 'cardio' ? ex.plan.minutes + ' min' : ex.plan.sets + '×' + ex.plan.reps}</span>
+      <br>${ref ? `<span class="badge b-ref">Referencia</span> ${esc(fmtSet(ex, ref.e))} <span class="mut">(${fmtDate(ref.date)})</span>` : '<span class="mut">Sin referencia</span>'}
+      ${ex.custom ? `<div class="row" style="margin-top:6px"><button class="btn sm" data-act="ex-edit" data-id="${esc(ex.id)}">Editar</button><button class="btn sm danger" data-act="ex-del" data-id="${esc(ex.id)}">Eliminar</button></div>` : ''}</div>`;
   }).join('')}</div></div>`;
 }
+/* ---------- Ejercicios propios ---------- */
+// Se guardan en el dispositivo. Los textos de la ficha son tuyos; la app no los valida clínicamente.
+const TEXTS = [['setup', 'Postura y ajustes', 'Altura del asiento, agarre, posición de espalda…'], ['hands', 'Manos y pies', 'Dónde van las manos y los pies'], ['range', 'Recorrido', 'Hasta dónde bajas y subes'], ['breath', 'Respiración', 'Cuándo inhalas y exhalas'], ['tempo', 'Ritmo', 'Ej. bajada 3 s, subida 2 s'], ['adjust', 'Regla de ajuste de peso', 'Cuándo subir, mantener o bajar']];
+const exType = ex => ex.kind === 'cardio' ? 'cardio' : ex.mode === 'cuerpo' ? 'cuerpo' : 'fuerza';
+function draftOf(ex) {
+  const d = { id: ex?.id || null, name: ex?.name || '', type: ex ? exType(ex) : 'fuerza', mode: ex?.mode && ex.mode !== 'cuerpo' ? ex.mode : 'total', machine: ex?.machine || '',
+    sets: ex?.plan.sets ?? 3, reps: ex?.plan.reps ?? 10, rest: ex?.rest ?? 60, minutes: ex?.plan.minutes ?? 10 };
+  TEXTS.forEach(([k]) => (d[k] = ex?.[k] || '')); return d;
+}
+function viewExForm() {
+  const d = ui.exDraft, cardio = d.type === 'cardio', fuerza = d.type === 'fuerza';
+  const num = (k, lab) => `<label>${lab}<input type="number" inputmode="numeric" data-x="${k}" value="${esc(d[k])}"></label>`;
+  return `<div class="card xf"><h2>${d.id ? 'Editar ejercicio' : 'Nuevo ejercicio'}</h2>
+    <label>Nombre<input type="text" maxlength="60" data-x="name" value="${esc(d.name)}" placeholder="Ej. Press inclinado en máquina"></label>
+    <label style="display:block;margin-top:8px">Tipo<select data-x="type"><option value="fuerza" ${fuerza ? 'selected' : ''}>Fuerza con peso</option><option value="cuerpo" ${d.type === 'cuerpo' ? 'selected' : ''}>Fuerza con peso corporal</option><option value="cardio" ${cardio ? 'selected' : ''}>Cardio (minutos y velocidad)</option></select></label>
+    ${fuerza ? `<label style="display:block;margin-top:8px">El peso se cuenta…<select data-x="mode">${['lado', 'mano', 'total'].map(k => `<option value="${k}" ${d.mode === k ? 'selected' : ''}>${MODES[k]}</option>`).join('')}</select></label>` : ''}
+    <label style="display:block;margin-top:8px">Máquina o equipo<input type="text" maxlength="60" data-x="machine" value="${esc(d.machine)}"></label>
+    <h3 style="margin-top:12px">Propuesta del plan</h3>
+    <div class="row" style="gap:8px">${cardio ? num('minutes', 'Minutos') : num('sets', 'Series') + num('reps', 'Reps') + num('rest', 'Descanso (s)')}</div>
+    <h3 style="margin-top:12px">Ficha (opcional)</h3>
+    ${TEXTS.map(([k, lab, ph]) => `<label style="display:block;margin-top:6px">${lab}<textarea data-x="${k}" maxlength="400" placeholder="${ph}">${esc(d[k])}</textarea></label>`).join('')}
+    <div class="nav"><button class="btn" data-act="ex-cancel">Cancelar</button><button class="btn pri" data-act="ex-save">Guardar</button></div></div>`;
+}
+function cleanEx(r) {
+  if (!r || typeof r.id !== 'string' || typeof r.name !== 'string' || !r.name.trim()) return null;
+  const cardio = r.kind === 'cardio', mode = cardio ? undefined : ['lado', 'mano', 'total', 'cuerpo'].includes(r.mode) ? r.mode : 'total';
+  const txt = v => (typeof v === 'string' ? v.slice(0, 400) : '');
+  const o = { id: r.id.slice(0, 40), name: r.name.trim().slice(0, 60), kind: cardio ? 'cardio' : 'fuerza', mode, machine: txt(r.machine).slice(0, 60),
+    plan: cardio ? { minutes: clamp(r.plan?.minutes ?? 10, LIM.minutes) } : { sets: clamp(r.plan?.sets ?? 3, LIM.sets), reps: clamp(r.plan?.reps ?? 10, LIM.reps) },
+    rest: cardio ? 0 : clamp(r.rest ?? 60, LIM.rest), custom: true };
+  TEXTS.forEach(([k]) => (o[k] = txt(r[k]))); if (r.archived) o.archived = true; return o;
+}
+function registerEx(o) { const i = EXERCISES.findIndex(e => e.id === o.id); if (i >= 0) EXERCISES.splice(i, 1); EXERCISES.push(o); }
+function saveExDraft() {
+  const d = ui.exDraft, cardio = d.type === 'cardio';
+  if (!d.name.trim()) return toast('Ponle un nombre al ejercicio');
+  const raw = { id: d.id || 'c-' + uid(), name: d.name, kind: cardio ? 'cardio' : 'fuerza', mode: d.type === 'cuerpo' ? 'cuerpo' : d.mode, machine: d.machine || (cardio ? '' : 'Máquina'),
+    plan: cardio ? { minutes: d.minutes === '' ? 10 : d.minutes } : { sets: d.sets === '' ? 3 : d.sets, reps: d.reps === '' ? 10 : d.reps }, rest: d.rest === '' ? 60 : d.rest };
+  TEXTS.forEach(([k]) => (raw[k] = d[k]));
+  const o = cleanEx(raw); registerEx(o);
+  db.customExercises = db.customExercises.filter(x => x.id !== o.id).concat([o]); save(); ui.exDraft = null; render(); toast('Ejercicio guardado');
+}
+function deleteEx(id) {
+  if (cur()?.steps.includes(id)) return toast('Está en tu sesión actual: termínala o cancélala primero.');
+  const hist = db.sessions.some(s => s.entries?.[id]);
+  if (!confirm(hist ? 'Este ejercicio tiene historial. Se ocultará de las listas pero tus sesiones y gráficas se conservan. ¿Continuar?' : '¿Eliminar este ejercicio?')) return;
+  db.templates.forEach(t => (t.items = t.items.filter(i => i.ex !== id)));
+  if (hist) { const o = { ...exById(id), archived: true }; registerEx(o); db.customExercises = db.customExercises.map(x => (x.id === id ? o : x)); }
+  else { const i = EXERCISES.findIndex(e => e.id === id); if (i >= 0) EXERCISES.splice(i, 1); db.customExercises = db.customExercises.filter(x => x.id !== id); }
+  save(); render();
+}
+
 function viewSet() {
   const u = db.settings.unit;
   return `<div class="card"><h2>Ajustes</h2>
@@ -180,7 +235,7 @@ function tplSummary(it) { const ex = exById(it.ex); return ex.kind === 'cardio' 
 function viewTpl() {
   const t = ui.tplEdit && tplById(ui.tplEdit);
   if (t) {
-    const unused = EXERCISES.filter(e => !t.items.some(i => i.ex === e.id));
+    const unused = active().filter(e => !t.items.some(i => i.ex === e.id));
     const items = t.items.map((it, n) => { const ex = exById(it.ex), cardio = ex.kind === 'cardio';
       const f = (k, lab) => `<label>${lab}<input type="number" inputmode="numeric" min="${LIM[k][0]}" max="${LIM[k][1]}" data-t="${k}" data-n="${n}" value="${it[k]}"></label>`;
       return `<div class="item"><div class="row sp"><strong>${n + 1}. ${esc(ex.name)}</strong><span class="row">
@@ -194,7 +249,7 @@ function viewTpl() {
   }
   const list = allTemplates().map(r => `<div class="item"><div class="row sp"><strong>${esc(r.name)}</strong>${r.mine ? '<span class="badge b-ref">Tuya</span>' : '<span class="badge">Integrada</span>'}</div>
     <div class="mut">${r.items.length ? r.items.map(i => `${esc(exById(i.ex).name)} (${tplSummary(i)})`).join(' · ') : 'Sin ejercicios'}</div>
-    <div class="row" style="margin-top:6px">${r.mine ? `<button class="btn sm" data-act="tpl-edit" data-id="${r.id}">Editar</button>` : ''}<button class="btn sm" data-act="tpl-dup" data-id="${r.id}">Duplicar</button>${r.mine ? `<button class="btn sm danger" data-act="tpl-del" data-id="${r.id}">Eliminar</button>` : ''}</div></div>`).join('');
+    <div class="row" style="margin-top:6px">${r.mine ? `<button class="btn sm" data-act="tpl-edit" data-id="${esc(r.id)}">Editar</button>` : ''}<button class="btn sm" data-act="tpl-dup" data-id="${esc(r.id)}">Duplicar</button>${r.mine ? `<button class="btn sm danger" data-act="tpl-del" data-id="${esc(r.id)}">Eliminar</button>` : ''}</div></div>`).join('');
   return `<div class="card"><div class="row sp"><h2>Plantillas</h2><button class="btn sm" data-act="tpl-back">← Volver</button></div>
     <div class="list">${list}</div><button class="btn pri" data-act="tpl-new" style="width:100%;margin-top:10px">Nueva plantilla</button></div>`;
 }
@@ -326,7 +381,7 @@ function resize(file) {
 
 document.addEventListener('click', e => {
   const tab = e.target.closest('[data-tab]');
-  if (tab) { ui.tab = tab.dataset.tab; return render(); }
+  if (tab) { ui.tab = tab.dataset.tab; ui.exDraft = null; return render(); }
   const b = e.target.closest('button[data-act]'); if (!b) return;
   const a = b.dataset.act;
   if (a === 'start') {
@@ -334,6 +389,11 @@ document.addEventListener('click', e => {
     if (!r.items.length) return toast('Esa plantilla no tiene ejercicios. Edítala primero.');
     ui.picked = r.id; startSession(r.name, r.items.map(i => i.ex), Object.fromEntries(r.items.map(i => [i.ex, { sets: i.sets, reps: i.reps, rest: i.rest, minutes: i.minutes }])));
   }
+  else if (a === 'ex-new') { ui.exDraft = draftOf(null); render(); }
+  else if (a === 'ex-edit') { ui.exDraft = draftOf(exById(b.dataset.id)); render(); }
+  else if (a === 'ex-cancel') { ui.exDraft = null; render(); }
+  else if (a === 'ex-save') saveExDraft();
+  else if (a === 'ex-del') deleteEx(b.dataset.id);
   else if (a === 'tpl-open') { ui.tab = 'plantillas'; ui.tplEdit = null; render(); }
   else if (a === 'tpl-back') { ui.tab = 'hoy'; ui.tplEdit = null; render(); }
   else if (a === 'tpl-new') { const t = { id: uid(), name: 'Mi plantilla', items: [] }; db.templates.push(t); save(); ui.tplEdit = t.id; render(); }
@@ -357,13 +417,14 @@ document.addEventListener('click', e => {
   else if (a === 'rest') startRest(); else if (a === 'restoff') { stopRest(); const t = $('#tval'); if (t) t.textContent = planOf(stepEx()).rest + ' s'; }
   else if (a === 'toggle') { ui.openSession = ui.openSession === b.dataset.id ? null : b.dataset.id; render(); }
   else if (a === 'del') { if (confirm('¿Borrar esta sesión?')) { db.sessions = db.sessions.filter(s => s.id !== b.dataset.id); save(); render(); } }
-  else if (a === 'export-json') download('pert-datos.json', JSON.stringify({ sessions: db.sessions, settings: db.settings, templates: db.templates }, null, 2), 'application/json');
+  else if (a === 'export-json') download('pert-datos.json', JSON.stringify({ sessions: db.sessions, settings: db.settings, templates: db.templates, customExercises: db.customExercises }, null, 2), 'application/json');
   else if (a === 'export-csv') exportCsv();
   else if (a === 'wipe') { if (confirm('Se borrarán todas las sesiones y fotos de este dispositivo. ¿Continuar?')) { db = blank(); save(); render(); } }
 });
 
 document.addEventListener('input', e => {
   const t = e.target;
+  if (t.dataset.x && ui.exDraft) { ui.exDraft[t.dataset.x] = t.value; return; }
   if (t.dataset.t && ui.tplEdit) { const tp = tplById(ui.tplEdit); if (!tp) return; if (t.dataset.t === 'name') tp.name = t.value.slice(0, 40); save(); return; }
   const f = t.dataset.f; if (!f || !cur()) return;
   const en = cur().entries[stepEx().id], i = t.dataset.i;
@@ -374,12 +435,15 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', async e => {
   const t = e.target, f = t.dataset.f, a = t.dataset.act;
+  if (t.dataset.x && ui.exDraft) { if (t.tagName === 'SELECT') render(); return; }
   if (t.dataset.t && t.dataset.t !== 'name' && ui.tplEdit) { const tp = tplById(ui.tplEdit), it = tp?.items[+t.dataset.n]; if (it) { it[t.dataset.t] = clamp(t.value, LIM[t.dataset.t]); t.value = it[t.dataset.t]; save(); } return; }
   if (a === 'pex') { ui.pex = t.value; ui.pmet = null; return render(); }
   if (a === 'unit') { db.settings.unit = t.value; save(); return render(); }
   if (a === 'photo' && t.files[0]) { try { db.photos[stepEx().id] = await resize(t.files[0]); save(); render(); } catch { toast('No se pudo leer la imagen'); } return; }
   if (a === 'import' && t.files[0]) {
     try { const d = JSON.parse(await t.files[0].text()); const ids = new Set(db.sessions.map(s => s.id));
+      const eids = new Set(db.customExercises.map(x => x.id));
+      (d.customExercises || []).forEach(r => { const o = cleanEx(r); if (o && !eids.has(o.id) && !EXERCISES.some(e => e.id === o.id)) { registerEx(o); db.customExercises.push(o); } });
       (d.sessions || []).filter(s => s.id && s.entries && !ids.has(s.id)).forEach(s => db.sessions.push(s));
       const tids = new Set(db.templates.map(x => x.id));
       (d.templates || []).filter(x => x.id && typeof x.name === 'string' && Array.isArray(x.items) && !tids.has(x.id))
@@ -395,5 +459,6 @@ document.addEventListener('change', async e => {
   if (f === 'mode') { en.mode = t.value; save(); return render(); }
 });
 
+db.customExercises = db.customExercises.map(cleanEx).filter(Boolean); db.customExercises.forEach(registerEx);
 if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
 render();
