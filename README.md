@@ -25,6 +25,37 @@ Abre `index.html` en el navegador (doble clic). No necesita servidor.
 - **Nivel 5, La Tormenta**: la cámara avanza sola y la lluvia te empuja. Al final, **La Grieta** parte el suelo: párate junto a cada grieta abierta y pulsa *apilar* para sellarla con un ladrillo. Con 6 sellos la vences.
 - El progreso (niveles desbloqueados, récord, tejas) se guarda en `localStorage`. Para borrarlo, limpia los datos del sitio en el navegador.
 
+## Minijuego: Torre de Ladrillos (Tetris de obra)
+
+Se abre desde el menú de etapas con el botón **MINIJUEGO: TORRE** o la tecla **T**. Las piezas son materiales de obra (viga, bloque, ladrillo, cemento, teja, tablón y losa).
+
+| Acción | Teclado | Celular |
+|---|---|---|
+| Mover | ← → o A D | ◀ ▶ |
+| Bajar más rápido | ↓ o S | ▼ |
+| Girar | ↑ / X / W (horario), Z (antihorario) | GIRAR |
+| Caída instantánea | Espacio | CAER |
+| Guardar pieza | C / Shift / K | GUARDAR |
+| Pausa | P o Esc | II |
+
+- Rotación SRS con patadas, bolsa de 7 piezas, pieza fantasma, 3 siguientes, guardar pieza y bloqueo con retardo.
+- **La casa se construye**: cada 8 líneas sube una etapa de la obra (fondo incluido); a las 40 líneas la obra se termina (+5000) y puedes seguir.
+- **Demolición**: cada 8 líneas llega una pieza bomba (se ve venir en "Próximas") que borra un área de 3×3; los escombros caen y pueden completar líneas.
+- **Modos** (se eligen al abrir el minijuego): **Clásico** (sin fin), **Sprint 40** (40 líneas en el menor tiempo; guarda el mejor tiempo) y **Escombros** (cada 8 piezas sube una fila de escombros con un hueco).
+- **T-spin**: girar la T para encajarla en un hueco (3 esquinas ocupadas) da bono extra (sencillo 800, doble 1200, triple 1600, ×nivel).
+- **Gestos en el celular** (sobre el tablero, además de los botones): deslizar de lado = mover, tocar = girar, mantener el dedo abajo = bajar, deslizón rápido hacia abajo = caer, deslizón hacia arriba = guardar pieza.
+- **Poderes cargables**: cada línea llena la barra verde (más con combos y Tetris, máximo 10). Con **E** (o tocando la barra) eliges el poder y con **V** (o el botón PODER en el celular) lo usas:
+  - **Freno** (cuesta 4): la caída va 3 veces más lenta durante 8 s.
+  - **Cemento** (cuesta 7): rellena los huecos tapados de las 6 filas de abajo, lo que puede completar líneas.
+  - **Niveladora** (cuesta 10): aplana las 2 filas de abajo de la torre.
+- **Misiones** (modo del menú): 5 objetivos, uno por etapa de la obra, que se desbloquean en orden y guardan el progreso. 1 Cimientos: borra 10 líneas · 2 Muros: 3 dobles o más · 3 Losa y techo: 12 líneas empezando con escombros · 4 Acabados: 2 Tetris · 5 La Tormenta: aguanta 75 s mientras suben escombros. Cada misión tiene su nivel de velocidad y su fondo, y la casa del panel avanza con las misiones completadas.
+- **Versus** (menú → VERSUS): dos tableros lado a lado con las mismas piezas para los dos. Borrar líneas manda **escombros** al rival (doble 1, triple 2, Tetris 4, T-spin el doble, +1 por combo o seguido; primero se cancela lo que te iba a llegar, y se ve como una barra roja junto al tablero). Pierde quien desborda la torre; hay revancha y marcador.
+  - **2 jugadores** en el mismo teclado: J1 **A D** mover, **W** girar, **Q** girar al revés, **S** bajar, **E** guardar, **Espacio** caer · J2 **← →** mover, **↑** girar, **,** girar al revés, **↓** bajar, **.** guardar, **Enter** caer.
+  - **Contra la CPU**: juegas con las flechas, WASD o los botones y gestos del celular; la CPU prueba todas las posiciones y elige la mejor.
+- **Bloque macizo** (cemento oscuro con esquinas naranjas): una fila que lo contiene **no se borra aunque esté llena** (parpadea en rojo). Solo la pieza **Demolición** lo rompe, así que con macizos en juego llega antes (cada 5 líneas en vez de 8). Aparece en **Escombros** (cada 3ª fila que sube) y en las misiones 3 y 5.
+- Puntaje: línea 100 · doble 300 · triple 500 · Tetris 800 (×nivel, ×1.5 si es seguido), combos, y puntos por caída. Récord guardado en el navegador.
+- Código: `js/tetris.js`. Prueba automática: `node tools/probar-tetris.js`.
+
 ## En el celular (vertical y pantalla completa)
 
 - Se juega en **vertical**: el juego ocupa toda la pantalla y los botones (◀ ▶, SALTO, APILAR, MURO) quedan abajo durante la partida. En horizontal también funciona.
@@ -45,6 +76,7 @@ js/font.js      fuente de píxeles (con tildes y ñ)
 js/audio.js     efectos y música (Web Audio API)
 js/sprites.js   arte dibujado por código
 js/game.js      motor: física, colisiones por tiles, enemigos, jefe, menús
+js/tetris.js    minijuego Torre de Ladrillos (Tetris con tema de obra)
 tools/          prueba automática (un robot juega cada nivel)
 ```
 

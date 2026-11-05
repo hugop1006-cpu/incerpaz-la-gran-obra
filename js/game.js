@@ -52,7 +52,12 @@
     left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'],
     jump: ['Space', 'ArrowUp', 'KeyW', 'KeyZ'], brick: ['KeyX', 'KeyJ', 'ArrowDown', 'KeyS'],
     wall: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], pause: ['KeyP', 'Escape'], mute: ['KeyM'],
-    confirm: ['Enter', 'NumpadEnter', 'Space'], back: ['Escape']
+    confirm: ['Enter', 'NumpadEnter', 'Space'], back: ['Escape'],
+    // minijuego Torre de Ladrillos
+    rotcw: ['ArrowUp', 'KeyX', 'KeyW'], rotccw: ['KeyZ'], hard: ['Space'], hold: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], soft: ['ArrowDown', 'KeyS'], mini: ['KeyT'], power: ['KeyV', 'KeyB'], powerSel: ['KeyE', 'KeyQ'],
+    // versus a 2 jugadores
+    p1left: ['KeyA'], p1right: ['KeyD'], p1soft: ['KeyS'], p1rot: ['KeyW'], p1rotccw: ['KeyQ'], p1hold: ['KeyE'], p1hard: ['Space'],
+    p2left: ['ArrowLeft'], p2right: ['ArrowRight'], p2soft: ['ArrowDown'], p2rot: ['ArrowUp'], p2rotccw: ['Comma'], p2hold: ['Period'], p2hard: ['Enter', 'NumpadEnter']
   };
   const keysDown = new Set(), keysPressed = new Set(), touchHeld = new Set(), touchPressed = new Set();
   const held = a => touchHeld.has(a) || BIND[a].some(k => keysDown.has(k));
@@ -77,8 +82,8 @@
       }
     } catch (e) {}
   }, { passive: true });
-  window.addEventListener('blur', () => { keysDown.clear(); touchHeld.clear(); if (G.state === 'play') setPause(true); });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { if (G.state === 'play') setPause(true); Snd.suspend(); } else Snd.resume(); });
+  window.addEventListener('blur', () => { keysDown.clear(); touchHeld.clear(); if (G.state === 'play') setPause(true); else if (G.state === 'tetris') Tetris.pause(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { if (G.state === 'play') setPause(true); else if (G.state === 'tetris') Tetris.pause(); Snd.suspend(); } else Snd.resume(); });
 
   function bindTouch() {
     document.querySelectorAll('[data-act]').forEach(btn => {
@@ -98,7 +103,7 @@
 
   /* ===================== Estado global ===================== */
   const G = {
-    state: 'title', // title | story | select | intro | play | pause | clear | over | ending
+    state: 'title', // title | story | select | intro | play | pause | clear | over | ending | tetris
     levelIndex: 0, lives: C.START_LIVES, score: 0, coinsRun: 0,
     t: 0, stateT: 0, cursor: 0, buttons: [], clearInfo: null, newRecord: false
   };
@@ -1027,6 +1032,7 @@
       Art.drawHouse(ctx, VW / 2 - 48, VH - 40, 0.8, Math.min(5, cleared), G.t, true);
     }
     button('VOLVER', 6, VH - 26, 76, 20, 'back', false);
+    button('MINIJUEGO: TORRE', VW - 198, VH - 26, 190, 20, 'mini', false);
   }
   function wrap(text, maxChars) {
     const words = text.split(' '), lines = []; let cur = '';
@@ -1083,6 +1089,8 @@
     txt('RÉCORD ' + pad(Save.data.hi, 6), VW / 2 + 20, 22, B.secondaryLight, { align: 'center' });
     button(mutedLabel(), VW - 86, 6, 80, 14, 'mute', false);
     button('VOLVER', 6, VH - 22, 60, 16, 'back', false);
+    button('MINIJUEGO: TORRE', VW - 126, VH - 22, 120, 16, 'mini', false);
+    txt('T: MINIJUEGO TORRE DE LADRILLOS', VW / 2, 192, B.secondary, { align: 'center' });
   }
   function drawIntro() {
     drawWorld();
@@ -1278,6 +1286,7 @@
       case 'select': drawSelect(); break;
       case 'intro': drawIntro(); break;
       case 'play': drawWorld(); break;
+      case 'tetris': Tetris.draw(VW, VH); break;
       case 'pause': drawPause(); break;
       case 'clear': drawClear(); break;
       case 'over': drawOver(); break;
@@ -1301,6 +1310,7 @@
     G.lives = C.START_LIVES; G.score = 0; G.coinsRun = 0; G.levelIndex = idx;
     loadLevel(idx); setState('intro');
   }
+  function startTetris() { Snd.play('ok'); Tetris.open(); setState('tetris'); }
   function nextLevel() { G.levelIndex++; loadLevel(G.levelIndex); setState('intro'); }
   function toSelect() { G.cursor = clamp(Math.min(G.levelIndex, Save.data.unlocked - 1), 0, LEVELS.length - 1); setState('select'); }
 
@@ -1311,7 +1321,9 @@
       case 'confirm': confirm(); return;
       case 'back': back(); return;
       case 'quit': toSelect(); Snd.play('select'); return;
+      case 'mini': if (G.state === 'select') startTetris(); return;
     }
+    if (a.startsWith('t:')) { if (G.state === 'tetris') Tetris.action(a.slice(2)); return; }
     if (a.startsWith('card')) {
       const i = +a.slice(4);
       if (G.state !== 'select') return;
@@ -1343,7 +1355,16 @@
       const b = G.buttons[i];
       if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) { doAction(b.action); return; }
     }
+    if (G.state === 'tetris') { Tetris.gesture('down', x, y); try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
   });
+  const tetrisPointer = type => e => {
+    if (G.state !== 'tetris') return;
+    const r = canvas.getBoundingClientRect();
+    Tetris.gesture(type, (e.clientX - r.left) * VW / r.width, (e.clientY - r.top) * VH / r.height);
+  };
+  canvas.addEventListener('pointermove', tetrisPointer('move'));
+  canvas.addEventListener('pointerup', tetrisPointer('up'));
+  canvas.addEventListener('pointercancel', tetrisPointer('cancel'));
   canvas.addEventListener('contextmenu', e => e.preventDefault());
 
   function update(dt) {
@@ -1362,8 +1383,10 @@
         if (pressed('right') || pressed('down')) { G.cursor = Math.min(LEVELS.length - 1, G.cursor + 1); Snd.play('select'); }
         if (pressed('confirm')) confirm();
         if (pressed('back')) back();
+        if (pressed('mini')) startTetris();
         break;
       case 'play': updatePlay(dt); break;
+      case 'tetris': Tetris.update(dt); break;
       case 'pause':
         if (pressed('pause') || pressed('confirm')) setPause(false);
         else if (keysPressed.has('KeyQ')) toSelect();
@@ -1386,10 +1409,11 @@
   }
   Object.defineProperty(INC, 'L', { get: () => L });
   Object.assign(INC, {
-    update, render, G, Save, startRun, setState,
+    update, render, G, Save, startRun, setState, startTetris,
     tileAt: (c, r) => tileAt(c, r), T,
     jumpToLevel(i) { loadLevel(i); G.levelIndex = i; G.lives = 3; G.score = 0; setState('play'); }
   });
+  Tetris.init({ ctx, C, B, Font, Art, Snd, Save, pressed, held, txt, button, mutedLabel, hit: (x, y, w, h, action) => G.buttons.push({ x, y: y + uiOffY, w, h, action }), quit: () => toSelect() });
   render();
   requestAnimationFrame(frame);
 })();
