@@ -1316,6 +1316,8 @@
 
   function doAction(a) {
     Snd.unlock();
+    // menús del minijuego (modos, misiones, versus, VOLVER): se resuelven dentro del módulo
+    if (G.state === 'tetris' && (a === 'quit' || a.startsWith('mode'))) { Tetris.action(a); return; }
     switch (a) {
       case 'mute': Snd.toggleMute(); return;
       case 'confirm': confirm(); return;
