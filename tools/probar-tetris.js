@@ -121,6 +121,32 @@ const assert = require('assert');
   assert.equal(await pg.evaluate(() => Tetris._s().mode), 'escombros');
   for (let i = 0; i < 9; i++) { await key('Space'); await step(2); if (await pg.evaluate(() => Tetris._s().phase) === 'over') break; }
   assert.ok(await pg.evaluate(() => Tetris._s().board[21].filter(v => v === 7).length) >= 1 || await pg.evaluate(() => Tetris._s().phase) === 'over', 'aparecen escombros');
+  await pg.evaluate(() => Tetris.action('quit'));
+
+  // Misiones: menú de etapas, completar la 1ª, desbloquear la 2ª
+  await key('KeyT'); await key('ArrowDown'); await key('ArrowDown'); await key('ArrowDown'); await key('Enter');
+  await key('ArrowDown'); await key('Enter'); // la 2ª está bloqueada: no arranca
+  assert.equal(await pg.evaluate(() => Tetris._s()), null, 'misión bloqueada no arranca');
+  await key('ArrowUp'); await key('Enter'); await step(160);
+  assert.equal(await pg.evaluate(() => Tetris._s().mis.name), 'CIMIENTOS');
+  await pg.evaluate(() => {
+    const S = Tetris._s(); S.lines = 9; S.board = Array.from({ length: 22 }, () => new Array(10).fill(0));
+    for (let x = 0; x < 10; x++) if (x < 3 || x > 6) S.board[21][x] = 3;
+    S.cur = { type: 1, rot: 0, x: 3, y: 10 }; S.lockT = 0;
+  });
+  await key('Space'); await step(40);
+  assert.equal(await pg.evaluate(() => Tetris._s().won), true, 'misión 1 cumplida');
+  assert.equal(await pg.evaluate(() => INCERPAZ.Save.data.tetris.mis), 1, 'desbloquea la siguiente');
+  await pg.evaluate(() => Tetris.action('next')); await step(160);
+  assert.equal(await pg.evaluate(() => Tetris._s().mis.name), 'MUROS', 'pasa a la misión 2');
+  assert.equal(await pg.evaluate(() => Tetris._s().level), 2);
+  await pg.evaluate(() => { INCERPAZ.Save.data.tetris.mis = 4; Tetris.action('quit'); });
+  await key('KeyT'); await key('ArrowDown'); await key('ArrowDown'); await key('ArrowDown'); await key('Enter');
+  await key('Enter'); await step(160);
+  assert.equal(await pg.evaluate(() => Tetris._s().mis.kind), 'survive');
+  await pg.evaluate(() => { Tetris._s().time = 74.95; }); await step(10);
+  assert.equal(await pg.evaluate(() => Tetris._s().won), true, 'sobrevivir 75 s cumple la misión');
+  assert.equal(await pg.evaluate(() => INCERPAZ.Save.data.tetris.mis), 5);
   assert.deepEqual(errs, [], 'sin errores en consola');
   console.log('Torre de Ladrillos: todo OK');
   await b.close();

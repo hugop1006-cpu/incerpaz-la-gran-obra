@@ -48,6 +48,7 @@ Se abre desde el menú de etapas con el botón **MINIJUEGO: TORRE** o la tecla *
   - **Freno** (cuesta 4): la caída va 3 veces más lenta durante 8 s.
   - **Cemento** (cuesta 7): rellena los huecos tapados de las 6 filas de abajo, lo que puede completar líneas.
   - **Niveladora** (cuesta 10): aplana las 2 filas de abajo de la torre.
+- **Misiones** (modo del menú): 5 objetivos, uno por etapa de la obra, que se desbloquean en orden y guardan el progreso. 1 Cimientos: borra 10 líneas · 2 Muros: 3 dobles o más · 3 Losa y techo: 12 líneas empezando con escombros · 4 Acabados: 2 Tetris · 5 La Tormenta: aguanta 75 s mientras suben escombros. Cada misión tiene su nivel de velocidad y su fondo, y la casa del panel avanza con las misiones completadas.
 - Puntaje: línea 100 · doble 300 · triple 500 · Tetris 800 (×nivel, ×1.5 si es seguido), combos, y puntos por caída. Récord guardado en el navegador.
 - Código: `js/tetris.js`. Prueba automática: `node tools/probar-tetris.js`.
 

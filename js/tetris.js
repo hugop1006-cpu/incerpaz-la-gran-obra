@@ -58,7 +58,16 @@
   const MODES = [
     { id: 'classic', name: 'CLÁSICO', desc: 'SIN FIN · CASA Y DEMOLICIÓN' },
     { id: 'sprint', name: 'SPRINT 40', desc: '40 LÍNEAS EN EL MENOR TIEMPO' },
-    { id: 'escombros', name: 'ESCOMBROS', desc: 'SUBEN FILAS DE ESCOMBROS' }
+    { id: 'escombros', name: 'ESCOMBROS', desc: 'SUBEN FILAS DE ESCOMBROS' },
+    { id: 'misiones', name: 'MISIONES', desc: '5 OBJETIVOS · LA OBRA POR ETAPAS' }
+  ];
+  // Misiones: una por etapa de la obra (se desbloquean en orden)
+  const MISSIONS = [
+    { name: 'CIMIENTOS', theme: 0, desc: 'BORRA 10 LÍNEAS', kind: 'lines', goal: 10, level: 1, rows: 0, rubble: 0 },
+    { name: 'MUROS', theme: 1, desc: 'HAZ 3 DOBLES O MÁS', kind: 'multi', goal: 3, level: 2, rows: 0, rubble: 0 },
+    { name: 'LOSA Y TECHO', theme: 2, desc: 'BORRA 12 LÍNEAS CON ESCOMBROS', kind: 'lines', goal: 12, level: 2, rows: 6, rubble: 0 },
+    { name: 'ACABADOS', theme: 3, desc: 'HAZ 2 TETRIS (4 LÍNEAS)', kind: 'tetris', goal: 2, level: 3, rows: 0, rubble: 0 },
+    { name: 'LA TORMENTA', theme: 4, desc: 'AGUANTA 75 S CON ESCOMBROS', kind: 'survive', goal: 75, level: 4, rows: 0, rubble: 6 }
   ];
   const SPRINT_LINES = 40, RUBBLE_EVERY = 8; // piezas entre filas de escombros
   let cellPx = 12;            // tamaño de celda del último dibujo (para los gestos)
@@ -77,10 +86,10 @@
   function fillQueue() { while (S.queue.length < 6) S.queue.push(...newBag()); }
   function emptyBoard() { return Array.from({ length: ROWS }, () => new Array(COLS).fill(0)); }
 
-  function start(mode) {
-    mode = mode || (S && S.mode) || 'classic'; M = null;
+  function start(mode, idx) {
+    mode = mode || (S && S.mode) || 'classic'; M = null; idx = idx || 0;
     S = {
-      mode, rb: 0, power: 0, sel: 0, slowT: 0, time: 0, sprintDone: false, won: false, lastRot: false,
+      mode, misIdx: idx, mis: mode === 'misiones' ? MISSIONS[idx] : null, mMulti: 0, mTet: 0, missionDone: false, rb: 0, power: 0, sel: 0, slowT: 0, time: 0, sprintDone: false, won: false, lastRot: false,
       board: emptyBoard(), queue: [], cur: null, hold: 0, holdUsed: false,
       score: 0, lines: 0, level: 1, combo: -1, b2b: false, bombCharge: 0, bombsUsed: 0,
       phase: 'ready', t: 0, phaseT: 0, fall: 0, lockT: 0, lockResets: 0, lowest: 0,
@@ -89,9 +98,19 @@
       newRecord: false, stats: { pieces: 0, tetrises: 0, bombs: 0 }
     };
     fillQueue();
+    if (S.mis) {
+      S.level = S.mis.level;
+      for (let k = 0; k < S.mis.rows; k++) { const hole = Math.floor(Math.random() * COLS); S.board[ROWS - 1 - k] = Array.from({ length: COLS }, (_, x) => x === hole ? 0 : 7); }
+    }
     env.Snd.music('tet');
+    env.Snd.tempo(S.mis ? 1 + (S.level - 1) * 0.035 : 1);
   }
-  const stage = () => Math.min(5, Math.floor(S.lines / HOUSE_LINES));
+  const doneMissions = () => Math.min(5, (env.Save.data.tetris && env.Save.data.tetris.mis) || 0);
+  const stage = () => S.mode === 'misiones' ? doneMissions() : Math.min(5, Math.floor(S.lines / HOUSE_LINES));
+  function mProg() { // [actual, meta, etiqueta]
+    const m = S.mis;
+    return m.kind === 'lines' ? [S.lines, m.goal, 'LÍNEAS'] : m.kind === 'multi' ? [S.mMulti, m.goal, 'DOBLES'] : m.kind === 'tetris' ? [S.mTet, m.goal, 'TETRIS'] : [Math.floor(S.time), m.goal, 'TIEMPO'];
+  }
 
   function cells(p) { return ROT[p.type][p.rot].map(([x, y]) => [p.x + x, p.y + y]); }
   function fits(p) {
@@ -190,7 +209,10 @@
     S.bombCharge += n;
     const pw0 = S.power; S.power = Math.min(POWER_MAX, S.power + n + (tet ? 2 : 0) + (S.combo > 0 ? 1 : 0));
     if (pw0 < POWER_MAX && S.power >= POWER_MAX) popup('¡CARGA AL MÁXIMO!', env.B.good);
-    const lvOld = S.level; S.level = Math.min(15, 1 + Math.floor(S.lines / 10));
+    if (n >= 2) S.mMulti++;
+    if (n >= 4) S.mTet++;
+    if (S.mis && S.mis.kind !== 'survive') { const [a, b] = mProg(); if (a >= b) S.missionDone = true; }
+    const lvOld = S.level; if (!S.mis) S.level = Math.min(15, 1 + Math.floor(S.lines / 10));
     S.clearRows = rows; S.phase = 'clearing'; S.phaseT = 0;
     rows.forEach(y => { for (let x = 0; x < COLS; x++) { burst(x, y, MAT[S.board[y][x]][0], 1, 90); } });
     popup(ts ? 'T-SPIN ' + ['', 'LÍNEA', 'DOBLE', 'TRIPLE'][Math.min(3, n)] + ' +' + pts : (tet ? '¡TETRIS! +' + pts : (['', 'LÍNEA', 'DOBLE', 'TRIPLE'][n] + ' +' + pts)), tet ? env.B.secondary : env.B.light, tet);
@@ -199,15 +221,15 @@
     env.Snd.play(tet ? 'ttetris' : (n >= 2 ? 'tline2' : 'tline'));
     if (tet) S.shake = 0.35; else S.shake = Math.max(S.shake, 0.1);
     if (S.level > lvOld) { popup('NIVEL ' + S.level, env.B.accent); env.Snd.tempo(1 + (S.level - 1) * 0.035); }
-    if (stage() > Math.floor(oldLines / HOUSE_LINES) && stage() < 5) popup('¡ETAPA ' + (stage() + 1) + '!', env.B.good);
-    if (stage() >= 5 && !S.houseDone) { S.houseDone = true; S.score += 5000; S.banner = { text: '¡OBRA TERMINADA!', sub: '+5000 · SIGUE CONSTRUYENDO', t: 3.2 }; env.Snd.play('clear'); }
+    if (S.mode !== 'misiones' && stage() > Math.floor(oldLines / HOUSE_LINES) && stage() < 5) popup('¡ETAPA ' + (stage() + 1) + '!', env.B.good);
+    if (S.mode !== 'misiones' && stage() >= 5 && !S.houseDone) { S.houseDone = true; S.score += 5000; S.banner = { text: '¡OBRA TERMINADA!', sub: '+5000 · SIGUE CONSTRUYENDO', t: 3.2 }; env.Snd.play('clear'); }
   }
   function finishClear() {
     const rows = S.clearRows.slice().sort((a, b) => a - b);
     rows.forEach(y => { S.board.splice(y, 1); S.board.unshift(new Array(COLS).fill(0)); });
     S.clearRows = [];
     S.phase = 'play';
-    if (S.sprintDone) return win();
+    if (S.sprintDone || S.missionDone) return win();
     nextPiece();
   }
   function explode(cx, cy) {
@@ -269,7 +291,8 @@
   }
   function nextPiece() {
     if (S.phase === 'over') return;
-    if (S.mode === 'escombros' && ++S.rb >= RUBBLE_EVERY) { S.rb = 0; if (!addRubble()) return; }
+    const rub = S.mode === 'escombros' ? RUBBLE_EVERY : (S.mis ? S.mis.rubble : 0);
+    if (rub && ++S.rb >= rub) { S.rb = 0; if (!addRubble()) return; }
     if (S.bombCharge >= BOMB_EVERY) { // la demolición llega como 3ª pieza para que se vea venir
       S.bombCharge -= BOMB_EVERY; S.queue.splice(2, 0, 8); S.bombsUsed++;
     }
@@ -288,8 +311,8 @@
   function win() {
     S.phase = 'over'; S.phaseT = 0; S.cur = null; S.won = true;
     const d = env.Save.data; d.tetris = d.tetris || { hi: 0, lines: 0, plays: 0 };
-    S.newRecord = !d.tetris.sprint || S.time < d.tetris.sprint;
-    if (S.newRecord) d.tetris.sprint = S.time;
+    if (S.mode === 'misiones') { d.tetris.mis = Math.max(d.tetris.mis || 0, S.misIdx + 1); S.score += 1000 * (S.misIdx + 1); S.newRecord = false; }
+    else { S.newRecord = !d.tetris.sprint || S.time < d.tetris.sprint; if (S.newRecord) d.tetris.sprint = S.time; }
     d.tetris.lines = Math.max(d.tetris.lines, S.lines); d.tetris.plays++;
     env.Save.write(); env.Snd.music(null); env.Snd.tempo(1); env.Snd.play('win');
   }
@@ -297,7 +320,7 @@
     S.phase = 'over'; S.phaseT = 0; S.cur = null;
     const d = env.Save.data; d.tetris = d.tetris || { hi: 0, lines: 0, plays: 0 };
     const rk = recKey(S.mode);
-    S.newRecord = S.mode !== 'sprint' && S.score > (d.tetris[rk] || 0);
+    S.newRecord = S.mode !== 'sprint' && S.mode !== 'misiones' && S.score > (d.tetris[rk] || 0);
     if (S.newRecord) d.tetris[rk] = S.score;
     d.tetris.lines = Math.max(d.tetris.lines, S.lines); d.tetris.plays++;
     env.Save.write();
@@ -310,6 +333,7 @@
     const e = env;
     if (!S) { if (M) menuUpdate(dt); return; }
     if (S.phase === 'play' || S.phase === 'clearing') S.time += dt;
+    if (S.mis && S.mis.kind === 'survive' && S.phase === 'play' && S.time >= S.mis.goal) { win(); return; }
     S.t += dt; S.phaseT += dt;
     S.shake = Math.max(0, S.shake - dt);
     updateFx(dt);
@@ -321,7 +345,7 @@
       return;
     }
     if (S.phase === 'over') {
-      if (S.phaseT > 0.6 && e.pressed('confirm')) { e.Snd.play('ok'); start(S.mode); }
+      if (S.phaseT > 0.6 && e.pressed('confirm')) { e.Snd.play('ok'); if (S.won && S.mis && S.misIdx < 4) start('misiones', S.misIdx + 1); else start(S.mode, S.misIdx); }
       else if (S.phaseT > 0.3 && e.pressed('back')) quit();
       return;
     }
@@ -382,13 +406,26 @@
     else if (!on && S.phase === 'paused') { S.phase = S.prevPhase || 'play'; env.Snd.pauseMusic(false); env.Snd.play('pause'); }
   }
   function quit() { env.Snd.pauseMusic(false); env.Snd.tempo(1); S = null; M = null; env.quit(); }
-  function open() { S = null; M = { cursor: 0, t: 0 }; }
+  function open() { S = null; M = { cursor: 0, t: 0, page: 'modes' }; }
+  const unlockedMis = () => Math.min(5, doneMissions() + 1);
+  function menuPick(i) {
+    if (M.page === 'missions') {
+      if (i >= unlockedMis()) { env.Snd.play('no'); return; }
+      env.Snd.play('ok'); start('misiones', i);
+    } else if (MODES[i].id === 'misiones') { env.Snd.play('ok'); M.page = 'missions'; M.cursor = Math.min(doneMissions(), 4); }
+    else { env.Snd.play('ok'); start(MODES[i].id); }
+  }
+  function menuBack() {
+    env.Snd.play('select');
+    if (M.page === 'missions') { M.page = 'modes'; M.cursor = MODES.length - 1; } else { M = null; env.quit(); }
+  }
   function menuUpdate(dt) {
     M.t += dt;
-    if (env.pressed('up')) { M.cursor = (M.cursor + MODES.length - 1) % MODES.length; env.Snd.play('select'); }
-    if (env.pressed('down')) { M.cursor = (M.cursor + 1) % MODES.length; env.Snd.play('select'); }
-    if (env.pressed('confirm')) { env.Snd.play('ok'); start(MODES[M.cursor].id); }
-    else if (env.pressed('back') || env.pressed('pause')) { M = null; env.Snd.play('select'); env.quit(); }
+    const n = M.page === 'missions' ? MISSIONS.length : MODES.length;
+    if (env.pressed('up')) { M.cursor = (M.cursor + n - 1) % n; env.Snd.play('select'); }
+    if (env.pressed('down')) { M.cursor = (M.cursor + 1) % n; env.Snd.play('select'); }
+    if (env.pressed('confirm')) menuPick(M.cursor);
+    else if (env.pressed('back') || env.pressed('pause')) menuBack();
   }
   /* Gestos táctiles sobre el tablero: deslizar = mover, tocar = girar, mantener abajo = bajar, deslizón rápido abajo = caer */
   function gesture(type, x, y) {
@@ -419,11 +456,12 @@
   function action(a) {
     if (!S) {
       if (!M) return;
-      if (a === 'quit') { M = null; env.quit(); } else if (a.startsWith('mode')) { env.Snd.play('ok'); start(MODES[+a.slice(4)].id); }
+      if (a === 'quit') menuBack(); else if (a.startsWith('mode')) menuPick(+a.slice(4)); else if (a.startsWith('mis')) { M.page = 'missions'; menuPick(+a.slice(3)); }
       return;
     }
     if (a === 'resume') setPause(false);
-    else if (a === 'retry') { env.Snd.pauseMusic(false); env.Snd.play('ok'); start(S.mode); }
+    else if (a === 'retry') { env.Snd.pauseMusic(false); env.Snd.play('ok'); start(S.mode, S.misIdx); }
+    else if (a === 'next' && S.won && S.mis && S.misIdx < 4) { env.Snd.play('ok'); start('misiones', S.misIdx + 1); }
     else if (a === 'quit') quit();
     else if (a === 'pause') setPause(true);
     else if (a === 'psel') cyclePower(1);
@@ -497,7 +535,7 @@
     const st = stage(), lay = layout(W, H), { cell: s, bx, by, narrow } = lay;
     cellPx = s;
     // fondo: cambia con la etapa de la obra
-    Art.drawBackground(g, Math.min(4, st), S.t * 6, 0, S.t, W, H, 0);
+    Art.drawBackground(g, S.mis ? S.mis.theme : Math.min(4, st), S.t * 6, 0, S.t, W, H, 0);
     g.fillStyle = 'rgba(30,16,8,0.45)'; g.fillRect(0, 0, W, H);
 
     g.save();
@@ -557,8 +595,9 @@
       txt('PUNTOS', lx + 6, by + 66, B.secondary, o1); txt(pad(S.score, 7), lx + 86, by + 77, B.light, { align: 'right', scale: 1 });
       txt('LÍNEAS', lx + 6, by + 94, B.secondary, o1); txt(String(S.lines), lx + 86, by + 105, B.light, { align: 'right', scale: 1 });
       txt('NIVEL', lx + 6, by + 122, B.secondary, o1); txt(String(S.level), lx + 86, by + 133, B.light, { align: 'right', scale: 1 });
-      if (S.mode !== 'sprint') txt('RÉCORD ' + pad(Math.max(S.score, hi()), 6), lx + 46, by + 160, B.secondaryLight, { align: 'center', scale: 1 });
+      if (S.mode !== 'sprint' && S.mode !== 'misiones') txt('RÉCORD ' + pad(Math.max(S.score, hi()), 6), lx + 46, by + 160, B.secondaryLight, { align: 'center', scale: 1 });
       if (S.mode === 'sprint') { box(g, lx, by + 160, 92, 62); txt('TIEMPO', lx + 6, by + 166, B.secondary, o1); txt(fmtT(S.time), lx + 86, by + 177, B.light, { align: 'right', scale: 1 }); txt('MEJOR ' + fmtT(bestT()), lx + 46, by + 193, B.secondaryLight, { align: 'center', scale: 1 }); txt('FALTAN ' + Math.max(0, SPRINT_LINES - S.lines), lx + 46, by + 207, B.light, { align: 'center', scale: 1 }); }
+      else if (S.mode === 'misiones') { const [a, b, lab] = mProg(); box(g, lx, by + 160, 92, 62); txt('MISIÓN ' + (S.misIdx + 1), lx + 46, by + 166, B.secondary, { align: 'center', scale: 1 }); txt(S.mis.name, lx + 46, by + 179, B.light, { align: 'center', scale: 1 }); txt(lab + ' ' + a + '/' + b + (S.mis.kind === 'survive' ? 'S' : ''), lx + 46, by + 195, a >= b ? B.good : B.secondaryLight, { align: 'center', scale: 1 }); if (S.mis.rubble) txt('ESCOMBROS: ' + (S.mis.rubble - S.rb), lx + 46, by + 208, B.danger, { align: 'center', scale: 1 }); }
       else if (S.mode === 'escombros') txt('ESCOMBROS EN ' + (RUBBLE_EVERY - S.rb), lx + 46, by + 172, S.rb >= RUBBLE_EVERY - 2 ? B.danger : B.light, { align: 'center', scale: 1 });
       // derecha: SIGUIENTES + casa
       box(g, rx, by, 92, 96, 'PRÓXIMAS');
@@ -576,6 +615,7 @@
       txt('LÍNEAS', sx + 2, y, B.secondary, o1); txt(String(S.lines), sx + sw - 2, y, B.light, { align: 'right', scale: 1 }); y += 14;
       txt('NIVEL', sx + 2, y, B.secondary, o1); txt(String(S.level), sx + sw - 2, y, B.light, { align: 'right', scale: 1 }); y += 14;
       if (S.mode === 'sprint') { txt(fmtT(S.time), sx + sw / 2, y, B.light, { align: 'center', scale: 1 }); y += 11; txt('FALTAN ' + Math.max(0, SPRINT_LINES - S.lines), sx + sw / 2, y, B.secondaryLight, { align: 'center', scale: 1 }); y += 12; }
+      else if (S.mode === 'misiones') { const [a, b, lab] = mProg(); txt(lab + ' ' + a + '/' + b + (S.mis.kind === 'survive' ? 'S' : ''), sx + sw / 2, y, a >= b ? B.good : B.secondaryLight, { align: 'center', scale: 1 }); y += 12; }
       else if (S.mode === 'escombros') { txt('ESCOMBROS: ' + (RUBBLE_EVERY - S.rb), sx + sw / 2, y, S.rb >= RUBBLE_EVERY - 2 ? B.danger : B.light, { align: 'center', scale: 1 }); y += 12; }
       drawBombBar(g, sx, y, sw); y += 14; drawPowerBar(g, sx, y, sw); y += 18;
       const hh = Math.min(70, by + bh - y);
@@ -584,7 +624,7 @@
     g.restore();
 
     // título pequeño arriba (sólo si hay sitio)
-    if (narrow) txt('TORRE · ' + MODES.find(m => m.id === S.mode).name, W / 2, 6, B.secondary, { align: 'center', scale: 1 });
+    if (narrow) txt(S.mis ? 'MISIÓN ' + (S.misIdx + 1) + ' · ' + S.mis.name : 'TORRE · ' + MODES.find(m => m.id === S.mode).name, W / 2, 6, B.secondary, { align: 'center', scale: 1 });
 
     drawOverlay(g, W, H, bx, by, bw, bh);
   }
@@ -600,7 +640,7 @@
     const sc = Math.min((w - 8) / 120, (h - 8) / 96);
     Art.drawHouse(g, x + (w - 120 * sc) / 2, y + h - 4, sc, st, S.t, true);
     g.restore();
-    env.txt('OBRA ' + Math.min(100, Math.floor((S.lines / (HOUSE_LINES * 5)) * 100)) + '%', x + w / 2, y + 3, B.secondary, { align: 'center', scale: 1 });
+    env.txt('OBRA ' + Math.min(100, S.mode === 'misiones' ? 20 * stage() : Math.floor((S.lines / (HOUSE_LINES * 5)) * 100)) + '%', x + w / 2, y + 3, B.secondary, { align: 'center', scale: 1 });
   }
   function drawPowerBar(g, x, y, w) {
     const { B } = env, P = POWERS[S.sel], ready = S.power >= P.cost, k = S.power / POWER_MAX;
@@ -609,7 +649,7 @@
     g.fillStyle = ready ? (Math.floor(S.t * 6) % 2 ? B.good : '#b6ffc2') : '#2f8a40'; g.fillRect(x, y, Math.round(w * k), 8);
     g.fillStyle = 'rgba(255,255,255,0.25)'; g.fillRect(x, y, Math.round(w * k), 1);
     POWERS.forEach((p, i) => { g.fillStyle = i === S.sel ? B.secondary : 'rgba(255,246,232,0.5)'; g.fillRect(x + Math.round(w * p.cost / POWER_MAX) - 1, y, 1, 8); }); // marcas de coste
-    const label = S.slowT > 0 ? 'FRENO ' + Math.ceil(S.slowT) + 'S' : (ready ? P.name + '! (V)' : '‹ ' + P.name + ' ›');
+    const label = S.slowT > 0 ? 'FRENO ' + Math.ceil(S.slowT) + 'S' : (ready ? P.name + '! (V)' : '< ' + P.name + ' >');
     env.txt(label, x + w / 2, y + 1, ready || S.slowT > 0 ? B.dark : B.light, { align: 'center', scale: 1 });
     env.hit(x, y - 2, w, 12, 't:psel'); // tocar la barra cambia de poder
   }
@@ -632,14 +672,17 @@
     for (let i = 0; i < 4; i++) drawCell(g, [3, 2, 1, 5][i], bx + 6 + (i % 2) * 11, y0 + 5 + (i >> 1) * 11, 10); // ladrillos del título
     txt('TORRE DE', bx + bw / 2 + 12, y0 + 6, B.light, { align: 'center', scale: 1 });
     txt('LADRILLOS', bx + bw / 2 + 12, y0 + 16, B.secondaryLight, { align: 'center', scale: 2 });
-    txt('ELIGE UN MODO', W / 2, y0 + 42, B.light, { align: 'center' });
-    const rh = narrow ? 56 : 40, bh = narrow ? 24 : 18, ys = y0 + (narrow ? 70 : 62);
-    MODES.forEach((m, i) => {
-      const y = ys + i * (rh + 6), sel = i === M.cursor;
-      button(m.name, bx, y, bw, bh, 'mode' + i, sel);
-      txt(m.desc, W / 2, y + bh + 5, B.light, { align: 'center', scale: 1 });
-      const rec = m.id === 'sprint' ? (d.sprint ? 'MEJOR ' + fmtT(d.sprint) : 'SIN RÉCORD') : 'RÉCORD ' + pad(d[recKey(m.id)] || 0, 7);
-      txt(rec, W / 2, y + bh + 17, B.secondaryLight, { align: 'center', scale: 1 });
+    const mis = M.page === 'missions';
+    txt(mis ? 'MISIONES · ' + doneMissions() + ' / 5 COMPLETAS' : 'ELIGE UN MODO', W / 2, y0 + 42, B.light, { align: 'center' });
+    const list = mis ? MISSIONS : MODES;
+    const rh = narrow ? (mis ? 48 : 56) : (mis ? 30 : 34), bh = narrow ? 24 : 16, ys = y0 + (narrow ? 70 : 54);
+    list.forEach((m, i) => {
+      const y = ys + i * (rh + 6), sel = i === M.cursor, locked = mis && i >= unlockedMis();
+      button(mis ? (locked ? (i + 1) + '. BLOQUEADA' : (i + 1) + '. ' + m.name) : m.name, bx, y, bw, bh, 'mode' + i, sel && !locked);
+      if (mis) { txt(locked ? 'CUMPLE LA MISIÓN ANTERIOR' : m.desc + (i < doneMissions() ? ' *' : ''), W / 2, y + bh + 4, locked ? '#aa6a5a' : (i < doneMissions() ? B.good : B.light), { align: 'center', scale: 1 }); return; }
+      txt(m.desc, W / 2, y + bh + 4, B.light, { align: 'center', scale: 1 });
+      const rec = m.id === 'sprint' ? (d.sprint ? 'MEJOR ' + fmtT(d.sprint) : 'SIN RÉCORD') : m.id === 'misiones' ? 'COMPLETAS ' + doneMissions() + ' / 5' : 'RÉCORD ' + pad(d[recKey(m.id)] || 0, 7);
+      txt(rec, W / 2, y + bh + 14, B.secondaryLight, { align: 'center', scale: 1 });
     });
     button('VOLVER', 6, H - (narrow ? 30 : 24), narrow ? 90 : 60, narrow ? 24 : 16, 'quit', false);
     if (!narrow) txt('↑ ↓ ELEGIR   ENTER JUGAR', W - 6, H - 14, B.secondary, { align: 'right', scale: 1 });
@@ -674,18 +717,20 @@
     if (S.phase === 'over') {
       dim(Math.min(0.85, S.phaseT * 1.5));
       if (S.phaseT > 0.3) {
-        if (S.won) { txt('¡TORRE', cx, by + 12, B.good, { align: 'center', scale: 2 }); txt('LISTA!', cx, by + 32, B.good, { align: 'center', scale: 2 }); }
+        if (S.won) { const t1 = S.mis ? ['¡MISIÓN', 'CUMPLIDA!'] : ['¡TORRE', 'LISTA!']; txt(t1[0], cx, by + 12, B.good, { align: 'center', scale: 2 }); txt(t1[1], cx, by + 32, B.good, { align: 'center', scale: 2 }); }
         else { txt('¡LA TORRE', cx, by + 12, B.danger, { align: 'center', scale: 2 }); txt('SE CAYÓ!', cx, by + 32, B.danger, { align: 'center', scale: 2 }); }
         const lh = narrow ? 14 : 11;
         txt('PUNTOS ' + pad(S.score, 7), cx, by + 66, B.light, { align: 'center' });
         txt('LÍNEAS ' + S.lines, cx, by + 66 + lh, B.light, { align: 'center' });
-        if (S.mode === 'sprint') { txt('TIEMPO ' + fmtT(S.time), cx, by + 66 + lh * 2, B.light, { align: 'center' }); txt('MEJOR ' + fmtT(bestT()), cx, by + 66 + lh * 3, B.secondaryLight, { align: 'center' }); }
+        if (S.mode === 'sprint' || S.mode === 'misiones') { txt('TIEMPO ' + fmtT(S.time), cx, by + 66 + lh * 2, B.light, { align: 'center' }); txt(S.mode === 'misiones' ? 'COMPLETAS ' + doneMissions() + '/5' : 'MEJOR ' + fmtT(bestT()), cx, by + 66 + lh * 3, B.secondaryLight, { align: 'center' }); }
         else { txt('NIVEL ' + S.level, cx, by + 66 + lh * 2, B.light, { align: 'center' }); txt('RÉCORD ' + pad(hi(), 7), cx, by + 66 + lh * 3, B.secondaryLight, { align: 'center' }); }
         if (S.newRecord) txt(S.mode === 'sprint' ? '¡MEJOR TIEMPO!' : '¡NUEVO RÉCORD!', cx, by + 66 + lh * 4, Math.floor(S.t * 4) % 2 ? B.secondary : B.light, { align: 'center' });
         if (S.phaseT > 0.6) {
           const bwid = Math.min(bw - 8, 130), bhgt = narrow ? 22 : 16, bxx = cx - bwid / 2, y0 = by + 66 + lh * 5 + 8;
-          button('OTRA VEZ', bxx, y0, bwid, bhgt, 't:retry', true);
-          button('SALIR AL MENÚ', bxx, y0 + bhgt + 6, bwid, bhgt, 't:quit', false);
+          const nxt = S.won && S.mis && S.misIdx < 4, k = bhgt + 6;
+          if (nxt) button('SIGUIENTE', bxx, y0, bwid, bhgt, 't:next', true);
+          button(nxt ? 'REPETIR' : 'OTRA VEZ', bxx, y0 + (nxt ? k : 0), bwid, bhgt, 't:retry', !nxt);
+          button('SALIR AL MENÚ', bxx, y0 + k * (nxt ? 2 : 1), bwid, bhgt, 't:quit', false);
         }
       }
     }
