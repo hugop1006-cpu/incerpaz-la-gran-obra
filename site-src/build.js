@@ -38,9 +38,21 @@ function bonito(nombre) {
   s = s.replace(/\bpavic\b/gi, 'PAVIC').replace(/\bxv\b/gi, 'XV').replace(/\bestandar\b/gi, 'estándar').replace(/\bceloc?ia\b/gi, 'celosía')
     .replace(/\beconomico\b/gi, 'económico').replace(/\brustico\b/gi, 'rústico').replace(/\bcaida\b/gi, 'caída').replace(/\bceramico\b/gi, 'cerámico')
     .replace(/\btrafico\b/gi, 'tráfico').replace(/\brapido\b/gi, 'rápido').replace(/\btrebol\b/gi, 'trébol').replace(/\bsuper\b/gi, 'súper')
-    .replace(/(\d+)h\b/gi, '$1H').replace(/\( /g, '(').replace(/ \)/g, ')');
+    .replace(/\bluis xv\b/gi, 'Luis XV').replace(/(\d+)h\b/gi, '$1H').replace(/\( /g, '(').replace(/ \)/g, ')');
   return s;
 }
+/* Ortografía de los textos del catálogo actual (descripción, acabado, color): tildes, erratas y mayúsculas. */
+const ORTOGRAFIA = [
+  [/\bcbado\b/gi, 'acabado'], [/\bacado\b/gi, 'acabado'], [/\btermincion\b/gi, 'terminación'], [/\bestrias\b/gi, 'estrías'],
+  [/\brustico\b/gi, 'rústico'], [/\brustica\b/gi, 'rústica'], [/\btrebol\b/gi, 'trébol'], [/\bengabado\b/gi, 'engobado'],
+  [/\bblanquesino\b/gi, 'blanquecino'], [/\bsu 4 caras\b/gi, 'sus 4 caras'], [/\btodas sus cara\b/gi, 'todas sus caras'],
+  [/\bliso todas las caras\b/gi, 'liso en todas las caras'], [/\bTextura rústico\b/g, 'Textura rústica'], [/\bTextura Lisa\b/g, 'Textura lisa'],
+  [/\bLadrillo Estructural\b/g, 'Ladrillo estructural'], [/\bhuecos Rayado\b/g, 'huecos rayado'], [/\bEngobe –/g, 'Engobado –'],
+  [/\bNaranja Natural\b/g, 'Naranja natural'], [/\bNaranja rojizo\b/g, 'Naranja rojizo'], [/\bresistencias y durabilidad\b/g, 'resistencia y durabilidad']
+];
+/* Concordancia en las descripciones que describen una «cerámica» o una «pieza» (femenino). */
+const concordancia = (s) => (typeof s === 'string' && /^(Cerámica|Pieza)/.test(s) ? s.replace(/\bmacizo\b/g, 'maciza').replace(/(?<!acabado )\brústico\b/g, 'rústica') : s);
+const ortografia = (s) => (typeof s === 'string' ? ORTOGRAFIA.reduce((t, [re, rep]) => t.replace(re, (m) => (/^[A-Z]/.test(m) && /^[a-z]/.test(rep) ? rep.replace(/^./, (c) => c.toUpperCase()) : rep)), s).replace(/\s{2,}/g, ' ').trim() : s);
 /* Correcciones puntuales de datos que parecen errores del sitio actual (ver CONTENIDO-PENDIENTE.md) */
 const CORRECCIONES = {
   'cochabamba:3-huecos-economico-rayado': { Ancho: 7 },
@@ -69,7 +81,7 @@ productos = productos.map((p) => {
     return '';
   });
   const linea = p.linea ? sentence(p.linea.replace(/VARIADADES/i, 'VARIEDADES').replace(/VARIEDAD(?!ES)/i, 'VARIEDADES').replace(/RUSTICO/i, 'RÚSTICO')) : '';
-  return Object.assign({}, p, { nombre: bonito(p.titulo), linea, medidas, variantes, sinFicha, peso: sinFicha ? null : p.peso, cat: categoriaPrincipal(p), todas: p.categorias, largo: dim('Largo'), ancho: dim('Ancho'), alto: dim('Alto') });
+  return Object.assign({}, p, { nombre: bonito(p.titulo), descripcion: concordancia(ortografia(p.descripcion)), acabado: ortografia(p.acabado), color: ortografia(p.color), linea, medidas, variantes, sinFicha, peso: sinFicha ? null : p.peso, cat: categoriaPrincipal(p), todas: p.categorias, largo: dim('Largo'), ancho: dim('Ancho'), alto: dim('Alto') });
 });
 /* catálogo confiable para el servidor: valida pedidos y presupuestos sin fiarse del navegador */
 fs.mkdirSync(path.dirname(CATALOGO_OUT), { recursive: true });
