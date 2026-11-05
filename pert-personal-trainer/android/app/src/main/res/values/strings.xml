@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Personal T</string>
+    <string name="title_activity_main">Personal T</string>
+    <string name="package_name">app.personalt.trainer</string>
+    <string name="custom_url_scheme">app.personalt.trainer</string>
+</resources>

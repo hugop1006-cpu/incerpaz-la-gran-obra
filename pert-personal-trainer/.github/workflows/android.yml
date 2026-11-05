@@ -1,0 +1,38 @@
+# Compila Android en GitHub Actions. Se activa al mover esta carpeta a su propio repositorio.
+# Secrets opcionales para firmar el AAB de Play Store: ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+name: Android
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - run: npm ci
+      - run: npm run sync
+      - name: APK de depuración
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with: { name: personal-t-debug-apk, path: android/app/build/outputs/apk/debug/app-debug.apk }
+      - name: AAB firmado para Play Store (solo si hay keystore)
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+        working-directory: android
+        run: |
+          if [ -z "$KS_B64" ]; then echo "Sin keystore: se omite el AAB firmado"; exit 0; fi
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/release.jks"
+          ./gradlew bundleRelease
+      - uses: actions/upload-artifact@v4
+        with: { name: personal-t-release-aab, path: android/app/build/outputs/bundle/release/app-release.aab, if-no-files-found: ignore }

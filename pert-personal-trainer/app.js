@@ -618,7 +618,7 @@ document.addEventListener('change', async e => {
 db.customExercises = db.customExercises.map(cleanEx).filter(Boolean); db.customExercises.forEach(registerEx);
 navigator.storage?.persist?.().catch(() => {});
 snapAll().then(all => { if (!all.length || Date.now() - all[all.length - 1].ts > 12 * 36e5) snap('Automática'); });
-if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol !== 'file:' && !window.Capacitor?.isNativePlatform?.()) navigator.serviceWorker.register('sw.js').catch(() => {});
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#viewer')) $('#viewer').hidden = true; });
 if (photosDirty) save();
 render();

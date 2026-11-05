@@ -1,0 +1,22 @@
+{
+  "name": "personal-t",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal T: entrenamiento guiado (PWA + apps Capacitor para Android e iOS)",
+  "scripts": {
+    "web": "python3 -m http.server 8000",
+    "build:web": "node scripts/build-web.mjs",
+    "sync": "npm run build:web && cap sync",
+    "android": "npm run sync && cap open android",
+    "ios": "npm run sync && cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.0.0"
+  }
+}

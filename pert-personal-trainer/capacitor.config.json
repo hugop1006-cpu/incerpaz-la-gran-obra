@@ -1,0 +1,7 @@
+{
+  "appId": "app.personalt.trainer",
+  "appName": "Personal T",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "ios": { "contentInset": "always" }
+}

@@ -1,0 +1,32 @@
+# Compilación de iOS en Codemagic (no hace falta un Mac). SIN PROBAR: requiere tu cuenta de Apple Developer.
+# Antes: en Codemagic crea la integración "App Store Connect" (clave API) y registra el bundle id app.personalt.trainer en Apple.
+workflows:
+  ios:
+    name: Personal T (iOS)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: Personal T
+    environment:
+      node: 22
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: app.personalt.trainer
+    scripts:
+      - name: Instalar dependencias
+        script: npm ci
+      - name: Sincronizar la app web con iOS
+        script: npm run sync
+      - name: Usar los perfiles de firma
+        script: xcode-project use-profiles --project ios/App/App.xcodeproj
+      - name: Número de compilación
+        script: sed -i '' "s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = $PROJECT_BUILD_NUMBER;/" ios/App/App.xcodeproj/project.pbxproj
+      - name: Compilar IPA
+        script: xcode-project build-ipa --project ios/App/App.xcodeproj --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
