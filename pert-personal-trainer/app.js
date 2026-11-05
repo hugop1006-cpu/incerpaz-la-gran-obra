@@ -67,7 +67,7 @@ function proposal(ex) {
 function render() {
   document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === ui.tab));
   const v = $('#view');
-  v.innerHTML = ({ hoy: viewHoy, historial: viewHist, ejercicios: viewEx, ajustes: viewSet }[ui.tab])();
+  v.innerHTML = ({ hoy: viewHoy, historial: viewHist, progreso: viewProg, ejercicios: viewEx, ajustes: viewSet }[ui.tab])();
   window.scrollTo(0, 0);
 }
 const SAFETY = `<div class="card safety"><strong>Seguridad:</strong> si aparece dolor de pecho, pesadez del brazo, falta de aire inusual, mareo o sudor frío, detén el ejercicio y busca atención urgente. PERT es un registro y guía, no una app médica ni da autorizaciones.</div>`;
@@ -162,6 +162,93 @@ function viewSet() {
       <button class="btn danger" data-act="wipe">Borrar todos los datos</button></div>${SAFETY}`;
 }
 
+/* ---------- Progreso (gráficas) ---------- */
+// Solo cuentan series CONFIRMADAS de sesiones terminadas; propuestas y omitidos nunca entran.
+function series(exId) {
+  const out = [];
+  db.sessions.forEach(s => {
+    const e = s.entries?.[exId]; if (!e || e.skipped) return;
+    const done = e.sets.filter(x => x.done); if (!done.length) return;
+    const num = v => { const n = parseFloat(v); return isNaN(n) ? null : n; };
+    const ws = done.map(x => num(x.weight)).filter(n => n !== null);
+    out.push({ date: s.date, mode: e.mode, effort: e.effort, sets: done.length,
+      maxW: ws.length ? Math.max(...ws) : null,
+      vol: done.reduce((a, x) => a + (num(x.weight) || 0) * (num(x.reps) || 0), 0),
+      reps: done.reduce((a, x) => a + (num(x.reps) || 0), 0),
+      minutes: done.reduce((a, x) => a + (num(x.minutes) || 0), 0),
+      speed: Math.max(0, ...done.map(x => num(x.speed) || 0)) || null });
+  });
+  return out;
+}
+const METRICS = {
+  fuerza: [['maxW', 'Peso máximo'], ['vol', 'Volumen'], ['reps', 'Repeticiones'], ['effort', 'Esfuerzo']],
+  cuerpo: [['reps', 'Repeticiones'], ['effort', 'Esfuerzo']],
+  cardio: [['minutes', 'Minutos'], ['speed', 'Velocidad máx.'], ['effort', 'Esfuerzo']]
+};
+const shortDate = iso => new Date(iso).toLocaleDateString('es', { day: 'numeric', month: 'short' });
+function lineChart(pts, label) {
+  const W = 340, H = 190, L = 40, R = 12, T = 14, B = 28;
+  const ys = pts.map(p => p.y); let lo = Math.min(...ys), hi = Math.max(...ys);
+  const rlo = lo, rhi = hi;
+  if (lo === hi) { lo -= 1; hi += 1; } const pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
+  const X = i => pts.length === 1 ? (L + W - R) / 2 : L + (i * (W - L - R)) / (pts.length - 1);
+  const Y = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+  const fmt = v => (Math.abs(v) >= 100 ? Math.round(v) : Math.round(v * 10) / 10);
+  const grid = [0, 1, 2].map(k => { const v = rlo === rhi ? rlo + (k - 1) : rlo + ((rhi - rlo) * k) / 2; return `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${L - 6}" y="${Y(v) + 4}" text-anchor="end" style="fill:var(--mut)" font-size="11">${fmt(v)}</text>`; }).join('');
+  const maxI = ys.lastIndexOf(Math.max(...ys));
+  const path = pts.map((p, i) => `${i ? 'L' : 'M'}${X(i)},${Y(p.y)}`).join('');
+  const dots = pts.map((p, i) => `<circle cx="${X(i)}" cy="${Y(p.y)}" r="${i === maxI ? 6 : 4}" style="fill:${i === maxI ? 'var(--warn)' : 'var(--acc)'};stroke:var(--card)" stroke-width="2"><title>${shortDate(p.x)}: ${fmt(p.y)}</title></circle>`).join('');
+  const ticks = `<text x="${X(0)}" y="${H - 8}" text-anchor="${pts.length > 1 ? 'start' : 'middle'}" style="fill:var(--mut)" font-size="11">${shortDate(pts[0].x)}</text>` +
+    (pts.length > 1 ? `<text x="${X(pts.length - 1)}" y="${H - 8}" text-anchor="end" style="fill:var(--mut)" font-size="11">${shortDate(pts[pts.length - 1].x)}</text>` : '');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}" style="width:100%;height:auto">${grid}<path d="${path}" fill="none" style="stroke:var(--acc)" stroke-width="2.5" stroke-linejoin="round"/>${dots}${ticks}</svg>`;
+}
+function weekBars() {
+  const monday = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x.getTime(); };
+  const now = monday(new Date()), WK = 7 * 864e5, counts = Array(8).fill(0);
+  db.sessions.forEach(s => { const k = Math.round((now - monday(s.date)) / WK); if (k >= 0 && k < 8) counts[7 - k]++; });
+  const max = Math.max(1, ...counts), W = 340, H = 110, bw = 28, gap = (W - 8 * bw) / 9;
+  const bars = counts.map((c, i) => { const h = (c / max) * (H - 36), x = gap + i * (bw + gap);
+    const d = new Date(now - (7 - i) * WK);
+    return `<rect x="${x}" y="${H - 20 - h}" width="${bw}" height="${h}" rx="4" style="fill:var(--acc)"><title>${c} sesiones</title></rect>
+      <text x="${x + bw / 2}" y="${H - 22 - h}" text-anchor="middle" style="fill:var(--fg)" font-size="11">${c || ''}</text>
+      <text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle" style="fill:var(--mut)" font-size="10">${shortDate(d)}</text>`; }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Sesiones por semana, últimas 8 semanas" style="width:100%;height:auto">${bars}</svg>`;
+}
+function viewProg() {
+  if (!db.sessions.length) return `<div class="card"><h2>Progreso</h2><p class="mut">Cuando termines tu primera sesión verás aquí tus gráficas. Solo cuentan series que hayas confirmado.</p></div>`;
+  const withData = EXERCISES.filter(ex => series(ex.id).length);
+  const sel = withData.find(e => e.id === ui.pex) || withData[0];
+  const week = `<div class="card"><h3>Sesiones por semana</h3>${weekBars()}</div>`;
+  if (!sel) return week + `<div class="card"><p class="mut">Aún no hay series confirmadas para graficar.</p></div>`;
+  const kind = sel.kind === 'cardio' ? 'cardio' : sel.mode === 'cuerpo' ? 'cuerpo' : 'fuerza';
+  const metrics = METRICS[kind], m = metrics.find(x => x[0] === ui.pmet) ? ui.pmet : metrics[0][0];
+  let data = series(sel.id), warn = '';
+  if (kind === 'fuerza') { // no mezclar por lado / por mano / total
+    const lastMode = data[data.length - 1].mode;
+    if (data.some(d => d.mode !== lastMode)) { warn = `<p class="alert" style="font-weight:400">Cambiaste el tipo de peso en este ejercicio. Se grafican solo las sesiones “${MODES[lastMode]}”, porque no son comparables entre sí.</p>`; data = data.filter(d => d.mode === lastMode); }
+  }
+  const pts = data.filter(d => d[m] !== null && d[m] !== undefined && (m !== 'speed' || d[m] > 0)).map(d => ({ x: d.date, y: d[m] }));
+  const unit = db.settings.unit, mdl = metrics.find(x => x[0] === m)[1];
+  const u = { maxW: unit, vol: unit + '·rep', reps: 'rep', effort: '/10', minutes: 'min', speed: 'km/h' }[m];
+  const best = pts.length ? pts.reduce((a, b) => (b.y >= a.y ? b : a)) : null;
+  const first = pts[0], last = pts[pts.length - 1];
+  const delta = pts.length > 1 ? Math.round((last.y - first.y) * 10) / 10 : null;
+  const hasMode = kind === 'fuerza' ? ` · ${MODES[data[data.length - 1].mode]}` : '';
+  const rows = [...data].reverse().slice(0, 12).map(d => `<tr><td>${shortDate(d.date)}</td><td>${d.sets} s.</td><td>${d.maxW ?? '—'}${d.maxW != null ? ' ' + unit : ''}</td><td>${d.reps || d.minutes ? (kind === 'cardio' ? d.minutes + ' min' : d.reps + ' rep') : '—'}</td><td>${d.effort}/10</td></tr>`).join('');
+  return `${week}
+    <div class="card"><h2>Progreso por ejercicio</h2>
+      <select data-act="pex" aria-label="Ejercicio">${withData.map(ex => `<option value="${ex.id}" ${ex.id === sel.id ? 'selected' : ''}>${esc(ex.name)}</option>`).join('')}</select>
+      <div class="row" style="margin:10px 0">${metrics.map(([k, n]) => `<button class="btn sm ${k === m ? 'pri' : ''}" data-act="pmet" data-m="${k}">${n}</button>`).join('')}</div>
+      ${warn}
+      ${pts.length ? `<div class="row sp"><span><span class="badge b-ok">Realizado</span> <span class="mut">${esc(mdl)}${hasMode} (${u})</span></span>
+        ${m !== 'effort' && best ? `<span class="badge b-prop">🏆 Récord ${Math.round(best.y * 10) / 10} ${u}</span>` : ''}</div>
+        ${lineChart(pts, `${sel.name}: ${mdl}`)}
+        <p class="mut">${pts.length} sesiones${delta !== null ? ` · cambio desde la primera: ${delta > 0 ? '+' : ''}${delta} ${u}` : ' · necesitas al menos 2 sesiones para ver tendencia'}.${m === 'effort' ? ' Esfuerzo bajo con mismo peso suele indicar adaptación; la decisión de subir carga es tuya.' : ''}</p>`
+      : '<p class="mut">No hay datos de esta métrica para este ejercicio.</p>'}
+      <details><summary>Últimas sesiones</summary><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Fecha</th><th>Series</th><th>Peso máx.</th><th>Total</th><th>Esfuerzo</th></tr></thead><tbody>${rows}</tbody></table></div></details>
+      <p class="mut">Los pesos no se convierten entre lb y kg: cada gráfica usa los números tal como los registraste.</p></div>`;
+}
+
 /* ---------- Acciones ---------- */
 let rest = { t: null, left: 0 };
 function stopRest() { clearInterval(rest.t); rest.t = null; }
@@ -215,6 +302,7 @@ document.addEventListener('click', e => {
     const last = ref.e.sets.find(s => s.done); e2.mode = ref.e.mode ?? e2.mode;
     e2.sets.forEach(s => { s.weight = last.weight; s.reps = last.reps; }); save(); render(); toast('Valores copiados. Marca cada serie solo cuando la hagas.');
   }
+  else if (a === 'pmet') { ui.pmet = b.dataset.m; render(); }
   else if (a === 'rest') startRest(); else if (a === 'restoff') { stopRest(); const t = $('#tval'); if (t) t.textContent = stepEx().rest + ' s'; }
   else if (a === 'toggle') { ui.openSession = ui.openSession === b.dataset.id ? null : b.dataset.id; render(); }
   else if (a === 'del') { if (confirm('¿Borrar esta sesión?')) { db.sessions = db.sessions.filter(s => s.id !== b.dataset.id); save(); render(); } }
@@ -233,6 +321,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', async e => {
   const t = e.target, f = t.dataset.f, a = t.dataset.act;
+  if (a === 'pex') { ui.pex = t.value; ui.pmet = null; return render(); }
   if (a === 'unit') { db.settings.unit = t.value; save(); return render(); }
   if (a === 'photo' && t.files[0]) { try { db.photos[stepEx().id] = await resize(t.files[0]); save(); render(); } catch { toast('No se pudo leer la imagen'); } return; }
   if (a === 'import' && t.files[0]) {
