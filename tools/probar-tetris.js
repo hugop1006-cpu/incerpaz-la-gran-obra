@@ -49,6 +49,20 @@ const assert = require('assert');
   await pg.evaluate(() => { const S = Tetris._s(); S.lastRot = true; Tetris._hooks.lockPiece(); });
   assert.equal(await pg.evaluate(() => Tetris._s().score) - ts0, 800, 'T-spin sencillo = 800');
   await step(40);
+  // gestos táctiles (con el ratón): tocar gira, arrastrar mueve, deslizón abajo cae
+  await pg.evaluate(() => { const S = Tetris._s(); S.board = Array.from({ length: 22 }, () => new Array(10).fill(0)); S.cur = { type: 3, rot: 0, x: 3, y: 4 }; S.lockT = 0; S.fall = 0; });
+  const box = await pg.evaluate(() => { const r = document.getElementById('game').getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+  const px = (vx, vy) => [box.x + vx * box.w / 480, box.y + vy * box.h / 272];
+  let [ax, ay] = px(240, 120);
+  await pg.mouse.move(ax, ay); await pg.mouse.down(); await pg.mouse.up(); await step(2);
+  assert.equal(await pg.evaluate(() => Tetris._s().cur.rot), 1, 'tocar gira la pieza');
+  const x0 = await pg.evaluate(() => Tetris._s().cur.x);
+  await pg.mouse.move(ax, ay); await pg.mouse.down(); await pg.mouse.move(...px(240 + 30, 120), { steps: 4 }); await pg.mouse.up(); await step(2);
+  assert.ok(await pg.evaluate(() => Tetris._s().cur.x) > x0, 'arrastrar a la derecha mueve la pieza');
+  const pcs = await pg.evaluate(() => Tetris._s().stats.pieces);
+  await pg.mouse.move(ax, ay); await pg.mouse.down(); await pg.mouse.move(...px(240, 120 + 70), { steps: 3 }); await pg.mouse.up(); await step(3);
+  assert.ok(await pg.evaluate(() => Tetris._s().stats.pieces) > pcs, 'deslizón rápido hacia abajo suelta la pieza');
+  await step(40);
   // guardar pieza
   const h0 = await pg.evaluate(() => Tetris._s().hold);
   await key('KeyC');

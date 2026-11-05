@@ -60,6 +60,8 @@
     { id: 'escombros', name: 'ESCOMBROS', desc: 'SUBEN FILAS DE ESCOMBROS' }
   ];
   const SPRINT_LINES = 40, RUBBLE_EVERY = 8; // piezas entre filas de escombros
+  let cellPx = 12;            // tamaño de celda del último dibujo (para los gestos)
+  let G0 = null;              // gesto táctil en curso
   let M = null;               // menú de modos {cursor}
   let env = null;             // {ctx, C, B, Font, Art, Snd, Save, pressed, held, txt, panel, button, quit()}
   let S = null;               // partida en curso
@@ -302,18 +304,19 @@
       S.dasT += dt;
       while (S.dasT >= DAS + ARR) { S.dasT -= ARR; if (tryMove(dir, 0)) e.Snd.play('tmove'); else break; }
     }
+    if (S.gRot) { S.gRot = false; rotate(1); }
     if (e.pressed('rotcw')) rotate(1);
     if (e.pressed('rotccw')) rotate(-1);
     if (e.pressed('hold')) doHold();
     if (!S.cur) return;
-    if (e.pressed('hard')) { // caída instantánea
+    if (e.pressed('hard') || S.gHard) { S.gHard = false; // caída instantánea
       let d = 0; while (tryMove(0, 1)) d++;
       S.score += d * 2; S.shake = Math.max(S.shake, 0.12);
       for (const [x, y] of cells(S.cur)) burst(x + 0.5, y + 1, MAT[S.cur.type][1], 2, 40);
       e.Snd.play('thard'); lockPiece(); return;
     }
     // gravedad + caída suave
-    const soft = e.held('soft');
+    const soft = e.held('soft') || S.gSoft;
     const gv = soft ? Math.min(GRAV(S.level), SOFT) : GRAV(S.level);
     S.fall += dt;
     while (S.fall >= gv) {
@@ -344,6 +347,32 @@
     if (env.pressed('down')) { M.cursor = (M.cursor + 1) % MODES.length; env.Snd.play('select'); }
     if (env.pressed('confirm')) { env.Snd.play('ok'); start(MODES[M.cursor].id); }
     else if (env.pressed('back') || env.pressed('pause')) { M = null; env.Snd.play('select'); env.quit(); }
+  }
+  /* Gestos táctiles sobre el tablero: deslizar = mover, tocar = girar, mantener abajo = bajar, deslizón rápido abajo = caer */
+  function gesture(type, x, y) {
+    if (!S || S.phase !== 'play') { if (type !== 'down') { G0 = null; if (S) S.gSoft = false; } return; }
+    const c = cellPx, now = performance.now();
+    if (type === 'down') { G0 = { x0: x, y0: y, ax: x, t0: now, moved: false, soft: false }; return; }
+    if (!G0) return;
+    if (type === 'move') {
+      while (S.cur && Math.abs(x - G0.ax) >= c * 0.9) {
+        const d = x > G0.ax ? 1 : -1; G0.ax += d * c * 0.9; G0.moved = true;
+        if (tryMove(d, 0)) env.Snd.play('tmove');
+      }
+      const dy = y - G0.y0;
+      G0.soft = dy > c * 1.6 && Math.abs(dy) > Math.abs(x - G0.x0);
+      S.gSoft = G0.soft;
+      if (G0.soft) G0.moved = true;
+    } else { // 'up' o 'cancel'
+      const dt = now - G0.t0, dx = x - G0.x0, dy = y - G0.y0;
+      S.gSoft = false;
+      if (type === 'up') {
+        if (dy > c * 3 && dt < 280 && Math.abs(dy) > Math.abs(dx) * 1.5) S.gHard = true;       // deslizón rápido hacia abajo
+        else if (!G0.moved && Math.hypot(dx, dy) < c * 0.7 && dt < 300) S.gRot = true;         // toque = girar
+        else if (dy < -c * 2.5 && dt < 300 && Math.abs(dy) > Math.abs(dx) * 1.5) doHold();     // deslizón hacia arriba = guardar
+      }
+      G0 = null;
+    }
   }
   function action(a) {
     if (!S) {
@@ -423,6 +452,7 @@
     const { ctx: g, B, Font, Art, txt } = env;
     if (!S) return drawMenu(W, H);
     const st = stage(), lay = layout(W, H), { cell: s, bx, by, narrow } = lay;
+    cellPx = s;
     // fondo: cambia con la etapa de la obra
     Art.drawBackground(g, Math.min(4, st), S.t * 6, 0, S.t, W, H, 0);
     g.fillStyle = 'rgba(30,16,8,0.45)'; g.fillRect(0, 0, W, H);
@@ -609,7 +639,7 @@
 
   window.Tetris = {
     init(e) { env = e; },
-    open, start, update, draw, action,
+    open, start, update, draw, action, gesture,
     pause() { if (S) setPause(true); },
     get active() { return !!S; },
     // utilidades para pruebas automáticas

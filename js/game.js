@@ -1352,7 +1352,16 @@
       const b = G.buttons[i];
       if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) { doAction(b.action); return; }
     }
+    if (G.state === 'tetris') { Tetris.gesture('down', x, y); try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
   });
+  const tetrisPointer = type => e => {
+    if (G.state !== 'tetris') return;
+    const r = canvas.getBoundingClientRect();
+    Tetris.gesture(type, (e.clientX - r.left) * VW / r.width, (e.clientY - r.top) * VH / r.height);
+  };
+  canvas.addEventListener('pointermove', tetrisPointer('move'));
+  canvas.addEventListener('pointerup', tetrisPointer('up'));
+  canvas.addEventListener('pointercancel', tetrisPointer('cancel'));
   canvas.addEventListener('contextmenu', e => e.preventDefault());
 
   function update(dt) {
