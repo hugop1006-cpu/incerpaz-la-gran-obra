@@ -82,3 +82,6 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - Precio de los combos: hoy se carga a mano por quien lo crea; falta definir si saldrá del ERP.
 - Para vender combos con Seasoft: definir si cada combo lleva un código propio en el ERP o se envía desglosado (hoy el pedido lleva el detalle de componentes en los datos que van al ERP).
 - Aviso por correo o WhatsApp cuando una publicación queda en revisión (hoy se ve en el panel).
+
+## 📌 En pausa: validación del mercado exportador
+Se dejó el plan de validación y las primeras cifras de importación (UN Comtrade, 5 nov 2026) en un documento. Se retoma después de la reunión con marketing. Siguiente paso concreto: consultar la subpartida estadounidense 6907.23.10 en USITC DataWeb para separar la terracota del total de 6907.23, confirmar qué pieza sería la baldosa tipo mexicana con las fábricas y fijar cantidades por pallet y contenedor.
