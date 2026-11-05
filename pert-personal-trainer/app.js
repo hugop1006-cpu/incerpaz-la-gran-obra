@@ -9,10 +9,17 @@ const MODES = { lado: 'por lado', mano: 'por mano', total: 'totales', cuerpo: 'p
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 const blank = () => ({ sessions: [], photos: {}, settings: { unit: 'lb' }, current: null, templates: [], customExercises: [] });
-let db = (() => { try { return Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { return blank(); } })();
+const PKEY = 'pert.photos.v1';
+let photosDirty = false;
+let db = (() => {
+  let d; try { d = Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { d = blank(); }
+  let ph = {}; try { ph = JSON.parse(localStorage.getItem(PKEY) || '{}'); } catch { /* sin fotos */ }
+  if (d.photos && Object.keys(d.photos).length) { ph = { ...d.photos, ...ph }; photosDirty = true; } // migra el formato anterior
+  d.photos = ph && typeof ph === 'object' && !Array.isArray(ph) ? ph : {}; return d;
+})();
 function save() {
-  try { localStorage.setItem(KEY, JSON.stringify(db)); return true; }
-  catch { toast('No se pudo guardar: almacenamiento lleno. Exporta tus datos.'); return false; }
+  try { const { photos, ...rest } = db; localStorage.setItem(KEY, JSON.stringify(rest)); if (photosDirty) { localStorage.setItem(PKEY, JSON.stringify(photos)); photosDirty = false; } return true; }
+  catch { toast('No se pudo guardar: almacenamiento lleno. Guarda una copia y quita fotos que no uses.'); return false; }
 }
 function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.hidden = false;
@@ -74,6 +81,22 @@ function render() {
   window.scrollTo(0, 0);
   if (ui.tab === 'ajustes') fillSnaps();
 }
+function photoBtns(ex) {
+  const id = esc(ex.id), has = !!db.photos[ex.id];
+  return `<label class="btn sm">📷 ${has ? 'Nueva foto' : 'Tomar foto'}<input type="file" accept="image/*" capture="environment" hidden data-act="photo" data-src="cam" data-ex="${id}"></label>
+    <label class="btn sm">🖼 Galería<input type="file" accept="image/*" hidden data-act="photo" data-src="gal" data-ex="${id}"></label>
+    ${has ? `<button class="btn sm danger" data-act="photo-del" data-ex="${id}">Quitar</button>` : ''}`;
+}
+function photoBox(ex) {
+  const photo = db.photos[ex.id], name = ex.machine || ex.name;
+  return `<div class="photo">${photo ? `<img src="${photo}" alt="${esc(name)}" data-act="viewphoto" data-ex="${esc(ex.id)}">` : `<span>📷 Sin foto de ${esc(name)}<br><small>Tómala cuando estés frente a la máquina</small></span>`}</div>
+    <div class="row" style="margin-top:8px">${photoBtns(ex)}</div>`;
+}
+const photoCount = () => { const L = active(); return [L.filter(e => db.photos[e.id]).length, L.length]; };
+function photoHint() {
+  const [n, t] = photoCount(); if (n >= t) return '';
+  return `<div class="card safety"><strong>Fotos de las máquinas:</strong> ${n} de ${t}. Tómalas con tu cámara al llegar a cada máquina (en la ficha del ejercicio) o desde la pestaña Ejercicios.</div>`;
+}
 const SAFETY = `<div class="card safety"><strong>Seguridad:</strong> si aparece dolor de pecho, pesadez del brazo, falta de aire inusual, mareo o sudor frío, detén el ejercicio y busca atención urgente. PERT es un registro y guía, no una app médica ni da autorizaciones.</div>`;
 
 function viewHoy() {
@@ -81,7 +104,7 @@ function viewHoy() {
     const all = allTemplates(), picked = all.find(r => r.id === ui.picked)?.id ?? all[0].id;
     const rows = all.map(r => `<label class="pick"><input type="radio" name="routine" value="${esc(r.id)}" ${picked === r.id ? 'checked' : ''}><span><strong>${esc(r.name)}</strong>${r.mine ? ' <span class="badge b-ref">Tuya</span>' : ''}<br><span class="mut">${r.items.length ? esc(r.items.map(i => exById(i.ex).name).join(' · ')) : 'Sin ejercicios'}</span></span></label>`).join('');
     const custom = active().map(e => `<label class="pick"><input type="checkbox" class="cx" value="${e.id}"><span>${esc(e.name)}</span></label>`).join('');
-    return `${SAFETY}${backupCard()}
+    return `${SAFETY}${backupCard()}${photoHint()}
       <div class="card"><h2>Nueva sesión</h2><p class="mut">Elige una plantilla. Las series y repeticiones de la plantilla son <span class="badge b-prop">Propuesta</span>: solo cuentan como realizadas cuando tú las marcas.</p>
       ${rows}<button class="btn pri" data-act="start" style="width:100%">Empezar sesión</button>
       <button class="btn" data-act="tpl-open" style="width:100%;margin-top:8px">Crear o editar plantillas</button></div>
@@ -105,8 +128,7 @@ function viewHoy() {
   return `<div class="card"><div class="row sp"><span class="mut">Ejercicio ${c.idx + 1} de ${n}</span><button class="btn sm danger" data-act="cancel">Cancelar sesión</button></div>
       <div class="progress" role="progressbar" aria-valuenow="${c.idx + 1}" aria-valuemax="${n}"><i style="width:${((c.idx + 1) / n) * 100}%"></i></div></div>
     <div class="card"><div class="row sp"><h2>${esc(ex.name)}</h2><span class="badge b-prop">Propuesta: ${plan}</span></div>
-      <div class="photo">${photo ? `<img src="${photo}" alt="${esc(ex.machine)}">` : `<span>📷 Sin foto de ${esc(ex.machine)}</span>`}
-        <label class="btn sm" style="display:inline-block">${photo ? 'Cambiar foto' : 'Añadir foto de la máquina'}<input type="file" accept="image/*" hidden data-act="photo"></label></div></div>
+      ${photoBox(ex)}</div>
     <div class="card"><details open><summary>Instrucciones</summary><dl>
       <dt>Postura y ajustes</dt><dd>${esc(ex.setup || '—')}</dd><dt>Manos y pies</dt><dd>${esc(ex.hands || '—')}</dd>
       <dt>Recorrido</dt><dd>${esc(ex.range || '—')}</dd><dt>Respiración</dt><dd>${esc(ex.breath || '—')}</dd>
@@ -154,10 +176,11 @@ function viewHist() {
 }
 function viewEx() {
   if (ui.exDraft) return viewExForm();
-  return `<div class="card"><div class="row sp"><h2>Ejercicios</h2><button class="btn sm pri" data-act="ex-new">+ Nuevo ejercicio</button></div><div class="list">${active().map(ex => {
+  return `<div class="card"><div class="row sp"><h2>Ejercicios</h2><button class="btn sm pri" data-act="ex-new">+ Nuevo ejercicio</button></div><p class="mut">Fotos de máquinas: ${photoCount()[0]} de ${photoCount()[1]}</p><div class="list">${active().map(ex => {
     const ref = reference(ex.id);
     return `<div class="item"><strong>${esc(ex.name)}</strong> ${ex.custom ? '<span class="badge b-ref">Propio</span>' : ''} <span class="badge b-prop">Propuesta ${ex.kind === 'cardio' ? ex.plan.minutes + ' min' : ex.plan.sets + '×' + ex.plan.reps}</span>
       <br>${ref ? `<span class="badge b-ref">Referencia</span> ${esc(fmtSet(ex, ref.e))} <span class="mut">(${fmtDate(ref.date)})</span>` : '<span class="mut">Sin referencia</span>'}
+      <div class="row" style="margin-top:8px">${db.photos[ex.id] ? `<img class="thumb" src="${db.photos[ex.id]}" alt="${esc(ex.machine || ex.name)}" data-act="viewphoto" data-ex="${esc(ex.id)}">` : '<span class="thumb">📷</span>'}${photoBtns(ex)}</div>
       ${ex.custom ? `<div class="row" style="margin-top:6px"><button class="btn sm" data-act="ex-edit" data-id="${esc(ex.id)}">Editar</button><button class="btn sm danger" data-act="ex-del" data-id="${esc(ex.id)}">Eliminar</button></div>` : ''}</div>`;
   }).join('')}</div></div>`;
 }
@@ -372,7 +395,7 @@ function ingest(t, d) {
   arr(d.templates).filter(x => x && typeof x.id === 'string' && typeof x.name === 'string' && Array.isArray(x.items) && !tids.has(x.id))
     .forEach(x => t.templates.push({ id: x.id.slice(0, 40), name: x.name.slice(0, 40), items: x.items.filter(i => i && exById(i.ex)).map(i => ({ ...itemOf(i.ex), ...Object.fromEntries(Object.keys(LIM).filter(k => k in itemOf(i.ex)).map(k => [k, clamp(i[k], LIM[k])])) })) }));
   if (d.photos && typeof d.photos === 'object') Object.entries(d.photos).forEach(([k, v]) => {
-    if (exById(k) && !t.photos[k] && typeof v === 'string' && v.length < 400000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(v)) t.photos[k] = v; });
+    if (exById(k) && !t.photos[k] && typeof v === 'string' && v.length < 400000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(v)) { t.photos[k] = v; photosDirty = true; } });
   t.sessions.sort((x, y) => x.date.localeCompare(y.date)); return added;
 }
 async function restoreData(d) {
@@ -383,12 +406,12 @@ async function restoreData(d) {
   const added = ingest(next, d);
   if (!added && !next.templates.length && !next.customExercises.length && !Object.keys(next.photos).length) { dropCustom(); old.forEach(registerEx); return toast('El archivo no contiene datos reconocibles. No se cambió nada.'); }
   if (d.settings?.unit === 'kg' || d.settings?.unit === 'lb') next.settings.unit = d.settings.unit;
-  db = next; save(); render(); toast(`Restaurado: ${added} sesiones`);
+  db = next; photosDirty = true; save(); render(); toast(`Restaurado: ${added} sesiones`);
 }
 async function wipeAll() {
   if (cur()) return toast('Termina o cancela la sesión actual antes de borrar.');
   if (!confirm('Se borrarán todas las sesiones, plantillas, ejercicios propios y fotos de este dispositivo. Antes se guarda una copia automática. ¿Continuar?')) return;
-  await snap('Antes de borrar'); dropCustom(); db = blank(); save(); render();
+  await snap('Antes de borrar'); dropCustom(); db = blank(); photosDirty = true; save(); render();
   if (confirm('¿Borrar también las copias automáticas de este dispositivo? (Aceptar = no podrás recuperar nada)')) { await snapClear(); render(); }
 }
 const hash = str => { let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return h; };
@@ -474,15 +497,28 @@ function exportCsv() {
 }
 function resize(file) {
   return new Promise((res, rej) => {
-    const img = new Image(); img.onload = () => {
-      const k = Math.min(1, 640 / Math.max(img.width, img.height)), c = document.createElement('canvas');
-      c.width = img.width * k; c.height = img.height * k; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      res(c.toDataURL('image/jpeg', 0.7)); URL.revokeObjectURL(img.src);
-    }; img.onerror = rej; img.src = URL.createObjectURL(file);
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url); let dim = 800, q = 0.72, out = '';
+      for (let i = 0; i < 6; i++) { // baja calidad/tamaño hasta que la foto pese poco
+        const k = Math.min(1, dim / Math.max(img.width, img.height)), c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k)); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        out = c.toDataURL('image/jpeg', q); if (out.length < 250000) break; q = Math.max(0.45, q - 0.1); dim = Math.round(dim * 0.85);
+      }
+      out.length < 380000 ? res(out) : rej(new Error('demasiado grande'));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('no es una imagen')); }; img.src = url;
   });
 }
+function openViewer(id) {
+  const v = $('#viewer'), src = db.photos[id]; if (!v || !src) return;
+  const im = document.createElement('img'); im.alt = 'Foto de la máquina'; im.src = src; v.replaceChildren(im); v.hidden = false;
+}
+const keepScroll = fn => { const y = window.scrollY; fn(); window.scrollTo(0, y); };
 
 document.addEventListener('click', e => {
+  if (e.target.closest('#viewer')) { $('#viewer').hidden = true; return; }
+  const vp = e.target.closest('img[data-act=viewphoto]'); if (vp) return openViewer(vp.dataset.ex);
   const tab = e.target.closest('[data-tab]');
   if (tab) { ui.tab = tab.dataset.tab; ui.exDraft = null; return render(); }
   const b = e.target.closest('button[data-act]'); if (!b) return;
@@ -522,6 +558,7 @@ document.addEventListener('click', e => {
   else if (a === 'del') { if (confirm('¿Borrar esta sesión?')) { db.sessions = db.sessions.filter(s => s.id !== b.dataset.id); save(); render(); } }
   else if (a === 'export-json') { download('pert-datos.json', JSON.stringify(backupData(), null, 2), 'application/json'); db.settings.lastBackup = Date.now(); save(); }
   else if (a === 'bk-save') saveBackup();
+  else if (a === 'photo-del') { if (confirm('¿Quitar esta foto?')) { delete db.photos[b.dataset.ex]; photosDirty = true; save(); keepScroll(render); } }
   else if (a === 'snap-restore') { if (confirm('Esto reemplaza TODOS los datos actuales por los de esa copia. Antes se guarda una copia automática de lo actual. ¿Continuar?')) snapAll().then(all => { const r = all.find(x => String(x.ts) === b.dataset.ts); if (!r) return toast('Esa copia ya no existe.'); try { restoreData(JSON.parse(r.text)); } catch { toast('La copia está dañada.'); } }); }
   else if (a === 'export-csv') exportCsv();
   else if (a === 'wipe') wipeAll();
@@ -544,7 +581,14 @@ document.addEventListener('change', async e => {
   if (t.dataset.t && t.dataset.t !== 'name' && ui.tplEdit) { const tp = tplById(ui.tplEdit), it = tp?.items[+t.dataset.n]; if (it) { it[t.dataset.t] = clamp(t.value, LIM[t.dataset.t]); t.value = it[t.dataset.t]; save(); } return; }
   if (a === 'pex') { ui.pex = t.value; ui.pmet = null; return render(); }
   if (a === 'unit') { db.settings.unit = t.value; save(); return render(); }
-  if (a === 'photo' && t.files[0]) { try { db.photos[stepEx().id] = await resize(t.files[0]); save(); render(); } catch { toast('No se pudo leer la imagen'); } return; }
+  if (a === 'photo' && t.files[0]) {
+    const id = t.dataset.ex || (cur() && stepEx().id), prev = db.photos[id]; if (!id || !exById(id)) return;
+    try {
+      db.photos[id] = await resize(t.files[0]); photosDirty = true;
+      if (!save()) { if (prev) db.photos[id] = prev; else delete db.photos[id]; photosDirty = false; } else keepScroll(render);
+    } catch { toast('No se pudo leer la imagen. Prueba con otra foto.'); }
+    t.value = ''; return;
+  }
   if (a === 'import' && t.files[0]) {
     try { const d = JSON.parse(await t.files[0].text()); if (!d || typeof d !== 'object') throw 0;
       await snap('Antes de importar'); const added = ingest(db, d); save(); render(); toast(added ? `Importadas ${added} sesiones` : 'Datos importados (sin sesiones nuevas)'); }
@@ -566,4 +610,6 @@ db.customExercises = db.customExercises.map(cleanEx).filter(Boolean); db.customE
 navigator.storage?.persist?.().catch(() => {});
 snapAll().then(all => { if (!all.length || Date.now() - all[all.length - 1].ts > 12 * 36e5) snap('Automática'); });
 if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#viewer')) $('#viewer').hidden = true; });
+if (photosDirty) save();
 render();
