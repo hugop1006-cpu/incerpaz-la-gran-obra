@@ -54,7 +54,7 @@
     wall: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], pause: ['KeyP', 'Escape'], mute: ['KeyM'],
     confirm: ['Enter', 'NumpadEnter', 'Space'], back: ['Escape'],
     // minijuego Torre de Ladrillos
-    rotcw: ['ArrowUp', 'KeyX', 'KeyW'], rotccw: ['KeyZ'], hard: ['Space'], hold: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], soft: ['ArrowDown', 'KeyS'], mini: ['KeyT'], power: ['KeyV', 'KeyB']
+    rotcw: ['ArrowUp', 'KeyX', 'KeyW'], rotccw: ['KeyZ'], hard: ['Space'], hold: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], soft: ['ArrowDown', 'KeyS'], mini: ['KeyT'], power: ['KeyV', 'KeyB'], powerSel: ['KeyE', 'KeyQ']
   };
   const keysDown = new Set(), keysPressed = new Set(), touchHeld = new Set(), touchPressed = new Set();
   const held = a => touchHeld.has(a) || BIND[a].some(k => keysDown.has(k));
@@ -1410,7 +1410,7 @@
     tileAt: (c, r) => tileAt(c, r), T,
     jumpToLevel(i) { loadLevel(i); G.levelIndex = i; G.lives = 3; G.score = 0; setState('play'); }
   });
-  Tetris.init({ ctx, C, B, Font, Art, Snd, Save, pressed, held, txt, button, mutedLabel, quit: () => toSelect() });
+  Tetris.init({ ctx, C, B, Font, Art, Snd, Save, pressed, held, txt, button, mutedLabel, hit: (x, y, w, h, action) => G.buttons.push({ x, y: y + uiOffY, w, h, action }), quit: () => toSelect() });
   render();
   requestAnimationFrame(frame);
 })();

@@ -44,7 +44,10 @@ Se abre desde el menú de etapas con el botón **MINIJUEGO: TORRE** o la tecla *
 - **Modos** (se eligen al abrir el minijuego): **Clásico** (sin fin), **Sprint 40** (40 líneas en el menor tiempo; guarda el mejor tiempo) y **Escombros** (cada 8 piezas sube una fila de escombros con un hueco).
 - **T-spin**: girar la T para encajarla en un hueco (3 esquinas ocupadas) da bono extra (sencillo 800, doble 1200, triple 1600, ×nivel).
 - **Gestos en el celular** (sobre el tablero, además de los botones): deslizar de lado = mover, tocar = girar, mantener el dedo abajo = bajar, deslizón rápido hacia abajo = caer, deslizón hacia arriba = guardar pieza.
-- **Niveladora** (poder cargable): cada línea llena la barra verde (más con combos y Tetris). Cuando está llena, pulsa **V** (o el botón NIVELAR en el celular) para aplanar las 2 filas de abajo de la torre.
+- **Poderes cargables**: cada línea llena la barra verde (más con combos y Tetris, máximo 10). Con **E** (o tocando la barra) eliges el poder y con **V** (o el botón PODER en el celular) lo usas:
+  - **Freno** (cuesta 4): la caída va 3 veces más lenta durante 8 s.
+  - **Cemento** (cuesta 7): rellena los huecos tapados de las 6 filas de abajo, lo que puede completar líneas.
+  - **Niveladora** (cuesta 10): aplana las 2 filas de abajo de la torre.
 - Puntaje: línea 100 · doble 300 · triple 500 · Tetris 800 (×nivel, ×1.5 si es seguido), combos, y puntos por caída. Récord guardado en el navegador.
 - Código: `js/tetris.js`. Prueba automática: `node tools/probar-tetris.js`.
 

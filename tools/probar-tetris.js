@@ -63,11 +63,28 @@ const assert = require('assert');
   await pg.mouse.move(ax, ay); await pg.mouse.down(); await pg.mouse.move(...px(240, 120 + 70), { steps: 3 }); await pg.mouse.up(); await step(3);
   assert.ok(await pg.evaluate(() => Tetris._s().stats.pieces) > pcs, 'deslizón rápido hacia abajo suelta la pieza');
   await step(40);
-  // nivelador: con la barra llena aplana 2 filas
-  await pg.evaluate(() => { const S = Tetris._s(); S.board = Array.from({ length: 22 }, () => new Array(10).fill(0)); for (let y = 18; y < 22; y++) for (let x = 0; x < 9; x++) S.board[y][x] = 3; S.power = 3; S.cur = { type: 2, rot: 0, x: 3, y: 2 }; S.lockT = 0; });
-  await key('KeyV'); assert.equal(await pg.evaluate(() => Tetris._s().board.flat().filter(v => v).length), 36, 'sin carga no hace nada');
+  // poderes (barra compartida; E cambia de poder, V lo usa)
+  const resetBoard = () => pg.evaluate(() => { const S = Tetris._s(); S.board = Array.from({ length: 22 }, () => new Array(10).fill(0)); S.cur = { type: 2, rot: 0, x: 3, y: 2 }; S.lockT = 0; S.slowT = 0; S.sel = 0; return 1; });
+  await resetBoard();
+  await pg.evaluate(() => { Tetris._s().power = 3; });
+  await key('KeyV'); assert.equal(await pg.evaluate(() => Tetris._s().slowT), 0, 'sin carga suficiente no hace nada');
+  await pg.evaluate(() => { Tetris._s().power = 5; });
+  await key('KeyV'); assert.ok(await pg.evaluate(() => Tetris._s().slowT) > 7, 'FRENO activa la caída lenta');
+  assert.equal(await pg.evaluate(() => Tetris._s().power), 1, 'FRENO gasta 4');
+  // cemento: rellena el hueco tapado y completa la fila
+  await resetBoard();
+  await pg.evaluate(() => { const S = Tetris._s(); for (let x = 0; x < 10; x++) { S.board[21][x] = x === 4 ? 0 : 3; S.board[20][x] = 3; } S.power = 10; });
+  await key('KeyE'); assert.equal(await pg.evaluate(() => Tetris._s().sel), 1);
+  const ln = await pg.evaluate(() => Tetris._s().lines);
+  await key('KeyV'); await step(40);
+  assert.ok(await pg.evaluate(() => Tetris._s().lines) > ln, 'CEMENTO rellena el hueco y borra líneas');
+  assert.equal(await pg.evaluate(() => Tetris._s().power), 5, 'CEMENTO gasta 7 y las 2 líneas cargan +2');
+  // nivelador: aplana 2 filas
+  await resetBoard();
+  await pg.evaluate(() => { const S = Tetris._s(); for (let y = 18; y < 22; y++) for (let x = 0; x < 9; x++) S.board[y][x] = 3; S.power = 9; S.sel = 2; });
+  await key('KeyV'); assert.equal(await pg.evaluate(() => Tetris._s().board.flat().filter(v => v).length), 36, 'sin carga suficiente no hace nada');
   await pg.evaluate(() => { Tetris._s().power = 10; });
-  await key('KeyV'); assert.equal(await pg.evaluate(() => Tetris._s().board.flat().filter(v => v).length), 18, 'nivelar borra 2 filas');
+  await key('KeyV'); assert.equal(await pg.evaluate(() => Tetris._s().board.flat().filter(v => v).length), 18, 'NIVELADORA borra 2 filas');
   assert.equal(await pg.evaluate(() => Tetris._s().power), 0);
   // guardar pieza
   const h0 = await pg.evaluate(() => Tetris._s().hold);

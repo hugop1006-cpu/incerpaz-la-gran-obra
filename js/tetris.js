@@ -80,7 +80,7 @@
   function start(mode) {
     mode = mode || (S && S.mode) || 'classic'; M = null;
     S = {
-      mode, rb: 0, power: 0, time: 0, sprintDone: false, won: false, lastRot: false,
+      mode, rb: 0, power: 0, sel: 0, slowT: 0, time: 0, sprintDone: false, won: false, lastRot: false,
       board: emptyBoard(), queue: [], cur: null, hold: 0, holdUsed: false,
       score: 0, lines: 0, level: 1, combo: -1, b2b: false, bombCharge: 0, bombsUsed: 0,
       phase: 'ready', t: 0, phaseT: 0, fall: 0, lockT: 0, lockResets: 0, lowest: 0,
@@ -189,7 +189,7 @@
     S.lines += n;
     S.bombCharge += n;
     const pw0 = S.power; S.power = Math.min(POWER_MAX, S.power + n + (tet ? 2 : 0) + (S.combo > 0 ? 1 : 0));
-    if (pw0 < POWER_MAX && S.power >= POWER_MAX) popup('¡NIVELADORA LISTA!', env.B.good);
+    if (pw0 < POWER_MAX && S.power >= POWER_MAX) popup('¡CARGA AL MÁXIMO!', env.B.good);
     const lvOld = S.level; S.level = Math.min(15, 1 + Math.floor(S.lines / 10));
     S.clearRows = rows; S.phase = 'clearing'; S.phaseT = 0;
     rows.forEach(y => { for (let x = 0; x < COLS; x++) { burst(x, y, MAT[S.board[y][x]][0], 1, 90); } });
@@ -232,14 +232,40 @@
     const rows = fullRows();
     if (rows.length) clearLines(rows); else { S.combo = -1; nextPiece(); }
   }
-  function usePower() { // NIVELADORA: aplana las 2 filas de abajo
+  const POWERS = [
+    { name: 'FRENO', cost: 4 },      // la caída va 3 veces más lenta durante 8 s
+    { name: 'CEMENTO', cost: 7 },    // rellena los huecos tapados de las 6 filas de abajo
+    { name: 'NIVELADORA', cost: 10 } // aplana las 2 filas de abajo
+  ];
+  const FREEZE_T = 8;
+  function cyclePower(d) { S.sel = (S.sel + (d || 1) + POWERS.length) % POWERS.length; env.Snd.play('select'); }
+  function usePower() {
     if (!S.cur || S.phase !== 'play') return;
-    if (S.power < POWER_MAX) { env.Snd.play('no'); return; }
-    S.power = 0;
-    for (let k = 0; k < 2; k++) { const row = S.board[ROWS - 1 - k]; for (let x = 0; x < COLS; x++) if (row[x]) burst(x, ROWS - 1 - k, MAT[row[x]][1], 2, 100); }
-    S.board.splice(ROWS - 2, 2); S.board.unshift(new Array(COLS).fill(0), new Array(COLS).fill(0));
-    S.score += 200 * S.level; popup('¡NIVELADORA! +' + 200 * S.level, env.B.good, true);
-    S.shake = 0.3; env.Snd.play('ttetris'); bumpLock();
+    const P = POWERS[S.sel];
+    if (S.power < P.cost) { env.Snd.play('no'); return; }
+    if (S.sel === 0) {
+      S.slowT = FREEZE_T; popup('¡FRENO!', env.B.accent, true); env.Snd.play('wall');
+    } else if (S.sel === 1) {
+      let n = 0;
+      for (let x = 0; x < COLS; x++) {
+        let covered = false;
+        for (let y = 0; y < ROWS; y++) {
+          if (S.board[y][x]) covered = true;
+          else if (covered && y >= ROWS - 6) { S.board[y][x] = 4; n++; burst(x, y, MAT[4][1], 2, 60); }
+        }
+      }
+      if (!n) { env.Snd.play('no'); return; }
+      S.power -= P.cost; S.score += n * 20 * S.level; popup('¡CEMENTO! +' + n * 20 * S.level, env.B.good, true); env.Snd.play('seal');
+      const rows = fullRows();
+      if (rows.length) { S.queue.unshift(S.cur.type); S.cur = null; S.tspin = false; clearLines(rows); }
+      return;
+    } else {
+      for (let k = 0; k < 2; k++) { const row = S.board[ROWS - 1 - k]; for (let x = 0; x < COLS; x++) if (row[x]) burst(x, ROWS - 1 - k, MAT[row[x]][1], 2, 100); }
+      S.board.splice(ROWS - 2, 2); S.board.unshift(new Array(COLS).fill(0), new Array(COLS).fill(0));
+      S.score += 200 * S.level; popup('¡NIVELADORA! +' + 200 * S.level, env.B.good, true);
+      S.shake = 0.3; env.Snd.play('ttetris'); bumpLock();
+    }
+    S.power -= P.cost;
   }
   function nextPiece() {
     if (S.phase === 'over') return;
@@ -321,6 +347,9 @@
     if (e.pressed('rotccw')) rotate(-1);
     if (e.pressed('hold')) doHold();
     if (e.pressed('power')) usePower();
+    if (e.pressed('powerSel')) cyclePower(1);
+    if (S.slowT > 0) S.slowT = Math.max(0, S.slowT - dt);
+    if (!S.cur) return;
     if (!S.cur) return;
     if (e.pressed('hard') || S.gHard) { S.gHard = false; // caída instantánea
       let d = 0; while (tryMove(0, 1)) d++;
@@ -330,7 +359,7 @@
     }
     // gravedad + caída suave
     const soft = e.held('soft') || S.gSoft;
-    const gv = soft ? Math.min(GRAV(S.level), SOFT) : GRAV(S.level);
+    const gv = soft ? Math.min(GRAV(S.level), SOFT) : GRAV(S.level) * (S.slowT > 0 ? 3 : 1);
     S.fall += dt;
     while (S.fall >= gv) {
       S.fall -= gv;
@@ -397,6 +426,7 @@
     else if (a === 'retry') { env.Snd.pauseMusic(false); env.Snd.play('ok'); start(S.mode); }
     else if (a === 'quit') quit();
     else if (a === 'pause') setPause(true);
+    else if (a === 'psel') cyclePower(1);
   }
 
   /* ===================== Dibujo ===================== */
@@ -573,12 +603,15 @@
     env.txt('OBRA ' + Math.min(100, Math.floor((S.lines / (HOUSE_LINES * 5)) * 100)) + '%', x + w / 2, y + 3, B.secondary, { align: 'center', scale: 1 });
   }
   function drawPowerBar(g, x, y, w) {
-    const { B } = env, ready = S.power >= POWER_MAX, k = S.power / POWER_MAX;
+    const { B } = env, P = POWERS[S.sel], ready = S.power >= P.cost, k = S.power / POWER_MAX;
     g.fillStyle = B.dark; g.fillRect(x - 1, y - 1, w + 2, 10);
     g.fillStyle = '#183a20'; g.fillRect(x, y, w, 8);
-    g.fillStyle = ready ? (Math.floor(S.t * 6) % 2 ? B.good : '#b6ffc2') : B.good; g.fillRect(x, y, Math.round(w * k), 8);
+    g.fillStyle = ready ? (Math.floor(S.t * 6) % 2 ? B.good : '#b6ffc2') : '#2f8a40'; g.fillRect(x, y, Math.round(w * k), 8);
     g.fillStyle = 'rgba(255,255,255,0.25)'; g.fillRect(x, y, Math.round(w * k), 1);
-    env.txt(ready ? 'NIVELAR! (V)' : 'NIVELADORA', x + w / 2, y + 1, ready ? B.dark : B.light, { align: 'center', scale: 1 });
+    POWERS.forEach((p, i) => { g.fillStyle = i === S.sel ? B.secondary : 'rgba(255,246,232,0.5)'; g.fillRect(x + Math.round(w * p.cost / POWER_MAX) - 1, y, 1, 8); }); // marcas de coste
+    const label = S.slowT > 0 ? 'FRENO ' + Math.ceil(S.slowT) + 'S' : (ready ? P.name + '! (V)' : '‹ ' + P.name + ' ›');
+    env.txt(label, x + w / 2, y + 1, ready || S.slowT > 0 ? B.dark : B.light, { align: 'center', scale: 1 });
+    env.hit(x, y - 2, w, 12, 't:psel'); // tocar la barra cambia de poder
   }
   function drawBombBar(g, x, y, w) {
     const { B } = env, k = Math.min(1, S.bombCharge / BOMB_EVERY), queued = S.queue.slice(0, 3).includes(8) || (S.cur && S.cur.type === 8);
@@ -634,7 +667,7 @@
       button(env.mutedLabel(), bxx, by + 40 + (bhgt + 6) * 2, bwid, bhgt, 'mute', false);
       button('SALIR AL MENÚ', bxx, by + 40 + (bhgt + 6) * 3, bwid, bhgt, 't:quit', false);
       if (!document.body.classList.contains('touch')) {
-        const keys = ['← →: MOVER', '↑ / X: GIRAR', 'Z: GIRAR ←', '↓: BAJAR', 'ESPACIO: CAER', 'C / SHIFT: GUARDAR', 'V: NIVELADORA', 'P / ESC: PAUSA'];
+        const keys = ['← →: MOVER', '↑ / X: GIRAR', 'Z: GIRAR ←', '↓: BAJAR', 'ESPACIO: CAER', 'C / SHIFT: GUARDAR', 'V: USAR PODER', 'E: CAMBIAR PODER', 'P / ESC: PAUSA'];
         if (!narrow) keys.forEach((k, i) => txt(k, cx, by + 40 + (bhgt + 6) * 4 + 6 + i * 11, B.light, { align: 'center' }));
       }
     }
@@ -660,7 +693,7 @@
 
   window.Tetris = {
     init(e) { env = e; },
-    open, start, update, draw, action, gesture, usePower,
+    open, start, update, draw, action, gesture, usePower, POWERS,
     pause() { if (S) setPause(true); },
     get active() { return !!S; },
     // utilidades para pruebas automáticas
