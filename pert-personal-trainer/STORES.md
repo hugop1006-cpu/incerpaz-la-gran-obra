@@ -30,9 +30,18 @@
 5. **App Privacy** (etiquetas de privacidad): declara los datos que realmente usa la app (ver política). En las notas de revisión explica que la nube es opcional y cómo eliminar la cuenta (Ajustes → Nube → Eliminar mi cuenta).
 6. Riesgo conocido: la regla 4.2 rechaza apps que son solo una web. Mitiga con funciones nativas reales (cámara, compartir, aviso de descanso con la pantalla apagada: pendiente).
 
+## Sitio de política y borrado de cuenta
+1. `cp site/config.example.json site/config.json` y pon **tu nombre legal** y un **correo de contacto** (se publicarán). Sin ellos, el script se niega a generar el sitio.
+2. `node scripts/build-site.mjs` genera `site/dist/` (3 páginas bilingües ES/EN, sin peticiones externas).
+3. Publica `site/dist/` en un hosting estático **público** (Cloudflare Pages o GitHub Pages: ambos tienen plan gratuito; GitHub Pages en repositorios privados exige un plan de pago).
+4. Pon esa dirección (https, sin barra final) en `LEGAL_BASE` de `data.js` para que la app enlace a las páginas desde Ajustes → «Privacidad y datos».
+5. Usa `…/privacy.html` como URL de política en ambas tiendas y `…/delete-account.html` como URL de borrado en Google Play (Data safety).
+6. Respuestas de los formularios de privacidad: ver `STORE-PRIVACY.md`. **Antes de publicar, que te revise la política alguien con criterio legal**: está redactada según lo que hace la app, pero no es asesoría jurídica.
+7. Si cambias lo que la app hace con los datos (por ejemplo, un servicio de nube propio), actualiza la política **antes**.
+
 ## Antes del primer envío (pendiente)
-- Política de privacidad y términos publicados en una URL pública; aviso claro de que no es una app médica.
-- Página web de borrado de cuenta (Google Play).
+- Publicar el sitio de política y borrado (ver arriba) y rellenar los formularios (`STORE-PRIVACY.md`).
+- Decidir la arquitectura de la nube para el público general (ver `STORE-PRIVACY.md`).
 - Notificación de descanso en segundo plano (plugin de notificaciones locales).
 - Probar en dispositivos reales: cámara, compartir copia, sin conexión, cambio de cuenta.
 - Comprobar disponibilidad del nombre "Personal T" en ambas tiendas.

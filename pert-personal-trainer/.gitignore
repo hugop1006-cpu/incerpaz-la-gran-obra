@@ -6,3 +6,5 @@ local.properties
 .gradle/
 build/
 Pods/
+site/dist/
+site/config.json

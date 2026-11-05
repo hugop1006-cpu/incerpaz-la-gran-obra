@@ -108,3 +108,7 @@ const ROUTINES = [
     ex: ['caminadora', 'eliptica', 'abductores', 'aductores', 'talones'] },
   { id: 'caminadora', name: 'Solo caminadora', ex: ['caminadora'] }
 ];
+
+// Dirección pública (https, sin barra final) donde publiques site/dist, p. ej. 'https://personal-t.pages.dev'.
+// Mientras esté vacía, la app muestra el resumen de privacidad sin enlaces.
+const LEGAL_BASE = '';

@@ -261,6 +261,7 @@ function viewSet() {
     <p class="mut">Cada ejercicio indica si el peso es total, por mano o por lado.</p></div>
     ${backupSettings()}
     ${cloudCard()}
+    ${privacyCard()}
     <div class="card"><h3>Tus datos</h3><p class="mut">Por defecto todo queda en este dispositivo; la nube es opcional y solo se usa si la conectas.</p>
       <button class="btn danger" data-act="wipe">Borrar todos los datos</button></div>${SAFETY}`;
 }
@@ -383,6 +384,21 @@ function viewProg() {
       : '<p class="mut">No hay datos de esta métrica para este ejercicio.</p>'}
       <details><summary>Últimas sesiones</summary><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Fecha</th><th>Series</th><th>Peso máx.</th><th>Total</th><th>Esfuerzo</th></tr></thead><tbody>${rows}</tbody></table></div></details>
       <p class="mut">Los pesos no se convierten entre lb y kg: cada gráfica usa los números tal como los registraste.</p></div>`;
+}
+
+/* ---------- Privacidad ---------- */
+function privacyCard(base = LEGAL_BASE) {
+  const root = /^https:\/\/[^\s"'<>]+$/.test(base) ? base.replace(/\/+$/, '') : '';
+  const link = (p, t) => `<a href="${esc(root)}/${p}" target="_blank" rel="noopener">${t}</a>`;
+  return `<div class="card"><h3>Privacidad y datos</h3>
+    <p class="mut">Tus entrenamientos se guardan en este dispositivo. Sin anuncios, analíticas ni rastreadores.</p>
+    <details><summary>Qué guarda y cómo borrarlo</summary><ul>
+      <li>Guarda: tus series, pesos, esfuerzo y comentarios; la respuesta Sí/No de síntomas (dato de salud); plantillas, ejercicios propios y las fotos que elijas.</li>
+      <li>Cámara: solo al pulsar «Tomar foto». Internet: solo para la nube opcional.</li>
+      <li>Nube opcional: si la activas, tus datos van al proyecto de Supabase que configuras tú; el autor de la app no recibe nada. No hay cifrado de extremo a extremo.</li>
+      <li>Borrar: <em>Tus datos → Borrar todos los datos</em> (este dispositivo) · <em>Nube → Eliminar mis datos en la nube</em> · <em>Nube → Eliminar mi cuenta</em>.</li>
+      <li>Personal T es un registro y guía; no es un producto sanitario.</li></ul></details>
+    ${root ? `<p>${link('privacy.html', 'Política de privacidad')} · ${link('delete-account.html', 'Eliminar cuenta y datos')}</p>` : ''}</div>`;
 }
 
 /* ---------- Copias de seguridad ---------- */
