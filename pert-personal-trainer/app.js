@@ -7,7 +7,7 @@ const exById = id => EXERCISES.find(e => e.id === id);
 const MODES = { lado: 'por lado', mano: 'por mano', total: 'totales', cuerpo: 'peso corporal' };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-const blank = () => ({ sessions: [], photos: {}, settings: { unit: 'lb' }, current: null });
+const blank = () => ({ sessions: [], photos: {}, settings: { unit: 'lb' }, current: null, templates: [] });
 let db = (() => { try { return Object.assign(blank(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { return blank(); } })();
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(db)); return true; }
@@ -21,15 +21,17 @@ function toast(msg) {
 const ui = { tab: 'hoy', picked: null, openSession: null };
 
 /* ---------- Datos de sesión ---------- */
-function newEntry(ex) {
+const defPlan = ex => ({ ...ex.plan, rest: ex.rest });
+const planOf = ex => cur()?.plans?.[ex.id] || defPlan(ex);
+function newEntry(ex, plan = defPlan(ex)) {
   if (ex.kind === 'cardio') return { skipped: false, sets: [{ done: false, minutes: '', speed: '' }], effort: 5, comment: '', symptoms: null, mode: null };
-  const n = ex.plan.sets;
+  const n = plan.sets;
   return { skipped: false, mode: ex.mode, effort: 5, comment: '', symptoms: null,
     sets: Array.from({ length: n }, () => ({ done: false, weight: '', reps: '' })) };
 }
-function startSession(routineName, ids) {
-  db.current = { id: uid(), date: new Date().toISOString(), routine: routineName, steps: ids, idx: 0, entries: {} };
-  ids.forEach(id => (db.current.entries[id] = newEntry(exById(id))));
+function startSession(routineName, ids, plans = {}) {
+  db.current = { id: uid(), date: new Date().toISOString(), routine: routineName, steps: ids, plans, idx: 0, entries: {} };
+  ids.forEach(id => (db.current.entries[id] = newEntry(exById(id), plans[id])));
   save(); render();
 }
 const cur = () => db.current;
@@ -57,7 +59,7 @@ const fmtDate = iso => new Date(iso).toLocaleDateString('es', { weekday: 'short'
 function proposal(ex) {
   const ref = reference(ex.id);
   if (!ref || ex.kind === 'cardio' || ex.mode === 'cuerpo') return null;
-  const full = ref.e.sets.length >= ex.plan.sets && ref.e.sets.every(s => s.done);
+  const full = ref.e.sets.length >= planOf(ex).sets && ref.e.sets.every(s => s.done);
   if (full && ref.e.effort <= 7 && ref.e.symptoms !== 'si') return 'Completaste todas las series con esfuerzo ≤7/10: puedes valorar subir un escalón pequeño de peso, o una repetición más.';
   if (ref.e.effort >= 9 || ref.e.symptoms === 'si') return 'La última vez el esfuerzo fue muy alto o hubo síntomas: mantén o reduce el peso y prioriza la técnica.';
   return 'Mantén el peso y busca completar todas las series con buena técnica antes de subir.';
@@ -65,35 +67,37 @@ function proposal(ex) {
 
 /* ---------- Render ---------- */
 function render() {
-  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === ui.tab));
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === (ui.tab === 'plantillas' ? 'hoy' : ui.tab)));
   const v = $('#view');
-  v.innerHTML = ({ hoy: viewHoy, historial: viewHist, progreso: viewProg, ejercicios: viewEx, ajustes: viewSet }[ui.tab])();
+  v.innerHTML = ({ hoy: viewHoy, historial: viewHist, progreso: viewProg, ejercicios: viewEx, ajustes: viewSet, plantillas: viewTpl }[ui.tab])();
   window.scrollTo(0, 0);
 }
 const SAFETY = `<div class="card safety"><strong>Seguridad:</strong> si aparece dolor de pecho, pesadez del brazo, falta de aire inusual, mareo o sudor frío, detén el ejercicio y busca atención urgente. PERT es un registro y guía, no una app médica ni da autorizaciones.</div>`;
 
 function viewHoy() {
   if (!cur()) {
-    const picked = ui.picked ?? ROUTINES[0].id;
-    const rows = ROUTINES.map(r => `<label class="pick"><input type="radio" name="routine" value="${r.id}" ${picked === r.id ? 'checked' : ''}><span><strong>${esc(r.name)}</strong><br><span class="mut">${r.ex.map(i => exById(i).name).join(' · ')}</span></span></label>`).join('');
+    const all = allTemplates(), picked = all.find(r => r.id === ui.picked)?.id ?? all[0].id;
+    const rows = all.map(r => `<label class="pick"><input type="radio" name="routine" value="${esc(r.id)}" ${picked === r.id ? 'checked' : ''}><span><strong>${esc(r.name)}</strong>${r.mine ? ' <span class="badge b-ref">Tuya</span>' : ''}<br><span class="mut">${r.items.length ? r.items.map(i => exById(i.ex).name).join(' · ') : 'Sin ejercicios'}</span></span></label>`).join('');
     const custom = EXERCISES.map(e => `<label class="pick"><input type="checkbox" class="cx" value="${e.id}"><span>${esc(e.name)}</span></label>`).join('');
     return `${SAFETY}
       <div class="card"><h2>Nueva sesión</h2><p class="mut">Elige una plantilla. Las series y repeticiones de la plantilla son <span class="badge b-prop">Propuesta</span>: solo cuentan como realizadas cuando tú las marcas.</p>
-      ${rows}<button class="btn pri" data-act="start" style="width:100%">Empezar sesión</button></div>
+      ${rows}<button class="btn pri" data-act="start" style="width:100%">Empezar sesión</button>
+      <button class="btn" data-act="tpl-open" style="width:100%;margin-top:8px">Crear o editar plantillas</button></div>
       <div class="card"><details><summary>Sesión personalizada</summary>${custom}<button class="btn" data-act="start-custom" style="width:100%">Empezar con los marcados</button></details></div>`;
   }
   const c = cur(), ex = stepEx(), e = c.entries[ex.id], n = c.steps.length;
   const ref = reference(ex.id), prop = proposal(ex);
   const photo = db.photos[ex.id];
-  const plan = ex.kind === 'cardio' ? `${ex.plan.minutes} min` : `${ex.plan.sets} × ${ex.plan.reps} · descanso ${ex.rest} s`;
+  const pl = planOf(ex);
+  const plan = ex.kind === 'cardio' ? `${pl.minutes} min` : `${pl.sets} × ${pl.reps} · descanso ${pl.rest} s`;
   const unit = db.settings.unit;
   const sets = e.sets.map((s, i) => ex.kind === 'cardio'
     ? `<div class="set ${s.done ? 'done' : ''}" style="grid-template-columns:48px 1fr 1fr"><label class="n"><input type="checkbox" data-f="done" data-i="${i}" ${s.done ? 'checked' : ''} aria-label="Completado"></label>
-        <label>Minutos<input type="number" inputmode="decimal" min="0" step="0.5" data-f="minutes" data-i="${i}" value="${esc(s.minutes)}" placeholder="${ex.plan.minutes}"></label>
+        <label>Minutos<input type="number" inputmode="decimal" min="0" step="0.5" data-f="minutes" data-i="${i}" value="${esc(s.minutes)}" placeholder="${pl.minutes}"></label>
         <label>Velocidad máx. (km/h)<input type="number" inputmode="decimal" min="0" step="0.1" data-f="speed" data-i="${i}" value="${esc(s.speed)}"></label></div>`
     : `<div class="set ${s.done ? 'done' : ''}" style="grid-template-columns:48px 1fr 1fr"><label class="n"><input type="checkbox" data-f="done" data-i="${i}" ${s.done ? 'checked' : ''} aria-label="Serie ${i + 1} completada"></label>
         <label>Peso (${unit}${e.mode === 'cuerpo' ? '' : ' ' + MODES[e.mode]})<input type="number" inputmode="decimal" min="0" step="0.5" data-f="weight" data-i="${i}" value="${esc(s.weight)}" ${e.mode === 'cuerpo' ? 'placeholder="0"' : ''}></label>
-        <label>Repeticiones<input type="number" inputmode="numeric" min="0" step="1" data-f="reps" data-i="${i}" value="${esc(s.reps)}" placeholder="${ex.plan.reps}"></label></div>`).join('');
+        <label>Repeticiones<input type="number" inputmode="numeric" min="0" step="1" data-f="reps" data-i="${i}" value="${esc(s.reps)}" placeholder="${pl.reps}"></label></div>`).join('');
   const modeSel = ex.kind === 'cardio' ? '' : `<label class="mut">Cómo cuentas el peso
       <select data-f="mode">${Object.entries(MODES).map(([k, v]) => `<option value="${k}" ${e.mode === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>`;
   return `<div class="card"><div class="row sp"><span class="mut">Ejercicio ${c.idx + 1} de ${n}</span><button class="btn sm danger" data-act="cancel">Cancelar sesión</button></div>
@@ -112,7 +116,7 @@ function viewHoy() {
       ${e.skipped ? '<p class="mut">Marcado como omitido (p. ej. máquina ocupada). No cuenta como realizado.</p>' : `${modeSel}${sets}
       <p class="mut" id="totalnote">${totalNote(ex, e)}</p>
       <label>Esfuerzo percibido: <strong id="effv">${e.effort}</strong>/10<input type="range" min="1" max="10" step="1" value="${e.effort}" data-f="effort"></label>
-      <div id="timer" class="card" ${ex.rest ? '' : 'hidden'}><div class="timer" id="tval">${ex.rest ? ex.rest + ' s' : ''}</div><div class="row" style="justify-content:center"><button class="btn sm" data-act="rest">Iniciar descanso</button><button class="btn sm" data-act="restoff">Parar</button></div></div>
+      <div id="timer" class="card" ${pl.rest ? '' : 'hidden'}><div class="timer" id="tval">${pl.rest ? pl.rest + ' s' : ''}</div><div class="row" style="justify-content:center"><button class="btn sm" data-act="rest">Iniciar descanso</button><button class="btn sm" data-act="restoff">Parar</button></div></div>
       <h3 style="margin-top:12px">¿Síntomas durante el ejercicio?</h3>
       <div class="yn"><label class="si"><input type="radio" name="sym" data-f="symptoms" value="si" ${e.symptoms === 'si' ? 'checked' : ''}><span>Sí</span></label><label><input type="radio" name="sym" data-f="symptoms" value="no" ${e.symptoms === 'no' ? 'checked' : ''}><span>No</span></label></div>
       ${e.symptoms === 'si' ? `<div class="alert">Detén el ejercicio. Si hay dolor de pecho, pesadez del brazo, falta de aire inusual, mareo o sudor frío, busca atención urgente. Describe lo que sentiste en comentarios.</div>` : ''}`}
@@ -160,6 +164,39 @@ function viewSet() {
     <p class="mut">Cada ejercicio indica si el peso es total, por mano o por lado.</p></div>
     <div class="card"><h3>Tus datos</h3><p class="mut">Todo queda en este dispositivo (sin cuenta ni servidor). Exporta una copia desde Historial con regularidad.</p>
       <button class="btn danger" data-act="wipe">Borrar todos los datos</button></div>${SAFETY}`;
+}
+
+/* ---------- Plantillas ---------- */
+// Las plantillas integradas no se editan (siempre puedes volver a ellas); se duplican para personalizar.
+// Series/reps/descanso de una plantilla son PROPUESTAS: no cuentan como realizadas.
+const LIM = { sets: [1, 10], reps: [1, 100], rest: [0, 600], minutes: [1, 180] };
+const clamp = (v, [lo, hi]) => Math.min(hi, Math.max(lo, Math.round(+v) || lo));
+const itemOf = id => { const ex = exById(id), p = defPlan(ex); return ex.kind === 'cardio' ? { ex: id, minutes: p.minutes, rest: 0 } : { ex: id, sets: p.sets, reps: p.reps, rest: p.rest }; };
+function allTemplates() {
+  return [...ROUTINES.map(r => ({ id: r.id, name: r.name, items: r.ex.map(itemOf), mine: false })), ...db.templates.map(t => ({ ...t, mine: true }))];
+}
+const tplById = id => db.templates.find(t => t.id === id);
+function tplSummary(it) { const ex = exById(it.ex); return ex.kind === 'cardio' ? `${it.minutes} min` : `${it.sets} × ${it.reps} · ${it.rest} s`; }
+function viewTpl() {
+  const t = ui.tplEdit && tplById(ui.tplEdit);
+  if (t) {
+    const unused = EXERCISES.filter(e => !t.items.some(i => i.ex === e.id));
+    const items = t.items.map((it, n) => { const ex = exById(it.ex), cardio = ex.kind === 'cardio';
+      const f = (k, lab) => `<label>${lab}<input type="number" inputmode="numeric" min="${LIM[k][0]}" max="${LIM[k][1]}" data-t="${k}" data-n="${n}" value="${it[k]}"></label>`;
+      return `<div class="item"><div class="row sp"><strong>${n + 1}. ${esc(ex.name)}</strong><span class="row">
+        <button class="btn sm" data-act="tpl-up" data-n="${n}" ${n === 0 ? 'disabled' : ''} aria-label="Subir">↑</button><button class="btn sm" data-act="tpl-down" data-n="${n}" ${n === t.items.length - 1 ? 'disabled' : ''} aria-label="Bajar">↓</button><button class="btn sm danger" data-act="tpl-rm" data-n="${n}" aria-label="Quitar">✕</button></span></div>
+        <div class="row" style="margin-top:6px;gap:8px">${cardio ? f('minutes', 'Minutos') : f('sets', 'Series') + f('reps', 'Reps') + f('rest', 'Descanso (s)')}</div></div>`; }).join('') || '<p class="mut">Plantilla vacía: añade ejercicios.</p>';
+    return `<div class="card"><label>Nombre<input type="text" maxlength="40" data-t="name" value="${esc(t.name)}"></label>
+      <p class="mut">Series, repeticiones y descanso son <span class="badge b-prop">Propuesta</span> para tu sesión; solo cuentan como realizadas cuando las marques.</p>
+      <div class="list">${items}</div>
+      ${unused.length ? `<div class="row" style="margin-top:10px"><select id="tpl-add" aria-label="Añadir ejercicio">${unused.map(e => `<option value="${e.id}">${esc(e.name)}</option>`).join('')}</select><button class="btn" data-act="tpl-add">Añadir ejercicio</button></div>` : ''}
+      <div class="nav"><button class="btn pri" data-act="tpl-done">Listo</button></div></div>`;
+  }
+  const list = allTemplates().map(r => `<div class="item"><div class="row sp"><strong>${esc(r.name)}</strong>${r.mine ? '<span class="badge b-ref">Tuya</span>' : '<span class="badge">Integrada</span>'}</div>
+    <div class="mut">${r.items.length ? r.items.map(i => `${esc(exById(i.ex).name)} (${tplSummary(i)})`).join(' · ') : 'Sin ejercicios'}</div>
+    <div class="row" style="margin-top:6px">${r.mine ? `<button class="btn sm" data-act="tpl-edit" data-id="${r.id}">Editar</button>` : ''}<button class="btn sm" data-act="tpl-dup" data-id="${r.id}">Duplicar</button>${r.mine ? `<button class="btn sm danger" data-act="tpl-del" data-id="${r.id}">Eliminar</button>` : ''}</div></div>`).join('');
+  return `<div class="card"><div class="row sp"><h2>Plantillas</h2><button class="btn sm" data-act="tpl-back">← Volver</button></div>
+    <div class="list">${list}</div><button class="btn pri" data-act="tpl-new" style="width:100%;margin-top:10px">Nueva plantilla</button></div>`;
 }
 
 /* ---------- Progreso (gráficas) ---------- */
@@ -253,7 +290,7 @@ function viewProg() {
 let rest = { t: null, left: 0 };
 function stopRest() { clearInterval(rest.t); rest.t = null; }
 function startRest() {
-  const ex = stepEx(); stopRest(); rest.left = ex.rest;
+  const ex = stepEx(); stopRest(); rest.left = planOf(ex).rest;
   const el = $('#tval'); if (!el) return;
   rest.t = setInterval(() => {
     rest.left--; const e2 = $('#tval'); if (!e2) return stopRest();
@@ -292,7 +329,21 @@ document.addEventListener('click', e => {
   if (tab) { ui.tab = tab.dataset.tab; return render(); }
   const b = e.target.closest('button[data-act]'); if (!b) return;
   const a = b.dataset.act;
-  if (a === 'start') { const r = ROUTINES.find(r => r.id === (document.querySelector('input[name=routine]:checked')?.value)) || ROUTINES[0]; ui.picked = r.id; startSession(r.name, r.ex); }
+  if (a === 'start') {
+    const all = allTemplates(), r = all.find(r => r.id === document.querySelector('input[name=routine]:checked')?.value) || all[0];
+    if (!r.items.length) return toast('Esa plantilla no tiene ejercicios. Edítala primero.');
+    ui.picked = r.id; startSession(r.name, r.items.map(i => i.ex), Object.fromEntries(r.items.map(i => [i.ex, { sets: i.sets, reps: i.reps, rest: i.rest, minutes: i.minutes }])));
+  }
+  else if (a === 'tpl-open') { ui.tab = 'plantillas'; ui.tplEdit = null; render(); }
+  else if (a === 'tpl-back') { ui.tab = 'hoy'; ui.tplEdit = null; render(); }
+  else if (a === 'tpl-new') { const t = { id: uid(), name: 'Mi plantilla', items: [] }; db.templates.push(t); save(); ui.tplEdit = t.id; render(); }
+  else if (a === 'tpl-edit') { ui.tplEdit = b.dataset.id; render(); }
+  else if (a === 'tpl-done') { const t = tplById(ui.tplEdit); if (t && !t.name.trim()) t.name = 'Mi plantilla'; save(); ui.tplEdit = null; render(); }
+  else if (a === 'tpl-dup') { const src = allTemplates().find(r => r.id === b.dataset.id); if (src) { const t = { id: uid(), name: (src.name + ' (copia)').slice(0, 40), items: src.items.map(i => ({ ...i })) }; db.templates.push(t); save(); ui.tplEdit = t.id; render(); } }
+  else if (a === 'tpl-del') { if (confirm('¿Eliminar esta plantilla? Tus sesiones ya guardadas no cambian.')) { db.templates = db.templates.filter(t => t.id !== b.dataset.id); if (ui.picked === b.dataset.id) ui.picked = null; save(); render(); } }
+  else if (a === 'tpl-add') { const t = tplById(ui.tplEdit), id = $('#tpl-add')?.value; if (t && id && !t.items.some(i => i.ex === id)) { t.items.push(itemOf(id)); save(); render(); } }
+  else if (a === 'tpl-rm') { const t = tplById(ui.tplEdit); t.items.splice(+b.dataset.n, 1); save(); render(); }
+  else if (a === 'tpl-up' || a === 'tpl-down') { const t = tplById(ui.tplEdit), n = +b.dataset.n, m = a === 'tpl-up' ? n - 1 : n + 1; if (t.items[m]) { [t.items[n], t.items[m]] = [t.items[m], t.items[n]]; save(); render(); } }
   else if (a === 'start-custom') { const ids = [...document.querySelectorAll('.cx:checked')].map(i => i.value); ids.length ? startSession('Sesión personalizada', ids) : toast('Marca al menos un ejercicio'); }
   else if (a === 'cancel') { if (confirm('¿Cancelar la sesión? No se guardará nada.')) { db.current = null; save(); stopRest(); render(); } }
   else if (a === 'prev') { cur().idx--; save(); stopRest(); render(); }
@@ -303,16 +354,18 @@ document.addEventListener('click', e => {
     e2.sets.forEach(s => { s.weight = last.weight; s.reps = last.reps; }); save(); render(); toast('Valores copiados. Marca cada serie solo cuando la hagas.');
   }
   else if (a === 'pmet') { ui.pmet = b.dataset.m; render(); }
-  else if (a === 'rest') startRest(); else if (a === 'restoff') { stopRest(); const t = $('#tval'); if (t) t.textContent = stepEx().rest + ' s'; }
+  else if (a === 'rest') startRest(); else if (a === 'restoff') { stopRest(); const t = $('#tval'); if (t) t.textContent = planOf(stepEx()).rest + ' s'; }
   else if (a === 'toggle') { ui.openSession = ui.openSession === b.dataset.id ? null : b.dataset.id; render(); }
   else if (a === 'del') { if (confirm('¿Borrar esta sesión?')) { db.sessions = db.sessions.filter(s => s.id !== b.dataset.id); save(); render(); } }
-  else if (a === 'export-json') download('pert-datos.json', JSON.stringify({ sessions: db.sessions, settings: db.settings }, null, 2), 'application/json');
+  else if (a === 'export-json') download('pert-datos.json', JSON.stringify({ sessions: db.sessions, settings: db.settings, templates: db.templates }, null, 2), 'application/json');
   else if (a === 'export-csv') exportCsv();
   else if (a === 'wipe') { if (confirm('Se borrarán todas las sesiones y fotos de este dispositivo. ¿Continuar?')) { db = blank(); save(); render(); } }
 });
 
 document.addEventListener('input', e => {
-  const t = e.target, f = t.dataset.f; if (!f || !cur()) return;
+  const t = e.target;
+  if (t.dataset.t && ui.tplEdit) { const tp = tplById(ui.tplEdit); if (!tp) return; if (t.dataset.t === 'name') tp.name = t.value.slice(0, 40); save(); return; }
+  const f = t.dataset.f; if (!f || !cur()) return;
   const en = cur().entries[stepEx().id], i = t.dataset.i;
   if (f === 'effort') { en.effort = +t.value; $('#effv').textContent = t.value; }
   else if (f === 'comment') en.comment = t.value;
@@ -321,18 +374,22 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', async e => {
   const t = e.target, f = t.dataset.f, a = t.dataset.act;
+  if (t.dataset.t && t.dataset.t !== 'name' && ui.tplEdit) { const tp = tplById(ui.tplEdit), it = tp?.items[+t.dataset.n]; if (it) { it[t.dataset.t] = clamp(t.value, LIM[t.dataset.t]); t.value = it[t.dataset.t]; save(); } return; }
   if (a === 'pex') { ui.pex = t.value; ui.pmet = null; return render(); }
   if (a === 'unit') { db.settings.unit = t.value; save(); return render(); }
   if (a === 'photo' && t.files[0]) { try { db.photos[stepEx().id] = await resize(t.files[0]); save(); render(); } catch { toast('No se pudo leer la imagen'); } return; }
   if (a === 'import' && t.files[0]) {
     try { const d = JSON.parse(await t.files[0].text()); const ids = new Set(db.sessions.map(s => s.id));
       (d.sessions || []).filter(s => s.id && s.entries && !ids.has(s.id)).forEach(s => db.sessions.push(s));
+      const tids = new Set(db.templates.map(x => x.id));
+      (d.templates || []).filter(x => x.id && typeof x.name === 'string' && Array.isArray(x.items) && !tids.has(x.id))
+        .forEach(x => db.templates.push({ id: x.id, name: x.name.slice(0, 40), items: x.items.filter(i => exById(i.ex)).map(i => ({ ...itemOf(i.ex), ...Object.fromEntries(Object.keys(LIM).filter(k => k in itemOf(i.ex)).map(k => [k, clamp(i[k], LIM[k])])) })) }));
       db.sessions.sort((x, y) => x.date.localeCompare(y.date)); save(); render(); toast('Datos importados'); }
     catch { toast('Archivo no válido'); } return;
   }
   if (!f || !cur()) return;
   const en = cur().entries[stepEx().id];
-  if (f === 'done') { en.sets[t.dataset.i].done = t.checked; save(); t.closest('.set').classList.toggle('done', t.checked); if (t.checked && stepEx().rest) startRest(); return; }
+  if (f === 'done') { en.sets[t.dataset.i].done = t.checked; save(); t.closest('.set').classList.toggle('done', t.checked); if (t.checked && planOf(stepEx()).rest) startRest(); return; }
   if (f === 'skipped') { en.skipped = t.checked; save(); return render(); }
   if (f === 'symptoms') { en.symptoms = t.value; save(); return render(); }
   if (f === 'mode') { en.mode = t.value; save(); return render(); }
