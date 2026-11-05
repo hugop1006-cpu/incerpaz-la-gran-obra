@@ -72,6 +72,7 @@ function render() {
   const v = $('#view');
   v.innerHTML = ({ hoy: viewHoy, historial: viewHist, progreso: viewProg, ejercicios: viewEx, ajustes: viewSet, plantillas: viewTpl }[ui.tab])();
   window.scrollTo(0, 0);
+  if (ui.tab === 'ajustes') fillSnaps();
 }
 const SAFETY = `<div class="card safety"><strong>Seguridad:</strong> si aparece dolor de pecho, pesadez del brazo, falta de aire inusual, mareo o sudor frío, detén el ejercicio y busca atención urgente. PERT es un registro y guía, no una app médica ni da autorizaciones.</div>`;
 
@@ -80,7 +81,7 @@ function viewHoy() {
     const all = allTemplates(), picked = all.find(r => r.id === ui.picked)?.id ?? all[0].id;
     const rows = all.map(r => `<label class="pick"><input type="radio" name="routine" value="${esc(r.id)}" ${picked === r.id ? 'checked' : ''}><span><strong>${esc(r.name)}</strong>${r.mine ? ' <span class="badge b-ref">Tuya</span>' : ''}<br><span class="mut">${r.items.length ? esc(r.items.map(i => exById(i.ex).name).join(' · ')) : 'Sin ejercicios'}</span></span></label>`).join('');
     const custom = active().map(e => `<label class="pick"><input type="checkbox" class="cx" value="${e.id}"><span>${esc(e.name)}</span></label>`).join('');
-    return `${SAFETY}
+    return `${SAFETY}${backupCard()}
       <div class="card"><h2>Nueva sesión</h2><p class="mut">Elige una plantilla. Las series y repeticiones de la plantilla son <span class="badge b-prop">Propuesta</span>: solo cuentan como realizadas cuando tú las marcas.</p>
       ${rows}<button class="btn pri" data-act="start" style="width:100%">Empezar sesión</button>
       <button class="btn" data-act="tpl-open" style="width:100%;margin-top:8px">Crear o editar plantillas</button></div>
@@ -148,7 +149,7 @@ function viewHist() {
         <button class="btn sm danger" data-act="del" data-id="${esc(s.id)}">Borrar sesión</button>` : ''}</div>`;
   }).join('') || '<p class="mut">Aún no hay sesiones terminadas.</p>';
   return `<div class="card"><h2>Historial</h2><div class="list">${list}</div></div>
-    <div class="card row"><button class="btn" data-act="export-json">Exportar JSON</button><button class="btn" data-act="export-csv">Exportar CSV</button>
+    <div class="card row"><button class="btn" data-act="export-json">Exportar copia (JSON)</button><button class="btn" data-act="export-csv">Exportar CSV</button>
       <label class="btn">Importar JSON<input type="file" accept="application/json" hidden data-act="import"></label></div>`;
 }
 function viewEx() {
@@ -229,7 +230,8 @@ function viewSet() {
   return `<div class="card"><h2>Ajustes</h2>
     <label>Unidad de peso<select data-act="unit"><option value="lb" ${u === 'lb' ? 'selected' : ''}>Libras (lb)</option><option value="kg" ${u === 'kg' ? 'selected' : ''}>Kilogramos (kg)</option></select></label>
     <p class="mut">Cada ejercicio indica si el peso es total, por mano o por lado.</p></div>
-    <div class="card"><h3>Tus datos</h3><p class="mut">Todo queda en este dispositivo (sin cuenta ni servidor). Exporta una copia desde Historial con regularidad.</p>
+    ${backupSettings()}
+    <div class="card"><h3>Tus datos</h3><p class="mut">Todo queda en este dispositivo (sin cuenta ni servidor).</p>
       <button class="btn danger" data-act="wipe">Borrar todos los datos</button></div>${SAFETY}`;
 }
 
@@ -353,6 +355,95 @@ function viewProg() {
       <p class="mut">Los pesos no se convierten entre lb y kg: cada gráfica usa los números tal como los registraste.</p></div>`;
 }
 
+/* ---------- Copias de seguridad ---------- */
+// Sin servidor: copias automáticas en IndexedDB (protegen de errores) + copia a tu nube vía menú de compartir.
+const dropCustom = () => { for (let i = EXERCISES.length - 1; i >= 0; i--) if (EXERCISES[i].custom) EXERCISES.splice(i, 1); };
+function backupData() {
+  return { app: 'pert', version: 1, exportedAt: new Date().toISOString(), sessions: db.sessions, templates: db.templates, customExercises: db.customExercises,
+    photos: db.photos, settings: { unit: db.settings.unit } };
+}
+// Fusiona datos externos (siempre saneados) dentro de t. Devuelve cuántas sesiones se añadieron.
+function ingest(t, d) {
+  const arr = v => (Array.isArray(v) ? v : []), eids = new Set(EXERCISES.map(e => e.id));
+  arr(d.customExercises).forEach(r => { const o = cleanEx(r); if (o && !eids.has(o.id)) { registerEx(o); t.customExercises.push(o); eids.add(o.id); } });
+  const ids = new Set(t.sessions.map(s => s.id)); let added = 0;
+  arr(d.sessions).forEach(r => { const c = cleanSession(r); if (c && !ids.has(c.id)) { t.sessions.push(c); ids.add(c.id); added++; } });
+  const tids = new Set(t.templates.map(x => x.id));
+  arr(d.templates).filter(x => x && typeof x.id === 'string' && typeof x.name === 'string' && Array.isArray(x.items) && !tids.has(x.id))
+    .forEach(x => t.templates.push({ id: x.id.slice(0, 40), name: x.name.slice(0, 40), items: x.items.filter(i => i && exById(i.ex)).map(i => ({ ...itemOf(i.ex), ...Object.fromEntries(Object.keys(LIM).filter(k => k in itemOf(i.ex)).map(k => [k, clamp(i[k], LIM[k])])) })) }));
+  if (d.photos && typeof d.photos === 'object') Object.entries(d.photos).forEach(([k, v]) => {
+    if (exById(k) && !t.photos[k] && typeof v === 'string' && v.length < 400000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(v)) t.photos[k] = v; });
+  t.sessions.sort((x, y) => x.date.localeCompare(y.date)); return added;
+}
+async function restoreData(d) {
+  if (cur()) return toast('Termina o cancela la sesión actual antes de restaurar.');
+  await snap('Antes de restaurar');
+  const old = db.customExercises.slice(); dropCustom();
+  const next = blank(); next.settings = { ...db.settings };
+  const added = ingest(next, d);
+  if (!added && !next.templates.length && !next.customExercises.length && !Object.keys(next.photos).length) { dropCustom(); old.forEach(registerEx); return toast('El archivo no contiene datos reconocibles. No se cambió nada.'); }
+  if (d.settings?.unit === 'kg' || d.settings?.unit === 'lb') next.settings.unit = d.settings.unit;
+  db = next; save(); render(); toast(`Restaurado: ${added} sesiones`);
+}
+async function wipeAll() {
+  if (cur()) return toast('Termina o cancela la sesión actual antes de borrar.');
+  if (!confirm('Se borrarán todas las sesiones, plantillas, ejercicios propios y fotos de este dispositivo. Antes se guarda una copia automática. ¿Continuar?')) return;
+  await snap('Antes de borrar'); dropCustom(); db = blank(); save(); render();
+  if (confirm('¿Borrar también las copias automáticas de este dispositivo? (Aceptar = no podrás recuperar nada)')) { await snapClear(); render(); }
+}
+const hash = str => { let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return h; };
+const idb = () => new Promise((res, rej) => { const r = indexedDB.open('pert-backups', 1); r.onupgradeneeded = () => r.result.createObjectStore('snaps', { keyPath: 'ts' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+async function snapOp(mode, fn) {
+  const d = await idb();
+  return new Promise((res, rej) => { const t = d.transaction('snaps', mode), req = fn(t.objectStore('snaps')); t.oncomplete = () => { d.close(); res(req?.result); }; t.onerror = t.onabort = () => { d.close(); rej(t.error); }; });
+}
+const snapAll = async () => { try { return ((await snapOp('readonly', s => s.getAll())) || []).sort((a, b) => a.ts - b.ts); } catch { return []; } };
+const snapClear = async () => { try { await snapOp('readwrite', s => s.clear()); } catch { /* sin IndexedDB */ } };
+async function snap(reason) {
+  try {
+    if (!db.sessions.length && !db.templates.length && !db.customExercises.length && !Object.keys(db.photos).length) return;
+    const text = JSON.stringify(backupData()), h = hash(text.replace(/"exportedAt":"[^"]*"/, '')), all = await snapAll();
+    if (all.length && all[all.length - 1].h === h) return;
+    await snapOp('readwrite', s => s.put({ ts: Date.now(), reason, h, sessions: db.sessions.length, text }));
+    for (const r of all.slice(0, Math.max(0, all.length + 1 - 7))) await snapOp('readwrite', s => s.delete(r.ts));
+  } catch { /* la copia automática nunca debe romper la app */ }
+}
+async function saveBackup() {
+  const text = JSON.stringify(backupData()), name = `pert-copia-${new Date().toISOString().slice(0, 10)}.json`, file = new File([text], name, { type: 'application/json' });
+  try {
+    if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: 'Copia de seguridad PERT' });
+    else download(name, text, 'application/json');
+  } catch (e) {
+    if (e?.name === 'AbortError') return toast('Copia cancelada: no se guardó.');
+    download(name, text, 'application/json');
+  }
+  db.settings.lastBackup = Date.now(); save(); render(); toast('Copia lista. Comprueba que quedó en tu nube o en Archivos.');
+}
+const unsaved = () => db.sessions.filter(s => Date.parse(s.finished || s.date) > (db.settings.lastBackup || 0)).length;
+const daysAgo = ms => Math.floor((Date.now() - ms) / 864e5);
+function backupCard() {
+  const n = unsaved(), lb = db.settings.lastBackup; if (!n || (lb && daysAgo(lb) < 7)) return '';
+  return `<div class="card safety"><strong>Copia de seguridad:</strong> ${n} sesión(es) sin respaldar ${lb ? `· última copia hace ${daysAgo(lb)} días` : '· aún no has guardado ninguna copia'}.
+    <button class="btn sm pri" data-act="bk-save" style="margin-top:8px">Guardar copia</button></div>`;
+}
+function backupSettings() {
+  const lb = db.settings.lastBackup;
+  return `<div class="card"><h3>Copia de seguridad</h3>
+    <p>${lb ? `Última copia: ${fmtDate(new Date(lb).toISOString())} (hace ${daysAgo(lb)} días)` : 'Todavía no has guardado ninguna copia.'}<br>Sesiones sin respaldar: <strong>${unsaved()}</strong></p>
+    <button class="btn pri" data-act="bk-save" style="width:100%">Guardar copia (Drive, iCloud, Archivos…)</button>
+    <label class="btn" style="display:block;text-align:center;margin-top:8px">Restaurar desde archivo<input type="file" accept="application/json" hidden data-act="restore"></label>
+    <p class="mut">En el menú elige Google Drive, iCloud Drive, Archivos o tu correo. Si tu navegador no ofrece compartir, se descarga el archivo. La copia incluye sesiones, plantillas, ejercicios propios y fotos.</p>
+    <h3 style="margin-top:12px">Copias automáticas en este dispositivo</h3><div id="snaps" class="list mut">Cargando…</div>
+    <p class="mut">Se guardan al terminar una sesión y antes de importar, restaurar o borrar (las últimas 7). Te protegen de errores, <strong>no</strong> de perder o cambiar de teléfono: para eso guarda una copia en tu nube.</p>
+    <p class="mut" id="persist"></p></div>`;
+}
+async function fillSnaps() {
+  const all = (await snapAll()).reverse(), el = $('#snaps'); if (!el) return;
+  el.innerHTML = all.length ? all.map(r => `<div class="item row sp"><span>${new Date(r.ts).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })}<br><span class="mut">${esc(r.reason)} · ${r.sessions} sesiones</span></span><button class="btn sm" data-act="snap-restore" data-ts="${r.ts}">Restaurar</button></div>`).join('') : 'Aún no hay copias automáticas.';
+  const p = $('#persist'), ok = await navigator.storage?.persisted?.();
+  if (p) p.textContent = ok ? 'Almacenamiento protegido por el navegador: sí.' : navigator.storage?.persisted ? 'Almacenamiento protegido: no garantizado. En iPhone instala la app en la pantalla de inicio: Safari puede borrar los datos de sitios que no usas.' : '';
+}
+
 /* ---------- Acciones ---------- */
 let rest = { t: null, left: 0 };
 function stopRest() { clearInterval(rest.t); rest.t = null; }
@@ -368,7 +459,7 @@ function startRest() {
 }
 function finish() {
   const s = cur(); s.finished = new Date().toISOString(); delete s.idx;
-  db.sessions.push(s); db.current = null; save(); stopRest();
+  db.sessions.push(s); db.current = null; save(); stopRest(); snap('Sesión terminada');
   ui.tab = 'historial'; ui.openSession = s.id; render(); toast('Sesión guardada');
 }
 function download(name, text, type) {
@@ -429,9 +520,11 @@ document.addEventListener('click', e => {
   else if (a === 'rest') startRest(); else if (a === 'restoff') { stopRest(); const t = $('#tval'); if (t) t.textContent = planOf(stepEx()).rest + ' s'; }
   else if (a === 'toggle') { ui.openSession = ui.openSession === b.dataset.id ? null : b.dataset.id; render(); }
   else if (a === 'del') { if (confirm('¿Borrar esta sesión?')) { db.sessions = db.sessions.filter(s => s.id !== b.dataset.id); save(); render(); } }
-  else if (a === 'export-json') download('pert-datos.json', JSON.stringify({ sessions: db.sessions, settings: db.settings, templates: db.templates, customExercises: db.customExercises }, null, 2), 'application/json');
+  else if (a === 'export-json') { download('pert-datos.json', JSON.stringify(backupData(), null, 2), 'application/json'); db.settings.lastBackup = Date.now(); save(); }
+  else if (a === 'bk-save') saveBackup();
+  else if (a === 'snap-restore') { if (confirm('Esto reemplaza TODOS los datos actuales por los de esa copia. Antes se guarda una copia automática de lo actual. ¿Continuar?')) snapAll().then(all => { const r = all.find(x => String(x.ts) === b.dataset.ts); if (!r) return toast('Esa copia ya no existe.'); try { restoreData(JSON.parse(r.text)); } catch { toast('La copia está dañada.'); } }); }
   else if (a === 'export-csv') exportCsv();
-  else if (a === 'wipe') { if (confirm('Se borrarán todas las sesiones y fotos de este dispositivo. ¿Continuar?')) { db = blank(); save(); render(); } }
+  else if (a === 'wipe') wipeAll();
 });
 
 document.addEventListener('input', e => {
@@ -453,15 +546,13 @@ document.addEventListener('change', async e => {
   if (a === 'unit') { db.settings.unit = t.value; save(); return render(); }
   if (a === 'photo' && t.files[0]) { try { db.photos[stepEx().id] = await resize(t.files[0]); save(); render(); } catch { toast('No se pudo leer la imagen'); } return; }
   if (a === 'import' && t.files[0]) {
-    try { const d = JSON.parse(await t.files[0].text()); const ids = new Set(db.sessions.map(s => s.id));
-      const eids = new Set(db.customExercises.map(x => x.id));
-      (Array.isArray(d.customExercises) ? d.customExercises : []).forEach(r => { const o = cleanEx(r); if (o && !eids.has(o.id) && !EXERCISES.some(e => e.id === o.id)) { registerEx(o); db.customExercises.push(o); } });
-      let added = 0; (Array.isArray(d.sessions) ? d.sessions : []).forEach(r => { const c = cleanSession(r); if (c && !ids.has(c.id)) { db.sessions.push(c); ids.add(c.id); added++; } });
-      const tids = new Set(db.templates.map(x => x.id));
-      (Array.isArray(d.templates) ? d.templates : []).filter(x => x && x.id && typeof x.name === 'string' && Array.isArray(x.items) && !tids.has(x.id))
-        .forEach(x => db.templates.push({ id: x.id, name: x.name.slice(0, 40), items: x.items.filter(i => i && exById(i.ex)).map(i => ({ ...itemOf(i.ex), ...Object.fromEntries(Object.keys(LIM).filter(k => k in itemOf(i.ex)).map(k => [k, clamp(i[k], LIM[k])])) })) }));
-      db.sessions.sort((x, y) => x.date.localeCompare(y.date)); save(); render(); toast(added ? `Importadas ${added} sesiones` : 'Datos importados (sin sesiones nuevas)'); }
-    catch { toast('Archivo no válido'); } return;
+    try { const d = JSON.parse(await t.files[0].text()); if (!d || typeof d !== 'object') throw 0;
+      await snap('Antes de importar'); const added = ingest(db, d); save(); render(); toast(added ? `Importadas ${added} sesiones` : 'Datos importados (sin sesiones nuevas)'); }
+    catch { toast('Archivo no válido'); } t.value = ''; return;
+  }
+  if (a === 'restore' && t.files[0]) {
+    let d; try { d = JSON.parse(await t.files[0].text()); if (!d || typeof d !== 'object') throw 0; } catch { t.value = ''; return toast('Archivo no válido'); }
+    t.value = ''; if (confirm('Esto reemplaza TODOS los datos actuales por los del archivo. Antes se guarda una copia automática. ¿Continuar?')) await restoreData(d); return;
   }
   if (!f || !cur()) return;
   const en = cur().entries[stepEx().id];
@@ -472,5 +563,7 @@ document.addEventListener('change', async e => {
 });
 
 db.customExercises = db.customExercises.map(cleanEx).filter(Boolean); db.customExercises.forEach(registerEx);
+navigator.storage?.persist?.().catch(() => {});
+snapAll().then(all => { if (!all.length || Date.now() - all[all.length - 1].ts > 12 * 36e5) snap('Automática'); });
 if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
 render();
