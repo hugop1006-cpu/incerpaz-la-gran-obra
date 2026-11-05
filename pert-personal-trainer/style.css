@@ -4,7 +4,7 @@
 html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
 .top{display:flex;align-items:baseline;gap:8px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px}
-.top h1{margin:0;font-size:22px;letter-spacing:2px;color:var(--acc)}
+.top h1{margin:0;font-size:22px;letter-spacing:1px;color:var(--acc)}
 .sub{color:var(--mut);font-size:13px}
 main{max-width:640px;margin:0 auto;padding:0 16px 16px}
 .tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}

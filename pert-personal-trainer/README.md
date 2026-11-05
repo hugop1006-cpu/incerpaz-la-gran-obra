@@ -1,4 +1,4 @@
-# PERT Personal Trainer (prototipo PWA)
+# Personal T (prototipo PWA)
 
 Entrenamiento guiado, un ejercicio a la vez, con registro real. Local-first: los datos viven en el dispositivo (localStorage), sin cuenta ni servidor. Sincronización en la nube **opcional** con tu propio proyecto de Supabase (ver `supabase/SETUP.md`).
 

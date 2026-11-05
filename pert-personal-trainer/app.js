@@ -1,5 +1,5 @@
 'use strict';
-// PERT Personal Trainer — PWA local-first. Todo se guarda en este dispositivo.
+// Personal T — PWA local-first. Todo se guarda en este dispositivo.
 const KEY = 'pert.v1';
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -98,7 +98,7 @@ function photoHint() {
   const [n, t] = photoCount(); if (n >= t) return '';
   return `<div class="card safety"><strong>Fotos de las máquinas:</strong> ${n} de ${t}. Tómalas con tu cámara al llegar a cada máquina (en la ficha del ejercicio) o desde la pestaña Ejercicios.</div>`;
 }
-const SAFETY = `<div class="card safety"><strong>Seguridad:</strong> si aparece dolor de pecho, pesadez del brazo, falta de aire inusual, mareo o sudor frío, detén el ejercicio y busca atención urgente. PERT es un registro y guía, no una app médica ni da autorizaciones.</div>`;
+const SAFETY = `<div class="card safety"><strong>Seguridad:</strong> si aparece dolor de pecho, pesadez del brazo, falta de aire inusual, mareo o sudor frío, detén el ejercicio y busca atención urgente. Personal T es un registro y guía, no una app médica ni da autorizaciones.</div>`;
 
 function viewHoy() {
   if (!cur()) {
@@ -440,7 +440,7 @@ async function snap(reason) {
 async function saveBackup() {
   const text = JSON.stringify(backupData()), name = `pert-copia-${new Date().toISOString().slice(0, 10)}.json`, file = new File([text], name, { type: 'application/json' });
   try {
-    if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: 'Copia de seguridad PERT' });
+    if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: 'Copia de seguridad Personal T' });
     else download(name, text, 'application/json');
   } catch (e) {
     if (e?.name === 'AbortError') return toast('Copia cancelada: no se guardó.');

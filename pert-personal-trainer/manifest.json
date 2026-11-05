@@ -1,6 +1,6 @@
 {
-  "name": "PERT Personal Trainer",
-  "short_name": "PERT",
+  "name": "Personal T",
+  "short_name": "Personal T",
   "description": "Entrenamiento guiado, un ejercicio a la vez, con registro real.",
   "start_url": "./index.html",
   "scope": "./",

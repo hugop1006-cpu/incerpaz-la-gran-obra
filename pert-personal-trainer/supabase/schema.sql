@@ -1,4 +1,4 @@
--- PERT Personal Trainer: esquema mínimo para sincronización opcional.
+-- Personal T: esquema mínimo para sincronización opcional.
 -- Ejecutar una vez en Supabase: SQL Editor -> New query -> pegar -> Run.
 -- Una sola tabla de documentos por usuario. La app guarda:
 --   key = 'session:<id>'   una sesión terminada (inmutable)
@@ -25,3 +25,22 @@ create policy "pert_docs_delete_own" on public.pert_docs for delete to authentic
 -- Sin acceso para usuarios anónimos.
 revoke all on public.pert_docs from anon;
 grant select, insert, update, delete on public.pert_docs to authenticated;
+
+-- Borrado de cuenta desde la app (exigido por App Store y Google Play).
+-- Elimina al usuario de auth.users; sus filas de pert_docs se borran en cascada.
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = public, auth
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'not authenticated';
+  end if;
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+
+revoke all on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;

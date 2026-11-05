@@ -214,6 +214,7 @@ function cloudCard() {
     ${st.error ? `<p class="alert" style="font-weight:400">No se pudo sincronizar: ${esc(st.error)} Tus datos locales están a salvo.</p>` : ''}
     <div class="row"><button class="btn pri" data-act="cloud-sync" ${c.syncing ? 'disabled' : ''}>Sincronizar ahora</button><button class="btn" data-act="cloud-logout">Cerrar sesión</button></div>
     <div class="row" style="margin-top:8px"><button class="btn sm danger" data-act="cloud-wipe">Eliminar mis datos en la nube</button><button class="btn sm danger" data-act="cloud-disconnect">Desconectar</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn sm danger" data-act="cloud-delete-account">Eliminar mi cuenta</button></div>
     <p class="mut">Se sincroniza al abrir la app, al terminar una sesión y al recuperar conexión. La sesión en curso no se sincroniza hasta terminarla.</p></div>`;
 }
 async function cloudAction(a) {
@@ -245,6 +246,15 @@ async function cloudAction(a) {
     return;
   }
   if (a === 'cloud-sync') return cSync();
+  if (a === 'cloud-delete-account') {
+    if (!cloud.session || !confirm(`Se eliminará DEFINITIVAMENTE tu cuenta ${cloud.session.email || ''} y todos tus datos en la nube. Este dispositivo conserva sus datos. Esta acción no se puede deshacer. ¿Continuar?`)) return;
+    try {
+      const r = await creq('/rest/v1/rpc/delete_my_account', { method: 'POST', body: {} });
+      if (!r.ok) throw /delete_my_account/.test(JSON.stringify(r.data)) && r.status === 404 ? new Error('Falta la función delete_my_account: ejecuta supabase/schema.sql en tu proyecto.') : httpErr(r);
+      cloud.session = null; cloud.email = ''; cloud.state = freshState(); csave(); render(); toast('Cuenta eliminada. Tus datos locales siguen en este dispositivo.');
+    } catch (e) { cloud.state.error = e.message; csave(); render(); }
+    return;
+  }
   if (a === 'cloud-wipe') {
     if (!cloud.session || !confirm('Se borrarán TODOS tus datos en la nube (sesiones, plantillas, ejercicios y fotos). Este dispositivo conserva los suyos. ¿Continuar?')) return;
     try { const r = await creq(`/rest/v1/pert_docs?user_id=eq.${encodeURIComponent(cloud.session.uid)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } }); if (!r.ok) throw httpErr(r); cloud.state = { ...freshState(), uid: cloud.session.uid }; csave(); render(); toast('Datos de la nube eliminados.'); }

@@ -1,6 +1,6 @@
 # Configurar la sincronización en la nube (opcional)
 
-PERT funciona completo sin nube. Si quieres sincronizar entre dispositivos usas **tu propio** proyecto de Supabase: tus datos de entrenamiento y salud quedan en tu cuenta, no en un servidor de la app.
+Personal T funciona completo sin nube. Si quieres sincronizar entre dispositivos usas **tu propio** proyecto de Supabase: tus datos de entrenamiento y salud quedan en tu cuenta, no en un servidor de la app.
 
 ## 1. Crear el proyecto
 1. Crea una cuenta en supabase.com y un proyecto nuevo (elige la región más cercana a ti).
@@ -9,7 +9,7 @@ PERT funciona completo sin nube. Si quieres sincronizar entre dispositivos usas 
 
 ## 2. Conectar la app
 1. En Supabase: **Project Settings → API**. Copia la **Project URL** y la clave pública (**anon** o **publishable**). **No uses nunca la clave `service_role`.**
-2. En PERT: **Ajustes → Nube (opcional)**: pega la URL y la clave pública, y pulsa **Guardar**.
+2. En Personal T: **Ajustes → Nube (opcional)**: pega la URL y la clave pública, y pulsa **Guardar**.
 3. Escribe correo y contraseña (mínimo 6 caracteres) y pulsa **Crear cuenta**. En tu segundo dispositivo usa **Iniciar sesión** con la misma cuenta.
 
 ## Cómo funciona
@@ -21,4 +21,4 @@ PERT funciona completo sin nube. Si quieres sincronizar entre dispositivos usas 
 ## Privacidad y límites
 - Los datos viajan cifrados (HTTPS) y quedan protegidos por permisos por usuario (RLS), pero **no están cifrados de extremo a extremo**: quien administre tu proyecto de Supabase puede leerlos.
 - Restaurar una copia de seguridad con la nube activa **no** borra lo que hay en la nube: se mezcla.
-- «Borrar todos los datos» borra solo este dispositivo; al sincronizar, vuelve a descargar lo de la nube. Para borrar la nube usa **Eliminar mis datos en la nube**. Eliminar la cuenta en sí se hace desde el panel de Supabase (Authentication → Users).
+- «Borrar todos los datos» borra solo este dispositivo; al sincronizar, vuelve a descargar lo de la nube. Para borrar la nube usa **Eliminar mis datos en la nube**. **Eliminar mi cuenta** (Ajustes → Nube) borra la cuenta y todos sus datos en la nube de forma definitiva; requiere la función `delete_my_account` de `schema.sql`. Este dispositivo conserva sus datos.
