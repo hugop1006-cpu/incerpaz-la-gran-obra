@@ -206,6 +206,26 @@ const assert = require('assert');
   assert.ok(st, 'termina la partida');
   await pg.evaluate(() => Tetris.action('quit'));
   assert.equal(await pg.evaluate(() => INCERPAZ.G.state), 'select');
+  // Menús del minijuego con toques/clics reales sobre los botones (no solo con el teclado)
+  const clickAct = async act => {
+    const p = await pg.evaluate(act => { const c = document.getElementById('game'), r = c.getBoundingClientRect(), bt = INCERPAZ.G.buttons.find(x => x.action === act); return bt ? [r.left + (bt.x + bt.w / 2) * r.width / c.width, r.top + (bt.y + bt.h / 2) * r.height / c.height] : null; }, act);
+    assert.ok(p, 'no hay botón ' + act);
+    await pg.mouse.click(p[0], p[1]); await step(3);
+  };
+  await pg.evaluate(() => { INCERPAZ.setState('select'); }); await step(2);
+  await clickAct('mini'); assert.equal(await pg.evaluate(() => INCERPAZ.G.state), 'tetris', 'el botón MINIJUEGO abre el minijuego');
+  await clickAct('mode0'); await step(160);
+  assert.equal(await pg.evaluate(() => Tetris._s() && Tetris._s().mode), 'classic', 'tocar CLÁSICO empieza la partida');
+  await pg.evaluate(() => Tetris.action('quit')); await step(3);
+  await clickAct('mini'); await clickAct('mode3');                                   // MISIONES -> lista
+  await clickAct('mode0'); await step(160);
+  assert.equal(await pg.evaluate(() => Tetris._s() && Tetris._s().mis && Tetris._s().mis.name), 'CIMIENTOS', 'tocar una misión la empieza');
+  await pg.evaluate(() => Tetris.action('quit')); await step(3);
+  await clickAct('mini'); await clickAct('mode4'); await clickAct('mode2'); await step(160); // VERSUS -> CPU NORMAL
+  assert.equal(await pg.evaluate(() => Tetris._vs() && Tetris._vs().diff), 1, 'tocar CPU NORMAL empieza el versus');
+  await pg.evaluate(() => Tetris.action('quit')); await step(3);
+  await clickAct('mini'); await clickAct('quit');                                    // VOLVER sale del minijuego
+  assert.equal(await pg.evaluate(() => INCERPAZ.G.state), 'select', 'VOLVER regresa al menú de etapas');
   assert.deepEqual(errs, [], 'sin errores en consola');
   console.log('Torre de Ladrillos: todo OK');
   await b.close();
