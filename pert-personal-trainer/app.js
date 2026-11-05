@@ -6,6 +6,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const exById = id => EXERCISES.find(e => e.id === id);
 const active = () => EXERCISES.filter(e => !e.archived);
 const MODES = { lado: 'por lado', mano: 'por mano', total: 'totales', cuerpo: 'peso corporal' };
+const sid = s => String(s).slice(0, 40).replace(/[^A-Za-z0-9_-]/g, '_');
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 const blank = () => ({ sessions: [], photos: {}, settings: { unit: 'lb' }, current: null, templates: [], customExercises: [] });
@@ -211,7 +212,7 @@ function cleanEx(r) {
   if (!r || typeof r.id !== 'string' || typeof r.name !== 'string' || !r.name.trim()) return null;
   const cardio = r.kind === 'cardio', mode = cardio ? undefined : ['lado', 'mano', 'total', 'cuerpo'].includes(r.mode) ? r.mode : 'total';
   const txt = v => (typeof v === 'string' ? v.slice(0, 400) : '');
-  const o = { id: r.id.slice(0, 40), name: r.name.trim().slice(0, 60), kind: cardio ? 'cardio' : 'fuerza', mode, machine: txt(r.machine).slice(0, 60),
+  const o = { id: sid(r.id), name: r.name.trim().slice(0, 60), updatedAt: Number.isFinite(r.updatedAt) ? r.updatedAt : 0, kind: cardio ? 'cardio' : 'fuerza', mode, machine: txt(r.machine).slice(0, 60),
     plan: cardio ? { minutes: clamp(r.plan?.minutes ?? 10, LIM.minutes) } : { sets: clamp(r.plan?.sets ?? 3, LIM.sets), reps: clamp(r.plan?.reps ?? 10, LIM.reps) },
     rest: cardio ? 0 : clamp(r.rest ?? 60, LIM.rest), custom: true };
   TEXTS.forEach(([k]) => (o[k] = txt(r[k]))); if (r.archived) o.archived = true; return o;
@@ -226,7 +227,12 @@ function cleanSession(r) {
       comment: str(e.comment, 400), symptoms: e.symptoms === 'si' || e.symptoms === 'no' ? e.symptoms : null,
       sets: (Array.isArray(e.sets) ? e.sets : []).slice(0, 10).map(x => ({ done: x?.done === true, weight: str(x?.weight, 8), reps: str(x?.reps, 8), minutes: str(x?.minutes, 8), speed: str(x?.speed, 8) })) };
   });
-  return steps.length ? { id: r.id.slice(0, 40), date: new Date(r.date).toISOString(), routine: str(r.routine, 60) || 'Sesión importada', steps, entries, finished: new Date(r.date).toISOString() } : null;
+  return steps.length ? { id: sid(r.id), date: new Date(r.date).toISOString(), routine: str(r.routine, 60) || 'Sesión importada', steps, entries, finished: new Date(r.date).toISOString() } : null;
+}
+function cleanTemplate(x) {
+  if (!x || typeof x.id !== 'string' || typeof x.name !== 'string' || !Array.isArray(x.items)) return null;
+  return { id: sid(x.id), name: x.name.slice(0, 40), updatedAt: Number.isFinite(x.updatedAt) ? x.updatedAt : 0,
+    items: x.items.filter(i => i && exById(i.ex)).map(i => ({ ...itemOf(i.ex), ...Object.fromEntries(Object.keys(LIM).filter(k => k in itemOf(i.ex)).map(k => [k, clamp(i[k], LIM[k])])) })) };
 }
 function registerEx(o) { const i = EXERCISES.findIndex(e => e.id === o.id); if (i >= 0) EXERCISES.splice(i, 1); EXERCISES.push(o); }
 function saveExDraft() {
@@ -254,7 +260,8 @@ function viewSet() {
     <label>Unidad de peso<select data-act="unit"><option value="lb" ${u === 'lb' ? 'selected' : ''}>Libras (lb)</option><option value="kg" ${u === 'kg' ? 'selected' : ''}>Kilogramos (kg)</option></select></label>
     <p class="mut">Cada ejercicio indica si el peso es total, por mano o por lado.</p></div>
     ${backupSettings()}
-    <div class="card"><h3>Tus datos</h3><p class="mut">Todo queda en este dispositivo (sin cuenta ni servidor).</p>
+    ${cloudCard()}
+    <div class="card"><h3>Tus datos</h3><p class="mut">Por defecto todo queda en este dispositivo; la nube es opcional y solo se usa si la conectas.</p>
       <button class="btn danger" data-act="wipe">Borrar todos los datos</button></div>${SAFETY}`;
 }
 
@@ -392,8 +399,7 @@ function ingest(t, d) {
   const ids = new Set(t.sessions.map(s => s.id)); let added = 0;
   arr(d.sessions).forEach(r => { const c = cleanSession(r); if (c && !ids.has(c.id)) { t.sessions.push(c); ids.add(c.id); added++; } });
   const tids = new Set(t.templates.map(x => x.id));
-  arr(d.templates).filter(x => x && typeof x.id === 'string' && typeof x.name === 'string' && Array.isArray(x.items) && !tids.has(x.id))
-    .forEach(x => t.templates.push({ id: x.id.slice(0, 40), name: x.name.slice(0, 40), items: x.items.filter(i => i && exById(i.ex)).map(i => ({ ...itemOf(i.ex), ...Object.fromEntries(Object.keys(LIM).filter(k => k in itemOf(i.ex)).map(k => [k, clamp(i[k], LIM[k])])) })) }));
+  arr(d.templates).forEach(x => { const c = cleanTemplate(x); if (c && !tids.has(c.id)) { t.templates.push(c); tids.add(c.id); } });
   if (d.photos && typeof d.photos === 'object') Object.entries(d.photos).forEach(([k, v]) => {
     if (exById(k) && !t.photos[k] && typeof v === 'string' && v.length < 400000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(v)) { t.photos[k] = v; photosDirty = true; } });
   t.sessions.sort((x, y) => x.date.localeCompare(y.date)); return added;
@@ -406,12 +412,12 @@ async function restoreData(d) {
   const added = ingest(next, d);
   if (!added && !next.templates.length && !next.customExercises.length && !Object.keys(next.photos).length) { dropCustom(); old.forEach(registerEx); return toast('El archivo no contiene datos reconocibles. No se cambió nada.'); }
   if (d.settings?.unit === 'kg' || d.settings?.unit === 'lb') next.settings.unit = d.settings.unit;
-  db = next; photosDirty = true; save(); render(); toast(`Restaurado: ${added} sesiones`);
+  db = next; photosDirty = true; cloudResetKnown(); save(); render(); toast(`Restaurado: ${added} sesiones`);
 }
 async function wipeAll() {
   if (cur()) return toast('Termina o cancela la sesión actual antes de borrar.');
-  if (!confirm('Se borrarán todas las sesiones, plantillas, ejercicios propios y fotos de este dispositivo. Antes se guarda una copia automática. ¿Continuar?')) return;
-  await snap('Antes de borrar'); dropCustom(); db = blank(); photosDirty = true; save(); render();
+  if (!confirm('Se borrarán todas las sesiones, plantillas, ejercicios propios y fotos de este dispositivo (lo que haya en la nube no se borra y se volverá a descargar al sincronizar). Antes se guarda una copia automática. ¿Continuar?')) return;
+  await snap('Antes de borrar'); dropCustom(); db = blank(); photosDirty = true; cloudResetKnown(); save(); render();
   if (confirm('¿Borrar también las copias automáticas de este dispositivo? (Aceptar = no podrás recuperar nada)')) { await snapClear(); render(); }
 }
 const hash = str => { let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return h; };
@@ -481,6 +487,7 @@ function startRest() {
   el.textContent = rest.left + ' s';
 }
 function finish() {
+  cloudSyncSoon(1500);
   const s = cur(); s.finished = new Date().toISOString(); delete s.idx;
   db.sessions.push(s); db.current = null; save(); stopRest(); snap('Sesión terminada');
   ui.tab = 'historial'; ui.openSession = s.id; render(); toast('Sesión guardada');
@@ -557,6 +564,7 @@ document.addEventListener('click', e => {
   else if (a === 'toggle') { ui.openSession = ui.openSession === b.dataset.id ? null : b.dataset.id; render(); }
   else if (a === 'del') { if (confirm('¿Borrar esta sesión?')) { db.sessions = db.sessions.filter(s => s.id !== b.dataset.id); save(); render(); } }
   else if (a === 'export-json') { download('pert-datos.json', JSON.stringify(backupData(), null, 2), 'application/json'); db.settings.lastBackup = Date.now(); save(); }
+  else if (a.startsWith('cloud-')) cloudAction(a);
   else if (a === 'bk-save') saveBackup();
   else if (a === 'photo-del') { if (confirm('¿Quitar esta foto?')) { delete db.photos[b.dataset.ex]; photosDirty = true; save(); keepScroll(render); } }
   else if (a === 'snap-restore') { if (confirm('Esto reemplaza TODOS los datos actuales por los de esa copia. Antes se guarda una copia automática de lo actual. ¿Continuar?')) snapAll().then(all => { const r = all.find(x => String(x.ts) === b.dataset.ts); if (!r) return toast('Esa copia ya no existe.'); try { restoreData(JSON.parse(r.text)); } catch { toast('La copia está dañada.'); } }); }
@@ -566,6 +574,7 @@ document.addEventListener('click', e => {
 
 document.addEventListener('input', e => {
   const t = e.target;
+  if (t.dataset.c) { (ui.cf = ui.cf || {})[t.dataset.c] = t.value; return; }
   if (t.dataset.x && ui.exDraft) { ui.exDraft[t.dataset.x] = t.value; return; }
   if (t.dataset.t && ui.tplEdit) { const tp = tplById(ui.tplEdit); if (!tp) return; if (t.dataset.t === 'name') tp.name = t.value.slice(0, 40); save(); return; }
   const f = t.dataset.f; if (!f || !cur()) return;
@@ -613,3 +622,4 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.ser
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#viewer')) $('#viewer').hidden = true; });
 if (photosDirty) save();
 render();
+cloudInit();
