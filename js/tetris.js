@@ -52,6 +52,7 @@
   const GRAV = lv => Math.pow(0.8 - (Math.min(lv, 15) - 1) * 0.007, Math.min(lv, 15) - 1); // seg por fila
   const DAS = 0.16, ARR = 0.04, SOFT = 0.035, LOCK_DELAY = 0.5, LOCK_RESETS = 15, CLEAR_T = 0.4, READY_T = 2.4;
   const BOMB_EVERY = 8;       // cada cuántas líneas llega una pieza DEMOLICIÓN
+  const POWER_MAX = 10;       // carga de la NIVELADORA (líneas + extras de combo/Tetris)
   const HOUSE_LINES = 8;      // líneas por etapa de la casa (5 etapas = 40 líneas)
 
   const MODES = [
@@ -79,7 +80,7 @@
   function start(mode) {
     mode = mode || (S && S.mode) || 'classic'; M = null;
     S = {
-      mode, rb: 0, time: 0, sprintDone: false, won: false, lastRot: false,
+      mode, rb: 0, power: 0, time: 0, sprintDone: false, won: false, lastRot: false,
       board: emptyBoard(), queue: [], cur: null, hold: 0, holdUsed: false,
       score: 0, lines: 0, level: 1, combo: -1, b2b: false, bombCharge: 0, bombsUsed: 0,
       phase: 'ready', t: 0, phaseT: 0, fall: 0, lockT: 0, lockResets: 0, lowest: 0,
@@ -187,6 +188,8 @@
     const oldLines = S.lines;
     S.lines += n;
     S.bombCharge += n;
+    const pw0 = S.power; S.power = Math.min(POWER_MAX, S.power + n + (tet ? 2 : 0) + (S.combo > 0 ? 1 : 0));
+    if (pw0 < POWER_MAX && S.power >= POWER_MAX) popup('¡NIVELADORA LISTA!', env.B.good);
     const lvOld = S.level; S.level = Math.min(15, 1 + Math.floor(S.lines / 10));
     S.clearRows = rows; S.phase = 'clearing'; S.phaseT = 0;
     rows.forEach(y => { for (let x = 0; x < COLS; x++) { burst(x, y, MAT[S.board[y][x]][0], 1, 90); } });
@@ -228,6 +231,15 @@
     S.cur = null;
     const rows = fullRows();
     if (rows.length) clearLines(rows); else { S.combo = -1; nextPiece(); }
+  }
+  function usePower() { // NIVELADORA: aplana las 2 filas de abajo
+    if (!S.cur || S.phase !== 'play') return;
+    if (S.power < POWER_MAX) { env.Snd.play('no'); return; }
+    S.power = 0;
+    for (let k = 0; k < 2; k++) { const row = S.board[ROWS - 1 - k]; for (let x = 0; x < COLS; x++) if (row[x]) burst(x, ROWS - 1 - k, MAT[row[x]][1], 2, 100); }
+    S.board.splice(ROWS - 2, 2); S.board.unshift(new Array(COLS).fill(0), new Array(COLS).fill(0));
+    S.score += 200 * S.level; popup('¡NIVELADORA! +' + 200 * S.level, env.B.good, true);
+    S.shake = 0.3; env.Snd.play('ttetris'); bumpLock();
   }
   function nextPiece() {
     if (S.phase === 'over') return;
@@ -308,6 +320,7 @@
     if (e.pressed('rotcw')) rotate(1);
     if (e.pressed('rotccw')) rotate(-1);
     if (e.pressed('hold')) doHold();
+    if (e.pressed('power')) usePower();
     if (!S.cur) return;
     if (e.pressed('hard') || S.gHard) { S.gHard = false; // caída instantánea
       let d = 0; while (tryMove(0, 1)) d++;
@@ -521,7 +534,7 @@
       box(g, rx, by, 92, 96, 'PRÓXIMAS');
       for (let i = 0; i < 3; i++) drawMini(g, S.queue[i], rx + 46, by + 24 + i * 25, hs);
       drawHouseBox(g, rx, by + 104, 92, 70, st);
-      drawBombBar(g, rx, by + 182, 92);
+      drawBombBar(g, rx, by + 182, 92); drawPowerBar(g, rx, by + 196, 92);
       txt(NAMES[S.cur ? S.cur.type : 0] || '', rx + 46, by + bh - 10, B.light, { align: 'center', scale: 1 });
     } else {
       const sx = lay.side[0], sw = lay.side[1] - sx;
@@ -534,7 +547,7 @@
       txt('NIVEL', sx + 2, y, B.secondary, o1); txt(String(S.level), sx + sw - 2, y, B.light, { align: 'right', scale: 1 }); y += 14;
       if (S.mode === 'sprint') { txt(fmtT(S.time), sx + sw / 2, y, B.light, { align: 'center', scale: 1 }); y += 11; txt('FALTAN ' + Math.max(0, SPRINT_LINES - S.lines), sx + sw / 2, y, B.secondaryLight, { align: 'center', scale: 1 }); y += 12; }
       else if (S.mode === 'escombros') { txt('ESCOMBROS: ' + (RUBBLE_EVERY - S.rb), sx + sw / 2, y, S.rb >= RUBBLE_EVERY - 2 ? B.danger : B.light, { align: 'center', scale: 1 }); y += 12; }
-      drawBombBar(g, sx, y, sw); y += 18;
+      drawBombBar(g, sx, y, sw); y += 14; drawPowerBar(g, sx, y, sw); y += 18;
       const hh = Math.min(70, by + bh - y);
       if (hh > 30) drawHouseBox(g, sx, y, sw, hh, st);
     }
@@ -558,6 +571,14 @@
     Art.drawHouse(g, x + (w - 120 * sc) / 2, y + h - 4, sc, st, S.t, true);
     g.restore();
     env.txt('OBRA ' + Math.min(100, Math.floor((S.lines / (HOUSE_LINES * 5)) * 100)) + '%', x + w / 2, y + 3, B.secondary, { align: 'center', scale: 1 });
+  }
+  function drawPowerBar(g, x, y, w) {
+    const { B } = env, ready = S.power >= POWER_MAX, k = S.power / POWER_MAX;
+    g.fillStyle = B.dark; g.fillRect(x - 1, y - 1, w + 2, 10);
+    g.fillStyle = '#183a20'; g.fillRect(x, y, w, 8);
+    g.fillStyle = ready ? (Math.floor(S.t * 6) % 2 ? B.good : '#b6ffc2') : B.good; g.fillRect(x, y, Math.round(w * k), 8);
+    g.fillStyle = 'rgba(255,255,255,0.25)'; g.fillRect(x, y, Math.round(w * k), 1);
+    env.txt(ready ? 'NIVELAR! (V)' : 'NIVELADORA', x + w / 2, y + 1, ready ? B.dark : B.light, { align: 'center', scale: 1 });
   }
   function drawBombBar(g, x, y, w) {
     const { B } = env, k = Math.min(1, S.bombCharge / BOMB_EVERY), queued = S.queue.slice(0, 3).includes(8) || (S.cur && S.cur.type === 8);
@@ -613,7 +634,7 @@
       button(env.mutedLabel(), bxx, by + 40 + (bhgt + 6) * 2, bwid, bhgt, 'mute', false);
       button('SALIR AL MENÚ', bxx, by + 40 + (bhgt + 6) * 3, bwid, bhgt, 't:quit', false);
       if (!document.body.classList.contains('touch')) {
-        const keys = ['← →: MOVER', '↑ / X: GIRAR', 'Z: GIRAR ←', '↓: BAJAR', 'ESPACIO: CAER', 'C / SHIFT: GUARDAR', 'P / ESC: PAUSA'];
+        const keys = ['← →: MOVER', '↑ / X: GIRAR', 'Z: GIRAR ←', '↓: BAJAR', 'ESPACIO: CAER', 'C / SHIFT: GUARDAR', 'V: NIVELADORA', 'P / ESC: PAUSA'];
         if (!narrow) keys.forEach((k, i) => txt(k, cx, by + 40 + (bhgt + 6) * 4 + 6 + i * 11, B.light, { align: 'center' }));
       }
     }
@@ -639,7 +660,7 @@
 
   window.Tetris = {
     init(e) { env = e; },
-    open, start, update, draw, action, gesture,
+    open, start, update, draw, action, gesture, usePower,
     pause() { if (S) setPause(true); },
     get active() { return !!S; },
     // utilidades para pruebas automáticas

@@ -29,6 +29,7 @@ body[data-state=tetris] .only-play, body:not([data-state=tetris]) .only-tet { di
 .act.big { width: 86px; height: 86px; background: rgba(200,80,30,.6) !important; font-size: 14px !important; }
 .act.mid { width: 66px; height: 66px; }
 .act.small { width: 52px; height: 52px; font-size: 11px !important; }
+#btn-power { position: absolute; top: 8px; left: 12px; height: 34px; padding: 0 10px !important; border-radius: 8px !important; z-index: 3; font-size: 11px !important; }
 #btn-pause { position: absolute; top: 8px; right: 8px; width: 40px; height: 34px; border-radius: 8px !important; z-index: 3; }
 
 /* Horizontal: los botones flotan sobre el juego */

@@ -54,7 +54,7 @@
     wall: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], pause: ['KeyP', 'Escape'], mute: ['KeyM'],
     confirm: ['Enter', 'NumpadEnter', 'Space'], back: ['Escape'],
     // minijuego Torre de Ladrillos
-    rotcw: ['ArrowUp', 'KeyX', 'KeyW'], rotccw: ['KeyZ'], hard: ['Space'], hold: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], soft: ['ArrowDown', 'KeyS'], mini: ['KeyT']
+    rotcw: ['ArrowUp', 'KeyX', 'KeyW'], rotccw: ['KeyZ'], hard: ['Space'], hold: ['KeyC', 'KeyK', 'ShiftLeft', 'ShiftRight'], soft: ['ArrowDown', 'KeyS'], mini: ['KeyT'], power: ['KeyV', 'KeyB']
   };
   const keysDown = new Set(), keysPressed = new Set(), touchHeld = new Set(), touchPressed = new Set();
   const held = a => touchHeld.has(a) || BIND[a].some(k => keysDown.has(k));
