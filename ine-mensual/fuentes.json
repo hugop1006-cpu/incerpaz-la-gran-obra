@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "agente": "ine-mensual/1.0 (descarga mensual de tablas publicas)",
+  "espera_segundos": 1.5,
+  "tamano_maximo_mb": 300,
+  "fuentes": [
+    {
+      "id": "cemento_consumo",
+      "titulo": "Consumo de cemento por departamento, según año y mes",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/produccion-venta-y-consumo-de-cemento-cuadros-estadisticos/",
+      "patron": "^bolivia consumo de cemento por departamento",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/8Zv5IDKUwWjvsDI/download",
+      "formato": "xlsx", "lector": "anio_mes", "params": {"unidad": "toneladas"},
+      "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "cemento_ventas",
+      "titulo": "Ventas de cemento por departamento, según año y mes",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/produccion-venta-y-consumo-de-cemento-cuadros-estadisticos/",
+      "patron": "^bolivia ventas de cemento por departamento",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/KkklD3dMnq2McoL/download",
+      "formato": "xlsx", "lector": "anio_mes", "params": {"unidad": "toneladas"},
+      "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "cemento_produccion",
+      "titulo": "Producción de cemento por departamento, según año y mes",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/produccion-venta-y-consumo-de-cemento-cuadros-estadisticos/",
+      "patron": "^bolivia produccion de cemento por departamento",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/KO5oEVNveSsP3Qm/download",
+      "formato": "xlsx", "lector": "anio_mes", "params": {"unidad": "toneladas"},
+      "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+
+    {
+      "id": "icc_beni", "titulo": "Precios promedio de materiales de construcción: Beni",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/costos-de-contruccion/",
+      "patron": "^beni$", "url_fija": "https://nube.ine.gob.bo/index.php/s/e3dko6IlAbFUPx8/download",
+      "formato": "xlsx", "lector": "precios_materiales", "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "icc_chuquisaca", "titulo": "Precios promedio de materiales de construcción: Chuquisaca",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/costos-de-contruccion/",
+      "patron": "^chuquisaca$", "url_fija": "https://nube.ine.gob.bo/index.php/s/hSnzLbrVcsf3rBl/download",
+      "formato": "xlsx", "lector": "precios_materiales", "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "icc_cochabamba", "titulo": "Precios promedio de materiales de construcción: Cochabamba",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/costos-de-contruccion/",
+      "patron": "^cochabamba$", "url_fija": "https://nube.ine.gob.bo/index.php/s/WXg8GYbH2qmdanK/download",
+      "formato": "xlsx", "lector": "precios_materiales", "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "icc_lapaz", "titulo": "Precios promedio de materiales de construcción: La Paz",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/costos-de-contruccion/",
+      "patron": "^la paz$", "url_fija": "https://nube.ine.gob.bo/index.php/s/MBTHZiAhvm2LVnB/download",
+      "formato": "xlsx", "lector": "precios_materiales", "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "icc_oruro", "titulo": "Precios promedio de materiales de construcción: Oruro",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/costos-de-contruccion/",
+      "patron": "^oruro$", "url_fija": "https://nube.ine.gob.bo/index.php/s/oa7NDxrkffRd198/download",
+      "formato": "xlsx", "lector": "precios_materiales", "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "icc_pando", "titulo": "Precios promedio de materiales de construcción: Pando",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/costos-de-contruccion/",
+      "patron": "^pando$", "url_fija": "https://nube.ine.gob.bo/index.php/s/i5vBfYZFUzLFAd0/download",
+      "formato": "xlsx", "lector": "precios_materiales", "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "icc_potosi", "titulo": "Precios promedio de materiales de construcción: Potosí",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/costos-de-contruccion/",
+      "patron": "^potosi$", "url_fija": "https://nube.ine.gob.bo/index.php/s/lhp8ZRD4J4y20hX/download",
+      "formato": "xlsx", "lector": "precios_materiales", "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "icc_santacruz", "titulo": "Precios promedio de materiales de construcción: Santa Cruz",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/costos-de-contruccion/",
+      "patron": "^santa cruz$", "url_fija": "https://nube.ine.gob.bo/index.php/s/ddaZ3Mrb8zQptBy/download",
+      "formato": "xlsx", "lector": "precios_materiales", "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "icc_tarija", "titulo": "Precios promedio de materiales de construcción: Tarija",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/costos-de-contruccion/",
+      "patron": "^tarija$", "url_fija": "https://nube.ine.gob.bo/index.php/s/xfE87NO4OW168o6/download",
+      "formato": "xlsx", "lector": "precios_materiales", "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+
+    {
+      "id": "permisos_superficie",
+      "titulo": "Superficie registrada en permisos de construcción, según año y mes",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/permisos-de-construccion-cuadros-estadisticos/",
+      "patron": "^bolivia superficie registrada en permisos de construccion",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/Ys6tEPQpLWYR4ba/download",
+      "formato": "xls", "lector": "anio_mes", "params": {"unidad": "metros cuadrados"},
+      "periodicidad": "mensual", "rezago_max_meses": 4, "no_negativos": true
+    },
+    {
+      "id": "permisos_numero",
+      "titulo": "Número de permisos de construcción, según año y mes",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/construccion/permisos-de-construccion-cuadros-estadisticos/",
+      "patron": "^bolivia numero de permisos de construccion",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/jLb5wFW0JvKCqtR/download",
+      "formato": "xls", "lector": "anio_mes", "params": {"unidad": "permisos"},
+      "periodicidad": "mensual", "rezago_max_meses": 4, "no_negativos": true
+    },
+
+    {
+      "id": "imp_cuci",
+      "titulo": "Importaciones según clasificación CUCI, por año y mes",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/comercio-exterior/importaciones-cuadros-estadisticos/",
+      "patron": "^bolivia importaciones segun clasificacion uniforme para el comercio internacional por ano y mes",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/sK59y78md8YZKSn/download",
+      "formato": "xlsx", "lector": "cuci", "params": {"hojas": {"IMP_VAL_MES_CUCI": "valor", "IMP_VOL_MES_CUCI": "volumen"}},
+      "periodicidad": "mensual", "rezago_max_meses": 3, "no_negativos": true
+    },
+    {
+      "id": "imp_micro_{anio}",
+      "anios": [0, -1],
+      "titulo": "Importaciones: microdatos de {anio} (agregado por partida arancelaria de construcción)",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/comercio-exterior/importaciones-bases-de-datos/",
+      "patron_crudo": "^IMPORTACIONES (ENE A [A-Z]{3,9} )?{anio}p?$",
+      "url_fija_por_anio": {
+        "2025": "https://nube.ine.gob.bo/index.php/s/22yfb3bJv9SDxim/download",
+        "2026": "https://nube.ine.gob.bo/index.php/s/99Nl1wDImLhVm3l/download"
+      },
+      "formato": "xlsx", "lector": "micro_importaciones", "pesada": true, "opcional": true,
+      "params": {
+        "grupos": [
+          ["721420", "Barras corrugadas (7214.20)"], ["7213", "Alambron (7213)"], ["7214", "Otras barras laminadas (7214 sin corrugadas)"],
+          ["7216", "Perfiles (7216)"], ["7217", "Alambre de hierro o acero (7217)"], ["7228", "Barras de acero aleado (7228)"],
+          ["2523", "Cemento (2523)"], ["6904", "Ladrillos de arcilla (6904)"], ["6905", "Tejas de arcilla (6905)"],
+          ["6907", "Baldosas y revestimientos ceramicos (6907)"], ["6908", "Baldosas ceramicas esmaltadas (6908)"]
+        ]
+      },
+      "periodicidad": "mensual", "rezago_max_meses": 3, "solo_ano_actual": true
+    },
+    {
+      "id": "imp_diccionario",
+      "titulo": "Diccionario de la base de datos de importaciones",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/comercio-exterior/importaciones-bases-de-datos/",
+      "patron": "^diccionario base de datos importaciones$",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/HukvdYl2zGx4nZ6/download",
+      "formato": "xlsx", "lector": null, "periodicidad": "eventual"
+    },
+
+    {
+      "id": "poblacion_rev2025",
+      "titulo": "Población estimada y proyectada por departamento, 2024-2034 (revisión 2025)",
+      "pagina": "https://www.ine.gob.bo/index.php/censos-y-proyecciones-de-poblacion-sociales/",
+      "patron_crudo": "POR DEPARTAMENTO, SEG.N A.OS CALENDARIO, 2024-2034",
+      "url_fija": "https://nimbus.ine.gob.bo/index.php/s/Dckwi79Zzn9sJdW/download",
+      "formato": "xlsx", "lector": "poblacion", "periodicidad": "anual", "no_negativos": true
+    },
+    {
+      "id": "poblacion_rev2014",
+      "titulo": "Población estimada y proyectada por departamento, 2000-2025 (revisión 2014)",
+      "pagina": "https://www.ine.gob.bo/index.php/censos-y-proyecciones-de-poblacion-sociales/",
+      "patron_crudo": "POR DEPARTAMENTO, SEG.N A.OS CALENDARIO, 2000-2025",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/JPqPbknARAJX8Rt/download",
+      "formato": "xlsx", "lector": "poblacion", "periodicidad": "anual", "no_negativos": true
+    },
+
+    {
+      "id": "hogares_paredes_depto",
+      "titulo": "Hogares según departamento y material de las paredes de la vivienda",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-sociales/vivienda-y-servicios-basicos/encuestas-de-hogares-vivienda/",
+      "patron": "hogares segun departamento y material de construccion utilizado en paredes",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/NFoXLM3sUYKLQoG/download",
+      "formato": "xlsx", "lector": "hogares_paredes", "periodicidad": "anual", "no_negativos": true
+    },
+    {
+      "id": "hogares_deficit",
+      "titulo": "Hogares según área y déficit habitacional",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-sociales/vivienda-y-servicios-basicos/encuestas-de-hogares-vivienda/",
+      "patron": "hogares segun area y deficit habitacional",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/iqsAV8Ovih6oSG6/download",
+      "formato": "xlsx", "lector": null, "periodicidad": "anual"
+    },
+
+    {
+      "id": "ipi_produccion",
+      "titulo": "Índice de volumen de producción de la industria manufacturera, por trimestre",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/industria-manufacturera-y-comercio/cuadros-estadisticos-i/",
+      "patron": "^bolivia indice de volumen de produccion de la industria manufacturera",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/POWVT4ZqvMZUIBl/download",
+      "formato": "xlsx", "lector": null, "periodicidad": "trimestral"
+    },
+    {
+      "id": "ipi_capacidad",
+      "titulo": "Utilización de la capacidad productiva instalada de la industria manufacturera",
+      "pagina": "https://www.ine.gob.bo/index.php/estadisticas-economicas/industria-manufacturera-y-comercio/cuadros-estadisticos-i/",
+      "patron": "^bolivia porcentaje de utilizacion de la capacidad productiva",
+      "url_fija": "https://nube.ine.gob.bo/index.php/s/rmFjGFy0nomAE9U/download",
+      "formato": "xlsx", "lector": null, "periodicidad": "trimestral"
+    }
+  ]
+}

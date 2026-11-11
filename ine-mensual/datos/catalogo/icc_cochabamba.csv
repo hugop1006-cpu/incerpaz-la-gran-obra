@@ -1,0 +1,147 @@
+serie,orden,nombre,unidad,cantidad
+1512003,0,Piedra bruta,Metro(s) cúbico(s),4
+1512010,1,Piedra manzana,Metro(s) cúbico(s),4
+1531001,2,Arena corriente,Metro(s) cúbico(s),4
+1531006,3,Arena fina,Metro(s) cúbico(s),4
+1532005,4,Grava común,Metro(s) cúbico(s),4
+3121003,5,Parqué de madera de primera,Metro(s) cuadrado(s),1
+3121008,6,Viga de madera,Metro(s),1
+3141001,7,Tablero de melamina,Pieza(s),1
+3160001,8,Ventana de madera,Pieza(s),1
+3160002,9,Puerta de madera,Pieza(s),1
+3160003,10,Zócalo de madera,Metro(s),1
+3160005,11,Madera de construcción para techo,Metro(s),3
+3472001,12,Plastoformo grande,Pieza(s),1
+3511002,13,Pintura anticorrosiva,Litro(s),3.5
+3511003,14,Limpiador,Litro(s),1
+3511004,15,Barniz,Litro(s),1
+3511006,16,Pintura látex de segunda,Litro(s),18
+3511007,17,Membrana para techo,Metro(s),1
+3511008,18,Pintura látex de primera,Litro(s),18
+3511009,19,Pintura al aceite,Litro(s),3.5
+3511099,20,Sellador de pintura,Litro(s),18
+3542007,21,Pegamento para PVC,Mililitro(s),946
+3542008,22,Silicona,Pieza(s),1
+3632004,23,Cañería de 1/2 pulgada,Metro(s),6
+3632008,24,Cañería de 3/4 pulgada,Metro(s),6
+3632011,25,Tubería para instalación sanitaria de 2 pulgadas,Metro(s),4
+3632013,26,Tubería para instalación sanitaria de 3 pulgadas,Metro(s),4
+3632014,27,Tubería para instalación sanitaria de 4 pulgadas,Metro(s),4
+3632015,28,Tubería para instalación sanitaria de 6 pulgadas,Metro(s),4
+3632016,29,Tubo para instalación eléctrica de 5/8 pulgada,Metro(s),3
+3632017,30,Cañería de 1 pulgada,Metro(s),6
+3632018,31,Cañería de 1/2 pulgada (alta presión),Metro(s),6
+3632019,32,Tubo Bergmann,Metro(s),3
+3633008,33,Placa,Metro(s) cuadrado(s),1
+3691001,34,Piso de vinil,Metro(s) cuadrado(s),1
+3692001,35,Cinta aislante,Pieza(s),1
+3693001,36,Ducha eléctrica,Pieza(s),1
+3693004,37,Regadera (ducha),Pieza(s),1
+3693009,38,Rejilla de piso plástica,Pieza(s),1
+3695001,39,Tanque para agua (menos de 900 litros),Pieza(s),1
+3695003,40,Persianas de fibra,Metro(s) cuadrado(s),1
+3695007,41,Caja interceptora,Pieza(s),1
+3695009,42,Caja de derivación,Pieza(s),1
+3695011,43,Tanque para agua (2.000-2.300 litros),Pieza(s),1
+3695012,44,Caja plástica,Pieza(s),1
+3695013,45,Tanque para agua (3.000-5.000 litros),Pieza(s),1
+3695014,46,Tanque para agua (10.000-25.000 litros),Pieza(s),1
+3711401,47,Vidrio doble,Metro(s) cuadrado(s),1
+3711403,48,Vidrio simple,Pie(s) cuadrado(s),1
+3711601,49,Espejo,Metro(s) cuadrado(s),1
+3711701,50,Bloque de vidrio grande,Pieza(s),1
+3719901,51,Puerta de vidrio,Pieza(s),1
+3719904,52,Tina,Pieza(s),1
+3719999,53,Base de ducha,Pieza(s),1
+3721001,54,Inodoro tanque alto,Pieza(s),1
+3721002,55,Urinario,Pieza(s),1
+3721003,56,Juego de baño,Juego(s),1
+3733001,57,Cemento cola,Kilo(s),20
+3735001,58,Ladrillo de 6 huecos,Pieza(s),1000
+3735002,59,Ladrillo adobito,Pieza(s),1000
+3735004,60,Teja cerámica,Pieza(s),1000
+3737002,61,Revestimiento de cerámica importado,Metro(s) cuadrado(s),1
+3737003,62,Piso de cerámica,Metro(s) cuadrado(s),1
+3737004,63,Piso de porcelanato,Metro(s) cuadrado(s),1
+3737006,64,Revestimiento de cerámica nacional,Metro(s) cuadrado(s),1
+3741001,65,Estuco / yeso,Kilo(s),40
+3742003,66,Cal molida,Kilo(s),10
+3744001,67,Cemento portland gris,Kilo(s),50
+3753001,68,Muro de drywall,Metro(s) cuadrado(s),1
+3754006,69,Mesón,Metro(s),1
+3756007,70,Lavandería,Pieza(s),1
+3756013,71,Vigueta pretensada con plastoformo,Metro(s) cuadrado(s),1
+3791006,72,Lija para pared,Metro(s),1
+3794002,73,Imprimante,Litro(s),4
+3799001,74,Cielo falso,Metro(s) cuadrado(s),1
+3899305,75,Rodillo,Pieza(s),1
+4121101,76,Plancha lámina plana,Pieza(s),1
+4124202,77,Fierro liso de 1/2 pulgada,Pieza(s),1
+4124203,78,Fierro corrugado de 1/2 pulgada,Kilo(s),1000
+4124204,79,Fierro corrugado de 1/4 pulgada,Kilo(s),1000
+4126301,80,Alambre de amarre,Kilo(s),1
+4126502,81,Fierro angular de 1 ½ pulgadas x 1/8 pulgada,Metro(s),6
+4127301,82,Tubería de fierro galvanizado de 1/2 pulgada,Metro(s),6
+4127303,83,Tubería de fierro galvanizado de 3/4 pulgada,Metro(s),6
+4127306,84,Tubería de fierro galvanizado de 2 pulgadas,Metro(s),6
+4127307,85,Perfil C metálico de 50 x 25 x 12 x 2 mm,Pieza(s),1
+4127308,86,Perfil C metálico de 80 x 40 x 15 x 2 mm,Pieza(s),1
+4127309,87,Fierro tubular,Metro(s),6
+4127311,88,Perfil metálico costanera,Metro(s),6
+4127316,89,Tubo rectangular uno,Metro(s),6
+4127319,90,Tubería de fierro galvanizado de 3 pulgadas,Metro(s),6
+4151201,91,Jabalina,Metro(s),2.4
+4154701,92,Soldadura,Pieza(s),1
+4212001,93,Box de baño,Pieza(s),1
+4212002,94,Ventana de aluminio,Pieza(s),1
+4219017,95,Panel de aluminio,Pieza(s),1
+4219018,96,Calamina ondulada,Pieza(s),1
+4219020,97,Calamina plana n.º 28,Pieza(s),1
+4219021,98,Calamina plana n.º 26,Pieza(s),1
+4291101,99,Lavaplatos de 2 depósitos,Pieza(s),1
+4292101,100,Pala,Pieza(s),1
+4292102,101,Picota,Pieza(s),1
+4292113,102,Alicate,Pieza(s),1
+4292114,103,Llave Crescent,Pieza(s),1
+4292118,104,Cepillo para madera,Pieza(s),1
+4292123,105,Pistola para silicona,Pieza(s),1
+4292199,106,Plancha de albañilería,Pieza(s),1
+4294301,107,Malla olímpica,Metro(s) cuadrado(s),1
+4294303,108,Alambre tejido,Metro(s),40
+4294401,109,Clavos,Kilo(s),1
+4299201,110,Cerradura / chapa exterior,Pieza(s),1
+4299202,111,Cerradura / chapa interior,Pieza(s),1
+4299203,112,Bisagra de 3 pulgadas,Pieza(s),2
+4299904,113,Escalerilla de fierro galvanizado,Pieza(s),1
+4322005,114,Bomba de agua,Pieza(s),1
+4322007,115,Bomba de agua de 1/2 HP,Pieza(s),1
+4322008,116,Bomba de agua de 3 HP,Pieza(s),1
+4324003,117,Llave de paso de 1/2 pulgada,Pieza(s),1
+4324006,118,Llave de paso de 2 pulgadas,Pieza(s),1
+4354003,119,Ascensor social para 8 personas y 11 paradas,Pieza(s),1
+4354004,120,Ascensor social para 8 personas y 6 paradas,Pieza(s),1
+4421601,121,Máquina cortadora de cerámica,Pieza(s),1
+4481501,122,Ventilador,Pieza(s),1
+4481502,123,Extractor,Pieza(s),1
+4482502,124,Calefón a gas (12 litros o menos),Pieza(s),1
+4482503,125,Calefón a gas (16 litros o más),Pieza(s),1
+4621201,126,Interruptor termomagnético bipolar,Pieza(s),1
+4621202,127,Interruptor doble,Pieza(s),1
+4621203,128,Tomacorriente simple,Pieza(s),1
+4621204,129,Tomacorriente doble,Pieza(s),1
+4621205,130,Interruptor simple,Pieza(s),1
+4621208,131,Interruptor breaker,Pieza(s),1
+4621209,132,Interruptor termomagnético unipolar,Pieza(s),1
+4621212,133,Conmutador interruptor simple de 3 vías,Pieza(s),1
+4621217,134,Tablero metálico para 14 medidores,Pieza(s),1
+4621305,135,Caja metálica para medidores,Pieza(s),1
+4631001,136,Alambre monopolar n.º 14 AWG,Metro(s),100
+4631002,137,Alambre monopolar n.º 16 AWG,Metro(s),100
+4631004,138,Alambre monopolar n.º 10 AWG,Metro(s),100
+4631005,139,Alambre monopolar n.º 12 AWG,Metro(s),100
+4631006,140,Alambre monopolar n.º 8 AWG,Metro(s),100
+4651001,141,Panel de luminaria led empotrable de 60 x 60 cm,Pieza(s),1
+4651002,142,Foco ahorrador,Pieza(s),1
+4651003,143,Panel de luminaria led de 30 x 30 cm,Pieza(s),1
+4651004,144,Luminaria led 2 tubos,Pieza(s),1
+4695001,145,Electrodos para soldadura,Kilo(s),1

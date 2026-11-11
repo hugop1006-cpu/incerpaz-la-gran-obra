@@ -1,0 +1,101 @@
+name: INE mensual
+
+# Descarga las tablas públicas del INE de Bolivia una vez al mes, las lee y guarda los datos nuevos en ine-mensual/datos.
+# También se puede lanzar a mano desde la pestaña Actions («Run workflow»).
+on:
+  schedule:
+    - cron: '17 12 15 * *'   # día 15 de cada mes, 12:17 UTC (08:17 en Bolivia)
+  workflow_dispatch:
+    inputs:
+      solo:
+        description: 'Ids de fuentes separados por coma (vacío = todas)'
+        required: false
+        default: ''
+      forzar:
+        description: 'Leer de nuevo aunque el archivo no haya cambiado'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # para guardar los datos nuevos en el repositorio
+  issues: write     # para abrir un aviso si alguna fuente falla
+
+concurrency:
+  group: ine-mensual
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: ine-mensual/requirements.txt
+
+      - name: Instalar dependencias
+        run: pip install -r ine-mensual/requirements.txt
+
+      - name: Pruebas
+        run: python -I -m unittest discover -s ine-mensual/tests
+
+      - name: Descargar y actualizar
+        id: ine
+        env:
+          SOLO: ${{ inputs.solo }}
+          FORZAR: ${{ inputs.forzar }}
+        run: |
+          set +e
+          args=()
+          if [ -n "$SOLO" ]; then args+=(--solo "$SOLO"); fi
+          if [ "$FORZAR" = "true" ]; then args+=(--forzar); fi
+          python -I ine-mensual/ine_mensual.py actualizar "${args[@]}"
+          echo "codigo=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Resumen en la página de la ejecución
+        if: always()
+        run: |
+          if [ -f ine-mensual/datos/ultimo_informe.md ]; then cat ine-mensual/datos/ultimo_informe.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Guardar las copias crudas (90 días)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: archivo-ine-${{ github.run_id }}
+          path: ine-mensual/archivo/
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Guardar los datos en el repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ine-mensual/datos
+          if git diff --cached --quiet; then
+            echo "Sin cambios en los datos."
+          else
+            git commit -m "Datos del INE: $(date -u +%F)"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+
+      - name: Avisar con un issue si hay datos nuevos, atrasos o errores
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          f=ine-mensual/datos/ultimo_resumen.json
+          [ -f "$f" ] || exit 0
+          nuevas=$(jq '.con_datos_nuevos | length' "$f"); atrasadas=$(jq '.atrasadas | length' "$f"); errores=$(jq '.errores | length' "$f")
+          if [ "$nuevas" != "0" ] || [ "$atrasadas" != "0" ] || [ "$errores" != "0" ]; then
+            gh issue create --title "INE mensual $(date -u +%F): $nuevas con datos nuevos, $atrasadas atrasadas, $errores con error" \
+              --body-file ine-mensual/datos/ultimo_informe.md
+          fi
+
+      - name: Marcar la ejecución como fallida si hubo errores
+        if: steps.ine.outputs.codigo != '0'
+        run: exit 1
