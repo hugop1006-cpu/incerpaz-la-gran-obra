@@ -1,0 +1,89 @@
+serie,orden,nombre,unidad,cantidad
+1512003,0,Piedra bruta,Metro(s) cúbico(s),4
+1512010,1,Piedra manzana,Metro(s) cúbico(s),4
+1531001,2,Arena corriente,Metro(s) cúbico(s),4
+1531006,3,Arena fina,Metro(s) cúbico(s),4
+1532005,4,Grava común,Metro(s) cúbico(s),4
+3121003,5,Parqué de madera de primera,Metro(s) cuadrado(s),1
+3121004,6,Parqué de madera de segunda,Metro(s) cuadrado(s),1
+3141001,7,Tablero de melamina,Pieza(s),1
+3160001,8,Ventana de madera,Pieza(s),1
+3160002,9,Puerta de madera,Pieza(s),1
+3160005,10,Madera de construcción para techo,Pie(s) cuadrado(s),1
+3472002,11,Plastoformo pequeño,Pieza(s),1
+3511002,12,Pintura anticorrosiva,Litro(s),3.5
+3511007,13,Membrana para techo,Metro(s),10
+3511008,14,Pintura látex de primera,Litro(s),18
+3511009,15,Pintura al aceite,Litro(s),3.5
+3542007,16,Pegamento para PVC,Litro(s),1
+3542099,17,Pegamento para pisos,Litro(s),3.5
+3632004,18,Cañería de 1/2 pulgada,Metro(s),6
+3632008,19,Cañería de 3/4 pulgada,Metro(s),6
+3632010,20,Tubería para instalación sanitaria de 1 ½ pulgadas,Metro(s),4
+3632011,21,Tubería para instalación sanitaria de 2 pulgadas,Metro(s),4
+3632014,22,Tubería para instalación sanitaria de 4 pulgadas,Metro(s),4
+3632016,23,Tubo para instalación eléctrica de 5/8 pulgada,Metro(s),3
+3632017,24,Cañería de 1 pulgada,Metro(s),6
+3639001,25,Lámina de policarbonato,Pieza(s),1
+3691001,26,Piso de vinil,Metro(s),1
+3693001,27,Ducha eléctrica,Pieza(s),1
+3693009,28,Rejilla de piso plástica,Pieza(s),1
+3695007,29,Caja interceptora,Pieza(s),1
+3695010,30,Tanque para agua (900-1.200 litros),Pieza(s),1
+3711401,31,Vidrio doble,Pie(s) cuadrado(s),1
+3711701,32,Bloque de vidrio grande,Pieza(s),1
+3719901,33,Puerta de vidrio,Pieza(s),1
+3719999,34,Base de ducha,Pieza(s),1
+3721001,35,Inodoro tanque alto,Pieza(s),1
+3721002,36,Urinario,Pieza(s),1
+3721003,37,Juego de baño,Pieza(s),2
+3733001,38,Cemento cola,Kilo(s),20
+3735001,39,Ladrillo de 6 huecos,Pieza(s),1000
+3735002,40,Ladrillo adobito,Pieza(s),1000
+3735003,41,Ladrillo gambote,Pieza(s),1000
+3737003,42,Piso de cerámica,Metro(s) cuadrado(s),1
+3737004,43,Piso de porcelanato,Metro(s) cuadrado(s),1
+3737006,44,Revestimiento de cerámica nacional,Metro(s) cuadrado(s),1
+3741001,45,Estuco / yeso,Kilo(s),25
+3744001,46,Cemento portland gris,Kilo(s),50
+3756013,47,Vigueta pretensada con plastoformo,Metro(s) cuadrado(s),1
+3757002,48,Placa ondulada,Pieza(s),1
+3899305,49,Rodillo,Pieza(s),1
+4124203,50,Fierro corrugado de 1/2 pulgada,Kilo(s),1000
+4126301,51,Alambre de amarre,Kilo(s),1
+4127302,52,Tubería de fierro galvanizado de 1 ½ pulgadas,Pieza(s),1
+4127304,53,Tubería de fierro galvanizado de 1 pulgada,Metro(s),5.8
+4127306,54,Tubería de fierro galvanizado de 2 pulgadas,Metro(s),6
+4127311,55,Perfil metálico costanera,Metro(s),6
+4127315,56,Tubo cuadrado,Metro(s),6
+4127321,57,Fierro tubular rectangular,Metro(s),6
+4154701,58,Soldadura,Pieza(s),1
+4212002,59,Ventana de aluminio,Pieza(s),1
+4219018,60,Calamina ondulada,Pieza(s),1
+4219020,61,Calamina plana n.º 28,Pieza(s),1
+4291106,62,Lavaplatos de 1 depósito,Pieza(s),1
+4292101,63,Pala,Pieza(s),1
+4292102,64,Picota,Pieza(s),1
+4292113,65,Alicate,Pieza(s),1
+4292114,66,Llave Crescent,Pieza(s),1
+4292118,67,Cepillo para madera,Pieza(s),1
+4292123,68,Pistola para silicona,Pieza(s),1
+4292199,69,Plancha de albañilería,Pieza(s),1
+4294401,70,Clavos,Kilo(s),1
+4299201,71,Cerradura / chapa exterior,Pieza(s),1
+4324003,72,Llave de paso de 1/2 pulgada,Pieza(s),1
+4421601,73,Máquina cortadora de cerámica,Pieza(s),1
+4621201,74,Interruptor termomagnético bipolar,Pieza(s),1
+4621202,75,Interruptor doble,Pieza(s),1
+4621204,76,Tomacorriente doble,Pieza(s),1
+4621205,77,Interruptor simple,Pieza(s),1
+4621210,78,Interruptor termomagnético unipolar de 20 amperios,Pieza(s),1
+4621212,79,Conmutador interruptor simple de 3 vías,Pieza(s),1
+4621303,80,Caja de distribución para 6 térmicos,Pieza(s),1
+4621304,81,Caja galvanizada rectangular,Pieza(s),1
+4631001,82,Alambre monopolar n.º 14 AWG,Metro(s),100
+4631004,83,Alambre monopolar n.º 10 AWG,Metro(s),100
+4631005,84,Alambre monopolar n.º 12 AWG,Metro(s),100
+4631006,85,Alambre monopolar n.º 8 AWG,Metro(s),100
+4651001,86,Panel de luminaria led empotrable de 60 x 60 cm,Pieza(s),1
+4695001,87,Electrodos para soldadura,Kilo(s),1

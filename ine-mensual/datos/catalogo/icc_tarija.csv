@@ -1,0 +1,89 @@
+serie,orden,nombre,unidad,cantidad
+1512003,0,Piedra bruta,Metro(s) cúbico(s),4
+1512010,1,Piedra manzana,Metro(s) cúbico(s),4
+1531001,2,Arena corriente,Metro(s) cúbico(s),4
+1531006,3,Arena fina,Metro(s) cúbico(s),4
+1532005,4,Grava común,Metro(s) cúbico(s),4
+3141001,5,Tablero de melamina,Pieza(s),1
+3160001,6,Ventana de madera,Pieza(s),1
+3160002,7,Puerta de madera,Pieza(s),1
+3160005,8,Madera de construcción para techo,Metro(s) cuadrado(s),1
+3472002,9,Plastoformo pequeño,Pieza(s),1
+3511002,10,Pintura anticorrosiva,Litro(s),3.5
+3511008,11,Pintura látex de primera,Litro(s),18
+3511009,12,Pintura al aceite,Litro(s),3.5
+3542007,13,Pegamento para PVC,Mililitro(s),100
+3542008,14,Silicona,Pieza(s),1
+3632004,15,Cañería de 1/2 pulgada,Metro(s),6
+3632008,16,Cañería de 3/4 pulgada,Metro(s),6
+3632011,17,Tubería para instalación sanitaria de 2 pulgadas,Metro(s),4
+3632014,18,Tubería para instalación sanitaria de 4 pulgadas,Metro(s),4
+3632016,19,Tubo para instalación eléctrica de 5/8 pulgada,Metro(s),3
+3632018,20,Cañería de 1/2 pulgada (alta presión),Metro(s),6
+3639001,21,Lámina de policarbonato,Pieza(s),1
+3693001,22,Ducha eléctrica,Pieza(s),1
+3693004,23,Regadera (ducha),Pieza(s),1
+3695003,24,Persianas de fibra,Metro(s) cuadrado(s),1
+3695007,25,Caja interceptora,Pieza(s),1
+3695009,26,Caja de derivación,Pieza(s),1
+3695010,27,Tanque para agua (900-1.200 litros),Pieza(s),1
+3711401,28,Vidrio doble,Metro(s) cuadrado(s),1
+3711403,29,Vidrio simple,Metro(s) cuadrado(s),1
+3711406,30,Vidrio emplomado (ahumado),Metro(s) cuadrado(s),1
+3711508,31,Vidrio blindex,Metro(s) cuadrado(s),1
+3719901,32,Puerta de vidrio,Pieza(s),1
+3719999,33,Base de ducha,Pieza(s),1
+3721002,34,Urinario,Pieza(s),1
+3721003,35,Juego de baño,Juego(s),1
+3735001,36,Ladrillo de 6 huecos,Pieza(s),1000
+3735002,37,Ladrillo adobito,Pieza(s),1000
+3735004,38,Teja cerámica,Pieza(s),1000
+3737003,39,Piso de cerámica,Metro(s) cuadrado(s),1
+3737006,40,Revestimiento de cerámica nacional,Metro(s) cuadrado(s),1
+3741001,41,Estuco / yeso,Kilo(s),20
+3742003,42,Cal molida,Kilo(s),10
+3744001,43,Cemento portland gris,Kilo(s),50
+3756007,44,Lavandería,Pieza(s),1
+3756012,45,Vigueta pretensada,Metro(s),1
+3899305,46,Rodillo,Pieza(s),1
+4124203,47,Fierro corrugado de 1/2 pulgada,Kilo(s),1000
+4126301,48,Alambre de amarre,Kilo(s),1
+4127301,49,Tubería de fierro galvanizado de 1/2 pulgada,Metro(s),6
+4127303,50,Tubería de fierro galvanizado de 3/4 pulgada,Metro(s),5.8
+4127304,51,Tubería de fierro galvanizado de 1 pulgada,Metro(s),5.8
+4127305,52,Tubería de fierro galvanizado de 1 1/4 pulgadas,Metro(s),5.8
+4127306,53,Tubería de fierro galvanizado de 2 pulgadas,Metro(s),5.8
+4127311,54,Perfil metálico costanera,Metro(s),6
+4127317,55,Tubo rectangular dos,Metro(s),6
+4154701,56,Soldadura,Pieza(s),1
+4212002,57,Ventana de aluminio,Pieza(s),1
+4219018,58,Calamina ondulada,Pieza(s),1
+4219021,59,Calamina plana n.º 26,Metro(s),1
+4291101,60,Lavaplatos de 2 depósitos,Pieza(s),1
+4292101,61,Pala,Pieza(s),1
+4292102,62,Picota,Pieza(s),1
+4292113,63,Alicate,Pieza(s),1
+4292114,64,Llave Crescent,Pieza(s),1
+4292118,65,Cepillo para madera,Pieza(s),1
+4292123,66,Pistola para silicona,Pieza(s),1
+4292199,67,Plancha de albañilería,Pieza(s),1
+4294303,68,Alambre tejido,Metro(s),40
+4294401,69,Clavos,Kilo(s),1
+4299201,70,Cerradura / chapa exterior,Pieza(s),1
+4322008,71,Bomba de agua de 3 HP,Pieza(s),1
+4324003,72,Llave de paso de 1/2 pulgada,Pieza(s),1
+4421601,73,Máquina cortadora de cerámica,Pieza(s),1
+4482502,74,Calefón a gas (12 litros o menos),Pieza(s),1
+4482601,75,Termotanque a gas,Pieza(s),1
+4621201,76,Interruptor termomagnético bipolar,Pieza(s),1
+4621202,77,Interruptor doble,Pieza(s),1
+4621204,78,Tomacorriente doble,Pieza(s),1
+4621205,79,Interruptor simple,Pieza(s),1
+4621208,80,Interruptor breaker,Pieza(s),1
+4631001,81,Alambre monopolar n.º 14 AWG,Metro(s),100
+4631004,82,Alambre monopolar n.º 10 AWG,Metro(s),100
+4631005,83,Alambre monopolar n.º 12 AWG,Metro(s),100
+4651001,84,Panel de luminaria led empotrable de 60 x 60 cm,Pieza(s),1
+4651002,85,Foco ahorrador,Pieza(s),1
+4651008,86,Pantalla para 2 tubos led largos,Pieza(s),1
+4695001,87,Electrodos para soldadura,Kilo(s),1
