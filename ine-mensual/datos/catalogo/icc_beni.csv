@@ -1,72 +1,72 @@
 serie,orden,nombre,unidad,cantidad
-1531001,0,Arena corriente,Metro(s) cúbico(s),1
-1531006,1,Arena fina,Metro(s) cúbico(s),1
-1532005,2,Grava común,Metro(s) cúbico(s),1
-1619001,3,Tierra de relleno,Metro(s) cúbico(s),10
-3160001,4,Ventana de madera,Pieza(s),1
-3160002,5,Puerta de madera,Pieza(s),1
-3160005,6,Madera de construcción para techo,Metro(s),3
-3472001,7,Plastoformo grande,Pieza(s),1
-3511002,8,Pintura anticorrosiva,Litro(s),3.5
-3511005,9,Masa corrida,Litro(s),3.5
-3511008,10,Pintura látex de primera,Litro(s),18
-3511009,11,Pintura al aceite,Litro(s),3.5
-3511099,12,Sellador de pintura,Litro(s),3.5
+1531001,0,Arena Corriente,Metro(s) cúbico(s),1
+1531006,1,Arena Fina,Metro(s) cúbico(s),1
+1532005,2,Grava Común,Metro(s) cúbico(s),1
+1619001,3,Tierra de Relleno,Metro(s) cúbico(s),10
+3160001,4,Ventana de Madera,Pieza(s),1
+3160002,5,Puerta de Madera,Pieza(s),1
+3160005,6,Madera de Construcción para Techo,Metro(s),3
+3472001,7,Plastoformo Grande,Pieza(s),1
+3511002,8,Pintura Anticorrosiva,Litro(s),3.5
+3511005,9,Masa Corrida,Litro(s),3.5
+3511008,10,Pintura Látex de Primera,Litro(s),18
+3511009,11,Pintura al Aceite,Litro(s),3.5
+3511099,12,Sellador de Pintura,Litro(s),3.5
 3542007,13,Pegamento para PVC,Litro(s),0.9
-3632004,14,Cañería de 1/2 pulgada,Metro(s),6
-3632008,15,Cañería de 3/4 pulgada,Metro(s),6
-3632011,16,Tubería para instalación sanitaria de 2 pulgadas,Metro(s),6
-3632015,17,Tubería para instalación sanitaria de 6 pulgadas,Metro(s),4
-3632016,18,Tubo para instalación eléctrica de 5/8 pulgada,Metro(s),3
-3632017,19,Cañería de 1 pulgada,Metro(s),6
-3632019,20,Tubo Bergmann,Metro(s),3
-3692001,21,Cinta aislante,Pieza(s),1
-3693001,22,Ducha eléctrica,Pieza(s),1
-3695007,23,Caja interceptora,Pieza(s),1
-3711403,24,Vidrio simple,Metro(s) cuadrado(s),1
-3719999,25,Base de ducha,Pieza(s),1
+3632004,14,Cañería de 1/2 Pulgada,Metro(s),6
+3632008,15,Cañería de 3/4 Pulgada,Metro(s),6
+3632011,16,Tubería para Instalación Sanitaria de 2 Pulgadas,Metro(s),6
+3632015,17,Tubería para Instalación Sanitaria de 6 Pulgadas,Metro(s),4
+3632016,18,Tubo para Instalación Eléctrica de 5/8 Pulgada,Metro(s),3
+3632017,19,Cañería de 1 Pulgada,Metro(s),6
+3632019,20,Tubo Berman,Metro(s),3
+3692001,21,Cinta Aislante,Pieza(s),1
+3693001,22,Ducha Eléctrica,Pieza(s),1
+3695007,23,Caja Interceptora,Pieza(s),1
+3711403,24,Vidrio Simple,Metro(s) cuadrado(s),1
+3719999,25,Base de Ducha,Pieza(s),1
 3721002,26,Urinario,Pieza(s),1
-3721003,27,Juego de baño,Pieza(s),2
-3721004,28,Inodoro tanque bajo,Pieza(s),1
-3735001,29,Ladrillo de 6 huecos,Pieza(s),1000
-3735002,30,Ladrillo adobito,Pieza(s),1000
-3735004,31,Teja cerámica,Pieza(s),1000
-3735005,32,Ladrillo tubular,Pieza(s),1000
-3737003,33,Piso de cerámica,Metro(s) cuadrado(s),1
-3741001,34,Estuco / yeso,Kilo(s),30
-3742003,35,Cal molida,Kilo(s),20
-3744001,36,Cemento portland gris,Kilo(s),50
+3721003,27,Juego de Baño,Pieza(s),2
+3721004,28,Inodoro Tanque Bajo,Pieza(s),1
+3735001,29,Ladrillo de 6 Huecos,Pieza(s),1000
+3735002,30,Ladrillo Adobito,Pieza(s),1000
+3735004,31,Teja Cerámica,Pieza(s),1000
+3735005,32,Ladrillo Tubular,Pieza(s),1000
+3737003,33,Piso de Cerámica,Metro(s) cuadrado(s),1
+3741001,34,Estuco / Yeso,Kilo(s),30
+3742003,35,Cal Molida,Kilo(s),20
+3744001,36,Cemento Portland Gris,Kilo(s),50
 3756007,37,Lavandería,Pieza(s),1
-3756012,38,Vigueta pretensada,Metro(s),1
+3756012,38,Vigueta Pretensada,Metro(s),1
 3899305,39,Rodillo,Pieza(s),1
-4124203,40,Fierro corrugado de 1/2 pulgada,Kilo(s),1000
-4124205,41,Fierro liso de 3/8 pulgada,Metro(s),12
-4219018,42,Calamina ondulada,Pieza(s),1
-4219020,43,Calamina plana n.º 28,Pieza(s),1
-4291101,44,Lavaplatos de 2 depósitos,Pieza(s),1
+4124203,40,Fierro Corrugado de 1/2 Pulgada,Kilo(s),1000
+4124205,41,Fierro Liso de 3/8 Pulgada,Metro(s),12
+4219018,42,Calamina Ondulada,Pieza(s),1
+4219020,43,Calamina Plana N.º 28,Pieza(s),1
+4291101,44,Lavaplatos de 2 Depósitos,Pieza(s),1
 4292101,45,Pala,Pieza(s),1
 4292102,46,Picota,Pieza(s),1
 4292113,47,Alicate,Pieza(s),1
 4292114,48,Llave Crescent,Pieza(s),1
-4292118,49,Cepillo para madera,Pieza(s),1
-4292199,50,Plancha de albañilería,Pieza(s),1
-4294303,51,Alambre tejido,Pieza(s),1
-4294306,52,Malla milimétrica,Metro(s) cuadrado(s),1
-4294402,53,Clavos para calamina,Kilo(s),1
-4299202,54,Cerradura / chapa interior,Pieza(s),1
-4299206,55,Bisagra de 4 pulgadas,Pieza(s),2
-4299902,56,Rejilla de piso metálica,Pieza(s),1
-4322005,57,Bomba de agua,Pieza(s),1
-4324006,58,Llave de paso de 2 pulgadas,Pieza(s),1
-4421601,59,Máquina cortadora de cerámica,Pieza(s),1
+4292118,49,Cepillo para Madera,Pieza(s),1
+4292199,50,Plancha de Albañilería,Pieza(s),1
+4294303,51,Alambre Tejido,Pieza(s),1
+4294306,52,Malla Milimétrica,Metro(s) cuadrado(s),1
+4294402,53,Clavos para Calamina,Kilo(s),1
+4299202,54,Cerradura / Chapa Interior,Pieza(s),1
+4299206,55,Bisagra de 4 Pulgadas,Pieza(s),2
+4299902,56,Rejilla de Piso Metálica,Pieza(s),1
+4322005,57,Bomba de Agua,Pieza(s),1
+4324006,58,Llave de Paso de 2 Pulgadas,Pieza(s),1
+4421601,59,Máquina Cortadora de Cerámica,Pieza(s),1
 4481501,60,Ventilador,Pieza(s),1
-4621201,61,Interruptor termomagnético bipolar,Pieza(s),1
-4621202,62,Interruptor doble,Pieza(s),1
-4621203,63,Tomacorriente simple,Pieza(s),1
-4621204,64,Tomacorriente doble,Pieza(s),1
-4621205,65,Interruptor simple,Pieza(s),1
-4621210,66,Interruptor termomagnético unipolar de 20 amperios,Pieza(s),1
-4621303,67,Caja de distribución para 6 térmicos,Pieza(s),1
-4631001,68,Alambre monopolar n.º 14 AWG,Metro(s),100
-4631005,69,Alambre monopolar n.º 12 AWG,Metro(s),100
-4651002,70,Foco ahorrador,Pieza(s),1
+4621201,61,Interruptor Termomagnético Bipolar,Pieza(s),1
+4621202,62,Interruptor Doble,Pieza(s),1
+4621203,63,Tomacorriente Simple,Pieza(s),1
+4621204,64,Tomacorriente Doble,Pieza(s),1
+4621205,65,Interruptor Simple,Pieza(s),1
+4621210,66,Interruptor Termomagnético Unipolar de 20 Amperios,Pieza(s),1
+4621303,67,Caja de Distribución para 6 Térmicos,Pieza(s),1
+4631001,68,Alambre Monopolar N.º 14 AWG,Metro(s),100
+4631005,69,Alambre Monopolar N.º 12 AWG,Metro(s),100
+4651002,70,Foco Ahorrador,Pieza(s),1

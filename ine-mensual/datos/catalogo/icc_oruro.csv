@@ -1,96 +1,96 @@
 serie,orden,nombre,unidad,cantidad
-1512003,0,Piedra bruta,Metro(s) cúbico(s),4
-1512010,1,Piedra manzana,Metro(s) cúbico(s),4
-1531001,2,Arena corriente,Metro(s) cúbico(s),4
-1531006,3,Arena fina,Metro(s) cúbico(s),4
-1532005,4,Grava común,Metro(s) cúbico(s),4
-1619099,5,Ocre importado,Kilo(s),1
-3121003,6,Parqué de madera de primera,Metro(s) cuadrado(s),1
-3160001,7,Ventana de madera,Pieza(s),1
-3160002,8,Puerta de madera,Pieza(s),1
-3160005,9,Madera de construcción para techo,Pie(s) cuadrado(s),1
-3511002,10,Pintura anticorrosiva,Litro(s),3.5
+1512003,0,Piedra Bruta,Metro(s) cúbico(s),4
+1512010,1,Piedra Manzana,Metro(s) cúbico(s),4
+1531001,2,Arena Corriente,Metro(s) cúbico(s),4
+1531006,3,Arena Fina,Metro(s) cúbico(s),4
+1532005,4,Grava Común,Metro(s) cúbico(s),4
+1619099,5,Ocre Importado,Kilo(s),1
+3121003,6,Parqué de Madera de Primera,Metro(s) cuadrado(s),1
+3160001,7,Ventana de Madera,Pieza(s),1
+3160002,8,Puerta de Madera,Pieza(s),1
+3160005,9,Madera de Construcción para Techo,Pie(s) cuadrado(s),1
+3511002,10,Pintura Anticorrosiva,Litro(s),3.5
 3511003,11,Limpiador,Litro(s),1
 3511004,12,Barniz,Litro(s),3.5
-3511008,13,Pintura látex de primera,Litro(s),18
-3511009,14,Pintura al aceite,Litro(s),1
-3511099,15,Sellador de pintura,Litro(s),3.5
-3541001,16,Aceite de linaza,Litro(s),1
+3511008,13,Pintura Látex de Primera,Litro(s),18
+3511009,14,Pintura al Aceite,Litro(s),1
+3511099,15,Sellador de Pintura,Litro(s),3.5
+3541001,16,Aceite de Linaza,Litro(s),1
 3542007,17,Pegamento para PVC,Mililitro(s),100
 3542008,18,Silicona,Pieza(s),1
-3542099,19,Pegamento para pisos,Litro(s),3.5
-3632004,20,Cañería de 1/2 pulgada,Metro(s),6
-3632008,21,Cañería de 3/4 pulgada,Metro(s),6
-3632010,22,Tubería para instalación sanitaria de 1 ½ pulgadas,Metro(s),4
-3632011,23,Tubería para instalación sanitaria de 2 pulgadas,Metro(s),4
-3632012,24,Tubería para instalación sanitaria de 2 ½ pulgadas,Metro(s),4
-3632014,25,Tubería para instalación sanitaria de 4 pulgadas,Metro(s),4
-3632015,26,Tubería para instalación sanitaria de 6 pulgadas,Metro(s),4
-3632016,27,Tubo para instalación eléctrica de 5/8 pulgada,Metro(s),3
-3632018,28,Cañería de 1/2 pulgada (alta presión),Metro(s),6
-3632019,29,Tubo Bergmann,Metro(s),3
+3542099,19,Pegamento para Pisos,Litro(s),3.5
+3632004,20,Cañería de 1/2 Pulgada,Metro(s),6
+3632008,21,Cañería de 3/4 Pulgada,Metro(s),6
+3632010,22,Tubería para Instalación Sanitaria de 1 ½ Pulgadas,Metro(s),4
+3632011,23,Tubería para Instalación Sanitaria de 2 Pulgadas,Metro(s),4
+3632012,24,Tubería para Instalación Sanitaria de 2 ½ Pulgadas,Metro(s),4
+3632014,25,Tubería para Instalación Sanitaria de 4 Pulgadas,Metro(s),4
+3632015,26,Tubería para Instalación Sanitaria de 6 Pulgadas,Metro(s),4
+3632016,27,Tubo para Instalación Eléctrica de 5/8 Pulgada,Metro(s),3
+3632018,28,Cañería de 1/2 Pulgada (Alta Presión),Metro(s),6
+3632019,29,Tubo Berman,Metro(s),3
 3633008,30,Placa,Metro(s) cuadrado(s),1
-3691001,31,Piso de vinil,Metro(s),1
-3692001,32,Cinta aislante,Pieza(s),1
-3693001,33,Ducha eléctrica,Pieza(s),1
-3695007,34,Caja interceptora,Pieza(s),1
-3695009,35,Caja de derivación,Pieza(s),1
-3695011,36,Tanque para agua (2.000-2.300 litros),Pieza(s),1
-3711401,37,Vidrio doble,Pie(s) cuadrado(s),1
-3711404,38,Vidrio catedral,Metro(s) cuadrado(s),1
+3691001,31,Piso de Vinil,Metro(s),1
+3692001,32,Cinta Aislante,Pieza(s),1
+3693001,33,Ducha Eléctrica,Pieza(s),1
+3695007,34,Caja Interceptora,Pieza(s),1
+3695009,35,Caja de Derivación,Pieza(s),1
+3695011,36,Tanque para Agua (2.000-2.300 Litros),Pieza(s),1
+3711401,37,Vidrio Doble,Pie(s) cuadrado(s),1
+3711404,38,Vidrio Catedral,Metro(s) cuadrado(s),1
 3719904,39,Tina,Pieza(s),1
-3719999,40,Base de ducha,Pieza(s),1
-3721003,41,Juego de baño,Juego(s),1
-3735001,42,Ladrillo de 6 huecos,Pieza(s),1000
-3735002,43,Ladrillo adobito,Pieza(s),1000
-3737003,44,Piso de cerámica,Metro(s) cuadrado(s),1
-3737004,45,Piso de porcelanato,Metro(s) cuadrado(s),1
-3737006,46,Revestimiento de cerámica nacional,Metro(s) cuadrado(s),1
-3741001,47,Estuco / yeso,Kilo(s),26.67419115058384
-3744001,48,Cemento portland gris,Kilo(s),50
+3719999,40,Base de Ducha,Pieza(s),1
+3721003,41,Juego de Baño,Juego(s),1
+3735001,42,Ladrillo de 6 Huecos,Pieza(s),1000
+3735002,43,Ladrillo Adobito,Pieza(s),1000
+3737003,44,Piso de Cerámica,Metro(s) cuadrado(s),1
+3737004,45,Piso de Porcelanato,Metro(s) cuadrado(s),1
+3737006,46,Revestimiento de Cerámica Nacional,Metro(s) cuadrado(s),1
+3741001,47,Estuco / Yeso,Kilo(s),26.67419115058384
+3744001,48,Cemento Portland Gris,Kilo(s),50
 3756007,49,Lavandería,Pieza(s),1
-3756013,50,Vigueta pretensada con plastoformo,Metro(s) cuadrado(s),1
-3757002,51,Placa ondulada,Pieza(s),1
-3791006,52,Lija para pared,Metro(s),1
+3756013,50,Vigueta Pretensada con Plastoformo,Metro(s) cuadrado(s),1
+3757002,51,Placa Ondulada,Pieza(s),1
+3791006,52,Lija para Pared,Metro(s),1
 3899305,53,Rodillo,Pieza(s),1
-4124203,54,Fierro corrugado de 1/2 pulgada,Kilo(s),1000
-4126301,55,Alambre de amarre,Kilo(s),1
-4127304,56,Tubería de fierro galvanizado de 1 pulgada,Metro(s),6
-4127306,57,Tubería de fierro galvanizado de 2 pulgadas,Metro(s),6
-4127315,58,Tubo cuadrado,Metro(s),6
+4124203,54,Fierro Corrugado de 1/2 Pulgada,Kilo(s),1000
+4126301,55,Alambre de Amarre,Kilo(s),1
+4127304,56,Tubería de Fierro Galvanizado de 1 Pulgada,Metro(s),6
+4127306,57,Tubería de Fierro Galvanizado de 2 Pulgadas,Metro(s),6
+4127315,58,Tubo Cuadrado,Metro(s),6
 4154701,59,Soldadura,Pieza(s),1
-4219018,60,Calamina ondulada,Pieza(s),1
-4219020,61,Calamina plana n.º 28,Pieza(s),1
-4219021,62,Calamina plana n.º 26,Pieza(s),1
-4291106,63,Lavaplatos de 1 depósito,Pieza(s),1
+4219018,60,Calamina Ondulada,Pieza(s),1
+4219020,61,Calamina Plana N.º 28,Pieza(s),1
+4219021,62,Calamina Plana N.º 26,Pieza(s),1
+4291106,63,Lavaplatos de 1 Depósito,Pieza(s),1
 4292101,64,Pala,Pieza(s),1
 4292102,65,Picota,Pieza(s),1
 4292113,66,Alicate,Pieza(s),1
 4292114,67,Llave Crescent,Pieza(s),1
-4292118,68,Cepillo para madera,Pieza(s),1
-4292123,69,Pistola para silicona,Pieza(s),1
-4292199,70,Plancha de albañilería,Pieza(s),1
+4292118,68,Cepillo para Madera,Pieza(s),1
+4292123,69,Pistola para Silicona,Pieza(s),1
+4292199,70,Plancha de Albañilería,Pieza(s),1
 4294401,71,Clavos,Kilo(s),1
-4294402,72,Clavos para calamina,Kilo(s),1
-4294403,73,Pernos de anclaje o expansión,Pieza(s),1
-4299202,74,Cerradura / chapa interior,Pieza(s),1
-4299206,75,Bisagra de 4 pulgadas,Pieza(s),2
-4299902,76,Rejilla de piso metálica,Pieza(s),1
-4322007,77,Bomba de agua de 1/2 HP,Pieza(s),1
-4324003,78,Llave de paso de 1/2 pulgada,Pieza(s),1
-4421601,79,Máquina cortadora de cerámica,Pieza(s),1
-4481701,80,Termotanque eléctrico,Pieza(s),1
-4621201,81,Interruptor termomagnético bipolar,Pieza(s),1
-4621204,82,Tomacorriente doble,Pieza(s),1
-4621205,83,Interruptor simple,Pieza(s),1
-4621208,84,Interruptor breaker,Pieza(s),1
-4621209,85,Interruptor termomagnético unipolar,Pieza(s),1
-4621214,86,Tablero metálico para 8 medidores,Pieza(s),1
-4621303,87,Caja de distribución para 6 térmicos,Pieza(s),1
-4621304,88,Caja galvanizada rectangular,Pieza(s),1
-4631001,89,Alambre monopolar n.º 14 AWG,Metro(s),100
-4631004,90,Alambre monopolar n.º 10 AWG,Metro(s),100
-4631005,91,Alambre monopolar n.º 12 AWG,Metro(s),100
-4631006,92,Alambre monopolar n.º 8 AWG,Metro(s),100
-4651008,93,Pantalla para 2 tubos led largos,Pieza(s),1
-4695001,94,Electrodos para soldadura,Kilo(s),1
+4294402,72,Clavos para Calamina,Kilo(s),1
+4294403,73,Pernos de Anclaje o Expansión,Pieza(s),1
+4299202,74,Cerradura / Chapa Interior,Pieza(s),1
+4299206,75,Bisagra de 4 Pulgadas,Pieza(s),2
+4299902,76,Rejilla de Piso Metálica,Pieza(s),1
+4322007,77,Bomba de Agua de 1/2 HP,Pieza(s),1
+4324003,78,Llave de Paso de 1/2 Pulgada,Pieza(s),1
+4421601,79,Máquina Cortadora de Cerámica,Pieza(s),1
+4481701,80,Termotanque Eléctrico,Pieza(s),1
+4621201,81,Interruptor Termomagnético Bipolar,Pieza(s),1
+4621204,82,Tomacorriente Doble,Pieza(s),1
+4621205,83,Interruptor Simple,Pieza(s),1
+4621208,84,Interruptor Breaker,Pieza(s),1
+4621209,85,Interruptor Termomagnético Unipolar,Pieza(s),1
+4621214,86,Tablero Metálico para 8 Medidores,Pieza(s),1
+4621303,87,Caja de Distribución para 6 Térmicos,Pieza(s),1
+4621304,88,Caja Galvanizada Rectangular,Pieza(s),1
+4631001,89,Alambre Monopolar N.º 14 AWG,Metro(s),100
+4631004,90,Alambre Monopolar N.º 10 AWG,Metro(s),100
+4631005,91,Alambre Monopolar N.º 12 AWG,Metro(s),100
+4631006,92,Alambre Monopolar N.º 8 AWG,Metro(s),100
+4651008,93,Pantalla para 2 Tubos LED Largos,Pieza(s),1
+4695001,94,Electrodos para Soldadura,Kilo(s),1
