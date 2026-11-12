@@ -48,7 +48,7 @@ Códigos de salida: `0` terminó bien (aunque no haya memorias nuevas o haya cif
 | `ultimo_resumen.json` | Lo mismo en forma legible por programas: empresas con memorias nuevas, por revisar, con error, atrasadas y empresas descubiertas. Lo usa el flujo de GitHub para decidir si abre un aviso. |
 
 Los PDF (`archivo/`) no se guardan en git; en GitHub Actions quedan como artefacto de la ejecución durante 90 días.
-La carga inicial (12 de noviembre de 2026) tiene las 55 memorias que las seis empresas seguidas ya habían publicado y las cifras de 2023 a 2026 que se leyeron de los PDF y se comprobaron
+La carga inicial (12 de noviembre de 2026) tiene las 70 memorias que las ocho empresas seguidas ya habían publicado y las cifras de 2023 a 2026 que se leyeron de los PDF y se comprobaron
 con las igualdades contables. La primera ejecución programada solo descarga lo que se publique después.
 
 ## Cómo se leen los estados financieros
@@ -72,8 +72,10 @@ de uno verificado a mano).
 
 ## Empresas (`empresas.json`)
 
-- `empresas`: las que se siguen. Cada una con `id`, `matricula`, `nombre`, `tipo` (`externa` o `grupo`), `cierre_mes` (3 = el ejercicio cierra el 31 de marzo, como casi toda la industria) y una nota.
-  `grupo` significa que usa las mismas cuentas que Incerco (probable empresa del grupo, por confirmar).
+- `empresas`: las que se siguen. Cada una con `id`, `matricula`, `nombre`, `tipo` (`externa`, `grupo` u `otra`), `cierre_mes` (3 = el ejercicio cierra el 31 de marzo, como casi toda la industria) y una nota.
+  `externa` es una cerámica fuera del grupo; `grupo` significa que usa las mismas cuentas que Incerco (probable empresa del grupo, por confirmar);
+  `otra` es de otro rubro de materiales de construcción y se sigue como referencia del sector (Soboce, cemento). Una empresa que casi no vende (Margla) lleva `"margenes": false`:
+  `exportar` solo trae sus razones de balance, porque sus márgenes no significan nada.
 - `ignoradas`: las que aparecieron en la búsqueda y no sirven como referencia, con el motivo (alquila sus ambientes, está en etapa de inversión, es cemento u hormigón, etc.).
   Existen para que la búsqueda de empresas nuevas no las vuelva a mencionar cada año.
 - `descubrir`: palabras que se buscan en el nombre de las empresas que publican memoria. Si aparece una empresa que no está en `empresas` ni en `ignoradas`, el informe la señala.
@@ -118,5 +120,7 @@ después de confirmar las cifras nuevas hay que volver a armar y publicar la pá
 ## Qué no cubre
 
 - Solo las sociedades anónimas están obligadas a publicar memoria; las S.R.L. y las empresas unipersonales no aparecen. Incerco mismo no figura.
+- Las empresas que no publican memoria sino su balance anual para emitir bonos (categoría «Balances» de la Gaceta, como Import Export Las Lomas Ltda.) no se siguen: el programa solo consulta «Memorias».
+- El control de atraso mira la fecha de publicación, no el ejercicio. Margla publica con un año de atraso (en septiembre de 2026 subió la memoria del ejercicio a marzo de 2025) y no se marca como atrasada.
 - No lee las notas a los estados financieros ni el flujo de efectivo.
 - No hay datos de producción por planta, salvo las unidades vendidas y producidas que Río Grande publica en gráficos; esas se cargaron a mano.

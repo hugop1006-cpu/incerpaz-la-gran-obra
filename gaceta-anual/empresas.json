@@ -84,6 +84,29 @@
    "giro": "Tejas",
    "cierre_mes": 3,
    "nota": "Usa las mismas cuentas que Incerco; falta confirmar si es del grupo."
+  },
+  {
+   "id": "mg",
+   "matricula": "1015323021",
+   "nombre": "Margla",
+   "razon": "Industria de Cerámica y Constructora Margla",
+   "tipo": "externa",
+   "depto": "Santa Cruz",
+   "giro": "Cerámica, casi sin ventas",
+   "cierre_mes": 3,
+   "margenes": false,
+   "nota": "Casi no vende (Bs 14.532 en el ejercicio a marzo de 2025): sirve para el balance y la escala, no para los márgenes. Publica con un año de atraso: la memoria de septiembre de 2026 es la del ejercicio a marzo de 2025. En sus estados los gastos de operación incluyen los financieros; aquí van aparte, y el resultado operativo es antes de financieros."
+  },
+  {
+   "id": "sb",
+   "matricula": "1020235024",
+   "nombre": "Soboce",
+   "razon": "Sociedad Boliviana de Cemento",
+   "tipo": "otra",
+   "depto": "",
+   "giro": "Cemento, hormigón y materiales de construcción",
+   "cierre_mes": 3,
+   "nota": "Otro rubro y otra escala (ventas de más de Bs 1.800 M en el ejercicio a marzo de 2026); se sigue como referencia del sector de la construcción. Gastos de operación: administración y comercialización. Resultado operativo antes de gastos financieros. La depreciación acumulada es sobre el costo, sin descontar la provisión por desvalorización."
   }
  ],
  "ignoradas": [
@@ -96,11 +119,6 @@
    "matricula": "404920024",
    "razon": "Cerámica Industrial Andesclay S.A.",
    "motivo": "en etapa de inversión, sin ventas; revisar cuando opere"
-  },
-  {
-   "matricula": "1015323021",
-   "razon": "Industria de Cerámica y Constructora Margla S.A.",
-   "motivo": "casi no vende"
   },
   {
    "matricula": "395853024",
@@ -185,11 +203,6 @@
   {
    "matricula": "292900020",
    "razon": "Preforte Pretensados y Hormigones S.A.",
-   "motivo": "cemento y hormigón: otro rubro"
-  },
-  {
-   "matricula": "1020235024",
-   "razon": "Sociedad Boliviana de Cemento S.A. (Soboce)",
    "motivo": "cemento y hormigón: otro rubro"
   }
  ]

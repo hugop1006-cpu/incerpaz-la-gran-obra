@@ -514,6 +514,18 @@ class TestAlmacenYExportar(Base):
         archivo = json.loads((Path(self.tmp) / 'salida' / 'pares.json').read_text(encoding='utf-8'))
         self.assertEqual(archivo['pares'][0]['nombre'], 'Alfa')
 
+    def test_una_empresa_sin_margenes_exporta_solo_el_balance(self):
+        self.cifras([self.fila(2026, 'ventas', 14532), self.fila(2026, 'costo', 63431), self.fila(2026, 'bruto', -48899), self.fila(2026, 'operativo', -2079682),
+                     self.fila(2026, 'neto', -5252346), self.fila(2026, 'ac', 300), self.fila(2026, 'pc', 200), self.fila(2026, 'act', 2000), self.fila(2026, 'pt', 800)])
+        reg = registro_prueba()
+        reg['empresas'][0]['margenes'] = False
+        alfa = ga.exportar(self.datos, Path(self.tmp) / 'salida', reg)[0]
+        self.assertFalse(alfa['margenes'])
+        self.assertEqual(sorted(alfa['rr']['2026']), ['pasivo_activo', 'razon'])          # sin márgenes: no tendrían sentido
+        self.assertAlmostEqual(alfa['rr']['2026']['razon'], 1.5)
+        self.assertEqual(alfa['ej']['2026']['ventas'], 14532.0)                           # los montos sí salen
+        self.assertTrue(ga.exportar(self.datos, Path(self.tmp) / 'salida', registro_prueba())[0]['margenes'])     # por defecto, con márgenes
+
     def test_fusion_no_pisa_lo_verificado_a_mano_y_avisa(self):
         previos = [self.fila(2026, 'ventas', 1000), self.fila(2026, 'costo', 600, metodo='auto')]
         nuevas = [self.fila(2026, 'ventas', 1200, metodo='auto'), self.fila(2026, 'costo', 650, metodo='auto'), self.fila(2026, 'bruto', 400, metodo='auto')]
@@ -550,8 +562,26 @@ class TestCargaInicial(unittest.TestCase):
         self.assertEqual(len(mats), len(set(mats)))
         ign = {e['matricula'] for e in reg['ignoradas']}
         self.assertFalse(ign & set(mats), 'una empresa no puede estar seguida e ignorada a la vez')
-        self.assertTrue(all(e.get('tipo') in ('externa', 'grupo') for e in reg['empresas']))
+        self.assertTrue(all(e.get('tipo') in ('externa', 'grupo', 'otra') for e in reg['empresas']))
         self.assertEqual(reg['origen'], ORIGEN)
+
+    def test_margla_y_soboce_se_siguen_y_exportan_lo_verificado(self):
+        reg = ga.cargar_registro()
+        por_id = {e['id']: e for e in reg['empresas']}
+        self.assertEqual((por_id['mg']['matricula'], por_id['mg']['tipo'], por_id['mg']['margenes']), ('1015323021', 'externa', False))
+        self.assertEqual((por_id['sb']['matricula'], por_id['sb']['tipo']), ('1020235024', 'otra'))
+        with tempfile.TemporaryDirectory() as tmp:
+            pares = {p['id']: p for p in ga.exportar(self.AQUI / 'datos', tmp, reg)}
+        mg, sb = pares['mg'], pares['sb']
+        self.assertEqual(sorted(mg['ej']), ['2023', '2024', '2025'])
+        self.assertEqual(sorted(sb['ej']), ['2025', '2026'])
+        self.assertEqual(sorted(mg['rr']['2025']), ['pasivo_activo', 'razon'])           # casi no vende: solo balance
+        self.assertAlmostEqual(mg['rr']['2025']['razon'], 8.073, places=2)
+        self.assertAlmostEqual(mg['rr']['2025']['pasivo_activo'], 18.97, places=1)
+        r = sb['rr']['2026']
+        for clave, esperado in (('bruto', 42.08), ('gastos_op', 31.37), ('operativo', 10.71), ('neto', 10.15), ('pasivo_activo', 52.99), ('dep_ppe', 67.2)):
+            self.assertAlmostEqual(r[clave], esperado, places=1, msg=clave)
+        self.assertAlmostEqual(r['razon'], 1.374, places=2)
 
     def test_datos_guardados(self):
         reg = ga.cargar_registro()
