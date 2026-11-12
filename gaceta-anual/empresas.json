@@ -1,0 +1,196 @@
+{
+ "agente": "gaceta-anual/1.0",
+ "api": "https://servicios.seprec.gob.bo/api",
+ "origen": "https://gacetadecomercio.gob.bo",
+ "espera_segundos": 1.0,
+ "tamano_maximo_mb": 60,
+ "ventana": {
+  "inicio_mes": 6,
+  "plazo_mes": 10
+ },
+ "descubrir": [
+  "CERAMICA",
+  "CERÁMICA",
+  "TEJA",
+  "LADRILL",
+  "ARCILLA",
+  "CEMENTO",
+  "HORMIGON",
+  "HORMIGÓN"
+ ],
+ "empresas": [
+  {
+   "id": "rg",
+   "matricula": "158664027",
+   "nombre": "Río Grande",
+   "razon": "Cerámica Río Grande",
+   "tipo": "externa",
+   "depto": "Cochabamba",
+   "giro": "Ladrillos y tejas",
+   "cierre_mes": 3,
+   "nota": "Competidor directo de Incerco en Cochabamba. Desde 2026 figura como S.R.L. (se transformó de S.A.)."
+  },
+  {
+   "id": "gl",
+   "matricula": "1028531026",
+   "nombre": "Gladymar",
+   "razon": "Cerámica Gladymar",
+   "tipo": "externa",
+   "depto": "Santa Cruz",
+   "giro": "Cerámica",
+   "cierre_mes": 3,
+   "nota": "El resultado operativo que informa es antes de gastos financieros."
+  },
+  {
+   "id": "ib",
+   "matricula": "1007205022",
+   "nombre": "Inbolteco",
+   "razon": "Industria Boliviana de Tejas y Complementos",
+   "tipo": "externa",
+   "depto": "",
+   "giro": "Tejas y complementos",
+   "cierre_mes": 3,
+   "nota": "Su utilidad bruta ya descuenta la depreciación de planta."
+  },
+  {
+   "id": "es",
+   "matricula": "211544020",
+   "nombre": "Estructural",
+   "razon": "Cerámica Estructural de Bolivia",
+   "tipo": "grupo",
+   "depto": "Santa Cruz",
+   "giro": "Cerámica estructural",
+   "cierre_mes": 3,
+   "nota": "Usa las mismas cuentas que Incerco; falta confirmar si es del grupo. Reexpresa por inflación el ejercicio anterior."
+  },
+  {
+   "id": "pa",
+   "matricula": "393816027",
+   "nombre": "Pavinal",
+   "razon": "Industria Cerámica Pavinal",
+   "tipo": "grupo",
+   "depto": "Santa Cruz",
+   "giro": "Pavimento cerámico",
+   "cierre_mes": 3,
+   "nota": "Figura entre las instalaciones de Seaoft del grupo. Reexpresa por inflación el ejercicio anterior."
+  },
+  {
+   "id": "tj",
+   "matricula": "410382020",
+   "nombre": "Tejapro",
+   "razon": "Industria Cerámica Tejapro",
+   "tipo": "grupo",
+   "depto": "",
+   "giro": "Tejas",
+   "cierre_mes": 3,
+   "nota": "Usa las mismas cuentas que Incerco; falta confirmar si es del grupo."
+  }
+ ],
+ "ignoradas": [
+  {
+   "matricula": "1016623023",
+   "razon": "Cerámica Santini S.A.",
+   "motivo": "alquila sus ambientes; no fabrica"
+  },
+  {
+   "matricula": "404920024",
+   "razon": "Cerámica Industrial Andesclay S.A.",
+   "motivo": "en etapa de inversión, sin ventas; revisar cuando opere"
+  },
+  {
+   "matricula": "1015323021",
+   "razon": "Industria de Cerámica y Constructora Margla S.A.",
+   "motivo": "casi no vende"
+  },
+  {
+   "matricula": "395853024",
+   "razon": "Industria Cerámica Propavers S.A.",
+   "motivo": "ventas de unos 5 M y memoria sin estados legibles; instalación de Seaoft del grupo"
+  },
+  {
+   "matricula": "398321024",
+   "razon": "Industria Cerámica Ceragres S.A.",
+   "motivo": "tamaño muy pequeño (activo de 6 a 7 M); instalación de Seaoft del grupo"
+  },
+  {
+   "matricula": "398021026",
+   "razon": "Industria Cerámica Cerablocks S.A.",
+   "motivo": "sin ventas en el último ejercicio"
+  },
+  {
+   "matricula": "137495023",
+   "razon": "Cerámica Industrial Sureña S.A. (Ceramisur)",
+   "motivo": "tamaño muy pequeño"
+  },
+  {
+   "matricula": "1029853025",
+   "razon": "Industrias Cerámicas Paz S.A. (Incerpaz)",
+   "motivo": "desde 2025 vende muy poco: opera como sociedad matriz"
+  },
+  {
+   "matricula": "193364027",
+   "razon": "GB Minerales y Agregados S.A.",
+   "motivo": "agregados: otro rubro"
+  },
+  {
+   "matricula": "143165021",
+   "razon": "Cemento Solidario S.A.",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "1015317027",
+   "razon": "Compañía de Cemento Camba S.A. (Coceca)",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "264828024",
+   "razon": "Fábrica de Hormigón Hormipaz S.A.",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "187490028",
+   "razon": "Fábrica de Hormigón Koncreto S.A.",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "1016259020",
+   "razon": "Fábrica Nacional de Cemento S.A. (Fancesa)",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "168482020",
+   "razon": "Hormigón Industrial del Norte S.A. (Hino)",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "295822023",
+   "razon": "Hormigones Andescura S.A.",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "1028695029",
+   "razon": "Itacamba Cemento S.A.",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "314004023",
+   "razon": "Montajes e Ingeniería del Cemento Bolivia S.A.",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "182630029",
+   "razon": "Prefabricados de Cemento, Hormigón y Agregados Preceha S.A.",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "292900020",
+   "razon": "Preforte Pretensados y Hormigones S.A.",
+   "motivo": "cemento y hormigón: otro rubro"
+  },
+  {
+   "matricula": "1020235024",
+   "razon": "Sociedad Boliviana de Cemento S.A. (Soboce)",
+   "motivo": "cemento y hormigón: otro rubro"
+  }
+ ]
+}
