@@ -726,10 +726,11 @@ def valores_vigentes(alm):
     return out
 
 
-def razones(e):
+def razones(e, margenes=True):
+    """Razones de un ejercicio. Con margenes=False (empresa que casi no vende) solo salen las del balance."""
     r = {}
     v = e.get('ventas')
-    if v:
+    if v and margenes:
         r['bruto'] = e['bruto'] / v * 100 if e.get('bruto') is not None else None
         r['gastos_op'] = (e['bruto'] - e['operativo']) / v * 100 if e.get('bruto') is not None and e.get('operativo') is not None else None
         r['operativo'] = e['operativo'] / v * 100 if e.get('operativo') is not None else None
@@ -751,16 +752,17 @@ def exportar(dir_datos, destino, registro):
     for e in registro['empresas']:
         if not e.get('seguir', True):
             continue
+        margenes = e.get('margenes', True)
         ej, rr = {}, {}
         for (m, anio), conceptos in sorted(vig.items()):
             if m != e['matricula'] or not conceptos.get('ventas'):
                 continue
             montos = {c: v for c, (v, _) in conceptos.items()}
             ej[anio] = montos
-            rr[anio] = {k: (round(v, 4) if v is not None else None) for k, v in razones(montos).items()}
+            rr[anio] = {k: (round(v, 4) if v is not None else None) for k, v in razones(montos, margenes).items()}
         if ej:
             pares.append({'id': e['id'], 'nombre': e['nombre'], 'razon': e.get('razon', e['nombre']), 'tipo': e.get('tipo', ''), 'depto': e.get('depto', ''),
-                          'giro': e.get('giro', ''), 'nota': e.get('nota', ''), 'ej': ej, 'rr': rr})
+                          'giro': e.get('giro', ''), 'nota': e.get('nota', ''), 'margenes': margenes, 'ej': ej, 'rr': rr})
     Path(destino).mkdir(parents=True, exist_ok=True)
     (Path(destino) / 'pares.json').write_text(json.dumps({'generado': dt.date.today().isoformat(), 'pares': pares}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     return pares
