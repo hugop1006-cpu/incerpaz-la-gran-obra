@@ -1,5 +1,54 @@
 {
- "empresas": {},
- "ultima_ejecucion": null,
+ "empresas": {
+  "es": {
+   "error": null,
+   "publicaciones": 10,
+   "revisada_el": "2026-11-15",
+   "ultima_publicacion": "2026-09-30"
+  },
+  "gl": {
+   "error": null,
+   "publicaciones": 6,
+   "revisada_el": "2026-11-15",
+   "ultima_publicacion": "2026-06-23"
+  },
+  "ib": {
+   "error": null,
+   "publicaciones": 10,
+   "revisada_el": "2026-11-15",
+   "ultima_publicacion": "2026-09-21"
+  },
+  "mg": {
+   "error": null,
+   "publicaciones": 5,
+   "revisada_el": "2026-11-15",
+   "ultima_publicacion": "2026-09-08"
+  },
+  "pa": {
+   "error": null,
+   "publicaciones": 6,
+   "revisada_el": "2026-11-15",
+   "ultima_publicacion": "2026-09-30"
+  },
+  "rg": {
+   "error": null,
+   "publicaciones": 18,
+   "revisada_el": "2026-11-15",
+   "ultima_publicacion": "2026-08-24"
+  },
+  "sb": {
+   "error": null,
+   "publicaciones": 10,
+   "revisada_el": "2026-11-15",
+   "ultima_publicacion": "2026-09-23"
+  },
+  "tj": {
+   "error": null,
+   "publicaciones": 5,
+   "revisada_el": "2026-11-15",
+   "ultima_publicacion": "2026-09-30"
+  }
+ },
+ "ultima_ejecucion": "2026-11-15",
  "version": 1
 }
