@@ -1,7 +1,17 @@
 {
- "fecha": "2026-11-11",
+ "fecha": "2026-11-15",
  "fuentes": 24,
- "con_datos_nuevos": [],
+ "con_datos_nuevos": [
+  "icc_beni",
+  "icc_chuquisaca",
+  "icc_cochabamba",
+  "icc_lapaz",
+  "icc_oruro",
+  "icc_pando",
+  "icc_potosi",
+  "icc_santacruz",
+  "icc_tarija"
+ ],
  "errores": [],
  "atrasadas": [],
  "sin_publicar": []
