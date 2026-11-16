@@ -309,3 +309,23 @@ tr.detalle td { background: var(--paper); padding: 16px 20px; }
 .tag--combo { background: var(--red); color: #fff; }
 .pcard--combo { border-color: var(--red); }
 #promo-estado { margin-block: 16px; }
+
+/* ventana de ciudad (primera visita) */
+.city-dlg { border: 0; padding: 28px; width: min(480px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; background: var(--white); color: var(--ink); box-shadow: 0 18px 50px rgba(0,0,0,.35); }
+.city-dlg::backdrop { background: rgba(20, 18, 17, .62); }
+.city-dlg h2 { font: 700 30px/1.05 var(--display); text-transform: uppercase; margin: 0 40px 10px 0; }
+.city-dlg p { margin: 0 0 20px; font-size: 16px; }
+.city-dlg__opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.city-dlg__opts .btn { width: 100%; }
+.city-dlg__otra { display: inline-block; margin-top: 18px; color: var(--red); font-weight: 600; }
+.city-dlg__x { position: absolute; top: 10px; right: 12px; width: 44px; height: 44px; border: 0; background: none; font-size: 30px; line-height: 1; cursor: pointer; color: var(--ink); }
+.city-dlg form { margin: 0; }
+@media (max-width: 420px) { .city-dlg__opts { grid-template-columns: 1fr; } }
+
+/* casilla de consentimiento en formularios */
+label.check { flex-direction: row; align-items: flex-start; gap: 10px; font-weight: 400; }
+label.check input { width: 22px; height: 22px; min-height: 0; flex: none; margin-top: 2px; padding: 0; accent-color: var(--red); }
+label.check a { color: var(--red); font-weight: 600; }
+
+/* que el botón fijo de WhatsApp no tape el final de la página en el móvil */
+@media (max-width: 640px) { .site-footer { padding-bottom: 80px; } .wa-float { right: 12px; bottom: 12px; padding: 12px 16px; font-size: 15px; } }

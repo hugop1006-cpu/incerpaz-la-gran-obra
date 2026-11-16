@@ -2,6 +2,7 @@
    Genera el sitio en modo público (PUBLICO=1), lo revisa y al terminar lo vuelve a generar como estaba.
    Uso: node tools/probar-publico.js */
 const { chromium } = require('playwright');
+const visitante = require('./visitante');
 const { spawn, execFileSync } = require('node:child_process');
 const http = require('node:http');
 const os = require('node:os');
@@ -94,7 +95,7 @@ async function levantar(puerto, extra) {
 
     /* ---------- 3. navegador: la política CSP no rompe nada ---------- */
     const b = await chromium.launch();
-    const pg = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+    const pg = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage();
     const errores = []; pg.on('pageerror', (e) => errores.push(e.message)); pg.on('console', (m) => { if (m.type() === 'error' && !/fonts\.(googleapis|gstatic)/.test(m.text())) errores.push(m.text()); });
     const BASE = 'http://127.0.0.1:8088/';
     await pg.goto(BASE); await pg.waitForFunction(() => document.querySelectorAll('#citySel option').length === 4);

@@ -25,13 +25,47 @@
     });
     $$('[data-city-name]').forEach(function (e) { e.textContent = c.nombre; });
   }
+  /* los formularios proponen la ciudad elegida mientras la persona no cambie ese campo */
+  function syncFormCity() {
+    var c = currentCity();
+    $$('form[data-lead] select[name="ciudad"]').forEach(function (s) {
+      if (s.getAttribute('data-tocado')) return;
+      for (var i = 0; i < s.options.length; i++) if (s.options[i].text === c.nombre) { s.selectedIndex = i; break; }
+    });
+  }
+  $$('form[data-lead] select[name="ciudad"]').forEach(function (s) { s.addEventListener('change', function () { s.setAttribute('data-tocado', '1'); }); });
+  function setCity(slug) {
+    if (!cityBySlug(slug)) return;
+    store(KEY, slug);
+    if (sel) sel.value = slug;
+    updateWa(); syncFormCity(); syncTabs(slug);
+    document.dispatchEvent(new CustomEvent('incerpaz:city', { detail: slug }));
+  }
   var sel = $('#citySel');
   if (sel) {
     sel.innerHTML = CFG.ciudades.map(function (c) { return '<option value="' + c.slug + '">' + c.nombre + '</option>'; }).join('');
     sel.value = currentCity().slug;
-    sel.addEventListener('change', function () { store(KEY, sel.value); updateWa(); syncTabs(sel.value); document.dispatchEvent(new CustomEvent('incerpaz:city', { detail: sel.value })); });
+    sel.addEventListener('change', function () { setCity(sel.value); });
   }
-  updateWa();
+  updateWa(); syncFormCity();
+
+  /* ---- primera visita: preguntar la ciudad una sola vez ----
+     No se abre si ya hay ciudad guardada, si la persona la cerró en esta visita
+     o si la dirección ya trae la ciudad (?ciudad=). Sin JavaScript no aparece. */
+  var dlg = $('#cityDlg');
+  if (dlg && typeof dlg.showModal === 'function') {
+    var PREG = 'incerpaz_ciudad_preguntada';
+    var yaPreguntada = function () { try { return sessionStorage.getItem(PREG); } catch (e) { return '1'; } };
+    var marcar = function () { try { sessionStorage.setItem(PREG, '1'); } catch (e) { /* sin almacenamiento */ } };
+    $$('[data-elegir-ciudad]', dlg).forEach(function (b) {
+      b.addEventListener('click', function () { setCity(b.getAttribute('data-elegir-ciudad')); marcar(); dlg.close(); });
+    });
+    dlg.addEventListener('close', marcar);
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+    if (!cityBySlug(store(KEY)) && !yaPreguntada() && !/[?&]ciudad=/.test(location.search)) {
+      try { dlg.showModal(); var pri = $('[data-elegir-ciudad]', dlg); if (pri) pri.focus(); } catch (e) { /* navegador sin soporte */ }
+    }
+  }
 
   /* ---- menú móvil ---- */
   var tg = $('.nav-toggle'), nav = $('#nav');
@@ -118,7 +152,7 @@
   $$('[data-city-tab]').forEach(function (t) {
     t.addEventListener('click', function () {
       var s = t.getAttribute('data-city-tab');
-      if (cityBySlug(s)) { store(KEY, s); if (sel) sel.value = s; updateWa(); }
+      if (cityBySlug(s)) { store(KEY, s); if (sel) sel.value = s; updateWa(); syncFormCity(); }
       syncTabs(s);
     });
   });
@@ -140,12 +174,18 @@
       var data = { asunto: asunto, ciudad: citySel ? citySel.value : (asunto.indexOf('Lista de espera') === 0 ? 'Otra ciudad' : city.nombre), pagina: location.pathname };
       $$('input, select, textarea', f).forEach(function (el) {
         if (!el.name || el.closest('.hp') || el.type === 'submit') return;
+        if (el.type === 'checkbox') { data[el.name] = el.checked ? 'sí' : 'no'; return; }
         var label = el.closest('label') ? el.closest('label').firstChild.textContent.trim() : el.name;
         data[el.name] = el.value;
         if (el.value) lines.push(label + ': ' + el.value);
       });
       if (CFG.demo) { var dm = $('.form-msg', f.parentNode) || $('.form-msg', f); if (dm) { dm.textContent = 'Esto es una demostración: en el sitio real tu solicitud llegaría a un ejecutivo de ' + city.nombre + '.'; dm.hidden = false; } return; }
-      var done = function (texto) { if (msgBox) { msgBox.textContent = texto; msgBox.hidden = false; } f.reset(); };
+      var done = function (texto) {
+        if (msgBox) { msgBox.textContent = texto; msgBox.hidden = false; }
+        f.reset();
+        $$('select[name="ciudad"]', f).forEach(function (s) { s.setAttribute('data-tocado', ''); });
+        syncFormCity();
+      };
       if (CFG.leadEndpoint) {
         fetch(CFG.leadEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'incerpaz' }, body: JSON.stringify(data) })
           .then(function (r) { if (!r.ok) throw new Error(r.status); done(asunto.indexOf('Lista de espera') === 0 ? 'Listo, te avisaremos cuando lleguemos a tu ciudad.' : 'Recibimos tu solicitud. Un ejecutivo de ' + city.nombre + ' te contactará.'); })

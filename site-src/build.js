@@ -29,6 +29,10 @@ const waHref = (numero, msg) => `https://wa.me/591${numero}?text=${encodeURIComp
 const telDisplay = (t) => t.replace(/^(\d)-(\d+)$/, '($1) $2');
 const telHref = (t) => 'tel:+591' + t.replace(/\D/g, '');
 
+/* Mensaje del botón fijo de WhatsApp; cada página puede dar el suyo ({ciudad} se reemplaza en el navegador). */
+const WA_GENERAL = 'Hola, quisiera más información, por favor.';
+/* Páginas donde no se pregunta la ciudad al entrar (cuenta, panel y administración). */
+const PAGINAS_SIN_CIUDAD = ['ingresar', 'registro', 'presupuesto', 'cuenta', 'equipo', 'admin'];
 /* ---- normalización de los datos del catálogo actual ---- */
 const CIUDAD_CATALOGO = { cochabamba: 'Cochabamba', 'santa-cruz': 'Santa Cruz' };
 const CAT_NOMBRE = Object.fromEntries(sitio.categorias.map((c) => [c.slug, c.nombre]));
@@ -125,7 +129,7 @@ const recortar = (t, max) => (t.length <= max ? t : t.slice(0, max - 1).replace(
 fs.mkdirSync(path.join(OUT, 'assets/js'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'assets/js/config.js'), `window.INCERPAZ=${JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || (config.comercio ? '/api/leads' : ''), demo: DEMO })};\n`);
 
-function layout({ file, base = '', title: titulo, desc: descripcion, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '' }) {
+function layout({ file, base = '', title: titulo, desc: descripcion, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '', wa = WA_GENERAL }) {
   const title = recortar(titulo, 62), desc = recortar(descripcion, 158);
   const url = `${sitio.dominio}/${file === 'index.html' ? '' : file}`;
   const nav = NAV.map(([href, label]) => `<a href="${base}${href}"${file === href ? ' aria-current="page"' : ''}>${label}</a>`).join('');
@@ -180,7 +184,14 @@ ${body}
   </div>
   <div class="legal"><span>© ${new Date().getFullYear()} INCERPAZ. Todos los derechos reservados. · <a href="${base}privacidad.html">Privacidad y cookies</a></span><span>Bolivia</span></div>
 </div></footer>
-<a class="wa-float" href="${waHref(ciudadDefecto.whatsapp, 'Hola, quisiera más información, por favor.')}" data-wa="Hola, quisiera más información, por favor." rel="noopener">WhatsApp</a>
+<a class="wa-float" href="${waHref(ciudadDefecto.whatsapp, wa.replace('{ciudad}', ciudadDefecto.nombre))}" data-wa="${esc(wa)}" rel="noopener" aria-label="Escríbenos por WhatsApp">WhatsApp</a>
+${PAGINAS_SIN_CIUDAD.includes(pagina) ? '' : `<dialog class="city-dlg" id="cityDlg" aria-labelledby="cityDlgTit">
+  <form method="dialog"><button class="city-dlg__x" value="cerrar" aria-label="Cerrar">×</button></form>
+  <h2 id="cityDlgTit">¿Desde qué ciudad nos visitas?</h2>
+  <p class="muted">Así te mostramos el catálogo, las promociones y el WhatsApp de la agencia de tu ciudad. Puedes cambiarla cuando quieras en «Tu ciudad».</p>
+  <div class="city-dlg__opts">${sitio.ciudades.map((c) => `<button class="btn" type="button" data-elegir-ciudad="${c.slug}">${esc(c.nombre)}</button>`).join('')}</div>
+  <a class="city-dlg__otra" href="${base}donde-estamos.html#otra-ciudad">Estoy en otra ciudad</a>
+</dialog>`}
 <script src="${base}${versionado('assets/js/config.js')}" defer></script>
 <script src="${base}${versionado('assets/js/site.js')}" defer></script>
 ${config.comercio ? `<script src="${base}${versionado('assets/js/comercio.js')}" defer></script>` : ''}
@@ -332,7 +343,16 @@ write('index.html', layout({
   }).join('')}</div>
 </div></section>
 
-<section class="section"><div class="wrap split">
+<section class="section" id="contacto"><div class="wrap split">
+  <div><span class="eyebrow">Contacto</span><h2 style="margin-block:12px 18px">Hablemos de tu proyecto</h2>
+    <p class="lead">Déjanos tus datos y un ejecutivo de <span data-city-name>tu ciudad</span> te contacta para ayudarte a elegir productos y cotizar.</p>
+    <p class="muted" style="margin-top:18px">¿Prefieres escribirnos? <a href="${waHref(ciudadDefecto.whatsapp, 'Hola, quiero que me ayuden con mi proyecto en Cochabamba.')}" data-wa="Hola, quiero que me ayuden con mi proyecto en {ciudad}." rel="noopener"><strong>Habla por WhatsApp</strong></a> o llama al <a href="tel:${sitio.servicio_cliente.tel}"><strong>${sitio.servicio_cliente.texto}</strong></a>.</p></div>
+  <div>${leadForm({ asunto: 'Contacto desde la portada', boton: 'Quiero que me contacten', campos: field('Nombre y apellido', 'nombre', 'required autocomplete="name" maxlength="120"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel" maxlength="20"') + selectCities('ciudad') +
+    '<label class="full">¿En qué podemos ayudarte?<textarea name="consulta" rows="3" maxlength="500" placeholder="Qué quieres construir, productos o cantidades aproximadas"></textarea></label>' +
+    `<label class="full check"><input type="checkbox" name="consentimiento" required><span>Acepto la <a href="privacidad.html">política de privacidad</a> y que INCERPAZ use estos datos para contactarme.</span></label>` })}</div>
+</div></section>
+
+<section class="section section--grey"><div class="wrap split">
   <div><span class="eyebrow">Empresa</span><h2 style="margin-block:12px 18px">Calidad que se construye todos los días</h2><p class="lead">${esc(sitio.somos)}</p><div class="btn-row" style="margin-top:24px"><a class="btn" href="empresa.html">Conocer INCERPAZ</a></div></div>
   <div class="values" style="margin-top:8px">${sitio.valores.map((v) => `<span>${v}</span>`).join('')}</div>
 </div></section>`
@@ -379,6 +399,7 @@ for (const p of productos) {
     file: `productos/${p.ciudad}/${p.slug}.html`, base,
     title: `${p.nombre} en ${CIUDAD_CATALOGO[p.ciudad]} | INCERPAZ`,
     desc: `${p.nombre}${p.descripcion ? ': ' + p.descripcion.replace(/\.$/, '') + '.' : ''} Medidas, peso y rendimiento. Catálogo de ${CIUDAD_CATALOGO[p.ciudad]}.`,
+    wa: `Hola, tengo una consulta sobre ${p.nombre}${p.codigo ? ` (código ${p.codigo})` : ''} en {ciudad}.`,
     og: imgs[0] || 'assets/img/logo-header.png', jsonld: ld + migas([['Inicio', ''], ['Productos', `catalogo.html?ciudad=${p.ciudad}`], [p.nombre, `productos/${p.ciudad}/${p.slug}.html`]]),
     body: `
 <div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="${base}index.html">Inicio</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}">Productos</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}&amp;cat=${p.cat}">${esc(CAT_NOMBRE[p.cat] || '')}</a> › ${esc(p.nombre)}</nav></div>
@@ -408,7 +429,7 @@ ${rel.length ? `<section class="section"><div class="wrap"><div class="section-h
 /* ============================ PAVIC ============================ */
 const fotosPavic = ['pavic-estandar', 'pavic-peatonal', 'pavic-tabaco'].map((s) => `assets/img/productos/${s}-2.jpg`);
 write('pavic.html', layout({
-  file: 'pavic.html',
+  file: 'pavic.html', wa: 'Hola, quisiera información sobre el pavimento PAVIC en {ciudad}.',
   title: 'PAVIC | Pavimento cerámico para proyectos | INCERPAZ',
   desc: 'PAVIC es el pavimento cerámico de INCERPAZ para calles, plazas, veredas y urbanizaciones. Calcula el material, solicita certificados y ensayos de calidad, y cotiza tu proyecto.',
   og: 'assets/img/productos/pavic-tabaco-2.jpg',
@@ -477,7 +498,7 @@ const piezasPavic = pavic.map((p) => {
     variantes: p.variantes.filter((x) => x.unidad === 'm2').map((x) => ({ rend: x.rend, etiqueta: x.etiqueta })), m2: !!v };
 });
 write('pavic-recursos.html', layout({
-  file: 'pavic-recursos.html', pagina: 'pavic-recursos', title: 'Recursos técnicos PAVIC para proyectistas | INCERPAZ',
+  file: 'pavic-recursos.html', pagina: 'pavic-recursos', wa: 'Hola, soy proyectista y tengo una consulta técnica sobre PAVIC en {ciudad}.', title: 'Recursos técnicos PAVIC para proyectistas | INCERPAZ',
   desc: 'Calculadora de obra, detalle en sección, texto para pliegos, DXF y documentación técnica del pavimento cerámico PAVIC para proyectistas, constructoras y entidades.',
   og: 'assets/img/productos/pavic-peatonal-2.jpg', jsonld: migas([['Inicio', ''], ['PAVIC', 'pavic.html'], ['Recursos técnicos', 'pavic-recursos.html']]),
   body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="pavic.html">PAVIC</a> › Recursos técnicos</nav></div>
@@ -685,7 +706,7 @@ for (const pr of proyectosData.proyectos) {
   const datos = { proyecto: pr, catalogos, ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })) };
   const ld = { '@context': 'https://schema.org', '@type': 'HowTo', name: pr.titulo, description: pr.resumen, tool: pr.herramientas.map((h) => ({ '@type': 'HowToTool', name: h })), step: pr.pasos.map((x, i) => ({ '@type': 'HowToStep', position: i + 1, name: x.titulo, text: x.texto })) };
   write(`proyectos/${pr.slug}.html`, layout({
-    file: `proyectos/${pr.slug}.html`, base: '../', pagina: 'proyecto', title: `${pr.titulo}: materiales y pasos | INCERPAZ`, desc: `${pr.resumen} Calcula la lista de materiales y sigue los pasos.`,
+    file: `proyectos/${pr.slug}.html`, base: '../', pagina: 'proyecto', wa: `Hola, quiero hacer el proyecto «${pr.titulo}» y tengo una consulta en {ciudad}.`, title: `${pr.titulo}: materiales y pasos | INCERPAZ`, desc: `${pr.resumen} Calcula la lista de materiales y sigue los pasos.`,
     og: pr.imagen, jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>` + migas([['Inicio', ''], ['Proyectos', 'proyectos.html'], [pr.titulo, `proyectos/${pr.slug}.html`]]),
     body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../proyectos.html">Proyectos</a> › ${esc(pr.titulo)}</nav></div>
 <section class="section" style="padding-top:12px"><div class="wrap">
@@ -732,7 +753,7 @@ for (const g of guiasData) {
   const cuerpo = g.cuerpo.map((x) => x.t === 'h2' ? `<h2 style="margin:32px 0 10px;font-size:28px">${esc(x.x)}</h2>` : x.t === 'p' ? `<p style="margin-bottom:14px;max-width:68ch">${esc(x.x)}</p>` : x.t === 'ul' ? `<ul class="lista" style="margin-bottom:14px;max-width:68ch">${x.x.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : `<p style="margin:28px 0"><a class="btn btn--red" href="${fix(x.href)}">${esc(x.x)}</a></p>`).join('');
   const ld = { '@context': 'https://schema.org', '@type': 'Article', headline: g.titulo, description: g.resumen, datePublished: g.fecha, image: `${sitio.dominio}/${g.imagen}`, author: { '@type': 'Organization', name: 'INCERPAZ' }, publisher: { '@type': 'Organization', name: 'INCERPAZ', logo: { '@type': 'ImageObject', url: `${sitio.dominio}/assets/img/logo-header.png` } } };
   write(`guias/${g.slug}.html`, layout({
-    file: `guias/${g.slug}.html`, base: b, pagina: 'guia', title: `${g.titulo} | INCERPAZ`, desc: g.resumen, og: g.imagen,
+    file: `guias/${g.slug}.html`, base: b, pagina: 'guia', wa: `Hola, leí la guía «${g.titulo}» y tengo una consulta en {ciudad}.`, title: `${g.titulo} | INCERPAZ`, desc: g.resumen, og: g.imagen,
     jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>` + migas([['Inicio', ''], ['Guías', 'guias.html'], [g.titulo, `guias/${g.slug}.html`]]),
     body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../guias.html">Guías</a> › ${esc(g.titulo)}</nav></div>
 <article class="section" style="padding-top:12px"><div class="wrap">
@@ -810,7 +831,7 @@ for (const n of novedades) {
     : n.cta.tipo === 'inscripcion' ? leadForm({ asunto: `Inscripción: ${n.titulo}`, boton: n.cta.texto || 'Inscribirme', campos: `<input type="hidden" name="campana" value="${esc(n.id)}">` + field('Nombre', 'nombre', 'required autocomplete="name"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel"') + field('Correo', 'correo', 'type="email" autocomplete="email"') + selectCities('ciudad') }) : '';
   const ld = ['evento', 'curso'].includes(n.tipo) && n.fecha_evento ? `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: n.titulo, description: n.resumen, startDate: n.fecha_evento, eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode', eventStatus: 'https://schema.org/EventScheduled', ...(n.lugar ? { location: { '@type': 'Place', name: n.lugar, address: n.lugar } } : {}), organizer: { '@type': 'Organization', name: 'INCERPAZ', url: sitio.dominio } }).replace(/</g, '\\u003c')}</script>` : '';
   write(`promociones/${n.id}.html`, layout({
-    file: `promociones/${n.id}.html`, base: '../', pagina: 'promocion', title: `${n.titulo} | INCERPAZ`, desc: n.resumen, og: n.imagen || 'assets/img/productos/pavic-tabaco-2.jpg',
+    file: `promociones/${n.id}.html`, base: '../', pagina: 'promocion', wa: `Hola, quisiera información sobre «${n.titulo}» en {ciudad}.`, title: `${n.titulo} | INCERPAZ`, desc: n.resumen, og: n.imagen || 'assets/img/productos/pavic-tabaco-2.jpg',
     jsonld: ld + migas([['Inicio', ''], ['Promociones', 'promociones.html'], [n.titulo, `promociones/${n.id}.html`]]),
     body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../promociones.html">Promociones</a> › ${esc(n.titulo)}</nav></div>
 <section class="section" style="padding-top:12px"><div class="wrap split">
@@ -833,7 +854,7 @@ for (const c of combos) {
   const waTxt = `Hola, quiero el combo "${c.titulo}" en {ciudad}.`;
   const im = comboImagen(c);
   write(`combos/${c.catalogo}/${c.id}.html`, layout({
-    file: `combos/${c.catalogo}/${c.id}.html`, base: '../../', pagina: 'combo', title: `${c.titulo} | INCERPAZ`, desc: c.descripcion || `Combo con ${c.componentes.length} componentes. Vigente hasta el ${fechaCorta(c.fin)}.`, og: im || 'assets/img/productos/pavic-tabaco-2.jpg',
+    file: `combos/${c.catalogo}/${c.id}.html`, base: '../../', pagina: 'combo', wa: `Hola, quiero el combo «${c.titulo}» en {ciudad}.`, title: `${c.titulo} | INCERPAZ`, desc: c.descripcion || `Combo con ${c.componentes.length} componentes. Vigente hasta el ${fechaCorta(c.fin)}.`, og: im || 'assets/img/productos/pavic-tabaco-2.jpg',
     jsonld: migas([['Inicio', ''], ['Promociones', 'promociones.html'], [c.titulo, `combos/${c.catalogo}/${c.id}.html`]]),
     body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../../index.html">Inicio</a> › <a href="../../promociones.html">Promociones</a> › ${esc(c.titulo)}</nav></div>
 <section class="wrap" style="padding-bottom:48px"><div class="prod">

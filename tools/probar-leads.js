@@ -1,6 +1,7 @@
 /* Prueba de punta a punta de las guías, exportaciones y la bandeja de contactos (leads).
    Uso: node tools/probar-leads.js */
 const { chromium } = require('playwright');
+const visitante = require('./visitante');
 const { spawn, execFileSync } = require('node:child_process');
 const os = require('node:os');
 const path = require('node:path');
@@ -19,8 +20,8 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
   try {
     for (let i = 0; i < 80; i++) { try { if ((await fetch(BASE + 'api/salud')).ok) break; } catch { /* aún no */ } await espera(200); }
     const b = await chromium.launch();
-    const p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
-    const adm = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+    const p = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage();
+    const adm = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage();
     const errores = []; [p, adm].forEach((x) => x.on('pageerror', (e) => errores.push(e.message)));
     let abiertas = 0; p.context().on('page', () => { abiertas++; });
 
@@ -54,6 +55,19 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await adm.selectOption('#lead-estado', 'contactado'); await adm.waitForFunction(() => document.querySelectorAll('[data-lead-estado]').length === 1);
     ok(true, 'cambiar estado y filtrar por estado funciona');
     ok(/leads\.csv/.test(await adm.getAttribute('a:has-text("Descargar CSV")', 'href')), 'hay descarga en CSV');
+
+    /* formulario corto de la portada, con consentimiento */
+    await p.goto(BASE + 'index.html');
+    const fp = '#contacto form[data-lead]';
+    await p.fill(`${fp} [name="nombre"]`, 'Marta Quispe'); await p.fill(`${fp} [name="celular"]`, '70099988');
+    await p.fill(`${fp} [name="consulta"]`, 'Quiero construir un muro de 20 m²');
+    ok(!(await p.evaluate((s) => document.querySelector(s).checkValidity(), fp)), 'la portada no envía sin aceptar la privacidad');
+    await p.check(`${fp} [name="consentimiento"]`); await p.click(`${fp} button[type="submit"]`);
+    await p.waitForSelector('#contacto .form-msg:not([hidden])');
+    ok(/Recibimos tu solicitud/.test(await p.textContent('#contacto .form-msg')), 'el formulario de la portada se envía');
+    const guardado = await adm.evaluate(() => fetch('/api/admin/leads?q=Marta', { headers: { 'X-Requested-With': 'incerpaz' } }).then((r) => r.json()));
+    const l = guardado.leads && guardado.leads[0];
+    ok(l && l.asunto === 'Contacto desde la portada' && l.datos.consentimiento === 'sí' && /muro/.test(l.datos.consulta), 'llega a Contactos con el asunto de la portada y el consentimiento');
 
     await p.setViewportSize({ width: 390, height: 800 });
     for (const u of ['guias/como-colocar-enchape-de-ladrillo.html', 'exportaciones.html', 'guias.html']) {

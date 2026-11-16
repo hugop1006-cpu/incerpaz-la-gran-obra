@@ -3,6 +3,7 @@
    el visitante lo ve en su ciudad, el cliente ve el precio, lo añade al presupuesto y hace el pedido.
    Uso: node tools/probar-promos.js */
 const { chromium } = require('playwright');
+const visitante = require('./visitante');
 const { spawn, execFileSync } = require('node:child_process');
 const os = require('node:os');
 const path = require('node:path');
@@ -32,7 +33,7 @@ async function avisoNuevo(p, accion, texto) {
   try {
     for (let i = 0; i < 80; i++) { try { if ((await fetch(BASE + 'api/salud')).ok) break; } catch { /* aún no */ } await espera(200); }
     const b = await chromium.launch();
-    const nuevo = async (w = 1280) => (await b.newContext({ viewport: { width: w, height: 900 } })).newPage();
+    const nuevo = async (w = 1280) => (await visitante(b, { viewport: { width: w, height: 900 } })).newPage();
     const ej = await nuevo(), adm = await nuevo(), vis = await nuevo();
     const errores = []; [ej, adm, vis].forEach((x) => { x.on('pageerror', (e) => errores.push(e.message)); x.on('dialog', (d) => d.accept()); });
 

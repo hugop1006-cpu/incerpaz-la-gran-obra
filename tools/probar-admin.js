@@ -3,6 +3,7 @@
    públicas cambian. Al terminar vuelve a generar el sitio con el contenido original.
    Uso: node tools/probar-admin.js */
 const { chromium } = require('playwright');
+const visitante = require('./visitante');
 const { spawn, execFileSync } = require('node:child_process');
 const os = require('node:os');
 const path = require('node:path');
@@ -23,8 +24,8 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
   try {
     for (let i = 0; i < 80; i++) { try { if ((await fetch(BASE + 'api/salud')).ok) break; } catch { /* aún no */ } await espera(200); }
     const b = await chromium.launch();
-    const p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
-    const ej = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+    const p = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage();
+    const ej = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage();
     const errores = []; [p, ej].forEach((x) => x.on('pageerror', (e) => errores.push(e.message)));
     p.on('dialog', (d) => d.accept()); pagAviso = p;
 

@@ -1,6 +1,7 @@
 /* Prueba de los recursos técnicos PAVIC con un navegador real.
    Uso: node tools/probar-pavic.js */
 const { chromium } = require('playwright');
+const visitante = require('./visitante');
 const { spawn, execFileSync } = require('node:child_process');
 const os = require('node:os');
 const path = require('node:path');
@@ -21,7 +22,7 @@ const fila = (p, t) => p.locator('#pv-resultado tbody tr', { hasText: t }).first
   try {
     for (let i = 0; i < 80; i++) { try { if ((await fetch(BASE + 'api/salud')).ok) break; } catch { /* aún no */ } await espera(200); }
     const b = await chromium.launch();
-    const p = await (await b.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true })).newPage();
+    const p = await (await visitante(b, { viewport: { width: 1280, height: 900 }, acceptDownloads: true })).newPage();
     const errores = []; p.on('pageerror', (e) => errores.push(e.message));
 
     await p.goto(BASE + 'pavic.html'); ok((await p.locator('a[href="pavic-recursos.html"]').count()) >= 1, 'la página PAVIC enlaza a los recursos');

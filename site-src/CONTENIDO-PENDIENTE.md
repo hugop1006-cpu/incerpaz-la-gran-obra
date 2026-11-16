@@ -66,6 +66,11 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - Leads: los formularios del sitio se guardan en el servidor y se ven en Equipo → Contactos (cada ejecutivo ve los de su ciudad; los de otras ciudades y la lista de espera los ve el administrador). Falta definir quién atiende exportaciones y PAVIC, y conectar avisos por correo o WhatsApp cuando entra un contacto nuevo (hoy solo se ve el contador en el panel).
 - Falta fotografía propia para las guías (hoy usan fotos de producto) y más guías (instalación de PAVIC, techos con teja, refractarios para hornos).
 
+## Ideas tomadas del prototipo de Fergie (Base44)
+- Ventana «¿Desde qué ciudad nos visitas?» en la primera visita, mensaje de WhatsApp según la página y formulario corto en la portada: hechos en el sitio preliminar.
+- Antes de publicar el formulario de la portada: revisión legal del texto de consentimiento y definir quién atiende los contactos de la portada y por qué canal llega el aviso.
+- Datos que no cuadran con el prototipo: WhatsApp de la agencia Central de Cochabamba (79723246 en el prototipo, 70750963 aquí) y de Castillo (70756067 en el prototipo).
+
 ## Publicación pública
 - Decidir las herramientas de medición (Google Analytics, Search Console, Meta Pixel) y el aviso de cookies que correspondan.
 - Crear o reclamar los perfiles de Negocio de Google de cada agencia y fábrica; confirmar que dirección y teléfono coinciden con los del sitio.
