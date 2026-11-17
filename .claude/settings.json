@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(node tools/*)",
+      "Bash(python3 -m unittest *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git branch *)",
+      "Bash(git checkout -b *)",
+      "Bash(git switch -c *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git fetch *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(gh pr create *)",
+      "Bash(codex queue *)",
+      "Bash(pip install *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/*password*)",
+      "Read(**/*credential*)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(gh auth *)",
+      "Bash(gh pr merge *)",
+      "Bash(rm -rf *)"
+    ]
+  }
+}
