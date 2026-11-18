@@ -590,7 +590,14 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
     let p; try { p = decodeURIComponent(url.pathname); } catch { return responder(res, 400, { error: 'Solicitud inválida' }); }
     if (p.includes('\0')) return responder(res, 400, { error: 'Solicitud inválida' });
     if (p === '/' || p === '') p = '/index.html';
-    else if (!path.extname(p)) p = fs.existsSync(path.join(SITIO, p + '.html')) ? p + '.html' : p;
+    else if (!path.extname(p)) {
+      const corta = p.replace(/\/+$/, '');
+      if (['/cochabamba', '/santa-cruz', '/oruro', '/sucre'].includes(corta)) {
+        if (p !== corta) { res.writeHead(301, { Location: corta + url.search }); return res.end(); }
+        p = corta + '.html';
+      }
+      else p = fs.existsSync(path.join(SITIO, p + '.html')) ? p + '.html' : p;
+    }
     const BASE = SUBIDAS && p.startsWith('/assets/img/subidas/') ? SUBIDAS : SITIO;
     if (BASE === SUBIDAS) p = p.slice('/assets/img/subidas'.length);
     const archivo = path.normalize(path.join(BASE, p));

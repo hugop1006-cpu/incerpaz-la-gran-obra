@@ -10,6 +10,12 @@
 
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
   function cityBySlug(s) { return CFG.ciudades.filter(function (c) { return c.slug === s; })[0]; }
+  function cityFromRoute() {
+    var p = location.pathname.replace(/\/+$/, ''), slug = p.slice(p.lastIndexOf('/') + 1);
+    return cityBySlug(slug) || cityBySlug(document.documentElement.getAttribute('data-ciudad-ruta'));
+  }
+  var rutaCity = cityFromRoute();
+  if (rutaCity) store(KEY, rutaCity.slug);
   function currentCity() { return cityBySlug(store(KEY)) || CFG.ciudades[0]; }
   function waUrl(num, msg) { return 'https://wa.me/591' + num + '?text=' + encodeURIComponent(msg); }
   function fmt(n) { return Math.round(n).toLocaleString('es-BO'); }
@@ -64,7 +70,7 @@
 
   /* ---- primera visita: preguntar la ciudad una sola vez ----
      No se abre si ya hay ciudad guardada, si la persona la cerró en esta visita
-     o si la dirección ya trae la ciudad (?ciudad=). Sin JavaScript no aparece. */
+     o si la dirección ya trae la ciudad en el query o en la ruta corta. Sin JavaScript no aparece. */
   var dlg = $('#cityDlg');
   if (dlg && typeof dlg.showModal === 'function') {
     var PREG = 'incerpaz_ciudad_preguntada';
@@ -75,7 +81,7 @@
     });
     dlg.addEventListener('close', marcar);
     dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
-    if (!cityBySlug(store(KEY)) && !yaPreguntada() && !/[?&]ciudad=/.test(location.search)) {
+    if (!rutaCity && !cityBySlug(store(KEY)) && !yaPreguntada() && !/[?&]ciudad=/.test(location.search)) {
       try { dlg.showModal(); var pri = $('[data-elegir-ciudad]', dlg); if (pri) pri.focus(); } catch (e) { /* navegador sin soporte */ }
     }
   }
@@ -119,7 +125,7 @@
     var m = /[?&]cat=([^&]+)/.exec(location.search); if (m) cat = decodeURIComponent(m[1]);
     var mc = /[?&]ciudad=([^&]+)/.exec(location.search);
     var enCatalogo = function (slug) { return slug === 'santa-cruz' ? 'santa-cruz' : 'cochabamba'; };
-    var catCity = mc ? decodeURIComponent(mc[1]) : enCatalogo(currentCity().slug);
+    var catCity = mc ? enCatalogo(decodeURIComponent(mc[1])) : enCatalogo(currentCity().slug);
     function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
     function apply() {
       var term = norm(q.value.trim()), n = 0, hoy = hoyLocal(), ciudadSel = currentCity().slug;

@@ -297,6 +297,7 @@ function write(file, html) {
 fs.rmSync(path.join(OUT, 'productos'), { recursive: true, force: true });
 fs.rmSync(path.join(OUT, 'promociones'), { recursive: true, force: true });
 fs.rmSync(path.join(OUT, 'combos'), { recursive: true, force: true });
+for (const ciudad of sitio.ciudades) fs.rmSync(path.join(OUT, ciudad.slug), { recursive: true, force: true });
 
 /* ============================ HOME ============================ */
 const mosaico = ['18-h', 'brick-enchape-corto', '9-huecos-economico-rayado', 'brick-estandar', 'pavic-peatonal', 'biscocho']
@@ -380,6 +381,16 @@ ${productos.some((p) => p.nuevoHasta && p.nuevoHasta >= hoyISO) ? `<section clas
 </div></section>`
 };
 write('index.html', layout(inicio));
+/* Entradas por ciudad, a las que el servidor responde en /cochabamba, /santa-cruz, /oruro y /sucre. */
+for (const ciudad of sitio.ciudades) {
+  const archivo = ciudad.slug + '.html';
+  const html = layout(Object.assign({}, inicio, {
+    file: archivo,
+    title: 'INCERPAZ | Cerámica para construir en ' + ciudad.nombre,
+    desc: 'Ladrillos, pisos, techos y revestimientos cerámicos INCERPAZ en ' + ciudad.nombre + '. Consulta el catálogo, las agencias y las opciones de cotización.'
+  })).replace('<html lang="es-BO">', '<html lang="es-BO" data-ciudad-ruta="' + ciudad.slug + '">');
+  write(archivo, html.replace(/[ \t]+$/gm, ''));
+}
 /* ============================ CATÁLOGO ============================ */
 write('catalogo.html', layout({
   file: 'catalogo.html',
@@ -936,7 +947,7 @@ write('404.html', layout({
   file: '404.html', title: 'Página no encontrada | INCERPAZ', desc: 'La página que buscas no existe.',
   body: `<section class="section"><div class="wrap"><h1>No encontramos esa página</h1><p class="lead" style="margin-block:16px 28px">Puede que el enlace haya cambiado. Prueba desde el inicio o el catálogo.</p><div class="btn-row"><a class="btn btn--red" href="${sitio.dominio}/">Ir al inicio</a><a class="btn" href="${sitio.dominio}/catalogo.html">Ver productos</a></div></div></section>`
 }));
-const urls = ['', 'privacidad.html', 'promociones.html', ...novedades.map((n) => `promociones/${n.id}.html`), ...combos.map((c) => `combos/${c.catalogo}/${c.id}.html`), 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
+const urls = ['', ...sitio.ciudades.map((c) => c.slug + '.html'), 'privacidad.html', 'promociones.html', ...novedades.map((n) => `promociones/${n.id}.html`), ...combos.map((c) => `combos/${c.catalogo}/${c.id}.html`), 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
 if (config.interno) {
   fs.rmSync(path.join(OUT, 'sitemap.xml'), { force: true });
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');

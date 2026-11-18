@@ -2,6 +2,19 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-18 · Codex
+**Hecho**
+- «Nuevo»: campo opcional `nuevo_hasta`, validado como `AAAA-MM-DD`; etiqueta en catálogo y portada hasta el vencimiento. La portada excluye tarjetas vencidas. No se marcó ningún producto real; queda pendiente indicarlo en `site-src/CONTENIDO-PENDIENTE.md`.
+- Rutas cortas `/cochabamba`, `/santa-cruz`, `/oruro` y `/sucre`, con ciudad preseleccionada. Oruro y Sucre usan el catálogo de Cochabamba y conservan su ciudad para atención y disponibilidad.
+- Comparador: se conserva sin duplicarlo desde la base `claude/awesome-curie-ehi971` (commit `975a6de`), con pruebas de sitio, comercio y publicación en verde.
+- Generador y sitio generados en 85 páginas. Pasan las 12 pruebas de API y las pruebas de navegador existentes y nuevas.
+
+**En curso**
+- PR de dos commits desde `codex/refresh-3-cambios` hacia `claude/awesome-curie-ehi971`; no incluye merge ni deploy.
+
+**Sigue**
+- Revisión de Claude y decisión de Hugo sobre el merge.
+
 ## 2026-11-18 · Claude Code
 **Hecho**
 - Comparador de productos (pedido de la reunión, con permiso de Hugo): botón «Comparar» en tarjetas del catálogo y en fichas, barra fija con el conteo, página `comparar.html` con tabla lado a lado (hasta 4 productos del mismo catálogo), filas que cambian resaltadas, «Mostrar solo lo que cambia», enlace compartible `?p=`, WhatsApp con la lista y precio solo con cuenta verificada.
