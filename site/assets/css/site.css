@@ -20,6 +20,8 @@
   color-scheme: light;
 }
 *, *::before, *::after { box-sizing: border-box; }
+/* lo que el sitio oculta con el atributo hidden queda oculto aunque su clase le dé display (tarjetas filtradas, etiquetas vencidas…) */
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.55; }
 img { max-width: 100%; height: auto; display: block; }
@@ -356,3 +358,7 @@ label.check a { color: var(--red); font-weight: 600; }
 .cmp-tabla tr.difiere td { background: #fff7dc; }
 .cmp-tabla.solo-dif tbody tr:not(.difiere):not(.cmp-precio) { display: none; }
 @media (max-width: 640px) { .cmp-tabla th, .cmp-tabla td { min-width: 150px; padding: 10px; font-size: 15px; } .cmp-tabla tbody th, .cmp-tabla .cmp-esq { min-width: 110px; } .cmp-prod img { width: 90px; height: 90px; } }
+
+/* productos nuevos */
+.tag--nuevo { background: var(--yellow); color: var(--ink); }
+.pcard .tags { display: flex; flex-wrap: wrap; gap: 6px; }

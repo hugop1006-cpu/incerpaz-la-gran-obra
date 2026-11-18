@@ -92,6 +92,8 @@ async function levantar(puerto, extra) {
     ok(rh.status === 301 && rh.headers.location === 'https://www.incerpaz.com/pavic.html', 'http redirige a https');
     ok((await pedir(8089, '/api/salud', { Host: 'www.incerpaz.com', 'X-Forwarded-Proto': 'http' })).status === 200, 'la verificación de salud no se redirige');
     ok((await pedir(8089, '/%E0%A4%A')).status === 400, 'una dirección mal codificada da 400 y no 500');
+    const cortas = await Promise.all(['cochabamba', 'santa-cruz', 'oruro', 'sucre'].map((c) => pedir(8089, '/' + c, { Host: 'www.incerpaz.com', 'X-Forwarded-Proto': 'https' })));
+    ok(cortas.every((r, i) => r.status === 200 && r.cuerpo.toString().includes(`data-ciudad-fija="${['cochabamba', 'santa-cruz', 'oruro', 'sucre'][i]}"`)), 'las direcciones cortas /cochabamba, /santa-cruz, /oruro y /sucre abren la página de su ciudad');
 
     /* ---------- 3. navegador: la política CSP no rompe nada ---------- */
     const b = await chromium.launch();

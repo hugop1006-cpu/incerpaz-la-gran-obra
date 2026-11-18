@@ -44,6 +44,21 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     const pagina = await (await fetch(BASE + 'productos/cochabamba/18-h.html')).text();
     ok(/18 huecos prueba/i.test(pagina), 'el cambio de nombre se publica en la ficha');
 
+    /* producto nuevo: con fecha «nuevo hasta» lleva la etiqueta y aparece en la portada */
+    const futuro = new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10);
+    await p.click('[data-edit="18-h"]'); await p.fill('[name="nuevo_hasta"]', futuro);
+    await p.click('#f button[type=submit]'); await p.waitForSelector('table.tabla');
+    ok(/Nuevo hasta/.test(await p.textContent('table.tabla')), 'el panel muestra que el producto está destacado como nuevo');
+    const vis = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage();
+    await vis.goto(BASE + 'index.html');
+    ok(await vis.isVisible('#nuevos-home .pcard[data-ciudad="cochabamba"] .tag--nuevo'), 'el producto nuevo aparece en la portada con su etiqueta');
+    await vis.goto(BASE + 'catalogo.html?ciudad=cochabamba&cat=nuevos');
+    ok((await vis.locator('#grid .pcard:visible').count()) === 1, 'el filtro «Nuevos» del catálogo lo muestra solo a él');
+    await vis.context().close();
+    await p.click('[data-edit="18-h"]'); await p.fill('[name="nuevo_hasta"]', '');
+    await p.click('#f button[type=submit]'); await p.waitForSelector('table.tabla');
+    ok(!/tag--nuevo/.test(await (await fetch(BASE + 'catalogo.html')).text()), 'sin fecha deja de destacarse');
+
     await p.click('[data-tab="precios"]'); await p.waitForSelector('input[data-slug="18-h"]');
     await p.fill('input[data-slug="18-h"][data-lista="general"]', '7.25'); await p.fill('#nota', 'Nota de prueba E2E');
     await aviso(() => p.click('#guardar'), '1 cambios guardados');

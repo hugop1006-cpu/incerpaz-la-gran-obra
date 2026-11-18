@@ -82,6 +82,21 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok(/PAVIC/.test(decodeURIComponent(await pg.getAttribute('.wa-float', 'href'))), 'en PAVIC, el WhatsApp habla de PAVIC');
   await pg.goto(BASE + 'empresa.html');
   ok(/m%C3%A1s%20informaci%C3%B3n/.test(await pg.getAttribute('.wa-float', 'href')), 'en las demás páginas queda el mensaje general');
+  /* el catálogo muestra en pantalla exactamente lo que cuenta */
+  await pg.setViewportSize({ width: 1280, height: 900 });
+  await pg.goto(BASE + 'catalogo.html?ciudad=santa-cruz');
+  ok(parseInt(await pg.textContent('#count'), 10) === (await pg.locator('#grid .pcard:visible').count()), 'el catálogo oculta en pantalla los productos de la otra ciudad');
+
+  /* página de ciudad: la ciudad queda elegida sin preguntar */
+  const cvis = await b.newContext({ viewport: { width: 1280, height: 900 } });
+  const cpg = await cvis.newPage(); cpg.on('pageerror', (e) => errores.push(e.message));
+  await cpg.goto(BASE + 'santa-cruz.html');
+  ok(!(await cpg.isVisible('#cityDlg')) && (await cpg.inputValue('#citySel')) === 'santa-cruz', 'la página de Santa Cruz elige la ciudad sin preguntar');
+  ok((await cpg.locator('.agency').count()) >= 1 && (await cpg.getAttribute('.wa-float', 'href')).includes('59170009021'), 'muestra sus agencias y el WhatsApp de Santa Cruz');
+  await cpg.goto(BASE + 'catalogo.html');
+  ok((await cpg.inputValue('#citySel')) === 'santa-cruz', 'la ciudad queda recordada al seguir navegando');
+  await cvis.close();
+
   /* comparador de productos */
   const cctx = await visitante(b, { viewport: { width: 1280, height: 900 } });
   const cp = await cctx.newPage(); cp.on('pageerror', (e) => errores.push(e.message));

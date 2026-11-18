@@ -129,7 +129,7 @@ const recortar = (t, max) => (t.length <= max ? t : t.slice(0, max - 1).replace(
 fs.mkdirSync(path.join(OUT, 'assets/js'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'assets/js/config.js'), `window.INCERPAZ=${JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || (config.comercio ? '/api/leads' : ''), demo: DEMO })};\n`);
 
-function layout({ file, base = '', title: titulo, desc: descripcion, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '', wa = WA_GENERAL }) {
+function layout({ file, base = '', title: titulo, desc: descripcion, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '', wa = WA_GENERAL, ciudadFija = '' }) {
   const title = recortar(titulo, 62), desc = recortar(descripcion, 158);
   const url = `${sitio.dominio}/${file === 'index.html' ? '' : file}`;
   const nav = NAV.map(([href, label]) => `<a href="${base}${href}"${file === href ? ' aria-current="page"' : ''}>${label}</a>`).join('');
@@ -152,7 +152,7 @@ ${config.interno || ['ingresar','registro','presupuesto','cuenta','equipo','admi
 <link rel="stylesheet" href="${base}${versionado('assets/css/site.css')}">
 ${jsonld}
 </head>
-<body data-base="${base}" data-pagina="${pagina}">
+<body data-base="${base}" data-pagina="${pagina}"${ciudadFija ? ` data-ciudad-fija="${ciudadFija}"` : ''}>
 <a class="skip" href="#contenido">Saltar al contenido</a>
 ${DEMO ? '<div style="background:#b5121b;color:#fff;font:600 14px/1.4 Barlow,sans-serif;padding:8px 16px;text-align:center">Demostración del rediseño, no es el sitio oficial. Cuentas, precios y pedidos no están activos y los formularios no envían nada. Los botones de WhatsApp sí abren el WhatsApp real de la agencia.</div>' : ''}
 <div class="topbar"><div class="wrap">
@@ -171,7 +171,7 @@ ${body}
 <footer class="site-footer"><div class="wrap">
   <div class="cols">
     <div><a class="brand" href="${base || './'}"><img src="${base}assets/img/logo-header.png" alt="INCERPAZ" width="210" height="34"></a>
-      <p style="margin-top:14px;max-width:34ch">Cerámica para construir tu hogar. Fabricamos en Bolivia y atendemos desde Cochabamba, Santa Cruz, Oruro y Sucre.</p></div>
+      <p style="margin-top:14px;max-width:34ch">Cerámica para construir tu hogar. Fabricamos en Bolivia y atendemos desde ${sitio.ciudades.map((c, i, l) => `${i === 0 ? '' : i === l.length - 1 ? ' y ' : ', '}<a href="${base}${c.slug}.html">${esc(c.nombre)}</a>`).join('')}.</p></div>
     <div><h4>Sitio</h4><ul>${NAV.map(([h, l]) => `<li><a href="${base}${h}">${l}</a></li>`).join('')}</ul></div>
     <div><h4>Contacto</h4><ul>
       <li><a href="tel:${sitio.servicio_cliente.tel}">Servicio al cliente ${sitio.servicio_cliente.texto}</a></li>
@@ -200,7 +200,7 @@ ${PAGINAS_SIN_CIUDAD.includes(pagina) ? '' : `<dialog class="city-dlg" id="cityD
 <script src="${base}${versionado('assets/js/config.js')}" defer></script>
 <script src="${base}${versionado('assets/js/site.js')}" defer></script>
 ${config.comercio ? `<script src="${base}${versionado('assets/js/comercio.js')}" defer></script>` : ''}
-${['inicio', 'promociones', 'promocion', 'combo'].includes(pagina) ? `<script src="${base}${versionado('assets/js/promos.js')}" defer></script>` : ''}
+${['inicio', 'ciudad', 'promociones', 'promocion', 'combo'].includes(pagina) ? `<script src="${base}${versionado('assets/js/promos.js')}" defer></script>` : ''}
 ${pagina === 'pavic-recursos' ? `<script src="${base}${versionado('assets/js/pavic.js')}" defer></script>` : ''}
 ${pagina === 'proyecto' ? `<script src="${base}${versionado('assets/js/proyectos.js')}" defer></script>` : ''}
 ${config.comercio && pagina === 'admin' ? `<script src="${base}${versionado('assets/js/admin.js')}" defer></script>` : ''}
@@ -217,15 +217,23 @@ const orgLd = `<script type="application/ld+json">${JSON.stringify({
 
 /* ---- piezas reutilizables ---- */
 /* Comparador: cada producto se identifica como «ciudad:slug»; solo se comparan productos del mismo catálogo. */
+/* Productos nuevos: se destacan hasta la fecha «nuevo_hasta» (el navegador vuelve a revisarla, por si el sitio no se regenera ese día). */
+const HOY = new Date().toISOString().slice(0, 10);
+const esNuevo = (p) => !!p.nuevo_hasta && p.nuevo_hasta >= HOY;
+const tagNuevo = (p) => esNuevo(p) ? `<span class="tag tag--nuevo" data-nuevo-hasta="${p.nuevo_hasta}">Nuevo</span>` : '';
+const seccionNuevos = () => productos.some(esNuevo) ? `<section class="section" id="nuevos-home" hidden><div class="wrap">
+  <div class="section-head"><div class="row"><div><span class="eyebrow">Recién llegados</span><h2 style="margin-top:12px">Productos nuevos</h2></div><a class="btn" href="catalogo.html?cat=nuevos" data-nuevos-ver>Ver en el catálogo</a></div></div>
+  <div class="grid-products">${productos.filter(esNuevo).sort((a, b) => (a.nuevo_hasta < b.nuevo_hasta ? 1 : -1)).map((p) => productCard(p)).join('')}</div>
+</div></section>` : '';
 const idComparar = (p) => `${p.ciudad}:${p.slug}`;
 const botonComparar = (p, cls = 'btn') => `<button class="${cls}" type="button" data-comparar="${idComparar(p)}" data-nombre="${esc(p.nombre)}" aria-pressed="false">Comparar</button>`;
 function productCard(p, base = '') {
   const im = p.imagenes[0];
-  return `<article class="pcard" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}">
+  return `<article class="pcard" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat, esNuevo(p) ? ['nuevos'] : []).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}"${esNuevo(p) ? ` data-nuevo-hasta="${p.nuevo_hasta}"` : ''}>
   ${botonComparar(p, 'pcard-cmp')}
   <a class="pcard-link" href="${purl(p, base)}">
   <div class="img">${im ? `<img src="${base}${im}" alt="${esc(p.nombre)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
-  <div class="body"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>
+  <div class="body"><div class="tags">${tagNuevo(p)}<span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span></div><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>
   ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir</button></div>` : ''}</article>`;
 }
 
@@ -318,6 +326,8 @@ write('index.html', layout({
   <a href="pavic.html"><b>PAVIC</b><span>Pavimentos para proyectos</span></a>
 </div></section>
 
+${seccionNuevos()}
+
 <section class="section section--grey" id="promos-home" hidden><div class="wrap">
   <div class="section-head"><div class="row"><div><span class="eyebrow">Promociones</span><h2 style="margin-top:12px">Vigentes en <span data-city-name>tu ciudad</span></h2></div><a class="btn" href="promociones.html">Ver todas</a></div></div>
   <div class="promo-grid" id="promos-home-lista"></div>
@@ -348,7 +358,7 @@ write('index.html', layout({
   <div class="section-head"><div class="row"><div><span class="eyebrow">Dónde estamos</span><h2 style="margin-top:12px">Una agencia cerca de tu obra</h2></div><a class="btn" href="donde-estamos.html">Ver todas las agencias</a></div></div>
   <div class="three" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${sitio.ciudades.map((c) => {
     const l = sitio.agencias[c.slug]; const ag = l.filter((a) => a.tipo === 'agencia').length;
-    return `<div><h3>${c.nombre}</h3><p class="muted">${ag} ${ag === 1 ? 'agencia' : 'agencias'} y fábrica</p><a class="btn btn--sm btn--wa" href="${waHref(c.whatsapp, `Hola, quisiera información en ${c.nombre}.`)}" rel="noopener">WhatsApp</a> <a class="btn btn--sm" href="donde-estamos.html#${c.slug}">Ver</a></div>`;
+    return `<div><h3>${c.nombre}</h3><p class="muted">${ag} ${ag === 1 ? 'agencia' : 'agencias'} y fábrica</p><a class="btn btn--sm btn--wa" href="${waHref(c.whatsapp, `Hola, quisiera información en ${c.nombre}.`)}" rel="noopener">WhatsApp</a> <a class="btn btn--sm" href="${c.slug}.html">Ver</a></div>`;
   }).join('')}</div>
 </div></section>
 
@@ -380,7 +390,7 @@ write('catalogo.html', layout({
 <section class="wrap" style="padding-bottom:72px">
   <div class="filters">
     <div><span class="mono-label">Catálogo de</span><div class="chips" role="group" aria-label="Catálogo por ciudad">${Object.entries(CIUDAD_CATALOGO).map(([s, n]) => `<button class="chip" data-catalogo="${s}" type="button" aria-pressed="false">${n}</button>`).join('')}</div></div>
-    <div style="flex:1 1 100%"><span class="mono-label">Categoría</span><div class="chips" role="group" aria-label="Categorías"><button class="chip" data-cat="todas" type="button" aria-pressed="true">Todas</button>${combos.length ? '<button class="chip" data-cat="combos" type="button" aria-pressed="false">Combos del mes</button>' : ''}${sitio.categorias.map((c) => `<button class="chip" data-cat="${c.slug}" type="button" aria-pressed="false">${esc(c.nombre)}</button>`).join('')}</div></div>
+    <div style="flex:1 1 100%"><span class="mono-label">Categoría</span><div class="chips" role="group" aria-label="Categorías"><button class="chip" data-cat="todas" type="button" aria-pressed="true">Todas</button>${productos.some(esNuevo) ? '<button class="chip" data-cat="nuevos" type="button" aria-pressed="false">Nuevos</button>' : ''}${combos.length ? '<button class="chip" data-cat="combos" type="button" aria-pressed="false">Combos del mes</button>' : ''}${sitio.categorias.map((c) => `<button class="chip" data-cat="${c.slug}" type="button" aria-pressed="false">${esc(c.nombre)}</button>`).join('')}</div></div>
     <label class="search">Buscar<input id="q" type="search" placeholder="Ej. 6 huecos, enchape, teja" autocomplete="off"></label>
     <span id="count" class="muted" aria-live="polite"></span>
   </div>
@@ -418,7 +428,7 @@ for (const p of productos) {
     ${imgs.length > 1 ? `<div class="thumbs">${imgs.map((im, i) => `<button type="button" data-thumb="${base}${im}" aria-pressed="${i === 0}" aria-label="Ver imagen ${i + 1}"><img src="${base}${im}" alt="" width="84" height="84"></button>`).join('')}</div>` : ''}
   </div>
   <div>
-    <div class="btn-row" style="gap:8px"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><span class="tag">Catálogo de ${CIUDAD_CATALOGO[p.ciudad]}</span>${p.a_pedido ? '<span class="tag" style="background:var(--yellow)">Producto a pedido</span>' : ''}</div>
+    <div class="btn-row" style="gap:8px">${tagNuevo(p)}<span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><span class="tag">Catálogo de ${CIUDAD_CATALOGO[p.ciudad]}</span>${p.a_pedido ? '<span class="tag" style="background:var(--yellow)">Producto a pedido</span>' : ''}</div>
     <h1>${esc(p.nombre)}</h1>
     ${p.descripcion ? `<p class="lead">${esc(p.descripcion)}</p>` : ''}
     ${rows.length ? `<table class="specs"><tbody>${rows.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${/<br>/.test(v) ? v : esc(v)}</td></tr>`).join('')}</tbody></table>` : `<p class="price-note">Las medidas de este producto las confirma la agencia. Escríbenos y te las enviamos.</p>`}
@@ -630,6 +640,62 @@ write('donde-estamos.html', layout({
   </div>
 </section>`
 }));
+
+/* ============================ PÁGINA POR CIUDAD (dirección corta: /cochabamba, /santa-cruz…) ============================ */
+/* El servidor sirve /cochabamba como cochabamba.html. Al entrar, la ciudad queda elegida (no se pregunta). */
+for (const c of sitio.ciudades) {
+  const ags = sitio.agencias[c.slug] || [];
+  const nAg = ags.filter((a) => a.tipo === 'agencia').length, nFab = ags.filter((a) => a.tipo === 'fabrica').length;
+  const cat = CIUDAD_CATALOGO[c.slug] ? c.slug : 'cochabamba';
+  const propio = !!CIUDAD_CATALOGO[c.slug];
+  const nProd = productos.filter((p) => p.ciudad === cat).length;
+  const waC = `Hola, quisiera cotizar en ${c.nombre}.`;
+  write(`${c.slug}.html`, layout({
+    file: `${c.slug}.html`, pagina: 'ciudad', ciudadFija: c.slug,
+    title: `INCERPAZ ${c.nombre}: ladrillos, tejas y pavimentos cerámicos`,
+    desc: `Agencias${nFab ? ' y fábrica' : ''} de INCERPAZ en ${c.nombre}: catálogo de ladrillos, techos, revestimientos y pavimentos, promociones de la ciudad y atención por WhatsApp.`,
+    wa: `Hola, quisiera información en ${c.nombre}.`,
+    jsonld: migas([['Inicio', ''], [c.nombre, `${c.slug}.html`]]),
+    body: `
+<section class="section" style="padding-bottom:32px"><div class="wrap">
+  <nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › ${esc(c.nombre)}</nav>
+  <span class="eyebrow">INCERPAZ en ${esc(c.nombre)}</span>
+  <h1 style="font-size:clamp(40px,6vw,76px);margin-block:12px 16px">Cerámica para construir en ${esc(c.nombre)}</h1>
+  <p class="lead">${nAg ? `${nAg} ${nAg === 1 ? 'agencia' : 'agencias'}` : ''}${nAg && nFab ? ' y ' : ''}${nFab ? 'fábrica' : ''} para atenderte. ${propio ? `Catálogo propio de ${nProd} productos.` : `Atendemos con el catálogo de ${CIUDAD_CATALOGO[cat]} (${nProd} productos); confirma la disponibilidad con tu agencia.`}</p>
+  <div class="btn-row" style="margin-top:24px"><a class="btn btn--red" href="catalogo.html?ciudad=${cat}">Ver el catálogo</a><a class="btn btn--wa" href="${waHref(c.whatsapp, waC)}" data-wa="${esc(waC)}" data-wa-num="${c.whatsapp}" rel="noopener">WhatsApp ${esc(c.nombre)}</a><a class="btn" href="donde-estamos.html#${c.slug}">Cómo llegar</a></div>
+</div></section>
+
+${seccionNuevos()}
+
+<section class="section section--grey" id="promos-home" hidden><div class="wrap">
+  <div class="section-head"><div class="row"><div><span class="eyebrow">Promociones</span><h2 style="margin-top:12px">Vigentes en ${esc(c.nombre)}</h2></div><a class="btn" href="promociones.html">Ver todas</a></div></div>
+  <div class="promo-grid" id="promos-home-lista"></div>
+</div><script type="application/json" id="datos-promos">${JSON.stringify(promosPublicas())}</script></section>
+
+<section class="section"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Dónde estamos</span><h2>Agencias${nFab ? ' y fábrica' : ''} en ${esc(c.nombre)}</h2></div>
+  <div class="agencies">${ags.map((a) => agencyCard(a, c)).join('')}</div>
+</div></section>
+
+<section class="section section--grey"><div class="wrap">
+  <div class="quick">
+    <a href="catalogo.html?ciudad=${cat}"><b>Catálogo</b><span>Fichas con medidas y rendimiento</span></a>
+    <a href="comparar.html"><b>Comparar</b><span>Hasta 4 productos lado a lado</span></a>
+    <a href="proyectos.html"><b>Proyectos</b><span>Construye tú mismo, con lista de materiales</span></a>
+    <a href="guias.html"><b>Guías</b><span>Cuántos ladrillos, cómo elegir y colocar</span></a>
+    <a href="pavic.html"><b>PAVIC</b><span>Pavimentos para proyectos</span></a>
+  </div>
+</div></section>
+
+<section class="section" id="contacto"><div class="wrap split">
+  <div><span class="eyebrow">Contacto</span><h2 style="margin-block:12px 18px">Hablemos de tu proyecto en ${esc(c.nombre)}</h2>
+    <p class="lead">Déjanos tus datos y un ejecutivo de ${esc(c.nombre)} te contacta para ayudarte a elegir productos y cotizar.</p></div>
+  <div>${leadForm({ asunto: `Contacto desde la página de ${c.nombre}`, boton: 'Quiero que me contacten', campos: field('Nombre y apellido', 'nombre', 'required autocomplete="name" maxlength="120"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel" maxlength="20"') + selectCities('ciudad') +
+    '<label class="full">¿En qué podemos ayudarte?<textarea name="consulta" rows="3" maxlength="500" placeholder="Qué quieres construir, productos o cantidades aproximadas"></textarea></label>' +
+    `<label class="full check"><input type="checkbox" name="consentimiento" required><span>Acepto la <a href="privacidad.html">política de privacidad</a> y que INCERPAZ use estos datos para contactarme.</span></label>` })}</div>
+</div></section>`
+  }));
+}
 
 /* ============================ EMPRESA ============================ */
 const fabricas = sitio.ciudades.map((c) => [c, sitio.agencias[c.slug].find((a) => a.tipo === 'fabrica')]).filter(([, f]) => f);
@@ -923,7 +989,7 @@ write('404.html', layout({
   file: '404.html', title: 'Página no encontrada | INCERPAZ', desc: 'La página que buscas no existe.',
   body: `<section class="section"><div class="wrap"><h1>No encontramos esa página</h1><p class="lead" style="margin-block:16px 28px">Puede que el enlace haya cambiado. Prueba desde el inicio o el catálogo.</p><div class="btn-row"><a class="btn btn--red" href="${sitio.dominio}/">Ir al inicio</a><a class="btn" href="${sitio.dominio}/catalogo.html">Ver productos</a></div></div></section>`
 }));
-const urls = ['', 'privacidad.html', 'promociones.html', ...novedades.map((n) => `promociones/${n.id}.html`), ...combos.map((c) => `combos/${c.catalogo}/${c.id}.html`), 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
+const urls = ['', ...sitio.ciudades.map((c) => `${c.slug}.html`), 'privacidad.html', 'promociones.html', ...novedades.map((n) => `promociones/${n.id}.html`), ...combos.map((c) => `combos/${c.catalogo}/${c.id}.html`), 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
 if (config.interno) {
   fs.rmSync(path.join(OUT, 'sitemap.xml'), { force: true });
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');

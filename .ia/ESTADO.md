@@ -2,6 +2,16 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-18 (tarde) · Claude Code
+**Hecho**
+- Productos nuevos: campo «Destacar como nuevo hasta» en el panel (producto); etiqueta «Nuevo» en tarjetas y fichas, filtro «Nuevos» en el catálogo y sección «Productos nuevos» en la portada y en las páginas de ciudad. Vence sola en la fecha. Hoy ningún producto está marcado, así que no se ve en el sitio hasta que alguien marque uno.
+- Direcciones cortas por ciudad: páginas `cochabamba.html`, `santa-cruz.html`, `oruro.html` y `sucre.html` (el servidor las sirve como /cochabamba, etc.). Dejan la ciudad elegida y muestran catálogo, nuevos, promociones, agencias y contacto. Enlazadas desde el pie y desde la portada; incluidas en el sitemap.
+- Corregido un error previo: el filtro del catálogo no ocultaba en pantalla las tarjetas filtradas (regla global `[hidden]` en el CSS).
+- Pruebas nuevas en probar-sitio, probar-admin y probar-publico. 12 de API y 8 de navegador en verde.
+
+**Sigue**
+- Pedidos de la reunión que dependen de otras áreas (ver `.ia/TAREAS.md`).
+
 ## 2026-11-18 · Claude Code
 **Hecho**
 - Comparador de productos (pedido de la reunión, con permiso de Hugo): botón «Comparar» en tarjetas del catálogo y en fichas, barra fija con el conteo, página `comparar.html` con tabla lado a lado (hasta 4 productos del mismo catálogo), filas que cambian resaltadas, «Mostrar solo lo que cambia», enlace compartible `?p=`, WhatsApp con la lista y precio solo con cuenta verificada.

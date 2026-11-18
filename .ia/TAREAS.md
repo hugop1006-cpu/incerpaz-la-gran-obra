@@ -6,8 +6,8 @@ Estado: `pendiente` · `en curso` · `bloqueada` · `hecha`.
 | Tarea | Responsable | Estado | Notas |
 |---|---|---|---|
 | Comparador de productos | claude-code | hecha (2026-11-18) | Pedido de la reunión. Marcar 3 o 4 productos de la misma ciudad y verlos lado a lado; precio solo con cuenta |
-| Productos nuevos destacados | claude-code | pendiente (espera permiso de Hugo) | Pedido de la reunión. Etiqueta «Nuevo» en catálogo y portada, con fecha de vencimiento |
-| Direcciones cortas por ciudad (incerpaz.com/cochabamba) | claude-code | pendiente (espera permiso de Hugo) | Pedido de la reunión. Confirmado por Hugo: son direcciones cortas por ciudad |
+| Productos nuevos destacados | claude-code | hecha (2026-11-18) | Pedido de la reunión. Etiqueta «Nuevo» en catálogo y portada, con fecha de vencimiento |
+| Direcciones cortas por ciudad (incerpaz.com/cochabamba) | claude-code | hecha (2026-11-18) | Pedido de la reunión. Confirmado por Hugo: son direcciones cortas por ciudad |
 | Cotizador con inicio de sesión para ver precios | claude-code | hecha | Pedido de la reunión. Ya funciona así; «En cotizador» falta confirmar si pide algo más |
 | Construye tú mismo (DIY): más proyectos | claude-code | bloqueada | Pedido de la reunión. Espera revisión técnica de fórmulas y fotos de obra |
 | Cursos reales | humano (Marketing) | pendiente | Pedido de la reunión. El tipo «curso» con inscripción ya existe; faltan calendario, lugar y cupos |
@@ -23,3 +23,4 @@ Estado: `pendiente` · `en curso` · `bloqueada` · `hecha`.
 | Revisión de fórmulas, guías y descripciones de producto | humano (técnicos) | pendiente | Documentos en Claude |
 | Pasar al sitio las descripciones de producto aprobadas | claude-code | bloqueada | Espera la aprobación de los técnicos |
 | Validación exportadora con CSV de USITC DataWeb | chat | bloqueada | Espera el CSV |
+| Marcar los productos nuevos reales | humano (Marketing) | pendiente | Desde el panel: «Destacar como nuevo hasta». Hoy ningún producto está marcado |

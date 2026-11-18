@@ -92,10 +92,13 @@ function crearContenido({ dir = process.env.CONTENT_DIR || path.join(RAIZ, 'serv
     });
     const peso = p.peso === '' || p.peso == null ? null : Number(p.peso);
     if (peso != null && (!Number.isFinite(peso) || peso <= 0 || peso > 1000)) falla(400, 'Peso inválido');
+    /* «nuevo hasta»: fecha opcional (AAAA-MM-DD) hasta la que el producto se destaca como nuevo */
+    const nuevoHasta = String(p.nuevo_hasta || '').trim();
+    if (nuevoHasta && (!/^\d{4}-\d{2}-\d{2}$/.test(nuevoHasta) || Number.isNaN(Date.parse(nuevoHasta)))) falla(400, 'La fecha de «nuevo hasta» no es válida');
     const imagenes = (Array.isArray(p.imagenes) ? p.imagenes : []).map((i) => String(i)).filter((i) => /^assets\/img\/(productos|subidas)\/[\w.-]+\.(jpg|jpeg|png|webp)$/i.test(i));
     return { ciudad: p.ciudad, slug, titulo: cad(p.titulo, 120, 'el nombre'), codigo: cad(p.codigo, 40, 'el código', false), linea: cad(p.linea, 60, 'la línea', false),
       descripcion: cad(p.descripcion, 600, 'la descripción', false), color: cad(p.color, 60, 'el color', false), acabado: cad(p.acabado, 200, 'el acabado', false),
-      medidas, peso, rendimiento: cad(p.rendimiento, 200, 'el rendimiento', false), a_pedido: !!p.a_pedido, categorias, imagenes };
+      medidas, peso, rendimiento: cad(p.rendimiento, 200, 'el rendimiento', false), a_pedido: !!p.a_pedido, ...(nuevoHasta ? { nuevo_hasta: nuevoHasta } : {}), categorias, imagenes };
   }
 
   /* ---------- promociones: novedades (concursos, sorteos, eventos, cursos…) y combos ---------- */

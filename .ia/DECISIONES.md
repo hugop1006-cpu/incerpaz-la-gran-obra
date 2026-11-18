@@ -4,6 +4,8 @@ Una línea por decisión: fecha, decisión, quién decidió. Lo más reciente ar
 
 | Fecha | Decisión | Decidió |
 |---|---|---|
+| 2026-11-18 | Direcciones cortas solo para las 4 ciudades con datos (Cochabamba, Santa Cruz, Oruro, Sucre); son páginas propias indexables. Oruro y Sucre muestran el catálogo de Cochabamba | Claude Code |
+| 2026-11-18 | Un producto se destaca como nuevo con una fecha de vencimiento («nuevo hasta»), no con una marca permanente | Claude Code |
 | 2026-11-18 | El comparador acepta hasta 4 productos del mismo catálogo; `comparar.html` no se indexa ni entra al sitemap | Claude Code |
 | 2026-11-16 | Del prototipo de Fergie (Base44) se toman: ventana de ciudad, WhatsApp según la página y formulario en la portada. No se toman: precios visibles para todos, sellos de constructoras inventadas, cifras de empresa sin confirmar, su catálogo ni la plataforma | Hugo |
 | 2026-11-07 | No se hace todavía el corte del sitio actual (redirecciones de tiendas y dominio) | Hugo |

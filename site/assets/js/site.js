@@ -15,6 +15,10 @@
   function fmt(n) { return Math.round(n).toLocaleString('es-BO'); }
   function hoyLocal() { var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
 
+  /* páginas de ciudad (/cochabamba, /santa-cruz…): quien entra por ahí ya eligió su ciudad */
+  var ciudadFija = document.body.getAttribute('data-ciudad-fija');
+  if (ciudadFija && cityBySlug(ciudadFija)) store(KEY, ciudadFija);
+
   /* ---- ciudad y enlaces de WhatsApp ---- */
   function updateWa() {
     var c = currentCity();
@@ -66,6 +70,26 @@
       try { dlg.showModal(); var pri = $('[data-elegir-ciudad]', dlg); if (pri) pri.focus(); } catch (e) { /* navegador sin soporte */ }
     }
   }
+
+  /* ---- productos nuevos: la etiqueta vence sola, aunque el sitio no se regenere ese día ---- */
+  (function () {
+    var hoy = hoyLocal();
+    $$('[data-nuevo-hasta]').forEach(function (el) {
+      if (el.getAttribute('data-nuevo-hasta') >= hoy) return;
+      if (el.classList.contains('tag')) { el.hidden = true; return; }
+      el.removeAttribute('data-nuevo-hasta');
+      if (el.hasAttribute('data-cats')) el.setAttribute('data-cats', el.getAttribute('data-cats').split(' ').filter(function (c) { return c !== 'nuevos'; }).join(' '));
+    });
+    var sec = $('#nuevos-home'); if (!sec) return;
+    function pintarNuevos() {
+      var cat = currentCity().slug === 'santa-cruz' ? 'santa-cruz' : 'cochabamba', n = 0;
+      $$('.pcard', sec).forEach(function (c) { var ok = c.getAttribute('data-ciudad') === cat && c.hasAttribute('data-nuevo-hasta'); c.hidden = !ok; if (ok) n++; });
+      sec.hidden = !n;
+      var ver = $('[data-nuevos-ver]', sec); if (ver) ver.href = 'catalogo.html?ciudad=' + cat + '&cat=nuevos';
+    }
+    pintarNuevos();
+    document.addEventListener('incerpaz:city', pintarNuevos);
+  })();
 
   /* ---- menú móvil ---- */
   var tg = $('.nav-toggle'), nav = $('#nav');
