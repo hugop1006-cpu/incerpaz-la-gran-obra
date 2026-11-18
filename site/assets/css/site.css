@@ -329,3 +329,30 @@ label.check a { color: var(--red); font-weight: 600; }
 
 /* que el botón fijo de WhatsApp no tape el final de la página en el móvil */
 @media (max-width: 640px) { .site-footer { padding-bottom: 80px; } .wa-float { right: 12px; bottom: 12px; padding: 12px 16px; font-size: 15px; } }
+
+/* comparador de productos */
+.pcard { position: relative; }
+.pcard-cmp { position: absolute; top: 10px; right: 10px; z-index: 2; font: 700 13px var(--display); letter-spacing: .06em; text-transform: uppercase; padding: 8px 10px; min-height: 36px; background: var(--white); color: var(--ink); border: 1.5px solid var(--ink); cursor: pointer; }
+.pcard-cmp:hover { background: var(--paper); }
+.pcard-cmp[aria-pressed="true"], .btn[data-comparar][aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.cmp-tray { position: fixed; left: 16px; bottom: 16px; z-index: 59; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; max-width: min(560px, calc(100vw - 200px)); background: var(--ink); color: #fff; padding: 10px 12px 10px 16px; box-shadow: 0 6px 20px rgba(0,0,0,.28); }
+.cmp-tray[hidden] { display: none; }
+.cmp-tray__txt { margin: 0; font-size: 15px; flex: 1 1 180px; }
+.cmp-tray__x { background: none; border: 0; color: #d9d4ce; font: 600 14px var(--body); text-decoration: underline; cursor: pointer; padding: 8px 4px; }
+.cmp-tray .btn[hidden] { display: none; }
+@media (max-width: 640px) { .cmp-tray { left: 12px; bottom: 12px; max-width: calc(100vw - 150px); padding: 8px 10px; gap: 6px; } .cmp-tray__txt { font-size: 14px; } }
+.cmp-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.cmp-barra .btn-row { margin: 0; }
+.cmp-scroll { overflow-x: auto; border: 1.5px solid var(--line); background: var(--white); }
+.cmp-scroll:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+.cmp-tabla { border-collapse: collapse; width: 100%; font-size: 16px; }
+.cmp-tabla th, .cmp-tabla td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; min-width: 190px; }
+.cmp-tabla tbody th, .cmp-tabla .cmp-esq { position: sticky; left: 0; z-index: 1; background: var(--paper); font-weight: 600; min-width: 150px; max-width: 190px; }
+.cmp-tabla thead th { vertical-align: bottom; }
+.cmp-prod { display: flex; flex-direction: column; gap: 8px; }
+.cmp-prod img { width: 120px; height: 120px; object-fit: contain; background: #fff; }
+.cmp-prod a { font: 700 20px/1.15 var(--display); text-transform: uppercase; color: var(--ink); }
+.cmp-quitar { align-self: flex-start; background: none; border: 0; padding: 4px 0; color: var(--red); font: 600 14px var(--body); text-decoration: underline; cursor: pointer; }
+.cmp-tabla tr.difiere td { background: #fff7dc; }
+.cmp-tabla.solo-dif tbody tr:not(.difiere):not(.cmp-precio) { display: none; }
+@media (max-width: 640px) { .cmp-tabla th, .cmp-tabla td { min-width: 150px; padding: 10px; font-size: 15px; } .cmp-tabla tbody th, .cmp-tabla .cmp-esq { min-width: 110px; } .cmp-prod img { width: 90px; height: 90px; } }

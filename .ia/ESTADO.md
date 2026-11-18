@@ -2,6 +2,17 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-18 · Claude Code
+**Hecho**
+- Comparador de productos (pedido de la reunión, con permiso de Hugo): botón «Comparar» en tarjetas del catálogo y en fichas, barra fija con el conteo, página `comparar.html` con tabla lado a lado (hasta 4 productos del mismo catálogo), filas que cambian resaltadas, «Mostrar solo lo que cambia», enlace compartible `?p=`, WhatsApp con la lista y precio solo con cuenta verificada.
+- Pruebas nuevas en `tools/probar-sitio.js` y `tools/probar-comercio.js`; `comparar.html` declarada no indexable en `tools/probar-publico.js`. 12 de API y 8 de navegador en verde.
+
+**En curso**
+- Nada.
+
+**Sigue**
+- Con permiso de Hugo: productos nuevos destacados y direcciones cortas por ciudad.
+
 ## 2026-11-17 (tarde) · Claude Code
 **Hecho**
 - Presentación «Refresh INCERPAZ y comercio internacional»: dos diapositivas nuevas después de «Etapa 2» con los 11 pedidos de la reunión de seguimiento («Lo que pidió la reunión» y «Qué necesitamos para cerrarlos»), una fila más en «Decisiones para hoy» y numeración actualizada (ahora 20 diapositivas).

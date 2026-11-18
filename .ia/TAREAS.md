@@ -5,7 +5,7 @@ Estado: `pendiente` · `en curso` · `bloqueada` · `hecha`.
 
 | Tarea | Responsable | Estado | Notas |
 |---|---|---|---|
-| Comparador de productos | claude-code | pendiente (espera permiso de Hugo) | Pedido de la reunión. Marcar 3 o 4 productos de la misma ciudad y verlos lado a lado; precio solo con cuenta |
+| Comparador de productos | claude-code | hecha (2026-11-18) | Pedido de la reunión. Marcar 3 o 4 productos de la misma ciudad y verlos lado a lado; precio solo con cuenta |
 | Productos nuevos destacados | claude-code | pendiente (espera permiso de Hugo) | Pedido de la reunión. Etiqueta «Nuevo» en catálogo y portada, con fecha de vencimiento |
 | Direcciones cortas por ciudad (incerpaz.com/cochabamba) | claude-code | pendiente (espera permiso de Hugo) | Pedido de la reunión. Confirmado por Hugo: son direcciones cortas por ciudad |
 | Cotizador con inicio de sesión para ver precios | claude-code | hecha | Pedido de la reunión. Ya funciona así; «En cotizador» falta confirmar si pide algo más |

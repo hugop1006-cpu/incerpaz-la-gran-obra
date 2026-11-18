@@ -186,6 +186,7 @@ Regla: después de cambiar `site-src/` o `site/assets/`, regenerar el sitio, cor
 - Ciudad: ventana «¿Desde qué ciudad nos visitas?» en la primera visita y selector en el encabezado. Cambia catálogo, promociones, WhatsApp y la ciudad de los formularios.
 - Catálogo por ciudad (Cochabamba y Santa Cruz; Oruro y Sucre usan el de la fábrica más cercana) con filtros, búsqueda y combos.
 - Fichas de producto con medidas, rendimiento y calculadora de piezas.
+- Comparador de productos: hasta 4 del mismo catálogo, lado a lado, en `comparar.html` (enlace compartible; precio solo con cuenta).
 - Proyectos con lista de materiales, costos (con cuenta) y esquema que cambia con las medidas.
 - PAVIC: página de marca y recursos para proyectistas (calculadora de obra, sección típica, texto para pliegos, DXF).
 - Promociones por ciudad: concursos, sorteos, eventos, cursos, noticias y combos (con productos del catálogo u otros, como ollas o herramientas). El ejecutivo crea borradores; el administrador publica.
@@ -244,7 +245,7 @@ Documentos dentro del repositorio: `site-src/CONTENIDO-PENDIENTE.md`, `server/RE
 ## 11. Pendientes
 
 **Nuevo pedido de Hugo (por planificar):**
-1. Comparador de productos (marcar 3 o 4 productos de la misma ciudad y verlos lado a lado). Hugo anunció más puntos para esta lista.
+Pedidos de la reunión de seguimiento (detalle y estado en `.ia/TAREAS.md`): comparador (hecho), productos nuevos, direcciones cortas por ciudad, transporte según producto y ubicación, seguimiento de la entrega, testimonios, más proyectos «Construye tú mismo», cursos reales y ficha técnica PAVIC.
 
 **De otras áreas** (detalle en `site-src/CONTENIDO-PENDIENTE.md`):
 - Sistemas: API, ambiente de pruebas y credenciales de Seasoft; códigos de producto por ciudad.

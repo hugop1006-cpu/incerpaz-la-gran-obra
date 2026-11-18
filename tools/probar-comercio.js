@@ -62,6 +62,15 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await cli.reload(); await cli.waitForFunction(() => /Bs\s*\d/.test(document.querySelector('.pcard:not([hidden]):not(.pcard--combo) .precio').textContent));
     ok(/ejemplo/.test(await cli.textContent('.pcard:not([hidden]):not(.pcard--combo) .precio')), 'la cuenta verificada ve precios (marcados como de ejemplo)');
 
+    /* comparador: la cuenta verificada ve el precio de cada producto, también después de quitar uno */
+    await cli.goto(BASE + 'comparar.html?p=cochabamba:18-h,cochabamba:18-h-1-2,cochabamba:pavic-estandar');
+    await cli.waitForFunction(() => { const n = document.querySelectorAll('.cmp-precio .precio'); return n.length === 3 && Array.from(n).every((x) => /Bs\s*\d/.test(x.textContent)); });
+    ok(true, 'el comparador muestra el precio de los 3 productos');
+    await cli.click('[data-cmp-quitar="cochabamba:18-h"]');
+    await cli.waitForFunction(() => { const n = document.querySelectorAll('.cmp-precio .precio'); return n.length === 2 && Array.from(n).every((x) => /Bs\s*\d/.test(x.textContent)); });
+    ok(true, 'al quitar un producto los precios se vuelven a pintar');
+    await cli.click('[data-cmp-vaciar]');
+
     await cli.goto(BASE + 'presupuesto.html'); await cli.waitForSelector('[data-q]');
     ok((await cli.locator('[data-q]').count()) === 2, 'el presupuesto conserva los productos añadidos');
     ok(/Bs\s*\d/.test(await cli.textContent('.tabla tfoot')), 'se muestra el total estimado');

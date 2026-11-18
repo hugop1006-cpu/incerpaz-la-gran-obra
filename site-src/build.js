@@ -140,7 +140,7 @@ function layout({ file, base = '', title: titulo, desc: descripcion, body, og = 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-${config.interno || ['ingresar','registro','presupuesto','cuenta','equipo','admin'].includes(pagina) ? '<meta name="robots" content="noindex, nofollow">' : ''}
+${config.interno || ['ingresar','registro','presupuesto','cuenta','equipo','admin','comparar'].includes(pagina) ? '<meta name="robots" content="noindex, nofollow">' : ''}
 <link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:locale" content="es_BO"><meta property="og:site_name" content="INCERPAZ">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${sitio.dominio}/${og}">
@@ -185,6 +185,11 @@ ${body}
   <div class="legal"><span>© ${new Date().getFullYear()} INCERPAZ. Todos los derechos reservados. · <a href="${base}privacidad.html">Privacidad y cookies</a></span><span>Bolivia</span></div>
 </div></footer>
 <a class="wa-float" href="${waHref(ciudadDefecto.whatsapp, wa.replace('{ciudad}', ciudadDefecto.nombre))}" data-wa="${esc(wa)}" rel="noopener" aria-label="Escríbenos por WhatsApp">WhatsApp</a>
+${PAGINAS_SIN_CIUDAD.includes(pagina) || pagina === 'comparar' ? '' : `<div class="cmp-tray" id="cmpTray" role="region" aria-label="Productos para comparar" hidden>
+  <p class="cmp-tray__txt" data-cmp-txt aria-live="polite"></p>
+  <a class="btn btn--sm btn--red" href="${base}comparar.html" data-cmp-ir>Comparar</a>
+  <button class="cmp-tray__x" type="button" data-cmp-vaciar>Vaciar</button>
+</div>`}
 ${PAGINAS_SIN_CIUDAD.includes(pagina) ? '' : `<dialog class="city-dlg" id="cityDlg" aria-labelledby="cityDlgTit">
   <form method="dialog"><button class="city-dlg__x" value="cerrar" aria-label="Cerrar">×</button></form>
   <h2 id="cityDlgTit">¿Desde qué ciudad nos visitas?</h2>
@@ -211,9 +216,13 @@ const orgLd = `<script type="application/ld+json">${JSON.stringify({
 })}</script>`;
 
 /* ---- piezas reutilizables ---- */
+/* Comparador: cada producto se identifica como «ciudad:slug»; solo se comparan productos del mismo catálogo. */
+const idComparar = (p) => `${p.ciudad}:${p.slug}`;
+const botonComparar = (p, cls = 'btn') => `<button class="${cls}" type="button" data-comparar="${idComparar(p)}" data-nombre="${esc(p.nombre)}" aria-pressed="false">Comparar</button>`;
 function productCard(p, base = '') {
   const im = p.imagenes[0];
   return `<article class="pcard" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}">
+  ${botonComparar(p, 'pcard-cmp')}
   <a class="pcard-link" href="${purl(p, base)}">
   <div class="img">${im ? `<img src="${base}${im}" alt="${esc(p.nombre)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
   <div class="body"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>
@@ -366,7 +375,7 @@ write('catalogo.html', layout({
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
   <span class="eyebrow">Catálogo</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Productos</h1>
-  <p class="lead">Cada producto tiene sus dimensiones, peso y rendimiento. Los precios los confirma la agencia de tu ciudad por WhatsApp.</p>
+  <p class="lead">Cada producto tiene sus dimensiones, peso y rendimiento. Marca «Comparar» en hasta 4 productos del mismo catálogo para verlos lado a lado. Los precios los confirma la agencia de tu ciudad por WhatsApp.</p>
 </div></section>
 <section class="wrap" style="padding-bottom:72px">
   <div class="filters">
@@ -417,7 +426,7 @@ for (const p of productos) {
     ${config.comercio ? `<div class="buy-box"><p class="precio-big" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</p>
       <div class="buy-row"><label>Cantidad (piezas)<input id="qty" type="number" min="1" step="1" value="100"></label><button class="btn btn--red" type="button" data-add data-qty-from="#qty" data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir al presupuesto</button></div>
       <p class="muted" style="font-size:15px;margin-top:10px">Los precios se ven con una cuenta verificada. Para obras grandes, cotiza por WhatsApp.</p></div>` : `<p class="price-note"><strong>Precio:</strong> lo confirma la agencia de tu ciudad según tu obra y la cantidad. Escríbenos y te cotizamos.</p>`}
-    <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a><a class="btn" href="${base}donde-estamos.html">Dónde comprar</a></div>
+    <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a><a class="btn" href="${base}donde-estamos.html">Dónde comprar</a>${botonComparar(p)}</div>
   </div>
 </div></section>
 ${p.variantes.length ? `<section class="section section--grey"><div class="wrap"><div class="section-head"><h2>Calcula cuántas piezas necesitas</h2></div>
@@ -425,6 +434,38 @@ ${calcBox({ options: opts, idp: 'p', waText, addBtn: config.comercio ? `<button 
 ${rel.length ? `<section class="section"><div class="wrap"><div class="section-head"><h2>Productos relacionados</h2></div><div class="grid-products">${rel.map((q) => productCard(q, base)).join('')}</div></div></section>` : ''}`
   }));
 }
+
+/* ============================ COMPARADOR ============================ */
+const datosComparar = {
+  comercio: !!config.comercio,
+  productos: productos.map((p) => {
+    const m2 = p.variantes.find((v) => v.unidad === 'm2');
+    return {
+      id: idComparar(p), catalogo: p.ciudad, ciudad: CIUDAD_CATALOGO[p.ciudad], slug: p.slug, nombre: p.nombre, url: purl(p), img: p.imagenes[0] || '',
+      cat: CAT_NOMBRE[p.cat] || '', linea: p.linea || '', codigo: p.codigo || '',
+      medidas: (p.largo && p.ancho && p.alto) ? `${num(p.largo)} × ${num(p.ancho)} × ${num(p.alto)} cm` : p.medidas.map(([l, v]) => `${l.toLowerCase()} ${num(v)} cm`).join(' · '),
+      peso: p.peso ? `${num(p.peso)} kg` : '',
+      rend: p.variantes.map((v) => `${num(v.rend)} por ${v.unidad === 'ml' ? 'metro lineal' : 'm²'}${v.etiqueta ? ` (${v.etiqueta.toLowerCase()})` : ''}`).join(' · '),
+      pesoM2: m2 && p.peso ? `${num(Math.round(m2.rend * p.peso))} kg por m²` : '',
+      acabado: p.acabado || '', color: p.color || '', pedido: p.a_pedido ? 'Producto a pedido' : 'Producto de línea'
+    };
+  })
+};
+write('comparar.html', layout({
+  file: 'comparar.html', pagina: 'comparar',
+  title: 'Comparar productos | INCERPAZ',
+  desc: 'Compara lado a lado hasta 4 productos INCERPAZ del mismo catálogo: medidas, peso, rendimiento por m², acabado y disponibilidad.',
+  body: `
+<section class="section" style="padding-bottom:24px"><div class="wrap">
+  <nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="catalogo.html">Productos</a> › Comparar</nav>
+  <span class="eyebrow">Catálogo</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Comparar productos</h1>
+  <p class="lead">Hasta 4 productos del mismo catálogo, lado a lado. Las filas resaltadas son las que cambian entre ellos.</p>
+</div></section>
+<section class="wrap" style="padding-bottom:80px">
+  <div id="cmpApp"><p class="muted">Cargando la comparación…</p></div>
+  <noscript><p>Para comparar productos activa JavaScript, o revisa cada ficha en el <a href="catalogo.html">catálogo</a>.</p></noscript>
+</section><script type="application/json" id="datos-comparar">${JSON.stringify(datosComparar).replace(/</g, '\\u003c')}</script>`
+}));
 
 /* ============================ PAVIC ============================ */
 const fotosPavic = ['pavic-estandar', 'pavic-peatonal', 'pavic-tabaco'].map((s) => `assets/img/productos/${s}-2.jpg`);

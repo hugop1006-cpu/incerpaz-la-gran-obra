@@ -349,6 +349,8 @@
   contador();
   /* lo usan las herramientas del sitio (proyectos) para sumar al presupuesto y leer precios */
   window.IncerpazPresupuesto = { añadir: function (it, n) { añadir(it, n); }, precios: precios, sesion: sesion, aviso: aviso, fmtBs: fmtBs, verificado: verificado };
+  /* el comparador vuelve a armar su tabla al quitar productos: repinta los precios nuevos */
+  document.addEventListener('incerpaz:precios', function () { sesion.then(pintarPrecios); });
   sesion.then(function (s) {
     pintarCabecera(s); pintarPrecios(s);
     if (PAGINA === 'ingresar') paginaIngresar(s);

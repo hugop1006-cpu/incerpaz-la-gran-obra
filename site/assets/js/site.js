@@ -133,6 +133,111 @@
     apply();
   }
 
+  /* ---- comparador de productos ----
+     Hasta 4 productos del mismo catálogo, guardados en el navegador como [{id: "ciudad:slug", nombre}].
+     La página comparar.html arma la tabla con los datos que trae embebidos (sin precios: esos los pinta comercio.js). */
+  var CMP = 'incerpaz_comparar', CMP_MAX = 4;
+  function escH(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function leerCmp() {
+    try { var v = JSON.parse(store(CMP) || '[]'); return Array.isArray(v) ? v.filter(function (x) { return x && typeof x.id === 'string' && x.nombre; }).slice(0, CMP_MAX) : []; } catch (e) { return []; }
+  }
+  function guardarCmp(l) { store(CMP, JSON.stringify(l)); }
+  function catalogoDe(id) { return id.split(':')[0]; }
+  var tray = $('#cmpTray');
+  function pintarCmp(msg) {
+    var l = leerCmp();
+    $$('[data-comparar]').forEach(function (b) {
+      var on = l.some(function (x) { return x.id === b.getAttribute('data-comparar'); });
+      b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '✓ Comparando' : 'Comparar';
+    });
+    if (!tray) return;
+    tray.hidden = !l.length && !msg;
+    var txt = $('[data-cmp-txt]', tray), ir = $('[data-cmp-ir]', tray);
+    txt.textContent = msg || (l.length === 1 ? '1 producto elegido. Elige otro para comparar.' : l.length + ' productos para comparar');
+    ir.hidden = l.length < 2;
+    ir.textContent = 'Comparar (' + l.length + ')';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-comparar]') : null;
+    if (b) {
+      e.preventDefault();
+      var id = b.getAttribute('data-comparar'), l = leerCmp(), i = -1;
+      l.forEach(function (x, k) { if (x.id === id) i = k; });
+      if (i >= 0) { l.splice(i, 1); guardarCmp(l); pintarCmp(); return; }
+      if (l.length && catalogoDe(l[0].id) !== catalogoDe(id)) {
+        if (!window.confirm('Solo se comparan productos del mismo catálogo. ¿Empezar una nueva comparación con este producto?')) return;
+        l = [];
+      }
+      if (l.length >= CMP_MAX) { pintarCmp('Puedes comparar hasta ' + CMP_MAX + ' productos. Quita uno para agregar otro.'); return; }
+      l.push({ id: id, nombre: b.getAttribute('data-nombre') || id }); guardarCmp(l); pintarCmp();
+      return;
+    }
+    if (e.target.closest && e.target.closest('[data-cmp-vaciar]')) { guardarCmp([]); pintarCmp(); renderCmp(); }
+  });
+
+  var cmpApp = $('#cmpApp'), cmpDatos = null, soloDif = false;
+  if (cmpApp && $('#datos-comparar')) {
+    cmpDatos = JSON.parse($('#datos-comparar').textContent);
+    var porId = {}; cmpDatos.productos.forEach(function (p) { porId[p.id] = p; });
+    var qp = /[?&]p=([^&#]+)/.exec(location.search);
+    if (qp) {
+      var ids = decodeURIComponent(qp[1]).split(',').filter(function (id) { return porId[id]; });
+      ids = ids.filter(function (id, k) { return ids.indexOf(id) === k && catalogoDe(id) === catalogoDe(ids[0]); }).slice(0, CMP_MAX);
+      if (ids.length) guardarCmp(ids.map(function (id) { return { id: id, nombre: porId[id].nombre }; }));
+    }
+    cmpApp.addEventListener('click', function (e) {
+      var q = e.target.closest('[data-cmp-quitar]');
+      if (q) { guardarCmp(leerCmp().filter(function (x) { return x.id !== q.getAttribute('data-cmp-quitar'); })); renderCmp(); pintarCmp(); }
+    });
+    cmpApp.addEventListener('change', function (e) {
+      if (e.target.id === 'cmpSoloDif') { soloDif = e.target.checked; var t = $('.cmp-tabla', cmpApp); if (t) t.classList.toggle('solo-dif', soloDif); }
+    });
+  }
+  function renderCmp() {
+    if (!cmpApp || !cmpDatos) return;
+    var l = leerCmp().map(function (x) { return porId[x.id]; }).filter(Boolean);
+    if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + (l.length ? '?p=' + l.map(function (p) { return p.id; }).join(',') : ''));
+    if (!l.length) {
+      cmpApp.innerHTML = '<div class="empty"><b>Todavía no elegiste productos.</b><p class="muted" style="margin-top:6px">En el catálogo, marca «Comparar» en hasta ' + CMP_MAX + ' productos del mismo catálogo.</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--red" href="catalogo.html">Ir al catálogo</a></div></div>';
+      return;
+    }
+    var filas = [
+      ['Categoría', function (p) { return p.cat; }],
+      ['Línea', function (p) { return p.linea; }],
+      ['Código', function (p) { return p.codigo; }],
+      ['Medidas (largo × ancho × alto)', function (p) { return p.medidas; }],
+      ['Peso por pieza', function (p) { return p.peso; }],
+      ['Rendimiento (piezas)', function (p) { return p.rend; }],
+      ['Peso por m² aprox.', function (p) { return p.pesoM2; }],
+      ['Acabado', function (p) { return p.acabado; }],
+      ['Color', function (p) { return p.color; }],
+      ['Disponibilidad', function (p) { return p.pedido; }]
+    ];
+    var cab = '<tr><th scope="col" class="cmp-esq">Producto</th>' + l.map(function (p) {
+      return '<th scope="col"><div class="cmp-prod"><img src="' + escH(p.img || 'assets/img/logo-icono.png') + '" alt="" width="160" height="160" loading="lazy">' +
+        '<a href="' + escH(p.url) + '">' + escH(p.nombre) + '</a><button type="button" class="cmp-quitar" data-cmp-quitar="' + escH(p.id) + '" aria-label="Quitar ' + escH(p.nombre) + ' de la comparación">Quitar</button></div></th>';
+    }).join('') + '</tr>';
+    var cuerpo = filas.map(function (f) {
+      var vals = l.map(function (p) { return f[1](p) || ''; });
+      if (!vals.some(Boolean)) return '';
+      var dif = l.length > 1 && vals.some(function (v) { return v !== vals[0]; });
+      return '<tr' + (dif ? ' class="difiere"' : '') + '><th scope="row">' + f[0] + '</th>' + vals.map(function (v) { return '<td>' + (v ? escH(v) : '<span class="muted">Sin dato</span>') + '</td>'; }).join('') + '</tr>';
+    }).join('');
+    if (cmpDatos.comercio) cuerpo += '<tr class="cmp-precio"><th scope="row">Precio</th>' + l.map(function (p) { return '<td><span class="precio" data-precio data-ciudad="' + escH(p.catalogo) + '" data-slug="' + escH(p.slug) + '">Precio con sesión</span></td>'; }).join('') + '</tr>';
+    var nombres = l.map(function (p) { return p.nombre; });
+    var lista = nombres.length > 1 ? nombres.slice(0, -1).join(', ') + ' y ' + nombres[nombres.length - 1] : nombres[0];
+    cmpApp.innerHTML =
+      (l.length === 1 ? '<p class="price-note">Elegiste un solo producto. <a href="catalogo.html?ciudad=' + escH(l[0].catalogo) + '">Agrega otro del catálogo de ' + escH(l[0].ciudad) + '</a> para compararlos.</p>' : '') +
+      '<div class="cmp-barra"><label class="check"><input type="checkbox" id="cmpSoloDif"' + (soloDif ? ' checked' : '') + '><span>Mostrar solo lo que cambia</span></label>' +
+      '<div class="btn-row"><a class="btn btn--wa" data-wa="' + escH('Hola, estoy comparando ' + lista + ' y quiero cotizar en {ciudad}.') + '" href="#">Cotizar por WhatsApp</a><a class="btn" href="catalogo.html?ciudad=' + escH(l[0].catalogo) + '">Agregar productos</a><button class="btn" type="button" data-cmp-vaciar>Vaciar</button></div></div>' +
+      '<div class="cmp-scroll" tabindex="0" role="region" aria-label="Tabla de comparación"><table class="cmp-tabla' + (soloDif ? ' solo-dif' : '') + '"><thead>' + cab + '</thead><tbody>' + cuerpo + '</tbody></table></div>' +
+      '<p class="muted" style="font-size:15px;margin-top:14px">Rendimiento y peso por m² son referencias de las fichas técnicas; la cantidad final depende de la obra y de la junta.</p>';
+    updateWa();
+    document.dispatchEvent(new CustomEvent('incerpaz:precios'));
+  }
+  renderCmp();
+  pintarCmp();
+
   /* ---- galería de producto ---- */
   $$('[data-thumb]').forEach(function (b) {
     b.addEventListener('click', function () {
