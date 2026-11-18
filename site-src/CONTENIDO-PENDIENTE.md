@@ -21,6 +21,7 @@ Hay que confirmar:
 - Precios, programa de puntos, marca de tejas, cifras de la empresa, historia y sostenibilidad: fuera de esta entrega.
 
 ## Catálogo
+- Indicar qué productos son nuevos y hasta qué fecha.
 El sitio tiene **dos catálogos**, tal como en las tiendas actuales: Cochabamba (32 productos) y Santa Cruz (25 productos, incluidas 2 tejas).
 El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tienda propia: muestran el de la fábrica más cercana con un aviso para confirmar disponibilidad.
 - **Combos y promociones:** no se incluyeron. Santa Cruz tiene 47 y Cochabamba 2; son campañas temporales ("hasta agotar stock", con regalos como coolers y parlantes). Si se quieren mostrar, conviene hacerlo como sección de promociones con vigencia.

@@ -25,6 +25,8 @@ if (DEMO || process.env.COMERCIO === '0') config.comercio = false;
 
 const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const num = (n) => Number(n).toLocaleString('es-BO', { maximumFractionDigits: 2 });
+const hoyISO = (() => { const d = new Date(); const pad = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; })();
+const fechaISOValida = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(`${s}T12:00:00Z`)) && new Date(`${s}T12:00:00Z`).toISOString().slice(0, 10) === s;
 const waHref = (numero, msg) => `https://wa.me/591${numero}?text=${encodeURIComponent(msg)}`;
 const telDisplay = (t) => t.replace(/^(\d)-(\d+)$/, '($1) $2');
 const telHref = (t) => 'tel:+591' + t.replace(/\D/g, '');
@@ -75,6 +77,8 @@ function categoriaPrincipal(p) {
 const ETQ = { 'Alto Sup': 'Alto superior', 'Alto Inf': 'Alto inferior', 'Ancho Sup': 'Ancho superior', 'Ancho Inf': 'Ancho inferior' };
 productos = productos.map((p) => {
   const key = `${p.ciudad}:${p.slug}`;
+  if (p.nuevo_hasta != null && p.nuevo_hasta !== '' && !fechaISOValida(p.nuevo_hasta)) throw new Error(`Fecha nuevo_hasta inválida en ${key}: usa AAAA-MM-DD`);
+  const nuevoHasta = fechaISOValida(p.nuevo_hasta) ? p.nuevo_hasta : '';
   const corr = CORRECCIONES[key] || {};
   const sinFicha = SIN_FICHA.has(key);
   const medidas = sinFicha ? [] : p.medidas.map(([l, v]) => [ETQ[l] || l, corr[l] != null ? corr[l] : v]);
@@ -85,7 +89,7 @@ productos = productos.map((p) => {
     return '';
   });
   const linea = p.linea ? sentence(p.linea.replace(/VARIADADES/i, 'VARIEDADES').replace(/VARIEDAD(?!ES)/i, 'VARIEDADES').replace(/RUSTICO/i, 'RÚSTICO')) : '';
-  return Object.assign({}, p, { nombre: bonito(p.titulo), descripcion: concordancia(ortografia(p.descripcion)), acabado: ortografia(p.acabado), color: ortografia(p.color), linea, medidas, variantes, sinFicha, peso: sinFicha ? null : p.peso, cat: categoriaPrincipal(p), todas: p.categorias, largo: dim('Largo'), ancho: dim('Ancho'), alto: dim('Alto') });
+  return Object.assign({}, p, { nombre: bonito(p.titulo), descripcion: concordancia(ortografia(p.descripcion)), acabado: ortografia(p.acabado), color: ortografia(p.color), linea, medidas, variantes, sinFicha, peso: sinFicha ? null : p.peso, cat: categoriaPrincipal(p), todas: p.categorias, largo: dim('Largo'), ancho: dim('Ancho'), alto: dim('Alto'), nuevoHasta });
 });
 /* catálogo confiable para el servidor: valida pedidos y presupuestos sin fiarse del navegador */
 fs.mkdirSync(path.dirname(CATALOGO_OUT), { recursive: true });
@@ -219,14 +223,17 @@ const orgLd = `<script type="application/ld+json">${JSON.stringify({
 /* Comparador: cada producto se identifica como «ciudad:slug»; solo se comparan productos del mismo catálogo. */
 const idComparar = (p) => `${p.ciudad}:${p.slug}`;
 const botonComparar = (p, cls = 'btn') => `<button class="${cls}" type="button" data-comparar="${idComparar(p)}" data-nombre="${esc(p.nombre)}" aria-pressed="false">Comparar</button>`;
-function productCard(p, base = '') {
+function productCard(p, base = '', { destacadoNuevo = false } = {}) {
   const im = p.imagenes[0];
-  return `<article class="pcard" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}">
+  const attrsNuevo = p.nuevoHasta ? ` data-nuevo-hasta="${p.nuevoHasta}"${destacadoNuevo ? ' data-nuevo-card' : ''}` : '';
+  const insigniaNuevo = p.nuevoHasta && p.nuevoHasta >= hoyISO ? '<span class="tag tag--nuevo" data-nuevo-badge>Nuevo</span>' : '';
+  return `<article class="pcard" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}"${attrsNuevo}>
   ${botonComparar(p, 'pcard-cmp')}
   <a class="pcard-link" href="${purl(p, base)}">
   <div class="img">${im ? `<img src="${base}${im}" alt="${esc(p.nombre)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
-  <div class="body"><span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>
-  ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir</button></div>` : ''}</article>`;
+  <div class="body">${insigniaNuevo}<span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>
+  ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir</button></div>` : ''}
+  </article>`;
 }
 
 /* ---- promociones: tarjetas y datos públicos ---- */
@@ -294,7 +301,7 @@ fs.rmSync(path.join(OUT, 'combos'), { recursive: true, force: true });
 /* ============================ HOME ============================ */
 const mosaico = ['18-h', 'brick-enchape-corto', '9-huecos-economico-rayado', 'brick-estandar', 'pavic-peatonal', 'biscocho']
   .map((s) => `assets/img/productos/${s}-2.jpg`);
-write('index.html', layout({
+const inicio = {
   file: 'index.html', pagina: 'inicio',
   title: 'INCERPAZ | Cerámica para construir tu hogar',
   desc: 'Ladrillos, pisos, techos, revestimientos y pavimentos cerámicos fabricados en Bolivia. Calcula tus piezas, encuentra tu agencia y cotiza por WhatsApp en Cochabamba, Santa Cruz, Oruro y Sucre.',
@@ -322,6 +329,12 @@ write('index.html', layout({
   <div class="section-head"><div class="row"><div><span class="eyebrow">Promociones</span><h2 style="margin-top:12px">Vigentes en <span data-city-name>tu ciudad</span></h2></div><a class="btn" href="promociones.html">Ver todas</a></div></div>
   <div class="promo-grid" id="promos-home-lista"></div>
 </div><script type="application/json" id="datos-promos">${JSON.stringify(promosPublicas())}</script></section>
+
+${productos.some((p) => p.nuevoHasta && p.nuevoHasta >= hoyISO) ? `<section class="section" id="nuevos-home"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Catálogo</span><h2>Productos nuevos</h2><p class="lead">Conoce las piezas que se sumaron recientemente al catálogo.</p></div>
+  <div class="grid-products">${productos.filter((p) => p.nuevoHasta && p.nuevoHasta >= hoyISO).map((p) => productCard(p, '', { destacadoNuevo: true })).join('')}</div>
+  <div class="btn-row" style="margin-top:20px"><a class="btn" href="catalogo.html">Ver catálogo completo</a></div>
+</div></section>` : ''}
 
 <section class="section"><div class="wrap">
   <div class="section-head"><span class="eyebrow">Productos</span><h2>Todo para levantar y terminar tu obra</h2></div>
@@ -365,8 +378,8 @@ write('index.html', layout({
   <div><span class="eyebrow">Empresa</span><h2 style="margin-block:12px 18px">Calidad que se construye todos los días</h2><p class="lead">${esc(sitio.somos)}</p><div class="btn-row" style="margin-top:24px"><a class="btn" href="empresa.html">Conocer INCERPAZ</a></div></div>
   <div class="values" style="margin-top:8px">${sitio.valores.map((v) => `<span>${v}</span>`).join('')}</div>
 </div></section>`
-}));
-
+};
+write('index.html', layout(inicio));
 /* ============================ CATÁLOGO ============================ */
 write('catalogo.html', layout({
   file: 'catalogo.html',

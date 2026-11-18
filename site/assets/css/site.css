@@ -159,6 +159,7 @@ textarea { min-height: 96px; resize: vertical; }
 .search { flex: 1 1 260px; max-width: 420px; }
 .grid-products { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
 .pcard { background: var(--white); border: 1.5px solid var(--line); text-decoration: none; display: flex; flex-direction: column; transition: border-color .15s, transform .15s; }
+.pcard[hidden] { display: none !important; }
 .pcard:hover { border-color: var(--ink); transform: translateY(-3px); }
 .pcard .img { background: #fff; aspect-ratio: 1; display: grid; place-items: center; padding: 14px; }
 .pcard .img img { width: 100%; height: 100%; object-fit: contain; }
@@ -166,6 +167,7 @@ textarea { min-height: 96px; resize: vertical; }
 .pcard h3 { font-size: 22px; }
 .pcard .meta { font-size: 14px; color: var(--ink-2); }
 .tag { align-self: flex-start; font: 600 12px var(--body); letter-spacing: .1em; text-transform: uppercase; background: var(--paper-2); padding: 3px 8px; }
+.tag--nuevo { background: var(--red); color: #fff; }
 .empty { padding: 28px; border: 2px dashed var(--line); background: var(--white); }
 
 /* producto */

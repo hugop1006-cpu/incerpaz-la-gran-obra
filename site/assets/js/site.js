@@ -14,6 +14,19 @@
   function waUrl(num, msg) { return 'https://wa.me/591' + num + '?text=' + encodeURIComponent(msg); }
   function fmt(n) { return Math.round(n).toLocaleString('es-BO'); }
   function hoyLocal() { var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  function aplicarNuevos() {
+    var hoy = hoyLocal();
+    $$('[data-nuevo-hasta]').forEach(function (el) {
+      if (el.getAttribute('data-nuevo-hasta') < hoy) {
+        var badge = $('[data-nuevo-badge]', el);
+        if (badge) badge.hidden = true;
+        if (el.hasAttribute('data-nuevo-card')) el.hidden = true;
+      }
+    });
+    var seccion = $('#nuevos-home');
+    if (seccion && !$$('[data-nuevo-card]', seccion).some(function (el) { return !el.hidden; })) seccion.hidden = true;
+  }
+  aplicarNuevos();
 
   /* ---- ciudad y enlaces de WhatsApp ---- */
   function updateWa() {
