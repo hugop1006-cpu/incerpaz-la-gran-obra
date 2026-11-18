@@ -82,6 +82,23 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok(/PAVIC/.test(decodeURIComponent(await pg.getAttribute('.wa-float', 'href'))), 'en PAVIC, el WhatsApp habla de PAVIC');
   await pg.goto(BASE + 'empresa.html');
   ok(/m%C3%A1s%20informaci%C3%B3n/.test(await pg.getAttribute('.wa-float', 'href')), 'en las demás páginas queda el mensaje general');
+  /* revisión UX en celular */
+  const ux = await (await visitante(b, { viewport: { width: 390, height: 844 } })).newPage(); ux.on('pageerror', (e) => errores.push(e.message));
+  await ux.goto(BASE + 'index.html');
+  ok((await ux.locator('.site-header').boundingBox()).height <= 72, 'el encabezado fijo del celular ocupa una sola fila');
+  ok((await ux.locator('.quick a').count()) === 4, 'los accesos rápidos son 4 (la grilla siempre cierra)');
+  await ux.goto(BASE + 'catalogo.html?ciudad=cochabamba');
+  const tarjetas = ux.locator('#grid .pcard:visible');
+  ok((await tarjetas.nth(0).boundingBox()).y === (await tarjetas.nth(1).boundingBox()).y, 'el catálogo muestra dos productos por fila en el celular');
+  ok((await ux.locator('#grid .pcard:visible .pcard-cmp').first().boundingBox()).height >= 44, 'el botón «Comparar» mide al menos 44 px de alto');
+  await ux.goto(BASE + 'productos/cochabamba/18-h.html');
+  ok(await ux.isVisible('.barra-compra') && !(await ux.isVisible('.wa-float')), 'la ficha en celular tiene la barra fija de cotizar en lugar del botón flotante');
+  await ux.goto(BASE + 'proyectos/churrasquero.html');
+  ok(await ux.isVisible('.wa-float'), 'el botón de WhatsApp se ve mientras no se escribe');
+  await ux.locator('input').first().focus();
+  ok(!(await ux.isVisible('.wa-float')), 'el botón de WhatsApp se aparta mientras se escribe en un campo');
+  await ux.context().close();
+
   /* el catálogo muestra en pantalla exactamente lo que cuenta */
   await pg.setViewportSize({ width: 1280, height: 900 });
   await pg.goto(BASE + 'catalogo.html?ciudad=santa-cruz');

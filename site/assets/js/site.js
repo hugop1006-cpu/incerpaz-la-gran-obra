@@ -28,7 +28,12 @@
       a.target = '_blank'; a.rel = 'noopener';
     });
     $$('[data-city-name]').forEach(function (e) { e.textContent = c.nombre; });
+    $$('[data-tu-ciudad]').forEach(function (a) { a.href = (document.body.getAttribute('data-base') || '') + c.slug + '.html'; });
   }
+  /* en el celular, el botón fijo de WhatsApp se aparta mientras la persona escribe en un formulario */
+  function esCampo(el) { return !!(el && el.matches && el.matches('input, textarea, select')); }
+  document.addEventListener('focusin', function (e) { if (esCampo(e.target)) document.body.classList.add('escribiendo'); });
+  document.addEventListener('focusout', function () { setTimeout(function () { document.body.classList.toggle('escribiendo', esCampo(document.activeElement)); }, 0); });
   /* los formularios proponen la ciudad elegida mientras la persona no cambie ese campo */
   function syncFormCity() {
     var c = currentCity();

@@ -2,6 +2,17 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-18 (noche) · Claude Code
+**Hecho** (revisión UX/UI, prioridad 1, con permiso de Hugo)
+- Accesos rápidos: 4 tareas (calcular, catálogo, comparar, tu ciudad) con flecha y líneas que no se cortan; en páginas de ciudad también 4.
+- Celular: encabezado en una fila (ciudad junto al menú, barra superior de una línea), botones del inicio a todo el ancho, catálogo a 2 columnas con categorías deslizables (de 20.300 a 8.300 px de alto), botón de WhatsApp redondo que se aparta al escribir, barra fija «Cotizar / Añadir» en las fichas.
+- Botones de al menos 44 px; valores de Empresa como texto (no parecen botones); promociones sin imagen con bloque de marca en lugar del ícono desvaído; Empresa con título propio («Quiénes somos»).
+- Pruebas nuevas en `tools/probar-sitio.js`. 12 de API y 8 de navegador en verde.
+
+**Sigue**
+- Revisión UX prioridad 2 (presupuesto y cuenta visibles, tarjetas más limpias, nombres consistentes, buscador general) si Hugo la aprueba.
+- Revisar los wireframes contra el sitio actual (pedido de Hugo).
+
 ## 2026-11-18 (tarde) · Claude Code
 **Hecho**
 - Productos nuevos: campo «Destacar como nuevo hasta» en el panel (producto); etiqueta «Nuevo» en tarjetas y fichas, filtro «Nuevos» en el catálogo y sección «Productos nuevos» en la portada y en las páginas de ciudad. Vence sola en la fecha. Hoy ningún producto está marcado, así que no se ve en el sitio hasta que alguien marque uno.

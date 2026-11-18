@@ -23,7 +23,7 @@
     var slug = ciudad().slug;
     var v = todos.filter(function (x) { return vigente(x, slug); }).sort(function (a, b) { return a.fin < b.fin ? -1 : 1; }).slice(0, 3);
     $('#promos-home-lista').innerHTML = v.map(function (x) {
-      return '<a class="promo-card" href="' + BASE + x.url + '"><div class="img">' + (x.imagen ? '<img src="' + BASE + esc(x.imagen) + '" alt="" loading="lazy" width="600" height="400">' : '<img src="' + BASE + 'assets/img/logo-icono.png" alt="" style="width:30%;opacity:.25">') + '</div><div class="body"><span class="tag' + (x.tipo === 'combo' ? ' tag--combo' : '') + '">' + TIPOS[x.tipo] + '</span><h3>' + esc(x.titulo) + '</h3><p>' + esc(x.resumen) + '</p><span class="meta">Hasta el ' + fecha(x.fin) + '</span></div></a>';
+      return '<a class="promo-card" href="' + BASE + x.url + '"><div class="img">' + (x.imagen ? '<img src="' + BASE + esc(x.imagen) + '" alt="" loading="lazy" width="600" height="400">' : '<span class="img-vacia" aria-hidden="true">' + TIPOS[x.tipo] + '</span>') + '</div><div class="body"><span class="tag' + (x.tipo === 'combo' ? ' tag--combo' : '') + '">' + TIPOS[x.tipo] + '</span><h3>' + esc(x.titulo) + '</h3><p>' + esc(x.resumen) + '</p><span class="meta">Hasta el ' + fecha(x.fin) + '</span></div></a>';
     }).join('');
     box.hidden = !v.length;
   }

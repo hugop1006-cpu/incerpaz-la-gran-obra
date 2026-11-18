@@ -184,7 +184,7 @@ ${body}
   </div>
   <div class="legal"><span>© ${new Date().getFullYear()} INCERPAZ. Todos los derechos reservados. · <a href="${base}privacidad.html">Privacidad y cookies</a></span><span>Bolivia</span></div>
 </div></footer>
-<a class="wa-float" href="${waHref(ciudadDefecto.whatsapp, wa.replace('{ciudad}', ciudadDefecto.nombre))}" data-wa="${esc(wa)}" rel="noopener" aria-label="Escríbenos por WhatsApp">WhatsApp</a>
+<a class="wa-float" href="${waHref(ciudadDefecto.whatsapp, wa.replace('{ciudad}', ciudadDefecto.nombre))}" data-wa="${esc(wa)}" rel="noopener" aria-label="Escríbenos por WhatsApp"><svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2.2a9.8 9.8 0 0 0-8.4 14.9L2.2 21.8l4.8-1.3A9.8 9.8 0 1 0 12 2.2zm0 2a7.8 7.8 0 1 1-4.1 14.4l-.3-.2-2.5.7.7-2.4-.2-.4A7.8 7.8 0 0 1 12 4.2zm-3.1 3.6c-.2 0-.5.1-.7.3-.3.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.8 2.2.9 2.6.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3l-1.7-.8c-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2-1.2-.7-.7-1.2-1.5-1.4-1.7-.1-.3 0-.4.1-.5l.4-.5.3-.5v-.5l-.8-1.9c-.2-.4-.4-.4-.5-.4h-.4z"/></svg><span class="wa-float__txt">WhatsApp</span></a>
 ${PAGINAS_SIN_CIUDAD.includes(pagina) || pagina === 'comparar' ? '' : `<div class="cmp-tray" id="cmpTray" role="region" aria-label="Productos para comparar" hidden>
   <p class="cmp-tray__txt" data-cmp-txt aria-live="polite"></p>
   <a class="btn btn--sm btn--red" href="${base}comparar.html" data-cmp-ir>Comparar</a>
@@ -246,7 +246,7 @@ function promosPublicas() {
 }
 function promoCard(x, base = '') {
   return `<a class="promo-card" href="${base}${x.url}" data-grupo="${x.grupo}" data-ciudades="${x.ciudades.join(' ')}" data-inicio="${x.inicio}" data-fin="${x.fin}">
-  <div class="img">${x.imagen ? `<img src="${base}${x.imagen}" alt="" loading="lazy" width="600" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:30%;opacity:.25">`}</div>
+  <div class="img">${x.imagen ? `<img src="${base}${x.imagen}" alt="" loading="lazy" width="600" height="400">` : `<span class="img-vacia" aria-hidden="true">${TIPO_NOMBRE[x.tipo]}</span>`}</div>
   <div class="body"><span class="tag${x.tipo === 'combo' ? ' tag--combo' : ''}">${TIPO_NOMBRE[x.tipo]}</span><h3>${esc(x.titulo)}</h3><p>${esc(x.resumen)}</p><span class="meta">Hasta el ${fechaCorta(x.fin)} · ${esc(nombreCiudades(x.ciudades))}</span></div></a>`;
 }
 function comboCard(c, base = '') {
@@ -318,13 +318,12 @@ write('index.html', layout({
   <div class="mosaic" aria-hidden="true">${mosaico.map((m) => `<img src="${m}" alt="" loading="eager" width="400" height="400">`).join('')}</div>
 </div></section>
 
-<section class="wrap" style="padding-bottom:8px"><div class="quick">
+<section class="wrap" style="padding-bottom:8px"><nav class="quick" aria-label="Accesos rápidos">
   <a href="#calculadora"><b>Calcula tus piezas</b><span>Cuántas necesitas por m²</span></a>
   <a href="catalogo.html"><b>Catálogo</b><span>Fichas con medidas y rendimiento</span></a>
-  <a href="proyectos.html"><b>Proyectos</b><span>Churrasquero, mesón, pared con enchape</span></a>
-  <a href="donde-estamos.html"><b>Dónde comprar</b><span>Agencias y WhatsApp por ciudad</span></a>
-  <a href="pavic.html"><b>PAVIC</b><span>Pavimentos para proyectos</span></a>
-</div></section>
+  <a href="comparar.html"><b>Compara productos</b><span>Hasta 4, lado a lado</span></a>
+  <a href="${ciudadDefecto.slug}.html" data-tu-ciudad><b>Tu ciudad</b><span>Agencias, promociones y WhatsApp de <span data-city-name>${esc(ciudadDefecto.nombre)}</span></span></a>
+</nav></section>
 
 ${seccionNuevos()}
 
@@ -415,7 +414,7 @@ for (const p of productos) {
   const waText = `Hola, quiero cotizar ${p.nombre}${p.codigo ? ` (código ${p.codigo})` : ''} en {ciudad}.`;
   const base = '../../';
   write(`productos/${p.ciudad}/${p.slug}.html`, layout({
-    file: `productos/${p.ciudad}/${p.slug}.html`, base,
+    file: `productos/${p.ciudad}/${p.slug}.html`, base, pagina: 'producto',
     title: `${p.nombre} en ${CIUDAD_CATALOGO[p.ciudad]} | INCERPAZ`,
     desc: `${p.nombre}${p.descripcion ? ': ' + p.descripcion.replace(/\.$/, '') + '.' : ''} Medidas, peso y rendimiento. Catálogo de ${CIUDAD_CATALOGO[p.ciudad]}.`,
     wa: `Hola, tengo una consulta sobre ${p.nombre}${p.codigo ? ` (código ${p.codigo})` : ''} en {ciudad}.`,
@@ -441,7 +440,11 @@ for (const p of productos) {
 </div></section>
 ${p.variantes.length ? `<section class="section section--grey"><div class="wrap"><div class="section-head"><h2>Calcula cuántas piezas necesitas</h2></div>
 ${calcBox({ options: opts, idp: 'p', waText, addBtn: config.comercio ? `<button class="btn" type="button" data-calc-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir al presupuesto</button>` : '' })}</div></section>` : ''}
-${rel.length ? `<section class="section"><div class="wrap"><div class="section-head"><h2>Productos relacionados</h2></div><div class="grid-products">${rel.map((q) => productCard(q, base)).join('')}</div></div></section>` : ''}`
+${rel.length ? `<section class="section"><div class="wrap"><div class="section-head"><h2>Productos relacionados</h2></div><div class="grid-products">${rel.map((q) => productCard(q, base)).join('')}</div></div></section>` : ''}
+<div class="barra-compra" role="region" aria-label="Cotizar ${esc(p.nombre)}">
+  <a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a>
+  ${config.comercio ? `<button class="btn btn--red" type="button" data-add data-qty-from="#qty" data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir</button>` : ''}
+</div>`
   }));
 }
 
@@ -678,13 +681,12 @@ ${seccionNuevos()}
 </div></section>
 
 <section class="section section--grey"><div class="wrap">
-  <div class="quick">
+  <nav class="quick" aria-label="Accesos rápidos">
     <a href="catalogo.html?ciudad=${cat}"><b>Catálogo</b><span>Fichas con medidas y rendimiento</span></a>
-    <a href="comparar.html"><b>Comparar</b><span>Hasta 4 productos lado a lado</span></a>
+    <a href="comparar.html"><b>Compara productos</b><span>Hasta 4, lado a lado</span></a>
     <a href="proyectos.html"><b>Proyectos</b><span>Construye tú mismo, con lista de materiales</span></a>
     <a href="guias.html"><b>Guías</b><span>Cuántos ladrillos, cómo elegir y colocar</span></a>
-    <a href="pavic.html"><b>PAVIC</b><span>Pavimentos para proyectos</span></a>
-  </div>
+  </nav>
 </div></section>
 
 <section class="section" id="contacto"><div class="wrap split">
@@ -706,7 +708,7 @@ write('empresa.html', layout({
   jsonld: orgLd,
   body: `
 <section class="section"><div class="wrap split">
-  <div><span class="eyebrow">Empresa</span><h1 style="font-size:clamp(40px,6vw,76px);margin-block:12px 20px">Cerámica para construir tu hogar</h1><p class="lead">${esc(sitio.somos)}</p></div>
+  <div><span class="eyebrow">Empresa</span><h1 style="font-size:clamp(40px,6vw,76px);margin-block:12px 20px">Quiénes somos</h1><p class="lead">${esc(sitio.somos)}</p></div>
   <img src="assets/img/productos/9-huecos-economico-rayado-2.jpg" alt="Muro de ladrillo cerámico INCERPAZ" width="800" height="800" loading="eager" style="width:100%;aspect-ratio:4/3;object-fit:cover">
 </div></section>
 
