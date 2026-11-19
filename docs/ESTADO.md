@@ -17,3 +17,4 @@ Lo actualiza Luna al cerrar cada tarea y Claude al aprobar un plan. Máximo una 
 ## Decisiones
 
 - 17-11-2026: protocolo común v2 entre IA; Claude arquitecto, Luna implementa, agentes locales solo para tareas mecánicas.
+- 19-11-2026: el protocolo vive en `.ia/PROTOCOLO.md`; `AGENTS.md` y `CLAUDE.md` de la raíz solo apuntan a él, para convivir con la carpeta `.ia/` del sitio sin chocar.
