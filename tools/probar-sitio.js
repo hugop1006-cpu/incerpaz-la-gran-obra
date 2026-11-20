@@ -114,6 +114,14 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok((await py.locator('h2:has-text("Proyectos donde se usa")').count()) === 0, 'un producto que ningún proyecto usa no muestra la sección');
   await py.context().close();
 
+  /* banda para constructores y campo «Soy» */
+  const bn = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); bn.on('pageerror', (e) => errores.push(e.message));
+  await bn.goto(BASE + 'index.html');
+  ok((await bn.locator('#contacto select[name="soy"] option').count()) === 6 && (await bn.inputValue('#contacto select[name="soy"]')) === 'Dueño de casa', 'el formulario de la portada pregunta «Soy» (dueño de casa por defecto)');
+  await bn.goto(BASE + 'cochabamba.html');
+  ok((await bn.locator('#contacto select[name="soy"]').count()) === 1, 'el formulario de la página de ciudad también pregunta «Soy»');
+  await bn.context().close();
+
   /* buscador general */
   const bs = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); bs.on('pageerror', (e) => errores.push(e.message));
   await bs.goto(BASE + 'index.html');

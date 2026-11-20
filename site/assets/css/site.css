@@ -458,3 +458,13 @@ label.check a { color: var(--red); font-weight: 600; }
 .filtro-nivel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 20px; }
 .filtro-nivel .mono-label { margin: 0; }
 .filtro-nivel p { margin: 0; font-size: 15px; }
+
+/* ---- banda para constructores y ferreterías (wireframes, punto 3) ---- */
+.banda-b2b .wrap { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px 48px; align-items: center; }
+.banda-b2b .lead { color: #d9d4ce; max-width: 56ch; }
+.b2b-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.b2b-lista li { display: flex; flex-direction: column; gap: 2px; padding-left: 16px; border-left: 4px solid var(--red); }
+.b2b-lista b { font: 700 22px var(--display); text-transform: uppercase; letter-spacing: .04em; }
+.b2b-lista span { font-size: 15px; color: #d9d4ce; }
+.banda-b2b .btn-row { grid-column: 1 / -1; }
+@media (max-width: 860px) { .banda-b2b .wrap { grid-template-columns: 1fr; } }

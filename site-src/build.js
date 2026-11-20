@@ -298,6 +298,8 @@ function leadForm({ asunto, campos, boton, waNum = '' }) {
 </form><p class="form-msg" role="status" hidden style="margin-top:16px"></p></div>`;
 }
 const field = (label, name, extra = '', cls = '') => `<label class="${cls}">${label}<input name="${name}" ${extra}></label>`;
+/* «Soy»: quién escribe. Llega a Contactos como dato extra y ayuda a decidir quién atiende. */
+const selectSoy = () => `<label>Soy<select name="soy"><option>Dueño de casa</option><option>Constructor o maestro</option><option>Ferretería o distribuidor</option><option>Proyectista o arquitecto</option><option>Empresa o entidad</option><option>Otro</option></select></label>`;
 const selectCities = (name = 'ciudad') => `<label>Ciudad<select name="${name}">${sitio.ciudades.map((c) => `<option>${c.nombre}</option>`).join('')}<option>Otra ciudad</option></select></label>`;
 
 function write(file, html) {
@@ -377,11 +379,18 @@ ${seccionNuevos()}
   }).join('')}</div>
 </div></section>
 
+${config.comercio ? `<section class="section dark banda-b2b" id="constructores"><div class="wrap">
+  <div><span class="eyebrow">Para constructores y ferreterías</span><h2 style="margin-block:12px 14px">¿Construyes o vendes materiales?</h2>
+    <p class="lead">Crea tu cuenta y un ejecutivo de tu ciudad la verifica. Con la cuenta verificada ves los precios de tu ciudad, armas presupuestos, haces pedidos y los repites con un clic.</p></div>
+  <ul class="b2b-lista"><li><b>Precios de tu ciudad</b><span>Según tu tipo de cliente</span></li><li><b>Presupuestos y pedidos</b><span>Con seguimiento del estado</span></li><li><b>Recompra</b><span>Repite un pedido en un clic</span></li></ul>
+  <div class="btn-row"><a class="btn btn--red" href="registro.html">Crear cuenta</a><a class="btn btn--ghost" href="ingresar.html">Ingresar</a></div>
+</div></section>` : ''}
+
 <section class="section" id="contacto"><div class="wrap split">
   <div><span class="eyebrow">Contacto</span><h2 style="margin-block:12px 18px">Hablemos de tu proyecto</h2>
     <p class="lead">Déjanos tus datos y un ejecutivo de <span data-city-name>tu ciudad</span> te contacta para ayudarte a elegir productos y cotizar.</p>
     <p class="muted" style="margin-top:18px">¿Prefieres escribirnos? <a href="${waHref(ciudadDefecto.whatsapp, 'Hola, quiero que me ayuden con mi proyecto en Cochabamba.')}" data-wa="Hola, quiero que me ayuden con mi proyecto en {ciudad}." rel="noopener"><strong>Habla por WhatsApp</strong></a> o llama al <a href="tel:${sitio.servicio_cliente.tel}"><strong>${sitio.servicio_cliente.texto}</strong></a>.</p></div>
-  <div>${leadForm({ asunto: 'Contacto desde la portada', boton: 'Quiero que me contacten', campos: field('Nombre y apellido', 'nombre', 'required autocomplete="name" maxlength="120"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel" maxlength="20"') + selectCities('ciudad') +
+  <div>${leadForm({ asunto: 'Contacto desde la portada', boton: 'Quiero que me contacten', campos: field('Nombre y apellido', 'nombre', 'required autocomplete="name" maxlength="120"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel" maxlength="20"') + selectCities('ciudad') + selectSoy() +
     '<label class="full">¿En qué podemos ayudarte?<textarea name="consulta" rows="3" maxlength="500" placeholder="Qué quieres construir, productos o cantidades aproximadas"></textarea></label>' +
     `<label class="full check"><input type="checkbox" name="consentimiento" required><span>Acepto la <a href="privacidad.html">política de privacidad</a> y que INCERPAZ use estos datos para contactarme.</span></label>` })}</div>
 </div></section>
@@ -709,7 +718,7 @@ ${seccionNuevos()}
 <section class="section" id="contacto"><div class="wrap split">
   <div><span class="eyebrow">Contacto</span><h2 style="margin-block:12px 18px">Hablemos de tu proyecto en ${esc(c.nombre)}</h2>
     <p class="lead">Déjanos tus datos y un ejecutivo de ${esc(c.nombre)} te contacta para ayudarte a elegir productos y cotizar.</p></div>
-  <div>${leadForm({ asunto: `Contacto desde la página de ${c.nombre}`, boton: 'Quiero que me contacten', campos: field('Nombre y apellido', 'nombre', 'required autocomplete="name" maxlength="120"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel" maxlength="20"') + selectCities('ciudad') +
+  <div>${leadForm({ asunto: `Contacto desde la página de ${c.nombre}`, boton: 'Quiero que me contacten', campos: field('Nombre y apellido', 'nombre', 'required autocomplete="name" maxlength="120"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel" maxlength="20"') + selectCities('ciudad') + selectSoy() +
     '<label class="full">¿En qué podemos ayudarte?<textarea name="consulta" rows="3" maxlength="500" placeholder="Qué quieres construir, productos o cantidades aproximadas"></textarea></label>' +
     `<label class="full check"><input type="checkbox" name="consentimiento" required><span>Acepto la <a href="privacidad.html">política de privacidad</a> y que INCERPAZ use estos datos para contactarme.</span></label>` })}</div>
 </div></section>`

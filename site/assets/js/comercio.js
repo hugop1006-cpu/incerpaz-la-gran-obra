@@ -77,6 +77,8 @@
     var cuenta = apiCaida ? '' : (u
       ? '<a href="' + BASE + (u.rol === 'cliente' ? 'mi-cuenta.html' : 'equipo.html') + '">' + (u.rol === 'cliente' ? 'Mi cuenta' : 'Panel') + ' (' + nombre + ')</a> · <a href="#" data-salir>Salir</a>'
       : '<a href="' + BASE + 'ingresar.html">Ingresar</a> · <a href="' + BASE + 'registro.html">Crear cuenta</a>');
+    /* quien ya tiene cuenta no necesita la invitación a crearla */
+    var banda = $('#constructores'); if (banda) banda.hidden = !!u;
     /* el presupuesto vive en el encabezado (ícono con contador); aquí queda solo la cuenta */
     box.innerHTML = cuenta ? cuenta + ' · ' : '';
     contador();

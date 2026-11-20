@@ -2,6 +2,18 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-20 (noche) · Claude Code
+**Hecho** (wireframes, tanda 3)
+- Inicio: banda oscura «¿Construyes o vendes materiales?» (precios de tu ciudad, presupuestos y pedidos, recompra) con «Crear cuenta» e «Ingresar». Solo existe con comercio activo y se oculta si ya hay sesión.
+- Formularios cortos de la portada y de las páginas de ciudad: campo «Soy» (dueño de casa, constructor o maestro, ferretería o distribuidor, proyectista o arquitecto, empresa o entidad, otro). Llega a Contactos como dato extra.
+- Pruebas nuevas en probar-sitio (72), probar-comercio (21) y probar-leads. 12 de API y 8 de navegador en verde.
+
+**Pendiente de decisión**
+- El programa de puntos que mencionaba el wireframe no se incluyó: falta decidir si existe.
+
+**Sigue**
+- Tanda 4: PAVIC con peso y camiones, «Cómo trabajamos un proyecto» y pedido de muestras.
+
 ## 2026-11-20 (tarde) · Claude Code
 **Hecho** (wireframes, tanda 2)
 - Inicio: sección «Proyectos para tu casa» con los 3 proyectos.

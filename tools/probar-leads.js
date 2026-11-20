@@ -60,14 +60,14 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await p.goto(BASE + 'index.html');
     const fp = '#contacto form[data-lead]';
     await p.fill(`${fp} [name="nombre"]`, 'Marta Quispe'); await p.fill(`${fp} [name="celular"]`, '70099988');
-    await p.fill(`${fp} [name="consulta"]`, 'Quiero construir un muro de 20 m²');
+    await p.fill(`${fp} [name="consulta"]`, 'Quiero construir un muro de 20 m²'); await p.selectOption(`${fp} [name="soy"]`, 'Constructor o maestro');
     ok(!(await p.evaluate((s) => document.querySelector(s).checkValidity(), fp)), 'la portada no envía sin aceptar la privacidad');
     await p.check(`${fp} [name="consentimiento"]`); await p.click(`${fp} button[type="submit"]`);
     await p.waitForSelector('#contacto .form-msg:not([hidden])');
     ok(/Recibimos tu solicitud/.test(await p.textContent('#contacto .form-msg')), 'el formulario de la portada se envía');
     const guardado = await adm.evaluate(() => fetch('/api/admin/leads?q=Marta', { headers: { 'X-Requested-With': 'incerpaz' } }).then((r) => r.json()));
     const l = guardado.leads && guardado.leads[0];
-    ok(l && l.asunto === 'Contacto desde la portada' && l.datos.consentimiento === 'sí' && /muro/.test(l.datos.consulta), 'llega a Contactos con el asunto de la portada y el consentimiento');
+    ok(l && l.asunto === 'Contacto desde la portada' && l.datos.consentimiento === 'sí' && /muro/.test(l.datos.consulta) && l.datos.soy === 'Constructor o maestro', 'llega a Contactos con el asunto de la portada, el consentimiento y quién escribe (Soy)');
 
     await p.setViewportSize({ width: 390, height: 800 });
     for (const u of ['guias/como-colocar-enchape-de-ladrillo.html', 'exportaciones.html', 'guias.html']) {

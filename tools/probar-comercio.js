@@ -26,6 +26,9 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     const adm = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage();
     const errores = []; [cli, adm].forEach((p) => p.on('pageerror', (e) => errores.push(e.message)));
 
+    /* banda para constructores: la ve el visitante y se oculta con sesión */
+    await cli.goto(BASE + 'index.html'); await cli.waitForSelector('[data-acct] a');
+    ok(await cli.isVisible('#constructores') && (await cli.getAttribute('#constructores a.btn--red', 'href')) === 'registro.html', 'el visitante ve la banda «¿Construyes o vendes materiales?» con el enlace a crear cuenta');
     await cli.goto(BASE + 'catalogo.html?ciudad=cochabamba');
     await cli.waitForSelector('.pcard:not([hidden]):not(.pcard--combo) [data-precio] a');
     ok(true, 'el visitante ve "Precio con sesión" en el catálogo');
@@ -91,6 +94,8 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
     await cli.setViewportSize({ width: 390, height: 800 }); await cli.goto(BASE + 'presupuesto.html'); await cli.waitForSelector('[data-q]');
     ok((await cli.evaluate(() => document.documentElement.scrollWidth)) <= 390, 'el presupuesto no se desborda en celular');
+    await cli.goto(BASE + 'index.html'); await cli.waitForSelector('[data-salir]');
+    ok(!(await cli.isVisible('#constructores')), 'con sesión iniciada la banda para constructores se oculta');
     await cli.click('[data-salir]'); await cli.waitForURL('**/index.html');
     await cli.goto(BASE + 'mi-cuenta.html'); await cli.waitForURL('**/ingresar.html**');
     ok(true, 'al salir, Mi cuenta pide ingresar de nuevo');
