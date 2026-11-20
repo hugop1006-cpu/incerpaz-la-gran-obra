@@ -36,13 +36,15 @@
   function num(id) { var n = parseFloat(String($(id).value).replace(',', '.')); return isFinite(n) && n >= 0 ? n : 0; }
   function calcular() {
     var p = actual(); if (!p) return;
-    var v = p.variantes[+selVar.value] || p.variantes[0], area = num('#pv-area'), merma = parseFloat($('#pv-merma').value), eb = num('#pv-base'), ec = num('#pv-cama');
+    var v = p.variantes[+selVar.value] || p.variantes[0], area = num('#pv-area'), merma = parseFloat($('#pv-merma').value), eb = num('#pv-base'), ec = num('#pv-cama'), capCamion = num('#pv-camion');
     var pzas = Math.ceil(area * v.rend * (1 + merma) - 1e-9), kg = p.peso ? pzas * p.peso : null;
-    var c = { pieza: p, v: v, area: area, merma: merma, pzas: pzas, kg: kg, base: area * eb / 100, arena: area * ec / 100, eb: eb, ec: ec };
+    var camiones = kg && capCamion > 0 ? Math.ceil(kg / 1000 / capCamion - 1e-9) : null;
+    var c = { pieza: p, v: v, area: area, merma: merma, pzas: pzas, kg: kg, camiones: camiones, capCamion: capCamion, base: area * eb / 100, arena: area * ec / 100, eb: eb, ec: ec };
     st.calc = c;
     $('#pv-resultado').innerHTML = '<div class="scroll"><table class="tabla"><thead><tr><th>Concepto</th><th class="num">Cantidad</th><th>Unidad</th></tr></thead><tbody>' +
       '<tr><td>Piezas ' + esc(p.nombre) + ' (con ' + fmt(merma * 100) + ' % de merma)</td><td class="num"><b>' + fmt(pzas) + '</b></td><td>piezas</td></tr>' +
       (kg ? '<tr><td>Peso de la cerámica</td><td class="num"><b>' + fmt(kg / 1000, 1) + '</b></td><td>toneladas</td></tr>' : '') +
+      (camiones ? '<tr><td>Camiones de ' + fmt(capCamion, 1) + ' t (capacidad de ejemplo, editable)</td><td class="num"><b>' + fmt(camiones) + '</b></td><td>camiones</td></tr>' : '') +
       '<tr><td>Base granular (espesor ' + fmt(eb, 1) + ' cm)</td><td class="num"><b>' + fmt(c.base, 1) + '</b></td><td>m³ compactos</td></tr>' +
       '<tr><td>Cama de arena (espesor ' + fmt(ec, 1) + ' cm)</td><td class="num"><b>' + fmt(c.arena, 1) + '</b></td><td>m³</td></tr></tbody></table></div>' +
       '<p class="price-note">Los volúmenes de base y arena son geométricos: no incluyen esponjamiento, compactación ni arena de sello. El diseño del paquete estructural lo define el proyectista según el tráfico y el suelo.</p>';
@@ -62,6 +64,7 @@
     $('#pv-csv').addEventListener('click', function () {
       var l = [['Concepto', 'Cantidad', 'Unidad'], ['Piezas ' + c.pieza.nombre, c.pzas, 'piezas'], ['Superficie', c.area, 'm2'], ['Merma', c.merma * 100, '%']];
       if (c.kg) l.push(['Peso de la ceramica', Math.round(c.kg / 10) / 100, 't']);
+      if (c.camiones) l.push(['Camiones de ' + c.capCamion + ' t', c.camiones, 'camiones']);
       l.push(['Base granular (' + c.eb + ' cm)', Math.round(c.base * 10) / 10, 'm3'], ['Cama de arena (' + c.ec + ' cm)', Math.round(c.arena * 10) / 10, 'm3']);
       bajar('cuadro-pavic.csv', '﻿' + l.map(function (r) { return r.map(function (x) { return '"' + String(x).replace(/"/g, '""') + '"'; }).join(';'); }).join('\r\n'), 'text/csv;charset=utf-8');
     });
@@ -131,7 +134,7 @@
   llenarPiezas(); pieza();
   selCiudad.addEventListener('change', function () { llenarPiezas(); pieza(); });
   selPieza.addEventListener('change', pieza);
-  ['#pv-area', '#pv-base', '#pv-cama'].forEach(function (id) { $(id).addEventListener('input', calcular); });
+  ['#pv-area', '#pv-base', '#pv-cama', '#pv-camion'].forEach(function (id) { $(id).addEventListener('input', calcular); });
   ['#pv-var', '#pv-merma'].forEach(function (id) { $(id).addEventListener('change', calcular); });
   document.addEventListener('incerpaz:city', function (e) { selCiudad.value = e.detail === 'santa-cruz' ? 'santa-cruz' : 'cochabamba'; llenarPiezas(); pieza(); });
   $('#pv-copiar').addEventListener('click', function () {

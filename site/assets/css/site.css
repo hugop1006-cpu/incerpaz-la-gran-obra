@@ -468,3 +468,13 @@ label.check a { color: var(--red); font-weight: 600; }
 .b2b-lista span { font-size: 15px; color: #d9d4ce; }
 .banda-b2b .btn-row { grid-column: 1 / -1; }
 @media (max-width: 860px) { .banda-b2b .wrap { grid-template-columns: 1fr; } }
+
+/* ---- PAVIC: proceso del proyecto (wireframes, punto 4) ---- */
+.pasos-proceso { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); counter-reset: paso; }
+.pasos-proceso li { counter-increment: paso; background: var(--white); padding: 20px 18px; display: flex; flex-direction: column; gap: 6px; }
+.pasos-proceso li::before { content: counter(paso, decimal-leading-zero); font: 700 30px var(--display); color: var(--red); }
+.pasos-proceso b { font: 700 22px var(--display); text-transform: uppercase; letter-spacing: .03em; }
+.pasos-proceso span { font-size: 15px; color: var(--ink-2); }
+.pasos-proceso a { color: var(--red); font-weight: 600; }
+@media (max-width: 1000px) { .pasos-proceso { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .pasos-proceso { grid-template-columns: 1fr; } }

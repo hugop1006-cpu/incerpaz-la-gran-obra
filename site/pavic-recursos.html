@@ -14,7 +14,7 @@
 <link rel="icon" href="assets/img/logo-icono.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/css/site.css?v=d1d33cf9">
+<link rel="stylesheet" href="assets/css/site.css?v=d7ac23fa">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://www.incerpaz.com/"},{"@type":"ListItem","position":2,"name":"PAVIC","item":"https://www.incerpaz.com/pavic.html"},{"@type":"ListItem","position":3,"name":"Recursos técnicos","item":"https://www.incerpaz.com/pavic-recursos.html"}]}</script>
 </head>
 <body data-base="" data-pagina="pavic-recursos">
@@ -61,6 +61,7 @@
       <label>Merma<select id="pv-merma"><option value="0.03">3 %</option><option value="0.05" selected>5 %</option><option value="0.08">8 %</option></select></label>
       <label>Espesor de la base (cm)<input id="pv-base" type="number" inputmode="decimal" min="0" step="1" value="15"></label>
       <label>Espesor de la cama de arena (cm)<input id="pv-cama" type="number" inputmode="decimal" min="0" step="0.5" value="4"></label>
+      <label class="full">Capacidad de carga por camión (toneladas)<input id="pv-camion" type="number" inputmode="decimal" min="1" step="0.5" value="20" aria-describedby="pv-camion-nota"><span id="pv-camion-nota" class="muted" style="font-weight:400;font-size:14px">Valor de ejemplo, editable. Cámbialo por la capacidad real del transporte que vayas a usar.</span></label>
     </div><p class="muted" style="font-size:15px;margin-top:14px">Los espesores son valores de partida editables, no una recomendación de diseño.</p></div>
     <figure class="plano" id="pv-seccion" aria-label="Sección típica del pavimento"></figure>
   </div>
@@ -130,7 +131,7 @@
 <script src="assets/js/site.js?v=cc74a872" defer></script>
 <script src="assets/js/comercio.js?v=13184757" defer></script>
 
-<script src="assets/js/pavic.js?v=fef6cde8" defer></script>
+<script src="assets/js/pavic.js?v=49d02fcb" defer></script>
 
 
 </body>

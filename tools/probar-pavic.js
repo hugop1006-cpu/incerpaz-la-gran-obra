@@ -26,11 +26,17 @@ const fila = (p, t) => p.locator('#pv-resultado tbody tr', { hasText: t }).first
     const errores = []; p.on('pageerror', (e) => errores.push(e.message));
 
     await p.goto(BASE + 'pavic.html'); ok((await p.locator('a[href="pavic-recursos.html"]').count()) >= 1, 'la página PAVIC enlaza a los recursos');
+    ok((await p.locator('#proceso .pasos-proceso li').count()) === 5, 'PAVIC explica cómo se trabaja un proyecto en 5 pasos');
+    ok((await p.locator('#proceso a[href="#muestras"]').count()) === 1 && (await p.locator('#muestras form[data-lead="Solicitud de muestras PAVIC"]').count()) === 1, 'el paso «Muestras» lleva al formulario de muestras');
     await p.goto(BASE + 'pavic-recursos.html'); await p.waitForSelector('#pv-resultado table');
     ok(/132,5/.test(await p.textContent('#pv-ficha')), 'la ficha muestra el peso por m² (50 piezas × 2,65 kg = 132,5)');
     ok(digitos(await fila(p, 'Piezas').textContent()) === '52500', '1.000 m² con 5 % de merma: 52.500 piezas');
     ok(/139,1/.test(await fila(p, 'Peso').textContent()), 'peso de la cerámica: 139,1 toneladas');
     ok(digitos(await fila(p, 'Base granular').textContent()) === '1500', 'base granular de 15 cm: 150,0 m³');
+    ok(digitos(await fila(p, 'Camiones').textContent()) === '7' && /ejemplo/.test(await p.locator('#pv-resultado tbody tr', { hasText: 'Camiones' }).first().textContent()), '139,1 t en camiones de 20 t (ejemplo): 7 camiones, marcado como ejemplo');
+    await p.fill('#pv-camion', '10');
+    ok(digitos(await fila(p, 'Camiones').textContent()) === '14', 'al cambiar la capacidad del camión a 10 t se recalcula: 14 camiones');
+    await p.fill('#pv-camion', '20');
     await p.fill('#pv-area', '2000');
     ok(digitos(await fila(p, 'Piezas').textContent()) === '105000', 'al cambiar la superficie se recalcula');
     ok((await p.locator('#pv-seccion svg rect').count()) === 4, 'la sección muestra las 4 capas');

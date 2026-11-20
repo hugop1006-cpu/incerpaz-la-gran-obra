@@ -551,6 +551,27 @@ write('pavic.html', layout({
   <div class="photos">${fotosPavic.map((f) => `<img src="${f}" alt="Pavimento cerámico PAVIC instalado" loading="lazy" width="800" height="600">`).join('')}</div>
 </div></section>
 
+<section class="section" id="proceso"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Cómo trabajamos un proyecto</span><h2>De la consulta a la obra</h2><p class="lead">Así avanza un proyecto PAVIC. Los plazos y condiciones los acuerda tu ejecutivo según la obra.</p></div>
+  <ol class="pasos-proceso">
+    <li><b>Consulta</b><span>Cuéntanos la obra, los m² y la fecha.</span></li>
+    <li><b>Cotización</b><span>Precio por volumen y plazo, preparado por un ejecutivo de proyectos.</span></li>
+    <li><b>Muestras</b><span>Piezas para aprobar color y acabado. <a href="#muestras">Pedir muestras</a></span></li>
+    <li><b>Despacho</b><span>Entregas programadas desde la planta más cercana.</span></li>
+    <li><b>Asesoría en obra</b><span>Apoyo técnico durante el colocado.</span></li>
+  </ol>
+</div></section>
+
+<section class="section dark" id="muestras"><div class="wrap split">
+  <div><span class="eyebrow">Muestras</span><h2 style="margin-block:12px 18px">Aprueba color y acabado antes de decidir</h2>
+    <p class="lead">Pide piezas de PAVIC para verlas y tocarlas en tu obra o en tu oficina. Un ejecutivo coordina la entrega o el retiro en la agencia más cercana.</p></div>
+  <div>${leadForm({ asunto: 'Solicitud de muestras PAVIC', boton: 'Pedir muestras', campos:
+    field('Nombre', 'nombre', 'required autocomplete="name" maxlength="120"') + field('Empresa o entidad', 'empresa', 'autocomplete="organization" maxlength="120"') + field('Celular', 'celular', 'type="tel" required autocomplete="tel" maxlength="20"') + selectCities('ciudad') +
+    `<label class="full">Piezas que quieres ver<select name="piezas"><option>Todas las líneas</option>${pavic.map((p) => `<option>${esc(p.nombre)} (${CIUDAD_CATALOGO[p.ciudad]})</option>`).join('')}</select></label>` +
+    '<label class="full">Dónde las recibes o retiras<textarea name="entrega" rows="2" maxlength="300" placeholder="Dirección de la obra o agencia donde las retiras"></textarea></label>' +
+    `<label class="full check"><input type="checkbox" name="consentimiento" required><span>Acepto la <a href="privacidad.html">política de privacidad</a> y que INCERPAZ use estos datos para contactarme.</span></label>` })}</div>
+</div></section>
+
 <section class="section section--grey" id="cotizar"><div class="wrap split">
   <div><span class="eyebrow">Cotiza tu proyecto</span><h2 style="margin-block:12px 18px">Cuéntanos de tu obra</h2>
     <p class="lead">Con estos datos un ejecutivo de tu ciudad prepara una cotización por volumen y plazo.</p>
@@ -605,6 +626,7 @@ write('pavic-recursos.html', layout({
       <label>Merma<select id="pv-merma"><option value="0.03">3 %</option><option value="0.05" selected>5 %</option><option value="0.08">8 %</option></select></label>
       <label>Espesor de la base (cm)<input id="pv-base" type="number" inputmode="decimal" min="0" step="1" value="15"></label>
       <label>Espesor de la cama de arena (cm)<input id="pv-cama" type="number" inputmode="decimal" min="0" step="0.5" value="4"></label>
+      <label class="full">Capacidad de carga por camión (toneladas)<input id="pv-camion" type="number" inputmode="decimal" min="1" step="0.5" value="20" aria-describedby="pv-camion-nota"><span id="pv-camion-nota" class="muted" style="font-weight:400;font-size:14px">Valor de ejemplo, editable. Cámbialo por la capacidad real del transporte que vayas a usar.</span></label>
     </div><p class="muted" style="font-size:15px;margin-top:14px">Los espesores son valores de partida editables, no una recomendación de diseño.</p></div>
     <figure class="plano" id="pv-seccion" aria-label="Sección típica del pavimento"></figure>
   </div>

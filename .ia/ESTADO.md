@@ -2,6 +2,18 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-21 · Claude Code
+**Hecho** (wireframes, tanda 4: PAVIC)
+- Recursos PAVIC: la calculadora de obra suma «Capacidad de carga por camión (toneladas)» y la fila «Camiones». **El valor de 20 t es de ejemplo** (editable y marcado como ejemplo en la tabla); falta confirmar la capacidad real.
+- Página PAVIC: sección «Cómo trabajamos un proyecto» (consulta, cotización, muestras, despacho, asesoría en obra) y sección «Muestras» con formulario de pedido (nombre, empresa, celular, ciudad, piezas, dónde recibirlas, consentimiento). Llega a Contactos con el asunto «Solicitud de muestras PAVIC».
+- Pruebas nuevas en probar-pavic (20) y probar-leads (19). 12 de API y 8 de navegador en verde.
+
+**Pendiente de decisión**
+- Quién atiende las solicitudes de muestras y cómo se entregan (envío o retiro en agencia). El texto del proceso («Los plazos los acuerda tu ejecutivo») es genérico: validar con ventas, igual que decía el wireframe.
+
+**Sigue**
+- Tanda 5: calculadora de tejas por pendiente.
+
 ## 2026-11-20 (noche) · Claude Code
 **Hecho** (wireframes, tanda 3)
 - Inicio: banda oscura «¿Construyes o vendes materiales?» (precios de tu ciudad, presupuestos y pedidos, recompra) con «Crear cuenta» e «Ingresar». Solo existe con comercio activo y se oculta si ya hay sesión.

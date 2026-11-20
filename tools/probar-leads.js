@@ -56,6 +56,16 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     ok(true, 'cambiar estado y filtrar por estado funciona');
     ok(/leads\.csv/.test(await adm.getAttribute('a:has-text("Descargar CSV")', 'href')), 'hay descarga en CSV');
 
+    /* pedido de muestras PAVIC */
+    await p.goto(BASE + 'pavic.html');
+    const fm = '#muestras form[data-lead]';
+    await p.fill(`${fm} [name="nombre"]`, 'Rosa Vargas'); await p.fill(`${fm} [name="celular"]`, '70033344'); await p.selectOption(`${fm} [name="ciudad"]`, 'Santa Cruz');
+    await p.fill(`${fm} [name="entrega"]`, 'Urbanización Los Pinos, calle 3'); await p.check(`${fm} [name="consentimiento"]`); await p.click(`${fm} button[type="submit"]`);
+    await p.waitForSelector('#muestras .form-msg:not([hidden])');
+    const mu = await adm.evaluate(() => fetch('/api/admin/leads?q=Rosa', { headers: { 'X-Requested-With': 'incerpaz' } }).then((r) => r.json()));
+    const lm = mu.leads && mu.leads[0];
+    ok(lm && lm.asunto === 'Solicitud de muestras PAVIC' && /Los Pinos/.test(lm.datos.entrega) && lm.datos.piezas, 'el pedido de muestras llega a Contactos con las piezas y dónde recibirlas');
+
     /* formulario corto de la portada, con consentimiento */
     await p.goto(BASE + 'index.html');
     const fp = '#contacto form[data-lead]';
