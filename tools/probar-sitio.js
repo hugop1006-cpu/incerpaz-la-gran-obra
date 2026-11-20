@@ -99,6 +99,21 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok(!(await ux.isVisible('.wa-float')), 'el botón de WhatsApp se aparta mientras se escribe en un campo');
   await ux.context().close();
 
+  /* proyectos: en el inicio, filtro por dificultad y en las fichas */
+  const py = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); py.on('pageerror', (e) => errores.push(e.message));
+  await py.goto(BASE + 'index.html');
+  ok((await py.locator('.proys .cat').count()) === 3, 'el inicio muestra los 3 proyectos para construir');
+  await py.goto(BASE + 'proyectos.html');
+  await py.click('[data-nivel-filtro="Básico"]');
+  ok((await py.locator('.proys .cat:visible').count()) === 2 && /2 proyectos/.test(await py.textContent('[data-nivel-cuenta]')), 'el filtro «Básico» deja los 2 proyectos básicos');
+  await py.click('[data-nivel-filtro=""]');
+  ok((await py.locator('.proys .cat:visible').count()) === 3, '«Todos» vuelve a mostrar los 3');
+  await py.goto(BASE + 'productos/cochabamba/brick-enchape-corto.html');
+  ok((await py.locator('h2:has-text("Proyectos donde se usa") + * .cat, section:has(h2:has-text("Proyectos donde se usa")) .cat').count()) === 2, 'la ficha del enchape muestra los 2 proyectos que lo usan');
+  await py.goto(BASE + 'productos/cochabamba/18-h.html');
+  ok((await py.locator('h2:has-text("Proyectos donde se usa")').count()) === 0, 'un producto que ningún proyecto usa no muestra la sección');
+  await py.context().close();
+
   /* buscador general */
   const bs = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); bs.on('pageerror', (e) => errores.push(e.message));
   await bs.goto(BASE + 'index.html');

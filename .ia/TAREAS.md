@@ -24,7 +24,7 @@ Estado: `pendiente` · `en curso` · `bloqueada` · `hecha`.
 | Pasar al sitio las descripciones de producto aprobadas | claude-code | bloqueada | Espera la aprobación de los técnicos |
 | Validación exportadora con CSV de USITC DataWeb | chat | bloqueada | Espera el CSV |
 | Wireframes tanda 1: buscador general y presupuesto en el encabezado | claude-code | hecha (2026-11-20) | |
-| Wireframes tanda 2: proyectos en el inicio, filtro por dificultad, «Proyectos donde se usa» | claude-code | pendiente (espera permiso de Hugo) | |
+| Wireframes tanda 2: proyectos en el inicio, filtro por dificultad, «Proyectos donde se usa» | claude-code | hecha (2026-11-20) | |
 | Wireframes tanda 3: banda para constructores y campo «Soy» | claude-code | pendiente | |
 | Wireframes tanda 4: PAVIC con camiones, proceso y muestras | claude-code | pendiente | Capacidad del camión: dato por confirmar |
 | Wireframes tanda 5: calculadora de tejas por pendiente | claude-code | pendiente | Tejas por m² y pendiente mínima por confirmar |

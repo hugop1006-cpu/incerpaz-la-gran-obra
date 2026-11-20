@@ -221,6 +221,11 @@ const orgLd = `<script type="application/ld+json">${JSON.stringify({
   contactPoint: [{ '@type': 'ContactPoint', telephone: '+591-800-10-8810', contactType: 'customer service', areaServed: 'BO', availableLanguage: 'es' }]
 })}</script>`;
 
+const proyectosData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/proyectos.json'), 'utf8'));
+/* Proyectos: qué productos usa cada uno (por ciudad o como opción a elegir, p. ej. el enchape) */
+const ORDEN_NIVEL = ['Básico', 'Medio', 'Avanzado'];
+const usaProducto = (pr, p) => pr.materiales.some((m) => (m.producto && m.producto[p.ciudad] === p.slug) || (m.eleccion && pr.eleccion && pr.eleccion.id === m.eleccion && pr.eleccion.opciones.includes(p.slug)));
+const proyCard = (pr, base = '') => `<a class="cat" href="${base}proyectos/${pr.slug}.html" style="grid-column:auto" data-nivel="${esc(pr.nivel)}"><img src="${base}${pr.imagen}" alt="" loading="lazy" width="600" height="400"><div><h3>${esc(pr.titulo)}</h3><span>${esc(pr.resumen)}</span><span style="display:block;margin-top:8px">Nivel ${pr.nivel.toLowerCase()} · ${esc(pr.dias)}</span></div></a>`;
 /* ---- piezas reutilizables ---- */
 /* Comparador: cada producto se identifica como «ciudad:slug»; solo se comparan productos del mismo catálogo. */
 /* Productos nuevos: se destacan hasta la fecha «nuevo_hasta» (el navegador vuelve a revisarla, por si el sitio no se regenera ese día). */
@@ -343,6 +348,11 @@ ${seccionNuevos()}
   <div class="cats">${sitio.categorias.map((c) => `<a class="cat" href="catalogo.html?cat=${c.slug}"><img src="${c.imagen}" alt="" loading="lazy" width="600" height="400"><div><h3>${esc(c.nombre)}</h3><span>${esc(c.descripcion)}</span></div></a>`).join('')}</div>
 </div></section>
 
+<section class="section section--grey"><div class="wrap">
+  <div class="section-head"><div class="row"><div><span class="eyebrow">Construye tú mismo</span><h2 style="margin-top:12px">Proyectos para tu casa</h2></div><a class="btn" href="proyectos.html">Ver todos</a></div><p class="lead" style="margin-top:12px">Ajusta las medidas a tu espacio y obtén la lista de materiales, el esquema y los pasos.</p></div>
+  <div class="proys">${proyectosData.proyectos.map((pr) => proyCard(pr)).join('')}</div>
+</div></section>
+
 <section class="section dark pavic-band"><div class="wrap">
   <img src="assets/img/productos/pavic-peatonal-2.jpg" alt="Plaza con pavimento cerámico PAVIC" loading="lazy" width="800" height="600">
   <div>
@@ -446,6 +456,7 @@ for (const p of productos) {
 </div></section>
 ${p.variantes.length ? `<section class="section section--grey"><div class="wrap"><div class="section-head"><h2>Calcula cuántas piezas necesitas</h2></div>
 ${calcBox({ options: opts, idp: 'p', waText, addBtn: config.comercio ? `<button class="btn" type="button" data-calc-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir al presupuesto</button>` : '' })}</div></section>` : ''}
+${proyectosData.proyectos.some((pr) => usaProducto(pr, p)) ? `<section class="section"><div class="wrap"><div class="section-head"><span class="eyebrow">Construye tú mismo</span><h2 style="margin-top:12px">Proyectos donde se usa</h2></div><div class="proys">${proyectosData.proyectos.filter((pr) => usaProducto(pr, p)).map((pr) => proyCard(pr, base)).join('')}</div></div></section>` : ''}
 ${rel.length ? `<section class="section"><div class="wrap"><div class="section-head"><h2>Productos relacionados</h2></div><div class="grid-products">${rel.map((q) => productCard(q, base)).join('')}</div></div></section>` : ''}
 <div class="barra-compra" role="region" aria-label="Cotizar ${esc(p.nombre)}">
   <a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a>
@@ -788,7 +799,6 @@ if (config.comercio) {
 }
 
 /* ============================ PROYECTOS (qué construir, con lista de materiales) ============================ */
-const proyectosData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/proyectos.json'), 'utf8'));
 /* rendimiento por m² de una ficha; el catálogo de Santa Cruz publica el enchape corto "por ml" pero la cifra corresponde a m² (20 × 7,5 cm) */
 function rendM2(p) {
   const v = p.variantes.find((x) => x.unidad === 'm2') || (/^brick-enchape/.test(p.slug) ? p.variantes[0] : null);
@@ -801,7 +811,8 @@ write('proyectos.html', layout({
   desc: 'Churrasquero, mesón y pared con enchape de ladrillo: calcula la lista de materiales, los costos y sigue los pasos para construirlos.',
   body: `<section class="section"><div class="wrap">
   <div class="section-head"><span class="eyebrow">Inspiración y obra</span><h1 style="font-size:clamp(36px,5vw,60px)">Proyectos para construir</h1><p class="lead">Elige un proyecto, ajusta las medidas a tu espacio y obtén la lista de materiales con cantidades, el esquema y los pasos. Con tu cuenta verificada ves el costo y lo envías a tu presupuesto.</p></div>
-  <div class="proys">${proyectosData.proyectos.map((pr) => `<a class="cat" href="proyectos/${pr.slug}.html" style="grid-column:auto"><img src="${pr.imagen}" alt="" loading="lazy" width="600" height="400"><div><h3>${esc(pr.titulo)}</h3><span>${esc(pr.resumen)}</span><span style="display:block;margin-top:8px">Nivel ${pr.nivel.toLowerCase()} · ${esc(pr.dias)}</span></div></a>`).join('')}</div>
+  <div class="filtro-nivel"><span class="mono-label">Dificultad</span><div class="chips" role="group" aria-label="Dificultad">${['Todos', ...ORDEN_NIVEL.filter((n) => proyectosData.proyectos.some((pr) => pr.nivel === n))].map((n, i) => `<button class="chip" type="button" data-nivel-filtro="${i ? esc(n) : ''}" aria-pressed="${i === 0}">${esc(n)}</button>`).join('')}</div><p class="muted" data-nivel-cuenta aria-live="polite"></p></div>
+  <div class="proys">${proyectosData.proyectos.map((pr) => proyCard(pr)).join('')}</div>
   <p class="price-note" style="margin-top:32px">${esc(proyectosData.aviso)}</p>
 </div></section>
 <section class="section section--grey"><div class="wrap split">

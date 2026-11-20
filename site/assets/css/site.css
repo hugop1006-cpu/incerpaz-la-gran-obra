@@ -453,3 +453,8 @@ label.check a { color: var(--red); font-weight: 600; }
   .buscador form, .buscar-pag { flex-wrap: wrap; }
   .buscador .btn, .buscar-pag .btn { flex: 1 1 100%; }
 }
+
+/* ---- proyectos: filtro por dificultad (wireframes, punto 2) ---- */
+.filtro-nivel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 20px; }
+.filtro-nivel .mono-label { margin: 0; }
+.filtro-nivel p { margin: 0; font-size: 15px; }

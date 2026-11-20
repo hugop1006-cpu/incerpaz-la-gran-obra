@@ -2,6 +2,16 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-20 (tarde) · Claude Code
+**Hecho** (wireframes, tanda 2)
+- Inicio: sección «Proyectos para tu casa» con los 3 proyectos.
+- Proyectos: filtro por dificultad (Todos, Básico, Medio) con contador. El bloque «¿Tienes otra idea?» ya existía.
+- Fichas: «Proyectos donde se usa», calculado con los materiales de cada proyecto (incluido el enchape a elegir).
+- Pruebas nuevas en probar-sitio (70). 12 de API y 8 de navegador en verde.
+
+**Sigue**
+- Tanda 3: banda para constructores y campo «Soy» en el formulario corto.
+
 ## 2026-11-20 · Claude Code
 **Hecho** (wireframes vs. sitio, tanda 1 de 6, con permiso de Hugo)
 - Buscador general: lupa en el encabezado que abre una barra de búsqueda y página `buscar.html` con resultados agrupados (productos del catálogo de la ciudad elegida, proyectos, guías, promociones vigentes y páginas). Busca por nombre, código, línea y categoría; sin resultados ofrece WhatsApp.

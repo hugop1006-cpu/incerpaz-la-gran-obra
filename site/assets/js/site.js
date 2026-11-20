@@ -96,6 +96,19 @@
     document.addEventListener('incerpaz:city', pintarNuevos);
   })();
 
+  /* ---- proyectos: filtro por dificultad ---- */
+  var chipsNivel = $$('[data-nivel-filtro]');
+  if (chipsNivel.length) {
+    var filtrarNivel = function (nivel) {
+      var n = 0;
+      $$('.proys [data-nivel]').forEach(function (c) { var ok = !nivel || c.getAttribute('data-nivel') === nivel; c.hidden = !ok; if (ok) n++; });
+      chipsNivel.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-nivel-filtro') === nivel)); });
+      var cuenta = $('[data-nivel-cuenta]'); if (cuenta) cuenta.textContent = n + (n === 1 ? ' proyecto' : ' proyectos');
+    };
+    chipsNivel.forEach(function (b) { b.addEventListener('click', function () { filtrarNivel(b.getAttribute('data-nivel-filtro')); }); });
+    filtrarNivel('');
+  }
+
   /* ---- menú móvil ---- */
   var tg = $('.nav-toggle'), nav = $('#nav');
   if (tg && nav) tg.addEventListener('click', function () {
