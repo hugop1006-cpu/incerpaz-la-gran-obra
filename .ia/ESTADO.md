@@ -2,6 +2,21 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-21 (tarde) · Claude Code
+**Hecho** (wireframes, tanda 5: tejas)
+- Página nueva `techos.html` («Techos y tejas»): calculadora de tejas por pendiente (superficie real = área en planta × √(1 + pendiente²); tejas = superficie real × tejas por m² × (1 + merma); peso aproximado), WhatsApp con el techo calculado, «Añadir al presupuesto» con cuenta, y las tejas del catálogo.
+- Usa solo datos de fichas: teja colonial tapa de Santa Cruz (18 por m², 2,6 kg). La teja canal no entra porque su ficha repite la de la tapa. En Cochabamba avisa que las tejas están en el catálogo de Santa Cruz.
+- Enlaces: fichas de tejas («Calcula tus tejas»), catálogo, buscador y sitemap.
+- Pruebas nuevas en probar-sitio (80). 12 de API y 8 de navegador en verde.
+
+**Pendiente de datos**
+- Pendiente mínima de cada modelo (el texto dice que está por confirmar en la ficha técnica).
+- Ficha propia de la teja canal; tejas por m² de otros modelos; catálogo de tejas en Cochabamba.
+- Marca propia de tejas (decisión aparte del sitio).
+
+**Sigue**
+- Tanda 6: ordenar el catálogo, «Nuestras marcas» en Empresa y enlace al juego.
+
 ## 2026-11-21 · Claude Code
 **Hecho** (wireframes, tanda 4: PAVIC)
 - Recursos PAVIC: la calculadora de obra suma «Capacidad de carga por camión (toneladas)» y la fila «Camiones». **El valor de 20 t es de ejemplo** (editable y marcado como ejemplo en la tabla); falta confirmar la capacidad real.

@@ -122,6 +122,25 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok((await bn.locator('#contacto select[name="soy"]').count()) === 1, 'el formulario de la página de ciudad también pregunta «Soy»');
   await bn.context().close();
 
+  /* calculadora de tejas por pendiente */
+  const tj = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); tj.on('pageerror', (e) => errores.push(e.message));
+  await tj.goto(BASE + 'techos.html');
+  const dig = async (id) => (await tj.textContent(id)).replace(/\D/g, '');
+  await tj.fill('#tj-area', '100'); await tj.fill('#tj-pend', '0');
+  ok((await dig('#tj-pzas')) === '1944' || (await dig('#tj-pzas')) === '1945', 'techo plano de 100 m²: 100 × 18 tejas por m² con 8 % de merma = 1.944');
+  await tj.fill('#tj-pend', '100');
+  ok((await tj.textContent('#tj-real')).startsWith('141,4') && (await dig('#tj-pzas')) === '2750', 'con 100 % de pendiente la superficie real es 141,4 m² y se necesitan 2.750 tejas');
+  ok(/45/.test(await tj.textContent('#tj-aviso')), 'muestra la pendiente en grados (100 % = 45°)');
+  ok(/Santa Cruz/.test(await tj.textContent('#tj-aviso')), 'en Cochabamba avisa que las tejas están en el catálogo de Santa Cruz');
+  await tj.fill('#tj-rend', '20');
+  ok((await dig('#tj-pzas')) !== '2750', 'se puede cambiar las tejas por m² del modelo');
+  ok(/wa\.me/.test(await tj.getAttribute('#tj-wa', 'href')) && /pendiente/.test(decodeURIComponent(await tj.getAttribute('#tj-wa', 'href'))), 'el WhatsApp lleva el techo calculado');
+  await tj.setViewportSize({ width: 390, height: 844 }); await tj.reload();
+  ok((await tj.evaluate(() => document.documentElement.scrollWidth)) <= 390, 'la calculadora de tejas no desborda en celular');
+  await tj.goto(BASE + 'productos/santa-cruz/tsc.html');
+  ok((await tj.locator('a[href$="techos.html"]').count()) >= 1, 'la ficha de la teja enlaza a la calculadora');
+  await tj.context().close();
+
   /* buscador general */
   const bs = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); bs.on('pageerror', (e) => errores.push(e.message));
   await bs.goto(BASE + 'index.html');

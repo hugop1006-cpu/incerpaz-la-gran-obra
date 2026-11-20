@@ -207,6 +207,7 @@ ${PAGINAS_SIN_CIUDAD.includes(pagina) ? '' : `<dialog class="city-dlg" id="cityD
 <script src="${base}${versionado('assets/js/site.js')}" defer></script>
 ${config.comercio ? `<script src="${base}${versionado('assets/js/comercio.js')}" defer></script>` : ''}
 ${['inicio', 'ciudad', 'promociones', 'promocion', 'combo'].includes(pagina) ? `<script src="${base}${versionado('assets/js/promos.js')}" defer></script>` : ''}
+${pagina === 'techos' ? `<script src="${base}${versionado('assets/js/techos.js')}" defer></script>` : ''}
 ${pagina === 'pavic-recursos' ? `<script src="${base}${versionado('assets/js/pavic.js')}" defer></script>` : ''}
 ${pagina === 'proyecto' ? `<script src="${base}${versionado('assets/js/proyectos.js')}" defer></script>` : ''}
 ${config.comercio && pagina === 'admin' ? `<script src="${base}${versionado('assets/js/admin.js')}" defer></script>` : ''}
@@ -409,7 +410,7 @@ write('catalogo.html', layout({
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
   <span class="eyebrow">Catálogo</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Productos</h1>
-  <p class="lead">Cada producto tiene sus dimensiones, peso y rendimiento. Marca «Comparar» en hasta 4 productos del mismo catálogo para verlos lado a lado. Los precios los confirma la agencia de tu ciudad por WhatsApp.</p>
+  <p class="lead">Cada producto tiene sus dimensiones, peso y rendimiento. Marca «Comparar» en hasta 4 productos del mismo catálogo para verlos lado a lado. ¿Buscas techo? <a href="techos.html">Calcula tus tejas por pendiente</a>. Los precios los confirma la agencia de tu ciudad por WhatsApp.</p>
 </div></section>
 <section class="wrap" style="padding-bottom:72px">
   <div class="filters">
@@ -460,7 +461,7 @@ for (const p of productos) {
     ${config.comercio ? `<div class="buy-box"><p class="precio-big" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</p>
       <div class="buy-row"><label>Cantidad (piezas)<input id="qty" type="number" min="1" step="1" value="100"></label><button class="btn btn--red" type="button" data-add data-qty-from="#qty" data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir al presupuesto</button></div>
       <p class="muted" style="font-size:15px;margin-top:10px">Los precios se ven con una cuenta verificada. Para obras grandes, cotiza por WhatsApp.</p></div>` : `<p class="price-note"><strong>Precio:</strong> lo confirma la agencia de tu ciudad según tu obra y la cantidad. Escríbenos y te cotizamos.</p>`}
-    <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a><a class="btn" href="${base}donde-estamos.html">Dónde comprar</a>${botonComparar(p)}</div>
+    <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a><a class="btn" href="${base}donde-estamos.html">Dónde comprar</a>${p.cat === 'techos' ? `<a class="btn" href="${base}techos.html">Calcula tus tejas</a>` : ''}${botonComparar(p)}</div>
   </div>
 </div></section>
 ${p.variantes.length ? `<section class="section section--grey"><div class="wrap"><div class="section-head"><h2>Calcula cuántas piezas necesitas</h2></div>
@@ -504,6 +505,51 @@ write('comparar.html', layout({
   <div id="cmpApp"><p class="muted">Cargando la comparación…</p></div>
   <noscript><p>Para comparar productos activa JavaScript, o revisa cada ficha en el <a href="catalogo.html">catálogo</a>.</p></noscript>
 </section><script type="application/json" id="datos-comparar">${JSON.stringify(datosComparar).replace(/</g, '\\u003c')}</script>`
+}));
+
+/* ============================ TECHOS: calculadora de tejas por pendiente ============================ */
+/* Solo se usan datos de las fichas (rendimiento y peso). La pendiente mínima de cada modelo no está en las fichas: queda por confirmar. */
+const tejas = productos.filter((p) => p.cat === 'techos');
+const tejasCalc = tejas.filter((p) => !p.sinFicha && p.variantes.some((v) => v.unidad === 'm2')).map((p) => ({ ciudad: p.ciudad, slug: p.slug, nombre: p.nombre, codigo: p.codigo || '', rend: p.variantes.find((v) => v.unidad === 'm2').rend, peso: p.peso || 0 }));
+write('techos.html', layout({
+  file: 'techos.html', pagina: 'techos', wa: 'Hola, quiero cotizar tejas para un techo en {ciudad}.',
+  title: 'Techos y tejas: calcula cuántas necesitas | INCERPAZ',
+  desc: 'Calcula cuántas tejas cerámicas necesitas según el área en planta y la pendiente del techo. Catálogo de tejas de INCERPAZ.',
+  jsonld: migas([['Inicio', ''], ['Productos', 'catalogo.html'], ['Techos y tejas', 'techos.html']]),
+  body: `
+<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="catalogo.html">Productos</a> › Techos y tejas</nav></div>
+<section class="section" style="padding-top:12px;padding-bottom:24px"><div class="wrap">
+  <span class="eyebrow">Techos y tejados</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Techos y tejas</h1>
+  <p class="lead">Tejas cerámicas para techos nuevos y para renovar. Calcula cuántas necesitas según el área del techo en planta y su pendiente.</p>
+  <div class="btn-row" style="margin-top:20px"><a class="btn btn--wa" data-wa="Hola, quiero cotizar tejas para un techo en {ciudad}." href="${waHref(ciudadDefecto.whatsapp, 'Hola, quiero cotizar tejas para un techo en Cochabamba.')}" rel="noopener">Cotizar por WhatsApp</a><a class="btn" href="catalogo.html?ciudad=santa-cruz&amp;cat=techos">Ver las tejas en el catálogo</a></div>
+</div></section>
+
+<section class="section section--grey"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Herramienta</span><h2>Calculadora de tejas</h2><p class="lead">Un techo inclinado es más grande que su proyección en planta. La superficie real es el área en planta × √(1 + pendiente²).</p></div>
+  <div class="calc" data-teja>
+    <div class="fields">
+      <label class="full">Modelo<select id="tj-modelo">${tejasCalc.map((t) => `<option value="${t.slug}">${esc(t.nombre)} (catálogo de ${CIUDAD_CATALOGO[t.ciudad]})</option>`).join('')}</select></label>
+      <label>Área del techo en planta (m²)<input id="tj-area" type="number" inputmode="decimal" min="0" step="any" value="80"></label>
+      <label>Pendiente del techo (%)<input id="tj-pend" type="number" inputmode="decimal" min="0" max="200" step="1" value="35"></label>
+      <label>Tejas por m² de techo<input id="tj-rend" type="number" inputmode="decimal" min="1" step="any" value="${tejasCalc[0] ? tejasCalc[0].rend : 18}"><span class="muted" style="font-weight:400;font-size:14px" id="tj-rend-nota">Dato de la ficha del modelo. Puedes cambiarlo.</span></label>
+      <label>Merma<select id="tj-merma"><option value="0.05">5 %</option><option value="0.08" selected>8 %</option><option value="0.1">10 %</option></select></label>
+      <p class="full muted" style="font-size:15px">La pendiente mínima de cada modelo sale de su ficha técnica y todavía no está publicada: confírmala con tu agencia antes de diseñar el techo. Esta calculadora es una estimación para pedir tu cotización.</p>
+    </div>
+    <div class="calc-out" aria-live="polite">
+      <div><span class="num" id="tj-real">0</span><small>m² de techo real</small></div>
+      <div class="pair"><div><span class="num" style="font-size:36px" id="tj-pzas">0</span><small>tejas</small></div><div><span class="num" style="font-size:36px" id="tj-ton">0</span><small>toneladas aprox.</small></div></div>
+      <p class="calc-note" id="tj-aviso" hidden></p>
+      <a class="btn btn--wa" id="tj-wa" data-wa="Hola, quiero cotizar tejas en {ciudad}." href="${waHref(ciudadDefecto.whatsapp, 'Hola, quiero cotizar tejas en Cochabamba.')}" rel="noopener">Cotizar por WhatsApp</a>
+      ${config.comercio ? '<button class="btn" type="button" id="tj-add">Añadir al presupuesto</button>' : ''}
+    </div>
+  </div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Catálogo</span><h2>Tejas disponibles</h2><p class="lead">Hoy las tejas están en el catálogo de Santa Cruz. Si estás en otra ciudad, la agencia confirma disponibilidad y entrega.</p></div>
+  <div class="grid-products">${tejas.map((p) => productCard(p)).join('')}</div>
+</div></section>
+<script type="application/json" id="datos-tejas">${JSON.stringify({ tejas: tejasCalc, ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })) }).replace(/</g, '\\u003c')}</script>`
 }));
 
 /* ============================ PAVIC ============================ */
@@ -1041,6 +1087,7 @@ const paginasBuscables = [
   ['Catálogo de productos', 'Fichas con medidas, peso y rendimiento', 'catalogo.html', 'productos ladrillos tejas pisos'],
   ['Comparar productos', 'Hasta 4 productos lado a lado', 'comparar.html', 'comparador'],
   ['Promociones', 'Combos, concursos, eventos y cursos de tu ciudad', 'promociones.html', 'promo oferta combo sorteo concurso curso evento'],
+  ['Techos y tejas', 'Calculadora de tejas por pendiente y catálogo de tejas', 'techos.html', 'techo teja tejas pendiente cubierta calculadora'],
   ['Proyectos para construir', 'Construye tú mismo, con lista de materiales', 'proyectos.html', 'diy hazlo tu mismo churrasquero meson pared'],
   ['Guías', 'Cuántos ladrillos, cómo elegir y cómo colocar', 'guias.html', 'aprende consejos instalacion'],
   ['PAVIC', 'Pavimento cerámico para calles, plazas y urbanizaciones', 'pavic.html', 'pavimento adoquin vereda plaza calle'],
@@ -1081,7 +1128,7 @@ write('404.html', layout({
   file: '404.html', title: 'Página no encontrada | INCERPAZ', desc: 'La página que buscas no existe.',
   body: `<section class="section"><div class="wrap"><h1>No encontramos esa página</h1><p class="lead" style="margin-block:16px 28px">Puede que el enlace haya cambiado. Prueba desde el inicio o el catálogo.</p><div class="btn-row"><a class="btn btn--red" href="${sitio.dominio}/">Ir al inicio</a><a class="btn" href="${sitio.dominio}/catalogo.html">Ver productos</a></div></div></section>`
 }));
-const urls = ['', ...sitio.ciudades.map((c) => `${c.slug}.html`), 'privacidad.html', 'promociones.html', ...novedades.map((n) => `promociones/${n.id}.html`), ...combos.map((c) => `combos/${c.catalogo}/${c.id}.html`), 'catalogo.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
+const urls = ['', ...sitio.ciudades.map((c) => `${c.slug}.html`), 'privacidad.html', 'promociones.html', ...novedades.map((n) => `promociones/${n.id}.html`), ...combos.map((c) => `combos/${c.catalogo}/${c.id}.html`), 'catalogo.html', 'techos.html', 'guias.html', 'exportaciones.html', ...guiasData.map((g) => `guias/${g.slug}.html`), 'pavic-recursos.html', 'proyectos.html', ...proyectosData.proyectos.map((x) => `proyectos/${x.slug}.html`), 'pavic.html', 'donde-estamos.html', 'empresa.html', ...productos.map((p) => `productos/${p.ciudad}/${p.slug}.html`)];
 if (config.interno) {
   fs.rmSync(path.join(OUT, 'sitemap.xml'), { force: true });
   fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
