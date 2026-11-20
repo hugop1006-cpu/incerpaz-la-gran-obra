@@ -2,6 +2,20 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-20 · Claude Code
+**Hecho** (wireframes vs. sitio, tanda 1 de 6, con permiso de Hugo)
+- Buscador general: lupa en el encabezado que abre una barra de búsqueda y página `buscar.html` con resultados agrupados (productos del catálogo de la ciudad elegida, proyectos, guías, promociones vigentes y páginas). Busca por nombre, código, línea y categoría; sin resultados ofrece WhatsApp.
+- Presupuesto en el encabezado: ícono con contador rojo (oculto en 0). La barra superior queda con la cuenta (Ingresar / Crear cuenta o Mi cuenta / Salir).
+- Celular: logo, lupa, presupuesto y Menú en una fila; la ciudad se elige dentro del menú abierto.
+- Pruebas nuevas en probar-sitio; `buscar.html` no indexable. 12 de API y 8 de navegador en verde.
+
+**Sigue** (tandas pendientes de los wireframes)
+2. Proyectos en el inicio, filtro por dificultad y «Proyectos donde se usa» en la ficha.
+3. Banda para constructores y campo «Soy» en el formulario corto.
+4. PAVIC: peso y camiones, «Cómo trabajamos un proyecto», pedido de muestras.
+5. Calculadora de tejas por pendiente.
+6. Ordenar el catálogo, «Nuestras marcas» en Empresa y enlace al juego.
+
 ## 2026-11-18 (noche) · Claude Code
 **Hecho** (revisión UX/UI, prioridad 1, con permiso de Hugo)
 - Accesos rápidos: 4 tareas (calcular, catálogo, comparar, tu ciudad) con flecha y líneas que no se cortan; en páginas de ciudad también 4.

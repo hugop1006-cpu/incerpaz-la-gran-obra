@@ -101,7 +101,63 @@
   if (tg && nav) tg.addEventListener('click', function () {
     var open = nav.classList.toggle('open');
     tg.setAttribute('aria-expanded', String(open));
+    /* en el celular la ciudad vive dentro del menú abierto */
+    var hdr = $('.site-header'); if (hdr) hdr.classList.toggle('menu-abierto', open);
   });
+
+  /* ---- buscador general ---- */
+  function normTxt(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+  var bAbrir = $('[data-buscar-abrir]'), bPanel = $('#buscador');
+  if (bAbrir && bPanel) {
+    var cerrarBuscador = function (volver) { bPanel.hidden = true; bAbrir.setAttribute('aria-expanded', 'false'); if (volver) bAbrir.focus(); };
+    bAbrir.addEventListener('click', function (e) {
+      e.preventDefault();
+      var abrir = bPanel.hidden;
+      bPanel.hidden = !abrir; bAbrir.setAttribute('aria-expanded', String(abrir));
+      if (abrir) $('input', bPanel).focus();
+    });
+    bPanel.addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrarBuscador(true); });
+  }
+  var bApp = $('#buscarApp'), bIn = $('#bq');
+  if (bApp && bIn && $('#datos-buscar')) {
+    var IDX = JSON.parse($('#datos-buscar').textContent);
+    var GRUPOS = ['Productos', 'Proyectos', 'Guías', 'Promociones', 'Páginas'];
+    var qIni = /[?&]q=([^&#]*)/.exec(location.search);
+    if (qIni) bIn.value = decodeURIComponent(qIni[1].replace(/\+/g, ' '));
+    var buscar = function () {
+      var q = bIn.value.trim(), palabras = normTxt(q).split(/\s+/).filter(Boolean);
+      if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + (q ? '?q=' + encodeURIComponent(q) : ''));
+      if (!palabras.length) { bApp.innerHTML = '<p class="muted">Escribe el nombre de un producto, un código, un proyecto o un tema.</p>'; return; }
+      var cat = currentCity().slug === 'santa-cruz' ? 'santa-cruz' : 'cochabamba', hoy = hoyLocal(), ciu = currentCity().slug, otros = 0;
+      var res = IDX.map(function (x) {
+        var nom = normTxt(x.n), todo = nom + ' ' + normTxt(x.d) + ' ' + normTxt(x.k);
+        if (!palabras.every(function (w) { return todo.indexOf(w) >= 0; })) return null;
+        if (x.fin && !(x.ini <= hoy && hoy <= x.fin && (!x.ciu.length || x.ciu.indexOf(ciu) >= 0))) return null;
+        if (x.c && x.c !== cat) { otros++; return null; }
+        var puntos = palabras.reduce(function (s, w) { return s + (nom.indexOf(w) === 0 ? 3 : nom.indexOf(w) >= 0 ? 2 : 0); }, 0);
+        return { x: x, p: puntos };
+      }).filter(Boolean);
+      if (!res.length) {
+        bApp.innerHTML = '<div class="empty"><b>No encontramos «' + escH(q) + '».</b><p class="muted" style="margin-top:6px">Prueba otra palabra o escríbenos por WhatsApp con el nombre o una foto del producto y te ayudamos.</p>' +
+          (otros ? '<p style="margin-top:8px">Hay ' + otros + ' resultado' + (otros === 1 ? '' : 's') + ' en el catálogo de ' + (cat === 'santa-cruz' ? 'Cochabamba' : 'Santa Cruz') + '. Cambia de ciudad arriba para verlos.</p>' : '') +
+          '<div class="btn-row" style="margin-top:14px"><a class="btn btn--wa" data-wa="' + escH('Hola, busco «' + q + '» en {ciudad}. ¿Me ayudan?') + '" href="#">Preguntar por WhatsApp</a><a class="btn" href="catalogo.html">Ver el catálogo</a></div></div>';
+        updateWa(); return;
+      }
+      var html = '<p class="muted" style="margin-bottom:18px">' + res.length + ' resultado' + (res.length === 1 ? '' : 's') + ' para «' + escH(q) + '» · productos del catálogo de ' + (cat === 'santa-cruz' ? 'Santa Cruz' : 'Cochabamba') + '</p>';
+      GRUPOS.forEach(function (g) {
+        var r = res.filter(function (y) { return y.x.t === g; }).sort(function (a, b) { return b.p - a.p; });
+        if (!r.length) return;
+        html += '<section class="bres"><h2>' + g + ' <span class="muted">(' + r.length + ')</span></h2><ul>' + r.map(function (y) {
+          return '<li><a href="' + escH(y.x.u) + '"><b>' + escH(y.x.n) + '</b>' + (y.x.d ? '<span>' + escH(y.x.d) + '</span>' : '') + '</a></li>';
+        }).join('') + '</ul></section>';
+      });
+      bApp.innerHTML = html;
+    };
+    var bT; bIn.addEventListener('input', function () { clearTimeout(bT); bT = setTimeout(buscar, 150); });
+    $('.buscar-pag').addEventListener('submit', function (e) { e.preventDefault(); buscar(); });
+    document.addEventListener('incerpaz:city', buscar);
+    buscar();
+  }
 
   /* ---- calculadoras ---- */
   $$('[data-calc]').forEach(function (box) {

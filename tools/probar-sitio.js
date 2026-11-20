@@ -95,9 +95,28 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok(await ux.isVisible('.barra-compra') && !(await ux.isVisible('.wa-float')), 'la ficha en celular tiene la barra fija de cotizar en lugar del botón flotante');
   await ux.goto(BASE + 'proyectos/churrasquero.html');
   ok(await ux.isVisible('.wa-float'), 'el botón de WhatsApp se ve mientras no se escribe');
-  await ux.locator('input').first().focus();
+  await ux.locator('main input').first().focus();
   ok(!(await ux.isVisible('.wa-float')), 'el botón de WhatsApp se aparta mientras se escribe en un campo');
   await ux.context().close();
+
+  /* buscador general */
+  const bs = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); bs.on('pageerror', (e) => errores.push(e.message));
+  await bs.goto(BASE + 'index.html');
+  await bs.click('[data-buscar-abrir]');
+  ok(await bs.isVisible('#buscadorQ') && (await bs.evaluate(() => document.activeElement.id)) === 'buscadorQ', 'la lupa abre el buscador y deja el cursor en el campo');
+  await bs.fill('#buscadorQ', 'enchape'); await bs.press('#buscadorQ', 'Enter');
+  await bs.waitForSelector('.bres');
+  const grupos = await bs.locator('.bres h2').allTextContents();
+  ok(['Productos', 'Proyectos', 'Guías'].every((g) => grupos.some((x) => x.startsWith(g))), 'buscar «enchape» encuentra productos, proyectos y guías');
+  await bs.fill('#bq', '18H'); await bs.waitForTimeout(300);
+  ok(/18 huecos/i.test(await bs.textContent('.bres')), 'se busca también por código');
+  await bs.fill('#bq', 'palabraquenoexiste'); await bs.waitForTimeout(300);
+  ok(/No encontramos/.test(await bs.textContent('#buscarApp')) && /wa\.me/.test(await bs.getAttribute('#buscarApp .btn--wa', 'href')), 'sin resultados ofrece WhatsApp');
+  await bs.goto(BASE + 'buscar.html?q=teja');
+  ok((await bs.locator('.bres h2', { hasText: 'Productos' }).count()) === 0, 'en Cochabamba no muestra tejas: no están en su catálogo');
+  await bs.selectOption('#citySel', 'santa-cruz'); await bs.waitForTimeout(300);
+  ok(/teja/i.test(await bs.textContent('.bres')), 'al cambiar a Santa Cruz aparecen sus tejas');
+  await bs.context().close();
 
   /* el catálogo muestra en pantalla exactamente lo que cuenta */
   await pg.setViewportSize({ width: 1280, height: 900 });

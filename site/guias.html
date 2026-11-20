@@ -14,7 +14,7 @@
 <link rel="icon" href="assets/img/logo-icono.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/css/site.css?v=88d6c441">
+<link rel="stylesheet" href="assets/css/site.css?v=928576d3">
 
 </head>
 <body data-base="" data-pagina="guias">
@@ -22,14 +22,20 @@
 
 <div class="topbar"><div class="wrap">
   <span>Servicio al cliente <a href="tel:800108810"><strong>800-10-8810</strong></a></span>
-  <span><span data-acct><a href="presupuesto.html">Presupuesto (<span data-bcount>0</span>)</a> · <a href="ingresar.html">Ingresar</a></span> · <a href="exportaciones.html">Exportaciones</a> · <a href="https://prospeccion.cbba.tienda.incerpaz.com/login.php" rel="noopener">Promotores</a></span>
+  <span><span data-acct><a href="ingresar.html">Ingresar</a> · <a href="registro.html">Crear cuenta</a> · </span><a href="exportaciones.html">Exportaciones</a> · <a href="https://prospeccion.cbba.tienda.incerpaz.com/login.php" rel="noopener">Promotores</a></span>
 </div></div>
 <header class="site-header"><div class="wrap">
   <a class="brand" href="./" aria-label="INCERPAZ, inicio"><img src="assets/img/logo-header.png" alt="INCERPAZ" width="235" height="38"></a>
   <button class="nav-toggle" aria-expanded="false" aria-controls="nav" type="button">Menú</button>
   <nav class="nav" id="nav" aria-label="Principal"><a href="catalogo.html">Productos</a><a href="promociones.html">Promociones</a><a href="proyectos.html">Proyectos</a><a href="guias.html" aria-current="page">Guías</a><a href="pavic.html">PAVIC</a><a href="donde-estamos.html">Dónde estamos</a><a href="empresa.html">Empresa</a></nav>
   <div class="city"><label for="citySel" style="flex-direction:row;align-items:center;font-weight:500;white-space:nowrap">Tu ciudad</label><select id="citySel" aria-label="Tu ciudad"><option>Cochabamba</option></select></div>
-</div></header>
+  <a class="hdr-ico" href="buscar.html" data-buscar-abrir aria-controls="buscador" aria-expanded="false" aria-label="Buscar en el sitio" title="Buscar"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg></a>
+  <a class="hdr-ico" href="presupuesto.html" aria-label="Mi presupuesto" title="Mi presupuesto"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 11h7M9 15h7M9 7h4" stroke="currentColor" stroke-width="2"/></svg><span class="hdr-badge" data-bcount hidden>0</span></a>
+</div>
+<div class="buscador" id="buscador" hidden><div class="wrap"><form action="buscar.html" method="get" role="search" aria-label="Buscar en el sitio">
+  <label class="sr" for="buscadorQ">Buscar en el sitio</label><input id="buscadorQ" type="search" name="q" placeholder="Busca productos, proyectos, guías…" autocomplete="off" maxlength="80">
+  <button class="btn btn--red" type="submit">Buscar</button>
+</form></div></div></header>
 <main id="contenido">
 <section class="section"><div class="wrap">
   <div class="section-head"><span class="eyebrow">Aprende antes de comprar</span><h1 style="font-size:clamp(36px,5vw,60px)">Guías para construir con cerámica</h1><p class="lead">Respuestas claras a las preguntas más comunes de quien construye, remodela o proyecta.</p></div>
@@ -66,8 +72,8 @@
   <a class="city-dlg__otra" href="donde-estamos.html#otra-ciudad">Estoy en otra ciudad</a>
 </dialog>
 <script src="assets/js/config.js?v=a36379d7" defer></script>
-<script src="assets/js/site.js?v=4cbbb7d7" defer></script>
-<script src="assets/js/comercio.js?v=7ef4266e" defer></script>
+<script src="assets/js/site.js?v=b131d088" defer></script>
+<script src="assets/js/comercio.js?v=aa190991" defer></script>
 
 
 

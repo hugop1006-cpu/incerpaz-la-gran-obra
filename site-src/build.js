@@ -140,7 +140,7 @@ function layout({ file, base = '', title: titulo, desc: descripcion, body, og = 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-${config.interno || ['ingresar','registro','presupuesto','cuenta','equipo','admin','comparar'].includes(pagina) ? '<meta name="robots" content="noindex, nofollow">' : ''}
+${config.interno || ['ingresar','registro','presupuesto','cuenta','equipo','admin','comparar','buscar'].includes(pagina) ? '<meta name="robots" content="noindex, nofollow">' : ''}
 <link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:locale" content="es_BO"><meta property="og:site_name" content="INCERPAZ">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${sitio.dominio}/${og}">
@@ -157,14 +157,20 @@ ${jsonld}
 ${DEMO ? '<div style="background:#b5121b;color:#fff;font:600 14px/1.4 Barlow,sans-serif;padding:8px 16px;text-align:center">Demostración del rediseño, no es el sitio oficial. Cuentas, precios y pedidos no están activos y los formularios no envían nada. Los botones de WhatsApp sí abren el WhatsApp real de la agencia.</div>' : ''}
 <div class="topbar"><div class="wrap">
   <span>Servicio al cliente <a href="tel:${sitio.servicio_cliente.tel}"><strong>${sitio.servicio_cliente.texto}</strong></a></span>
-  <span>${config.comercio ? `<span data-acct><a href="${base}presupuesto.html">Presupuesto (<span data-bcount>0</span>)</a> · <a href="${base}ingresar.html">Ingresar</a></span> · ` : ''}<a href="${base}exportaciones.html">Exportaciones</a> · <a href="${sitio.enlaces_externos.promotores}" rel="noopener">Promotores</a></span>
+  <span>${config.comercio ? `<span data-acct><a href="${base}ingresar.html">Ingresar</a> · <a href="${base}registro.html">Crear cuenta</a> · </span>` : ''}<a href="${base}exportaciones.html">Exportaciones</a> · <a href="${sitio.enlaces_externos.promotores}" rel="noopener">Promotores</a></span>
 </div></div>
 <header class="site-header"><div class="wrap">
   <a class="brand" href="${base || './'}" aria-label="INCERPAZ, inicio"><img src="${base}assets/img/logo-header.png" alt="INCERPAZ" width="235" height="38"></a>
   <button class="nav-toggle" aria-expanded="false" aria-controls="nav" type="button">Menú</button>
   <nav class="nav" id="nav" aria-label="Principal">${nav}</nav>
   <div class="city"><label for="citySel" style="flex-direction:row;align-items:center;font-weight:500;white-space:nowrap">Tu ciudad</label><select id="citySel" aria-label="Tu ciudad"><option>${ciudadDefecto.nombre}</option></select></div>
-</div></header>
+  <a class="hdr-ico" href="${base}buscar.html" data-buscar-abrir aria-controls="buscador" aria-expanded="false" aria-label="Buscar en el sitio" title="Buscar"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg></a>
+  ${config.comercio ? `<a class="hdr-ico" href="${base}presupuesto.html" aria-label="Mi presupuesto" title="Mi presupuesto"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 11h7M9 15h7M9 7h4" stroke="currentColor" stroke-width="2"/></svg><span class="hdr-badge" data-bcount hidden>0</span></a>` : ''}
+</div>
+<div class="buscador" id="buscador" hidden><div class="wrap"><form action="${base}buscar.html" method="get" role="search" aria-label="Buscar en el sitio">
+  <label class="sr" for="buscadorQ">Buscar en el sitio</label><input id="buscadorQ" type="search" name="q" placeholder="Busca productos, proyectos, guías…" autocomplete="off" maxlength="80">
+  <button class="btn btn--red" type="submit">Buscar</button>
+</form></div></div></header>
 <main id="contenido">
 ${body}
 </main>
@@ -985,6 +991,48 @@ for (const c of combos) {
 </div></section>`
   }));
 }
+
+/* ============================ BUSCADOR GENERAL ============================ */
+/* Índice para buscar en el navegador: productos (se muestran los del catálogo de la ciudad elegida), proyectos, guías,
+   promociones vigentes y páginas. Sin servidor: funciona igual en el sitio estático. */
+const paginasBuscables = [
+  ['Catálogo de productos', 'Fichas con medidas, peso y rendimiento', 'catalogo.html', 'productos ladrillos tejas pisos'],
+  ['Comparar productos', 'Hasta 4 productos lado a lado', 'comparar.html', 'comparador'],
+  ['Promociones', 'Combos, concursos, eventos y cursos de tu ciudad', 'promociones.html', 'promo oferta combo sorteo concurso curso evento'],
+  ['Proyectos para construir', 'Construye tú mismo, con lista de materiales', 'proyectos.html', 'diy hazlo tu mismo churrasquero meson pared'],
+  ['Guías', 'Cuántos ladrillos, cómo elegir y cómo colocar', 'guias.html', 'aprende consejos instalacion'],
+  ['PAVIC', 'Pavimento cerámico para calles, plazas y urbanizaciones', 'pavic.html', 'pavimento adoquin vereda plaza calle'],
+  ['Recursos PAVIC para proyectistas', 'Calculadora de obra, texto para pliegos y DXF', 'pavic-recursos.html', 'proyectista calculista pliego licitacion dxf cad'],
+  ['Dónde estamos', 'Agencias y fábricas por ciudad, con WhatsApp', 'donde-estamos.html', 'agencias direccion telefono whatsapp fabrica como llegar'],
+  ['Empresa', 'Quiénes somos, misión, valores y contacto', 'empresa.html', 'nosotros mision vision contacto reclamo trabajo'],
+  ['Exportaciones', 'Consulta para importadores, en español e inglés', 'exportaciones.html', 'export importar internacional'],
+  ['Privacidad y cookies', 'Cómo usamos tus datos', 'privacidad.html', 'datos personales'],
+  ...sitio.ciudades.map((c) => [`INCERPAZ en ${c.nombre}`, `Agencias, promociones y WhatsApp de ${c.nombre}`, `${c.slug}.html`, `${c.nombre} agencia`]),
+  ...(config.comercio ? [['Ingresar', 'Entra a tu cuenta para ver precios', 'ingresar.html', 'login cuenta precios sesion'], ['Crear cuenta', 'Regístrate para ver precios y hacer pedidos', 'registro.html', 'registro cuenta constructor ferreteria'], ['Mi presupuesto', 'Tu lista de productos para cotizar o pedir', 'presupuesto.html', 'carrito pedido cotizar']] : [])
+];
+const indiceBusqueda = [
+  ...productos.map((p) => ({ t: 'Productos', n: p.nombre, d: [CAT_NOMBRE[p.cat], medidaTexto(p)].filter(Boolean).join(' · '), u: purl(p), c: p.ciudad, k: [p.codigo, p.linea, ...p.todas.map((x) => CAT_NOMBRE[x])].filter(Boolean).join(' ') })),
+  ...proyectosData.proyectos.map((pr) => ({ t: 'Proyectos', n: pr.titulo, d: pr.resumen, u: `proyectos/${pr.slug}.html`, k: 'proyecto construir' })),
+  ...guiasData.map((g) => ({ t: 'Guías', n: g.titulo, d: g.resumen, u: `guias/${g.slug}.html`, k: 'guia' })),
+  ...promosPublicas().map((x) => ({ t: 'Promociones', n: x.titulo, d: x.resumen, u: x.url, k: TIPO_NOMBRE[x.tipo], ini: x.inicio, fin: x.fin, ciu: x.ciudades })),
+  ...paginasBuscables.map(([n, d, u, k]) => ({ t: 'Páginas', n, d, u, k }))
+];
+write('buscar.html', layout({
+  file: 'buscar.html', pagina: 'buscar',
+  title: 'Buscar | INCERPAZ',
+  desc: 'Busca productos, proyectos, guías, promociones y páginas de INCERPAZ.',
+  body: `
+<section class="section" style="padding-bottom:16px"><div class="wrap">
+  <span class="eyebrow">Buscar</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 18px">¿Qué buscas?</h1>
+  <form class="buscar-pag" action="buscar.html" method="get" role="search" aria-label="Buscar en el sitio">
+    <label class="sr" for="bq">Buscar en el sitio</label><input id="bq" type="search" name="q" placeholder="Ej. 18 huecos, enchape, churrasquero, PAVIC" autocomplete="off" maxlength="80">
+    <button class="btn btn--red" type="submit">Buscar</button>
+  </form>
+</div></section>
+<section class="wrap" style="padding-bottom:80px"><div id="buscarApp" aria-live="polite"></div>
+  <noscript><p>Para buscar activa JavaScript, o recorre el <a href="catalogo.html">catálogo</a>.</p></noscript>
+</section><script type="application/json" id="datos-buscar">${JSON.stringify(indiceBusqueda).replace(/</g, '\\u003c')}</script>`
+}));
 
 /* ============================ 404, sitemap, robots ============================ */
 write('404.html', layout({

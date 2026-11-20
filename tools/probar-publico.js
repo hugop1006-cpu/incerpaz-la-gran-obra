@@ -11,7 +11,7 @@ const fs = require('node:fs');
 
 const RAIZ = path.join(__dirname, '..'), SITIO = path.join(RAIZ, 'site');
 const DOMINIO = JSON.parse(fs.readFileSync(path.join(RAIZ, 'site-src/data/sitio.json'), 'utf8')).dominio;
-const PRIVADAS = new Set(['ingresar.html', 'registro.html', 'presupuesto.html', 'mi-cuenta.html', 'equipo.html', 'admin.html', '404.html', 'comparar.html']); /* comparar: herramienta sin contenido propio, fuera de buscadores */
+const PRIVADAS = new Set(['ingresar.html', 'registro.html', 'presupuesto.html', 'mi-cuenta.html', 'equipo.html', 'admin.html', '404.html', 'comparar.html', 'buscar.html']); /* comparar: herramienta sin contenido propio, fuera de buscadores */
 let fallos = 0;
 const ok = (c, m, detalle) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m + (!c && detalle ? '\n       ' + [].concat(detalle).slice(0, 6).join('\n       ') : '')); if (!c) fallos++; };
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -58,7 +58,7 @@ async function levantar(puerto, extra) {
     }
     ok(publicas.length >= 60, `${publicas.length} páginas públicas revisadas`);
     ok(!p.noindex.length, 'ninguna página pública lleva noindex', p.noindex);
-    ok(!p.privNoidx.length, 'ingresar, registro, presupuesto, cuenta, equipo, admin y comparar llevan noindex', p.privNoidx);
+    ok(!p.privNoidx.length, 'ingresar, registro, presupuesto, cuenta, equipo, admin, comparar y buscar llevan noindex', p.privNoidx);
     ok(!p.canon.length, 'cada página declara su canonical con el dominio público', p.canon);
     ok([...p.titulos.values()].every((v) => v.length === 1), 'no hay títulos repetidos', [...p.titulos].filter(([, v]) => v.length > 1).map(([t, v]) => `${t}: ${v.join(', ')}`));
     ok(!p.titulosLargos.length, 'los títulos miden entre 15 y 62 caracteres', p.titulosLargos);

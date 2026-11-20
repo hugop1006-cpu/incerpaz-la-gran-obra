@@ -35,7 +35,7 @@
   /* ---------- presupuesto local ---------- */
   function leerCart() { try { var c = JSON.parse(localStorage.getItem(CLAVE) || 'null'); if (c && Array.isArray(c.items)) return c; } catch (e) { /* vacío */ } return { items: [], obra: '', notas: '', id: null }; }
   function guardarCart(c) { try { localStorage.setItem(CLAVE, JSON.stringify(c)); } catch (e) { /* sin almacenamiento */ } contador(); }
-  function contador() { var n = leerCart().items.length; $$('[data-bcount]').forEach(function (e) { e.textContent = n; }); }
+  function contador() { var n = leerCart().items.length; $$('[data-bcount]').forEach(function (e) { e.textContent = n; if (e.classList.contains('hdr-badge')) e.hidden = !n; }); }
   function añadir(it, cantidad) {
     var c = leerCart(), ya = c.items.filter(function (x) { return x.ciudad === it.ciudad && x.slug === it.slug; })[0];
     if (ya) ya.cantidad += cantidad; else c.items.push({ ciudad: it.ciudad, slug: it.slug, nombre: it.nombre, codigo: it.codigo || '', cantidad: cantidad });
@@ -77,7 +77,8 @@
     var cuenta = apiCaida ? '' : (u
       ? '<a href="' + BASE + (u.rol === 'cliente' ? 'mi-cuenta.html' : 'equipo.html') + '">' + (u.rol === 'cliente' ? 'Mi cuenta' : 'Panel') + ' (' + nombre + ')</a> · <a href="#" data-salir>Salir</a>'
       : '<a href="' + BASE + 'ingresar.html">Ingresar</a> · <a href="' + BASE + 'registro.html">Crear cuenta</a>');
-    box.innerHTML = '<a href="' + BASE + 'presupuesto.html">Presupuesto (<span data-bcount>0</span>)</a>' + (cuenta ? ' · ' + cuenta : '');
+    /* el presupuesto vive en el encabezado (ícono con contador); aquí queda solo la cuenta */
+    box.innerHTML = cuenta ? cuenta + ' · ' : '';
     contador();
     var salir = $('[data-salir]', box);
     if (salir) salir.addEventListener('click', function (e) { e.preventDefault(); api('POST', '/api/logout', {}).finally(function () { location.href = BASE + 'index.html'; }); });
