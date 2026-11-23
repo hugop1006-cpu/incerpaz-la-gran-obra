@@ -34,6 +34,7 @@ El catálogo que se ve depende de la ciudad elegida. Oruro y Sucre no tienen tie
 - **Bloque cerámico 9 cm:** su foto no carga en el sitio actual (nombre de archivo con tilde). Muestra un marcador.
 - Los productos de la tienda de Oruro y de Tarija no se pudieron revisar (no abrían).
 - Faltan fichas técnicas en PDF y manuales de instalación.
+- Indicar qué productos son nuevos y hasta qué fecha (campo «nuevo hasta» del panel)
 - Los nombres de producto se normalizaron (de MAYÚSCULAS a minúsculas con tildes). La ortografía de nombres, descripciones, acabados y colores se corrige al generar el sitio (`ORTOGRAFIA` y `concordancia` en `build.js`); los datos originales no se tocaron. Queda por revisar a mano el estilo de algunas descripciones (por ejemplo «liso/rayado» frente a «cerámica», o «presenta 18 orificios») y que los técnicos confirmen los nombres comerciales.
 
 ## Para conectar después
