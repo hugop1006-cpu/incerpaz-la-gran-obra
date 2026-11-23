@@ -2,6 +2,12 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-23 (noche) · Claude Code
+**Hecho**
+- Comparador: botón «← Volver al catálogo» arriba de la página. Si se llegó desde el catálogo regresa a él tal cual (con ciudad y filtro); si se abrió directo, lleva al catálogo de los productos elegidos. También se cambió «Precio con sesión» por «Ingresa para ver precios» en la fila de precio de la tabla.
+- Pruebas: probar-sitio 92 (3 nuevas). Falta aplicar el mismo botón a otras páginas de herramienta si Hugo lo pide (techos, buscar).
+- La demo privada en Claude no incluye este cambio hasta republicarla.
+
 ## 2026-11-23 (tarde) · Claude Code
 **Hecho** (revisión UX, prioridad 2, aprobada por Hugo)
 - Nombres consistentes: el menú, los títulos y el buscador dicen «Productos» y «Dónde comprar» (antes «Catálogo» y «Dónde estamos»). Las direcciones (`catalogo.html`, `donde-estamos.html`) no cambian.

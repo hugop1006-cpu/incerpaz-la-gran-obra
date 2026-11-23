@@ -516,6 +516,7 @@ write('comparar.html', layout({
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
   <nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="catalogo.html">Productos</a> › Comparar</nav>
+  <a class="volver" href="catalogo.html" data-cmp-volver>← Volver al catálogo</a>
   <span class="eyebrow">Productos</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Comparar productos</h1>
   <p class="lead">Hasta 4 productos del mismo catálogo, lado a lado. Las filas resaltadas son las que cambian entre ellos.</p>
 </div></section>
