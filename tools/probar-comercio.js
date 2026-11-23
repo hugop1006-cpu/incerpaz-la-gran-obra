@@ -99,8 +99,8 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await cli.goto(BASE + 'index.html'); await cli.waitForSelector('[data-salir]');
     ok((await cli.getAttribute('[data-cuenta]', 'href')) === 'mi-cuenta.html' && (await cli.locator('[data-cuenta] .hdr-dot').count()) === 1, 'con sesión el ícono de cuenta lleva a Mi cuenta y muestra el punto verde');
     ok(!(await cli.isVisible('#constructores')), 'con sesión iniciada la banda para constructores se oculta');
-    /* se espera la respuesta de cerrar sesión: la página ya está en index.html y la URL no cambia */
-    await Promise.all([cli.waitForResponse((r) => /\/api\/logout/.test(r.url())), cli.click('[data-salir]')]);
+    /* la página ya está en index.html y la URL no cambia: se espera a que cierre sesión y recargue */
+    await Promise.all([cli.waitForEvent('load'), cli.click('[data-salir]')]);
     await cli.goto(BASE + 'mi-cuenta.html'); await cli.waitForURL('**/ingresar.html**');
     ok(true, 'al salir, Mi cuenta pide ingresar de nuevo');
     ok(errores.length === 0, 'sin errores de JavaScript' + (errores.length ? ': ' + errores[0] : ''));
