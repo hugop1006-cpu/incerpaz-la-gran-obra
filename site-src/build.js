@@ -115,7 +115,7 @@ const NAV = [
   ['proyectos.html', 'Proyectos'],
   ['guias.html', 'Guías'],
   ['pavic.html', 'PAVIC'],
-  ['donde-estamos.html', 'Dónde estamos'],
+  ['donde-estamos.html', 'Dónde comprar'],
   ['empresa.html', 'Empresa']
 ];
 const ciudadDefecto = sitio.ciudades[0];
@@ -165,7 +165,7 @@ ${DEMO ? '<div style="background:#b5121b;color:#fff;font:600 14px/1.4 Barlow,san
   <nav class="nav" id="nav" aria-label="Principal">${nav}</nav>
   <div class="city"><label for="citySel" style="flex-direction:row;align-items:center;font-weight:500;white-space:nowrap">Tu ciudad</label><select id="citySel" aria-label="Tu ciudad"><option>${ciudadDefecto.nombre}</option></select></div>
   <a class="hdr-ico" href="${base}buscar.html" data-buscar-abrir aria-controls="buscador" aria-expanded="false" aria-label="Buscar en el sitio" title="Buscar"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg></a>
-  ${config.comercio ? `<a class="hdr-ico" href="${base}presupuesto.html" aria-label="Mi presupuesto" title="Mi presupuesto"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 11h7M9 15h7M9 7h4" stroke="currentColor" stroke-width="2"/></svg><span class="hdr-badge" data-bcount hidden>0</span></a>` : ''}
+  ${config.comercio ? `<a class="hdr-ico" href="${base}presupuesto.html" aria-label="Mi presupuesto" title="Mi presupuesto"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 11h7M9 15h7M9 7h4" stroke="currentColor" stroke-width="2"/></svg><span class="hdr-badge" data-bcount hidden>0</span></a><a class="hdr-ico hdr-cuenta" href="${base}ingresar.html" data-cuenta aria-label="Ingresar a tu cuenta" title="Ingresar a tu cuenta"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>` : ''}
 </div>
 <div class="buscador" id="buscador" hidden><div class="wrap"><form action="${base}buscar.html" method="get" role="search" aria-label="Buscar en el sitio">
   <label class="sr" for="buscadorQ">Buscar en el sitio</label><input id="buscadorQ" type="search" name="q" placeholder="Busca productos, proyectos, guías…" autocomplete="off" maxlength="80">
@@ -247,7 +247,7 @@ function productCard(p, base = '') {
   <a class="pcard-link" href="${purl(p, base)}">
   <div class="img">${im ? `<img src="${base}${im}" alt="${esc(p.nombre)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
   <div class="body"><div class="tags">${tagNuevo(p)}<span class="tag">${esc(CAT_NOMBRE[p.cat] || '')}</span></div><h3>${esc(p.nombre)}</h3><span class="meta">${esc(medidaTexto(p))}</span></div></a>
-  ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir</button></div>` : ''}</article>`;
+  ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}"><a href="${base}ingresar.html">Ingresa para ver precios</a></span><button class="btn btn--sm" type="button" data-add data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir</button></div>` : ''}</article>`;
 }
 
 /* ---- promociones: tarjetas y datos públicos ---- */
@@ -268,7 +268,7 @@ function comboCard(c, base = '') {
   <a class="pcard-link" href="${comboUrl(c, base)}">
   <div class="img">${im ? `<img src="${base}${im}" alt="${esc(c.titulo)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
   <div class="body"><span class="tag tag--combo">Combo</span><h3>${esc(c.titulo)}</h3><span class="meta">${c.componentes.length} componentes · hasta el ${fechaCorta(c.fin)}</span></div></a>
-  ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${c.catalogo}" data-slug="combo-${c.id}">Precio con sesión</span><button class="btn btn--sm" type="button" data-add data-ciudad="${c.catalogo}" data-slug="combo-${c.id}" data-nombre="${esc(c.titulo)}" data-codigo="COMBO">Añadir</button></div>` : ''}
+  ${config.comercio ? `<div class="pcard-buy"><span class="precio" data-precio data-ciudad="${c.catalogo}" data-slug="combo-${c.id}"><a href="${base}ingresar.html">Ingresa para ver precios</a></span><button class="btn btn--sm" type="button" data-add data-ciudad="${c.catalogo}" data-slug="combo-${c.id}" data-nombre="${esc(c.titulo)}" data-codigo="COMBO">Añadir</button></div>` : ''}
 </article>`;
 }
 function calcOptions(list) {
@@ -317,6 +317,19 @@ fs.rmSync(path.join(OUT, 'combos'), { recursive: true, force: true });
 /* ============================ HOME ============================ */
 const mosaico = ['18-h', 'brick-enchape-corto', '9-huecos-economico-rayado', 'brick-estandar', 'pavic-peatonal', 'biscocho']
   .map((s) => `assets/img/productos/${s}-2.jpg`);
+/* Señales de confianza: solo datos que ya están en el sitio (agencias, fábricas, ciudades); no se inventan cifras. */
+function franjaConfianza() {
+  const todas = Object.values(sitio.agencias).flat();
+  const nAg = todas.filter((a) => a.tipo === 'agencia').length, nFab = todas.filter((a) => a.tipo === 'fabrica').length;
+  const items = [
+    [`${sitio.ciudades.length} ciudades`, 'Cochabamba, Santa Cruz, Oruro y Sucre'],
+    [`${nAg} agencias y ${nFab} ${nFab === 1 ? 'fábrica' : 'fábricas'}`, 'Atención directa, cerca de tu obra'],
+    ['Fabricado en Bolivia', 'Cerámica INCERPAZ y pavimento PAVIC'],
+    [config.comercio ? 'Precios con cuenta verificada' : 'Cotiza por WhatsApp', config.comercio ? 'Un ejecutivo de tu ciudad la verifica' : 'La agencia de tu ciudad te responde']
+  ];
+  return `<section class="wrap" aria-label="Por qué INCERPAZ"><ul class="confianza">${items.map(([t, d]) => `<li><b>${esc(t)}</b><span>${esc(d)}</span></li>`).join('')}</ul></section>`;
+}
+
 write('index.html', layout({
   file: 'index.html', pagina: 'inicio',
   title: 'INCERPAZ | Cerámica para construir tu hogar',
@@ -335,10 +348,12 @@ write('index.html', layout({
 
 <section class="wrap" style="padding-bottom:8px"><nav class="quick" aria-label="Accesos rápidos">
   <a href="#calculadora"><b>Calcula tus piezas</b><span>Cuántas necesitas por m²</span></a>
-  <a href="catalogo.html"><b>Catálogo</b><span>Fichas con medidas y rendimiento</span></a>
+  <a href="catalogo.html"><b>Productos</b><span>Fichas con medidas y rendimiento</span></a>
   <a href="comparar.html"><b>Compara productos</b><span>Hasta 4, lado a lado</span></a>
   <a href="${ciudadDefecto.slug}.html" data-tu-ciudad><b>Tu ciudad</b><span>Agencias, promociones y WhatsApp de <span data-city-name>${esc(ciudadDefecto.nombre)}</span></span></a>
 </nav></section>
+
+${franjaConfianza()}
 
 ${seccionNuevos()}
 
@@ -374,7 +389,7 @@ ${seccionNuevos()}
 </div></section>
 
 <section class="section section--grey"><div class="wrap">
-  <div class="section-head"><div class="row"><div><span class="eyebrow">Dónde estamos</span><h2 style="margin-top:12px">Una agencia cerca de tu obra</h2></div><a class="btn" href="donde-estamos.html">Ver todas las agencias</a></div></div>
+  <div class="section-head"><div class="row"><div><span class="eyebrow">Dónde comprar</span><h2 style="margin-top:12px">Una agencia cerca de tu obra</h2></div><a class="btn" href="donde-estamos.html">Ver todas las agencias</a></div></div>
   <div class="three" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${sitio.ciudades.map((c) => {
     const l = sitio.agencias[c.slug]; const ag = l.filter((a) => a.tipo === 'agencia').length;
     return `<div><h3>${c.nombre}</h3><p class="muted">${ag} ${ag === 1 ? 'agencia' : 'agencias'} y fábrica</p><a class="btn btn--sm btn--wa" href="${waHref(c.whatsapp, `Hola, quisiera información en ${c.nombre}.`)}" rel="noopener">WhatsApp</a> <a class="btn btn--sm" href="${c.slug}.html">Ver</a></div>`;
@@ -410,8 +425,8 @@ write('catalogo.html', layout({
   desc: 'Catálogo de ladrillos, techos, revestimientos, pisos y piezas especiales de INCERPAZ, con dimensiones, peso y rendimiento por m². Catálogos de Cochabamba y Santa Cruz.',
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
-  <span class="eyebrow">Catálogo</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Productos</h1>
-  <p class="lead">Cada producto tiene sus dimensiones, peso y rendimiento. Marca «Comparar» en hasta 4 productos del mismo catálogo para verlos lado a lado. ¿Buscas techo? <a href="techos.html">Calcula tus tejas por pendiente</a>. Los precios los confirma la agencia de tu ciudad por WhatsApp.</p>
+  <span class="eyebrow">Fichas técnicas</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Productos</h1>
+  <p class="lead">Cada producto tiene sus dimensiones, peso y rendimiento. Marca «Comparar» en hasta 4 productos del mismo catálogo para verlos lado a lado. ¿Buscas techo? <a href="techos.html">Calcula tus tejas por pendiente</a>. ${config.comercio ? 'Los precios los ves con tu cuenta verificada; sin cuenta, la agencia de tu ciudad te cotiza por WhatsApp.' : 'Los precios los confirma la agencia de tu ciudad por WhatsApp.'}</p>
 </div></section>
 <section class="wrap" style="padding-bottom:72px">
   <div class="filters">
@@ -460,10 +475,11 @@ for (const p of productos) {
     ${p.descripcion ? `<p class="lead">${esc(p.descripcion)}</p>` : ''}
     ${rows.length ? `<table class="specs"><tbody>${rows.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${/<br>/.test(v) ? v : esc(v)}</td></tr>`).join('')}</tbody></table>` : `<p class="price-note">Las medidas de este producto las confirma la agencia. Escríbenos y te las enviamos.</p>`}
     ${otra ? `<p class="muted" style="font-size:15px">Este producto también está en el <a href="${base}${purl(otra)}">catálogo de ${CIUDAD_CATALOGO[otra.ciudad]}</a>. Las medidas pueden variar según la fábrica.</p>` : ''}
-    ${config.comercio ? `<div class="buy-box"><p class="precio-big" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}">Precio con sesión</p>
+    ${config.comercio ? `<div class="buy-box"><p class="precio-big" data-precio data-ciudad="${p.ciudad}" data-slug="${p.slug}"><a href="${base}ingresar.html">Ingresa para ver precios</a></p>
       <div class="buy-row"><label>Cantidad (piezas)<input id="qty" type="number" min="1" step="1" value="100"></label><button class="btn btn--red" type="button" data-add data-qty-from="#qty" data-ciudad="${p.ciudad}" data-slug="${p.slug}" data-nombre="${esc(p.nombre)}" data-codigo="${esc(p.codigo || '')}">Añadir al presupuesto</button></div>
       <p class="muted" style="font-size:15px;margin-top:10px">Los precios se ven con una cuenta verificada. Para obras grandes, cotiza por WhatsApp.</p></div>` : `<p class="price-note"><strong>Precio:</strong> lo confirma la agencia de tu ciudad según tu obra y la cantidad. Escríbenos y te cotizamos.</p>`}
     <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waText)}" href="${waHref(ciudadDefecto.whatsapp, waText.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Cotizar por WhatsApp</a><a class="btn" href="${base}donde-estamos.html">Dónde comprar</a>${p.cat === 'techos' ? `<a class="btn" href="${base}techos.html">Calcula tus tejas</a>` : ''}${botonComparar(p)}</div>
+    <ul class="confianza-mini"><li>Fabricado en Bolivia</li><li>La agencia de tu ciudad confirma disponibilidad y entrega</li></ul>
   </div>
 </div></section>
 ${p.variantes.length ? `<section class="section section--grey"><div class="wrap"><div class="section-head"><h2>Calcula cuántas piezas necesitas</h2></div>
@@ -500,7 +516,7 @@ write('comparar.html', layout({
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
   <nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="catalogo.html">Productos</a> › Comparar</nav>
-  <span class="eyebrow">Catálogo</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Comparar productos</h1>
+  <span class="eyebrow">Productos</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Comparar productos</h1>
   <p class="lead">Hasta 4 productos del mismo catálogo, lado a lado. Las filas resaltadas son las que cambian entre ellos.</p>
 </div></section>
 <section class="wrap" style="padding-bottom:80px">
@@ -548,7 +564,7 @@ write('techos.html', layout({
 </div></section>
 
 <section class="section"><div class="wrap">
-  <div class="section-head"><span class="eyebrow">Catálogo</span><h2>Tejas disponibles</h2><p class="lead">Hoy las tejas están en el catálogo de Santa Cruz. Si estás en otra ciudad, la agencia confirma disponibilidad y entrega.</p></div>
+  <div class="section-head"><span class="eyebrow">Productos</span><h2>Tejas disponibles</h2><p class="lead">Hoy las tejas están en el catálogo de Santa Cruz. Si estás en otra ciudad, la agencia confirma disponibilidad y entrega.</p></div>
   <div class="grid-products">${tejas.map((p) => productCard(p)).join('')}</div>
 </div></section>
 <script type="application/json" id="datos-tejas">${JSON.stringify({ tejas: tejasCalc, ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })) }).replace(/</g, '\\u003c')}</script>`
@@ -721,12 +737,12 @@ function agencyCard(a, ciudad) {
 const tabs = [...sitio.ciudades.map((c) => [c.slug, c.nombre]), ['la-paz', 'La Paz'], ['otra-ciudad', 'Otra ciudad']];
 write('donde-estamos.html', layout({
   file: 'donde-estamos.html',
-  title: 'Dónde estamos | Agencias y fábricas | INCERPAZ',
+  title: 'Dónde comprar | Agencias y fábricas | INCERPAZ',
   desc: 'Encuentra la agencia INCERPAZ más cercana en Cochabamba, Santa Cruz, Oruro y Sucre, con dirección, teléfono, WhatsApp y cómo llegar.',
   jsonld: `<script type="application/ld+json">${JSON.stringify(sitio.ciudades.flatMap((c) => sitio.agencias[c.slug].map((a) => ({ '@context': 'https://schema.org', '@type': 'LocalBusiness', name: `INCERPAZ ${a.nombre}`, parentOrganization: { '@type': 'Organization', name: 'INCERPAZ' }, url: `${sitio.dominio}/donde-estamos.html#${c.slug}`, image: `${sitio.dominio}/assets/img/logo-header.png`, telephone: a.telefonos[0] ? '+591' + a.telefonos[0].replace(/\D/g, '') : '+591' + a.whatsapp, address: { '@type': 'PostalAddress', streetAddress: a.direccion, addressLocality: c.nombre, addressCountry: 'BO' } })))).replace(/</g, '\\u003c')}</script>`,
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
-  <span class="eyebrow">Dónde estamos</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Agencias y fábricas</h1>
+  <span class="eyebrow">Dónde comprar</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Agencias y fábricas</h1>
   <p class="lead">Elige tu ciudad y escribe por WhatsApp a la agencia más cercana a tu obra.</p>
 </div></section>
 <section class="wrap" style="padding-bottom:80px">
@@ -772,13 +788,13 @@ ${seccionNuevos()}
 </div><script type="application/json" id="datos-promos">${JSON.stringify(promosPublicas())}</script></section>
 
 <section class="section"><div class="wrap">
-  <div class="section-head"><span class="eyebrow">Dónde estamos</span><h2>Agencias${nFab ? ' y fábrica' : ''} en ${esc(c.nombre)}</h2></div>
+  <div class="section-head"><span class="eyebrow">Dónde comprar</span><h2>Agencias${nFab ? ' y fábrica' : ''} en ${esc(c.nombre)}</h2></div>
   <div class="agencies">${ags.map((a) => agencyCard(a, c)).join('')}</div>
 </div></section>
 
 <section class="section section--grey"><div class="wrap">
   <nav class="quick" aria-label="Accesos rápidos">
-    <a href="catalogo.html?ciudad=${cat}"><b>Catálogo</b><span>Fichas con medidas y rendimiento</span></a>
+    <a href="catalogo.html?ciudad=${cat}"><b>Productos</b><span>Fichas con medidas y rendimiento</span></a>
     <a href="comparar.html"><b>Compara productos</b><span>Hasta 4, lado a lado</span></a>
     <a href="proyectos.html"><b>Proyectos</b><span>Construye tú mismo, con lista de materiales</span></a>
     <a href="guias.html"><b>Guías</b><span>Cuántos ladrillos, cómo elegir y colocar</span></a>
@@ -1080,7 +1096,7 @@ for (const c of combos) {
     <h2 style="font-size:28px;margin:22px 0 8px">Qué incluye</h2>
     <div class="scroll"><table class="tabla"><thead><tr><th>Componente</th><th class="num">Cantidad</th><th>Origen</th></tr></thead><tbody>${filas}</tbody></table></div>
     <div data-promo-cta>
-    ${config.comercio ? `<div class="buy-box"><p class="precio-big" data-precio data-ciudad="${c.catalogo}" data-slug="combo-${c.id}">Precio con sesión</p>
+    ${config.comercio ? `<div class="buy-box"><p class="precio-big" data-precio data-ciudad="${c.catalogo}" data-slug="combo-${c.id}"><a href="../../ingresar.html">Ingresa para ver precios</a></p>
       <div class="buy-row"><label>Cantidad de combos<input id="qty" type="number" min="1" step="1" value="1"></label><button class="btn btn--red" type="button" data-add data-qty-from="#qty" data-ciudad="${c.catalogo}" data-slug="combo-${c.id}" data-nombre="${esc(c.titulo)}" data-codigo="COMBO">Añadir al presupuesto</button></div>
       <p class="muted" style="font-size:15px;margin-top:10px">El precio se ve con una cuenta verificada. Los productos que no son de INCERPAZ vienen incluidos en el combo.</p></div>` : `<p class="price-note"><strong>Precio:</strong> lo confirma la agencia de tu ciudad. Escríbenos y te cotizamos.</p>`}
     <div class="btn-row"><a class="btn btn--wa" data-wa="${esc(waTxt)}" href="${waHref(ciudadDefecto.whatsapp, waTxt.replace('{ciudad}', ciudadDefecto.nombre))}" rel="noopener">Pedir por WhatsApp</a><a class="btn" href="../../donde-estamos.html">Dónde comprar</a></div>
@@ -1094,7 +1110,7 @@ for (const c of combos) {
 /* Índice para buscar en el navegador: productos (se muestran los del catálogo de la ciudad elegida), proyectos, guías,
    promociones vigentes y páginas. Sin servidor: funciona igual en el sitio estático. */
 const paginasBuscables = [
-  ['Catálogo de productos', 'Fichas con medidas, peso y rendimiento', 'catalogo.html', 'productos ladrillos tejas pisos'],
+  ['Productos', 'Fichas con medidas, peso y rendimiento', 'catalogo.html', 'productos ladrillos tejas pisos'],
   ['Comparar productos', 'Hasta 4 productos lado a lado', 'comparar.html', 'comparador'],
   ['Promociones', 'Combos, concursos, eventos y cursos de tu ciudad', 'promociones.html', 'promo oferta combo sorteo concurso curso evento'],
   ['Techos y tejas', 'Calculadora de tejas por pendiente y catálogo de tejas', 'techos.html', 'techo teja tejas pendiente cubierta calculadora'],
@@ -1102,7 +1118,7 @@ const paginasBuscables = [
   ['Guías', 'Cuántos ladrillos, cómo elegir y cómo colocar', 'guias.html', 'aprende consejos instalacion'],
   ['PAVIC', 'Pavimento cerámico para calles, plazas y urbanizaciones', 'pavic.html', 'pavimento adoquin vereda plaza calle'],
   ['Recursos PAVIC para proyectistas', 'Calculadora de obra, texto para pliegos y DXF', 'pavic-recursos.html', 'proyectista calculista pliego licitacion dxf cad'],
-  ['Dónde estamos', 'Agencias y fábricas por ciudad, con WhatsApp', 'donde-estamos.html', 'agencias direccion telefono whatsapp fabrica como llegar'],
+  ['Dónde comprar', 'Agencias y fábricas por ciudad, con WhatsApp', 'donde-estamos.html', 'agencias direccion telefono whatsapp fabrica como llegar'],
   ['Empresa', 'Quiénes somos, misión, valores y contacto', 'empresa.html', 'nosotros mision vision contacto reclamo trabajo marcas'],
   ['La Gran Obra, el juego de INCERPAZ', 'Ayuda a Ladri a levantar una casa antes de la tormenta', 'juego/index.html', 'juego jugar ladri videojuego'],
   ['Exportaciones', 'Consulta para importadores, en español e inglés', 'exportaciones.html', 'export importar internacional'],

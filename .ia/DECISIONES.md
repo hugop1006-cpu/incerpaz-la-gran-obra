@@ -4,6 +4,8 @@ Una línea por decisión: fecha, decisión, quién decidió. Lo más reciente ar
 
 | Fecha | Decisión | Decidió |
 |---|---|---|
+| 2026-11-23 | El sitio usa «Productos» (no «Catálogo») y «Dónde comprar» (no «Dónde estamos») para nombrar esas secciones; «Catálogo de Cochabamba/Santa Cruz» queda solo para la lista de cada ciudad | Hugo (aprobó la prioridad 2) |
+| 2026-11-23 | Señales de confianza solo con datos que ya están en el sitio (ciudades, agencias, fábricas); sin cifras de la empresa hasta que Marketing las confirme | Claude Code |
 | 2026-11-18 | Direcciones cortas solo para las 4 ciudades con datos (Cochabamba, Santa Cruz, Oruro, Sucre); son páginas propias indexables. Oruro y Sucre muestran el catálogo de Cochabamba | Claude Code |
 | 2026-11-18 | Un producto se destaca como nuevo con una fecha de vencimiento («nuevo hasta»), no con una marca permanente | Claude Code |
 | 2026-11-18 | El comparador acepta hasta 4 productos del mismo catálogo; `comparar.html` no se indexa ni entra al sitemap | Claude Code |

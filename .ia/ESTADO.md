@@ -2,6 +2,19 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-23 (tarde) · Claude Code
+**Hecho** (revisión UX, prioridad 2, aprobada por Hugo)
+- Nombres consistentes: el menú, los títulos y el buscador dicen «Productos» y «Dónde comprar» (antes «Catálogo» y «Dónde estamos»). Las direcciones (`catalogo.html`, `donde-estamos.html`) no cambian.
+- Tarjetas del catálogo: una sola línea de precio («Ingresa para ver precios», enlace discreto) y botón «Añadir» más liviano en celular. Misma línea en fichas y combos. El texto de la cabecera del catálogo explica cómo se ven los precios.
+- Cuenta y presupuesto visibles: ícono de cuenta en el encabezado de escritorio (lleva a ingresar o a Mi cuenta/Panel; punto verde con sesión). El ícono del presupuesto se oscurece cuando hay productos y el contador da un pulso al añadir. En celular la cuenta sigue en la barra superior. Entre 1121 y 1340 px el encabezado se compacta para que todo quepa.
+- Señales de confianza: franja en el inicio (4 ciudades, agencias y fábricas calculadas de los datos, fabricado en Bolivia, precios con cuenta verificada) y dos líneas en cada ficha. No hay cifras inventadas.
+- Accesos rápidos: la grilla ya no deja celdas vacías con 5 o 6 accesos (Hugo mostró una versión antigua con 5 accesos y la última fila rota).
+- Prueba: se arregló una carrera en `probar-comercio.js` (esperar la respuesta de cerrar sesión). Pruebas nuevas: sitio 89, comercio 24. 12 de API y 8 de navegador en verde.
+
+**No se hizo**
+- Fotos uniformes de producto: las tarjetas ya muestran todas las fotos contenidas sobre blanco; unificar el estilo de las fotos originales requiere fotos nuevas (marketing).
+- Prioridad 3 de la revisión UX (no aprobada).
+
 ## 2026-11-23 · Claude Code
 **Hecho** (wireframes, tanda 6: la última)
 - Catálogo: selector «Ordenar» (orden del catálogo, nombre de la A a la Z, categoría); los combos van siempre primero.

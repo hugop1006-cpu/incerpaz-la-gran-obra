@@ -76,13 +76,14 @@ Todas deben pasar antes de subir (hoy: 12 de API y 8 de navegador en verde; el s
   4. PAVIC: camiones en la calculadora, «Cómo trabajamos un proyecto» y pedido de muestras.
   5. Calculadora de tejas por pendiente (`techos.html`).
   6. Ordenar el catálogo, «Nuestras marcas» en Empresa y el juego «La Gran Obra» dentro del sitio (`site/juego/`, copiado por el generador).
+- **Revisión UX prioridad 2:** nombres consistentes, tarjetas más limpias, ícono de cuenta y presupuesto marcado, franja de confianza con datos reales.
 
 **Documentos creados en Claude** (privados; ChatGPT y Codex no los abren por enlace): presentación del directorio (20 diapositivas, incluye «Lo que pidió la reunión»), demo navegable, wireframes, resumen de una página, pendientes por área, validación exportadora, plantilla de campaña mensual, revisión técnica, mensajes por responsable, descripciones de producto, revisión del prototipo de Fergie.
 
 ## 7. Qué sigue
 
 **Con Hugo, en este orden:**
-1. **Revisión UX prioridades 2 y 3** (propuestas, no aprobadas): presupuesto y cuenta más visibles, tarjetas del catálogo más limpias, nombres consistentes («Dónde comprar» frente a «Dónde estamos», «Productos» frente a «Catálogo»), fotos de producto uniformes, señales de confianza.
+1. **Revisión UX prioridad 3** (propuesta, no aprobada). La prioridad 2 ya está hecha: nombres consistentes («Productos», «Dónde comprar»), tarjetas con una línea de precio, ícono de cuenta y presupuesto marcado, franja de confianza. Las fotos de producto uniformes dependen de Marketing.
 2. **Cerrar los pedidos de la reunión que dependen de otras áreas:** transporte según producto y ubicación, seguimiento real de la entrega, testimonios, ficha técnica PAVIC, cursos reales, más proyectos «Construye tú mismo».
 
 **Pendientes que dependen de otras personas** (hay mensajes listos para cada área):

@@ -35,7 +35,19 @@
   /* ---------- presupuesto local ---------- */
   function leerCart() { try { var c = JSON.parse(localStorage.getItem(CLAVE) || 'null'); if (c && Array.isArray(c.items)) return c; } catch (e) { /* vacío */ } return { items: [], obra: '', notas: '', id: null }; }
   function guardarCart(c) { try { localStorage.setItem(CLAVE, JSON.stringify(c)); } catch (e) { /* sin almacenamiento */ } contador(); }
-  function contador() { var n = leerCart().items.length; $$('[data-bcount]').forEach(function (e) { e.textContent = n; if (e.classList.contains('hdr-badge')) e.hidden = !n; }); }
+  var ultimoN = null;
+  function contador() {
+    var n = leerCart().items.length;
+    $$('[data-bcount]').forEach(function (e) {
+      e.textContent = n;
+      if (!e.classList.contains('hdr-badge')) return;
+      e.hidden = !n;
+      /* el ícono se marca cuando hay productos y el contador da un pulso al añadir */
+      if (e.parentNode) e.parentNode.classList.toggle('hdr-ico--on', n > 0);
+      if (ultimoN !== null && n > ultimoN) { e.classList.remove('pulso'); void e.offsetWidth; e.classList.add('pulso'); }
+    });
+    ultimoN = n;
+  }
   function añadir(it, cantidad) {
     var c = leerCart(), ya = c.items.filter(function (x) { return x.ciudad === it.ciudad && x.slug === it.slug; })[0];
     if (ya) ya.cantidad += cantidad; else c.items.push({ ciudad: it.ciudad, slug: it.slug, nombre: it.nombre, codigo: it.codigo || '', cantidad: cantidad });
@@ -56,7 +68,7 @@
     var nodos = $$('[data-precio]'); if (!nodos.length) return;
     var u = s.usuario, volver = encodeURIComponent((location.pathname.split('/').pop() || 'index.html') + location.search);
     if (!verificado(u)) {
-      nodos.forEach(function (n) { n.innerHTML = !u ? '<a href="' + BASE + 'ingresar.html?volver=' + volver + '">Precio con sesión</a>' : 'Precio al verificar tu cuenta'; });
+      nodos.forEach(function (n) { n.innerHTML = !u ? '<a href="' + BASE + 'ingresar.html?volver=' + volver + '">Ingresa para ver precios</a>' : 'Precio al verificar tu cuenta'; });
       return;
     }
     var ciudades = {}; nodos.forEach(function (n) { ciudades[n.getAttribute('data-ciudad')] = 1; });
@@ -81,6 +93,18 @@
     var banda = $('#constructores'); if (banda) banda.hidden = !!u;
     /* el presupuesto vive en el encabezado (ícono con contador); aquí queda solo la cuenta */
     box.innerHTML = cuenta ? cuenta + ' · ' : '';
+    /* ícono de cuenta en el encabezado: lleva a ingresar o a la cuenta y marca cuando hay sesión */
+    var ic = $('[data-cuenta]');
+    if (ic && apiCaida) ic.hidden = true;
+    else if (ic) {
+      var dest = u ? (u.rol === 'cliente' ? 'mi-cuenta.html' : 'equipo.html') : 'ingresar.html';
+      var et = u ? (u.rol === 'cliente' ? 'Mi cuenta' : 'Panel del equipo') + ' (' + u.nombre.split(' ')[0] + ')' : 'Ingresar a tu cuenta';
+      ic.setAttribute('href', BASE + dest); ic.setAttribute('aria-label', et); ic.setAttribute('title', et);
+      ic.classList.toggle('hdr-ico--on', !!u);
+      var punto = $('.hdr-dot', ic);
+      if (u && !punto) { punto = document.createElement('span'); punto.className = 'hdr-dot'; punto.setAttribute('aria-hidden', 'true'); ic.appendChild(punto); }
+      else if (!u && punto) ic.removeChild(punto);
+    }
     contador();
     var salir = $('[data-salir]', box);
     if (salir) salir.addEventListener('click', function (e) { e.preventDefault(); api('POST', '/api/logout', {}).finally(function () { location.href = BASE + 'index.html'; }); });

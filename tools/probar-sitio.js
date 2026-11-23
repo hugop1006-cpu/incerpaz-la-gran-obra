@@ -87,6 +87,11 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   await ux.goto(BASE + 'index.html');
   ok((await ux.locator('.site-header').boundingBox()).height <= 72, 'el encabezado fijo del celular ocupa una sola fila');
   ok((await ux.locator('.quick a').count()) === 4, 'los accesos rápidos son 4 (la grilla siempre cierra)');
+  /* con 5 accesos no queda ninguna celda vacía: el último ocupa todo el ancho */
+  const cierra = await ux.evaluate(() => { const q = document.querySelector('.quick'); const c = q.querySelector('a').cloneNode(true); q.appendChild(c); const u = q.lastElementChild.getBoundingClientRect(), r = q.getBoundingClientRect(); return Math.abs(u.right - r.right) < 3 && Math.abs(u.left - r.left) < 3; });
+  ok(cierra, 'un número impar de accesos rápidos no deja celdas vacías');
+  ok((await ux.locator('.confianza li').count()) === 4 && /Fabricado en Bolivia/.test(await ux.textContent('.confianza')), 'el inicio muestra la franja de confianza con 4 datos reales');
+  ok(/Dónde comprar/.test(await ux.textContent('#nav')) && !/Dónde estamos/.test(await ux.textContent('#nav')), 'el menú usa «Dónde comprar»');
   await ux.goto(BASE + 'catalogo.html?ciudad=cochabamba');
   const tarjetas = ux.locator('#grid .pcard:visible');
   ok((await tarjetas.nth(0).boundingBox()).y === (await tarjetas.nth(1).boundingBox()).y, 'el catálogo muestra dos productos por fila en el celular');

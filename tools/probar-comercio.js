@@ -31,9 +31,11 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     ok(await cli.isVisible('#constructores') && (await cli.getAttribute('#constructores a.btn--red', 'href')) === 'registro.html', 'el visitante ve la banda «¿Construyes o vendes materiales?» con el enlace a crear cuenta');
     await cli.goto(BASE + 'catalogo.html?ciudad=cochabamba');
     await cli.waitForSelector('.pcard:not([hidden]):not(.pcard--combo) [data-precio] a');
-    ok(true, 'el visitante ve "Precio con sesión" en el catálogo');
+    ok(/Ingresa para ver precios/.test(await cli.textContent('.pcard:not([hidden]):not(.pcard--combo) .precio')), 'el visitante ve «Ingresa para ver precios» en el catálogo');
+    ok((await cli.getAttribute('[data-cuenta]', 'href')) === 'ingresar.html' && !(await cli.locator('[data-cuenta] .hdr-dot').count()), 'el ícono de cuenta del encabezado lleva a ingresar');
     await cli.click('.pcard:not([hidden]):not(.pcard--combo) [data-add]');
     ok((await cli.textContent('[data-bcount]')) === '1', 'añadir al presupuesto actualiza el contador');
+    ok(await cli.evaluate(() => document.querySelector('[data-bcount]').parentNode.classList.contains('hdr-ico--on')), 'el ícono del presupuesto se marca cuando hay productos');
 
     await cli.goto(BASE + 'productos/cochabamba/pavic-estandar.html');
     await cli.fill('#qty', '2000'); await cli.click('[data-add][data-qty-from]');
@@ -95,8 +97,10 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await cli.setViewportSize({ width: 390, height: 800 }); await cli.goto(BASE + 'presupuesto.html'); await cli.waitForSelector('[data-q]');
     ok((await cli.evaluate(() => document.documentElement.scrollWidth)) <= 390, 'el presupuesto no se desborda en celular');
     await cli.goto(BASE + 'index.html'); await cli.waitForSelector('[data-salir]');
+    ok((await cli.getAttribute('[data-cuenta]', 'href')) === 'mi-cuenta.html' && (await cli.locator('[data-cuenta] .hdr-dot').count()) === 1, 'con sesión el ícono de cuenta lleva a Mi cuenta y muestra el punto verde');
     ok(!(await cli.isVisible('#constructores')), 'con sesión iniciada la banda para constructores se oculta');
-    await cli.click('[data-salir]'); await cli.waitForURL('**/index.html');
+    /* se espera la respuesta de cerrar sesión: la página ya está en index.html y la URL no cambia */
+    await Promise.all([cli.waitForResponse((r) => /\/api\/logout/.test(r.url())), cli.click('[data-salir]')]);
     await cli.goto(BASE + 'mi-cuenta.html'); await cli.waitForURL('**/ingresar.html**');
     ok(true, 'al salir, Mi cuenta pide ingresar de nuevo');
     ok(errores.length === 0, 'sin errores de JavaScript' + (errores.length ? ': ' + errores[0] : ''));

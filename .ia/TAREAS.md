@@ -27,6 +27,8 @@ Estado: `pendiente` · `en curso` · `bloqueada` · `hecha`.
 | Wireframes tanda 2: proyectos en el inicio, filtro por dificultad, «Proyectos donde se usa» | claude-code | hecha (2026-11-20) | |
 | Wireframes tanda 3: banda para constructores y campo «Soy» | claude-code | hecha (2026-11-20) | Sin programa de puntos: falta decidir si existe |
 | Wireframes tanda 4: PAVIC con camiones, proceso y muestras | claude-code | hecha (2026-11-21) | Capacidad del camión (20 t) es de ejemplo; proceso por validar con ventas |
+| Revisión UX prioridad 2: nombres, tarjetas, cuenta y presupuesto visibles, confianza | claude-code | hecha (2026-11-23) | Fotos uniformes quedan con Marketing |
+| Revisión UX prioridad 3 | claude-code | pendiente | Propuesta no aprobada |
 | Wireframes tanda 5: calculadora de tejas por pendiente | claude-code | hecha (2026-11-21) | Pendiente mínima y ficha de la teja canal por confirmar |
 | Wireframes tanda 6: ordenar catálogo, «Nuestras marcas», enlace al juego | claude-code | hecha (2026-11-23) | Falta decidir la marca propia de tejas |
 | Marcar los productos nuevos reales | humano (Marketing) | pendiente | Desde el panel: «Destacar como nuevo hasta». Hoy ningún producto está marcado |
