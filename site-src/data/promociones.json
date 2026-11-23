@@ -1,0 +1,100 @@
+{
+  "novedades": [
+    {
+      "id": "ejemplo-sorteo-aniversario",
+      "tipo": "sorteo",
+      "titulo": "Ejemplo: sorteo de aniversario",
+      "resumen": "Contenido de ejemplo para mostrar cómo se verá un sorteo en todas las ciudades.",
+      "texto": "Aquí va la descripción del sorteo: premios, cómo participar y fechas. Este texto es de ejemplo y debe reemplazarse antes de publicar el sitio.",
+      "imagen": "",
+      "ciudades": [],
+      "inicio": "2026-11-01",
+      "fin": "2026-12-31",
+      "estado": "publicada",
+      "cta": { "tipo": "whatsapp", "texto": "Quiero participar", "url": "" },
+      "bases": "[Bases del sorteo pendientes de revisión legal.]",
+      "fecha_evento": "",
+      "lugar": "",
+      "cupo": 0,
+      "autor_ciudad": "nacional",
+      "ejemplo": true
+    },
+    {
+      "id": "ejemplo-curso-enchape",
+      "tipo": "curso",
+      "titulo": "Ejemplo: curso de colocación de enchape para maestros",
+      "resumen": "Contenido de ejemplo de un curso con inscripción y cupo limitado en Cochabamba.",
+      "texto": "Aquí va el temario, el instructor y lo que debe llevar el participante. Este texto es de ejemplo.",
+      "imagen": "assets/img/productos/brick-enchape-corto-2.jpg",
+      "ciudades": ["cochabamba"],
+      "inicio": "2026-11-01",
+      "fin": "2026-12-05",
+      "estado": "publicada",
+      "cta": { "tipo": "inscripcion", "texto": "Inscribirme", "url": "" },
+      "bases": "",
+      "fecha_evento": "2026-12-05",
+      "lugar": "Agencia Central, Cochabamba",
+      "cupo": 30,
+      "autor_ciudad": "nacional",
+      "ejemplo": true
+    },
+    {
+      "id": "ejemplo-nuevo-proyecto-scz",
+      "tipo": "proyecto",
+      "titulo": "Ejemplo: nueva línea de enchapes en Santa Cruz",
+      "resumen": "Contenido de ejemplo para anunciar un producto o proyecto nuevo en una sola ciudad.",
+      "texto": "Aquí va la descripción del lanzamiento. Este texto es de ejemplo y debe reemplazarse antes de publicar el sitio.",
+      "imagen": "assets/img/productos/scz-brick-enchape-corto-2.jpg",
+      "ciudades": ["santa-cruz"],
+      "inicio": "2026-11-01",
+      "fin": "2026-12-31",
+      "estado": "publicada",
+      "cta": { "tipo": "whatsapp", "texto": "Pedir información", "url": "" },
+      "bases": "",
+      "fecha_evento": "",
+      "lugar": "",
+      "cupo": 0,
+      "autor_ciudad": "nacional",
+      "ejemplo": true
+    }
+  ],
+  "combos": [
+    {
+      "id": "ejemplo-combo-parrillero",
+      "titulo": "Ejemplo: combo parrillero del mes",
+      "descripcion": "Contenido de ejemplo: ladrillos y refractario del catálogo junto con productos que no son de INCERPAZ, como una parrilla y utensilios.",
+      "imagen": "assets/img/productos/brick-estandar-2.jpg",
+      "catalogo": "cochabamba",
+      "ciudades": ["cochabamba"],
+      "inicio": "2026-11-01",
+      "fin": "2026-11-30",
+      "estado": "publicada",
+      "componentes": [
+        { "tipo": "catalogo", "slug": "brick-estandar", "cantidad": 300, "nota": "" },
+        { "tipo": "catalogo", "slug": "biscocho", "cantidad": 60, "nota": "" },
+        { "tipo": "otro", "nombre": "Parrilla de acero", "cantidad": 1, "nota": "Del ancho interior del hogar" },
+        { "tipo": "otro", "nombre": "Set de utensilios de asador", "cantidad": 1, "nota": "" }
+      ],
+      "autor_ciudad": "nacional",
+      "ejemplo": true
+    },
+    {
+      "id": "ejemplo-combo-pared-enchape",
+      "titulo": "Ejemplo: combo pared con enchape",
+      "descripcion": "Contenido de ejemplo: enchape del catálogo con herramientas y adhesivo para colocarlo.",
+      "imagen": "assets/img/productos/scz-brick-enchape-corto-2.jpg",
+      "catalogo": "santa-cruz",
+      "ciudades": ["santa-cruz"],
+      "inicio": "2026-11-01",
+      "fin": "2026-11-30",
+      "estado": "publicada",
+      "componentes": [
+        { "tipo": "catalogo", "slug": "brick-enchape-corto", "cantidad": 400, "nota": "" },
+        { "tipo": "otro", "nombre": "Llana dentada", "cantidad": 1, "nota": "" },
+        { "tipo": "otro", "nombre": "Adhesivo cerámico de 25 kg", "cantidad": 4, "nota": "" }
+      ],
+      "autor_ciudad": "nacional",
+      "ejemplo": true
+    }
+  ]
+}

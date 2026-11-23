@@ -1,0 +1,30 @@
+# Servidor propio (VPS o servidor de la empresa) con HTTPS automático por Caddy.
+# Uso:  cp .env.ejemplo .env  →  editar  →  docker compose up -d --build
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: "8080"
+    volumes:
+      - datos:/datos
+    expose:
+      - "8080"
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMINIO: ${DOMINIO:-localhost}
+      DOMINIO_RAIZ: ${DOMINIO_RAIZ:-}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_datos:/data
+    depends_on:
+      - app
+volumes:
+  datos:
+  caddy_datos:

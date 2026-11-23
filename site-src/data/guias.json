@@ -1,0 +1,121 @@
+{
+  "guias": [
+    {
+      "slug": "cuantos-ladrillos-por-metro-cuadrado",
+      "titulo": "¿Cuántos ladrillos necesito por metro cuadrado?",
+      "resumen": "Cómo calcular las piezas de un muro a partir del rendimiento de cada ladrillo, con un ejemplo paso a paso.",
+      "minutos": 4,
+      "fecha": "2026-10-22",
+      "imagen": "assets/img/productos/6-huecos-big-rayado-2.jpg",
+      "cuerpo": [
+        { "t": "p", "x": "Antes de pedir material conviene saber cuántas piezas necesitas. La cifra clave se llama rendimiento: cuántas piezas entran en un metro cuadrado de muro terminado, contando la junta de mortero." },
+        { "t": "h2", "x": "El rendimiento depende de la pieza" },
+        { "t": "p", "x": "Cada ladrillo tiene su propio rendimiento porque cambia el tamaño de la cara que queda a la vista. Estos son algunos valores de las fichas técnicas del catálogo de Cochabamba:" },
+        { "t": "ul", "x": ["18 huecos: 45 piezas por m²", "6 huecos económico rayado: 23 piezas por m²", "8 huecos económico rayado: 18 piezas por m²", "Brick estándar: 50 piezas por m²"] },
+        { "t": "p", "x": "Algunas piezas tienen dos cifras, por ejemplo una para colocarlas de tabique y otra de soguilla, porque el aparejo cambia cuántas caben. Revisa siempre la ficha del producto que elegiste." },
+        { "t": "h2", "x": "La fórmula" },
+        { "t": "p", "x": "Piezas = superficie del muro × rendimiento × (1 + merma). La merma cubre cortes y roturas: usa entre 5 % y 10 %, más si el muro tiene muchos vanos o cortes." },
+        { "t": "h2", "x": "Un ejemplo" },
+        { "t": "p", "x": "Un muro de 5 × 4 m tiene 20 m². Con ladrillo de 6 huecos (23 piezas por m²) y 8 % de merma: 20 × 23 × 1,08 = 496,8. Pide 497 piezas." },
+        { "t": "p", "x": "Si el muro tiene una ventana de 2 m², descuéntala de la superficie antes de multiplicar: 18 m² × 23 × 1,08 = 447,1, es decir 448 piezas." },
+        { "t": "h2", "x": "Consejos para no quedarte corto" },
+        { "t": "ul", "x": ["Mide el muro terminado, no la losa: usa ancho por alto de cada paño.", "Suma todos los paños antes de aplicar la merma.", "Pide todo de una misma producción para que el color sea parejo.", "Para obras grandes, confirma con tu agencia plazos y disponibilidad."] },
+        { "t": "cta", "x": "Calcula tus piezas ahora", "href": "index.html#calculadora" }
+      ],
+      "relacionados": [["proyectos.html", "Proyectos con lista de materiales"], ["catalogo.html", "Catálogo de productos"]]
+    },
+    {
+      "slug": "ladrillo-hueco-o-visto-como-elegir",
+      "titulo": "Ladrillo hueco, visto o de enchape: cómo elegir",
+      "resumen": "Las diferencias entre las piezas más usadas y qué pensar antes de decidir para tu muro, fachada o piso.",
+      "minutos": 4,
+      "fecha": "2026-10-22",
+      "imagen": "assets/img/productos/18-h-2.jpg",
+      "cuerpo": [
+        { "t": "p", "x": "No hay un ladrillo mejor que otro: hay un ladrillo adecuado para cada uso. Estas preguntas te ayudan a decidir." },
+        { "t": "h2", "x": "1. ¿Qué función cumple el muro?" },
+        { "t": "p", "x": "Los ladrillos huecos son livianos y rinden bien en muros divisorios o de cerramiento. Si el muro recibe cargas, el tipo de pieza y su colocación los define el ingeniero estructural del proyecto: no los elijas solo por precio." },
+        { "t": "h2", "x": "2. ¿Va con revoque o a la vista?" },
+        { "t": "p", "x": "El ladrillo visto (la línea Brick) tiene acabado listo y no necesita revoque. Si quieres el aspecto del ladrillo sobre un muro ya construido, el enchape es una pieza delgada que se pega como un revestimiento." },
+        { "t": "h2", "x": "3. ¿Cuánto rinde?" },
+        { "t": "p", "x": "Una pieza más grande cubre más superficie y se coloca más rápido. Por ejemplo, el ladrillo de 18 huecos de Cochabamba mide 7 × 25 × 12 cm y rinde 45 piezas por m²; el de 6 huecos económico rayado mide 15 × 25 × 10 cm y rinde 23 piezas por m². Compara el rendimiento de las fichas." },
+        { "t": "h2", "x": "4. ¿Es para piso?" },
+        { "t": "p", "x": "Para pavimentos usa piezas pensadas para eso, como las de la línea PAVIC. Son macizas y resisten el tránsito peatonal y vehicular según la línea que elijas." },
+        { "t": "h2", "x": "Antes de decidir" },
+        { "t": "ul", "x": ["Define primero el diseño y la estructura con un profesional.", "Compara fichas técnicas, no solo el nombre del producto.", "Pide una muestra si el ladrillo va a la vista.", "Confirma disponibilidad en tu ciudad: los catálogos de Cochabamba y Santa Cruz no son idénticos."] },
+        { "t": "cta", "x": "Ver el catálogo", "href": "catalogo.html" }
+      ],
+      "relacionados": [["guias/cuantos-ladrillos-por-metro-cuadrado.html", "Cuántos ladrillos necesito por m²"], ["pavic.html", "PAVIC, pavimento cerámico"]]
+    },
+    {
+      "slug": "como-colocar-enchape-de-ladrillo",
+      "titulo": "Cómo colocar enchape de ladrillo paso a paso",
+      "resumen": "De la preparación del muro al rejuntado: una guía práctica para una pared de ladrillo visto sin errores.",
+      "minutos": 5,
+      "fecha": "2026-10-22",
+      "imagen": "assets/img/productos/brick-enchape-corto-2.jpg",
+      "cuerpo": [
+        { "t": "p", "x": "El enchape de ladrillo da calidez a una sala, una fachada o un jardín. El resultado depende más de la preparación que de la pieza: sigue estos pasos." },
+        { "t": "h2", "x": "Antes de empezar" },
+        { "t": "ul", "x": ["El muro debe estar plano, limpio, seco y sin pintura suelta.", "Si hay humedad, resuélvela antes: el enchape no la tapa.", "Calcula la cantidad con merma de 10 %.", "Reúne llana dentada, nivel, cordel, crucetas, amoladora y esponja."] },
+        { "t": "h2", "x": "1. Traza el nivel de arranque" },
+        { "t": "p", "x": "Marca una línea a nivel y fija el perfil de arranque. Desde ahí se trazan las demás hiladas con cordel." },
+        { "t": "h2", "x": "2. Pega por paños" },
+        { "t": "p", "x": "Extiende adhesivo cerámico con la llana dentada en paños de 1 m² y presiona cada pieza. Trabaja de abajo hacia arriba." },
+        { "t": "h2", "x": "3. Traba las hiladas" },
+        { "t": "p", "x": "Desplaza cada hilada media pieza respecto a la anterior y mantén juntas parejas, por ejemplo de 1 cm, con crucetas. Mezcla piezas de varias cajas para evitar manchones de color." },
+        { "t": "h2", "x": "4. Corta y remata" },
+        { "t": "p", "x": "Marca y corta con amoladora en bordes, vanos y esquinas. Si hay piezas de esquina, úsalas." },
+        { "t": "h2", "x": "5. Rejunta y limpia" },
+        { "t": "p", "x": "Después de 24 horas rellena las juntas con fragüe y límpialas con una esponja antes de que seque. En exteriores, aplica un hidrofugante después de probarlo en un sector pequeño." },
+        { "t": "cta", "x": "Calcula materiales y costo", "href": "proyectos/pared-con-enchape.html" }
+      ],
+      "relacionados": [["proyectos/meson-con-enchape.html", "Mesón con enchape"], ["guias/cuidado-del-ladrillo-visto.html", "Cuidado del ladrillo visto"]]
+    },
+    {
+      "slug": "pavimento-ceramico-que-debe-pedir-el-proyectista",
+      "titulo": "Pavimento cerámico: qué debe pedir el proyectista",
+      "resumen": "Lista de verificación para especificar un pavimento cerámico en una licitación o una obra privada.",
+      "minutos": 4,
+      "fecha": "2026-10-22",
+      "imagen": "assets/img/productos/pavic-peatonal-2.jpg",
+      "cuerpo": [
+        { "t": "p", "x": "Especificar un pavimento es más que elegir un color. Esta lista te ayuda a pedir lo necesario para que el proveedor responda con respaldo." },
+        { "t": "h2", "x": "Datos de la pieza" },
+        { "t": "ul", "x": ["Medidas nominales y tolerancias, y peso por pieza.", "Rendimiento por m² para cada aparejo previsto.", "Color y acabado de la cara superior (por ejemplo biselado o con tetones).", "Fábrica de origen: las medidas pueden variar entre fábricas, por eso conviene fijar cuál."] },
+        { "t": "h2", "x": "Respaldo técnico" },
+        { "t": "ul", "x": ["Certificados de calidad vigentes.", "Informes de ensayos de laboratorio, con la norma aplicada.", "Certificación ISO del fabricante.", "Muestras físicas para aprobación de la fiscalización."] },
+        { "t": "h2", "x": "Diseño del pavimento" },
+        { "t": "ul", "x": ["Paquete estructural (subrasante, base y cama de arena) según tránsito y suelo.", "Confinamiento lateral: bordillos o elementos que impidan que la pieza se abra.", "Aparejo y juntas, y sellado con arena.", "Pendientes y drenaje."] },
+        { "t": "h2", "x": "Logística" },
+        { "t": "ul", "x": ["Cantidad total con merma, y entregas por etapas.", "Plazo de producción y fecha de inicio de obra.", "Puntos de entrega y volumen por viaje."] },
+        { "t": "p", "x": "En la sección de recursos para proyectistas de PAVIC encuentras la calculadora de obra, el texto para pliegos, el detalle de la pieza en DXF y la solicitud de certificados y ensayos." },
+        { "t": "cta", "x": "Ir a los recursos PAVIC", "href": "pavic-recursos.html" }
+      ],
+      "relacionados": [["pavic.html", "Conocer PAVIC"]]
+    },
+    {
+      "slug": "cuidado-del-ladrillo-visto",
+      "titulo": "Cuidado y mantenimiento del ladrillo visto",
+      "resumen": "Cómo limpiar y proteger el ladrillo a la vista para que se vea bien por años.",
+      "minutos": 3,
+      "fecha": "2026-10-22",
+      "imagen": "assets/img/productos/brick-estandar-2.jpg",
+      "cuerpo": [
+        { "t": "p", "x": "La cerámica es un material duradero, pero un buen mantenimiento evita manchas y deterioro de las juntas." },
+        { "t": "h2", "x": "Limpieza periódica" },
+        { "t": "p", "x": "Para el polvo y la suciedad común basta agua y un cepillo de cerdas suaves. Humedece la pared, cepilla y enjuaga de arriba hacia abajo." },
+        { "t": "h2", "x": "Manchas difíciles" },
+        { "t": "p", "x": "Antes de usar un producto químico, pruébalo en un sector pequeño y poco visible. Evita los ácidos fuertes sin consultar: pueden dañar las juntas y dejar manchas." },
+        { "t": "h2", "x": "Protección en exteriores" },
+        { "t": "p", "x": "En fachadas y muros expuestos a la lluvia, un hidrofugante que deje respirar el muro ayuda a limitar la absorción de agua. Aplícalo con el muro limpio y seco, y prueba primero en un sector pequeño." },
+        { "t": "h2", "x": "Revisa las juntas" },
+        { "t": "p", "x": "Las juntas son lo primero que se desgasta. Si ves grietas o material suelto, repáralas a tiempo para que no entre humedad detrás de la pieza." },
+        { "t": "h2", "x": "Humedad en la base" },
+        { "t": "p", "x": "Si aparecen manchas blancas o el muro se humedece desde abajo, revisa el drenaje y la impermeabilización de la base: la causa suele estar ahí, no en el ladrillo." },
+        { "t": "cta", "x": "Consultar a un ejecutivo", "href": "donde-estamos.html" }
+      ],
+      "relacionados": [["guias/como-colocar-enchape-de-ladrillo.html", "Cómo colocar enchape"], ["catalogo.html", "Catálogo de productos"]]
+    }
+  ]
+}

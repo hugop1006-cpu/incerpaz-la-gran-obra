@@ -1,0 +1,2238 @@
+<title>Wireframes INCERPAZ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Concepto: planos de obra. Papel de concreto frío, líneas de plano, rojo INCERPAZ solo en lo que convierte (leads, presupuesto, login). Amarillo solo para los pines de anotación. */
+:root {
+  --bg: #e9ebee;
+  --surface: #ffffff;
+  --surface-2: #f3f4f6;
+  --line: #c3c8cf;
+  --line-strong: #8d95a0;
+  --fg: #1a1d22;
+  --muted: #5b626d;
+  --accent: #b5121b;
+  --accent-ink: #ffffff;
+  --pin: #f2b705;
+  --pin-ink: #1a1d22;
+  --ok: #1f7a4d;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171b; --surface: #1d2127; --surface-2: #262b32; --line: #3a414a; --line-strong: #6b7480;
+    --fg: #eceef1; --muted: #9ba3ae; --accent: #e5484d; --accent-ink: #14171b; --pin: #f2b705; --pin-ink: #14171b; --ok: #4cc38a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171b; --surface: #1d2127; --surface-2: #262b32; --line: #3a414a; --line-strong: #6b7480;
+  --fg: #eceef1; --muted: #9ba3ae; --accent: #e5484d; --accent-ink: #14171b; --pin: #f2b705; --pin-ink: #14171b; --ok: #4cc38a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-block: 20px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: .01em; text-wrap: balance; margin: 0; line-height: 1.05; }
+h1 { font-size: clamp(34px, 6vw, 52px); text-transform: uppercase; }
+h2 { font-size: 28px; text-transform: uppercase; }
+h3 { font-size: 20px; }
+p { margin: 0; }
+.mono { font-family: var(--mono); font-size: 12px; }
+.muted { color: var(--muted); }
+
+/* encabezado de la lámina */
+.sheet-head { display: flex; flex-wrap: wrap; gap: 14px 24px; justify-content: space-between; align-items: end; border-bottom: 2px solid var(--fg); padding-bottom: 14px; }
+.sheet-head p { max-width: 58ch; color: var(--muted); margin-top: 8px; }
+.stamp { font-family: var(--mono); font-size: 11px; line-height: 1.6; text-align: right; color: var(--muted); }
+.stamp b { color: var(--fg); font-weight: 500; }
+
+nav.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+nav.tabs a {
+  font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: .04em; text-transform: uppercase;
+  padding: 7px 16px; border: 1.5px solid var(--line-strong); color: var(--fg); text-decoration: none; background: var(--surface);
+}
+nav.tabs a[aria-current="page"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+nav.tabs a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--pin); outline-offset: 2px; }
+
+section.view[hidden] { display: none; }
+.view { display: flex; flex-direction: column; gap: 22px; }
+
+/* marco de navegador */
+.wf { background: var(--surface); border: 1.5px solid var(--line-strong); }
+.chrome { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-bottom: 1.5px solid var(--line-strong); background: var(--surface-2); }
+.chrome i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
+.chrome span { margin-left: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line); background: var(--surface); padding: 2px 10px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.canvas { display: flex; flex-direction: column; }
+.blk { padding: 18px; border-bottom: 1px dashed var(--line); position: relative; }
+.blk:last-child { border-bottom: 0; }
+.blk-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.blk-title small { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.grid.g2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.grid.g3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.split { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: start; }
+
+/* imagen de relleno */
+.ph {
+  position: relative; border: 1.5px solid var(--line-strong); background: var(--surface-2); min-height: 120px;
+  background-image: linear-gradient(to top right, transparent calc(50% - .75px), var(--line) calc(50% - .75px), var(--line) calc(50% + .75px), transparent calc(50% + .75px)),
+                    linear-gradient(to bottom right, transparent calc(50% - .75px), var(--line) calc(50% - .75px), var(--line) calc(50% + .75px), transparent calc(50% + .75px));
+  display: flex; align-items: flex-end; padding: 8px;
+}
+.ph b { font-family: var(--mono); font-weight: 400; font-size: 11px; background: var(--surface); border: 1px solid var(--line); padding: 2px 6px; color: var(--muted); }
+.ph.tall { min-height: 260px; } .ph.hero { min-height: 240px; }
+
+/* piezas de interfaz */
+.btn { display: inline-flex; align-items: center; gap: 6px; font: 600 14px var(--body); padding: 9px 16px; border: 1.5px solid var(--fg); background: var(--surface); color: var(--fg); cursor: pointer; text-decoration: none; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.ghost { border-style: dashed; border-color: var(--line-strong); color: var(--muted); }
+.btn.wide { width: 100%; justify-content: center; }
+.chip { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line-strong); padding: 2px 8px; color: var(--muted); background: var(--surface); white-space: nowrap; }
+.chip.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.chip.lock { border-color: var(--accent); color: var(--accent); }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); font-family: var(--mono); }
+.field input, .field select { font: 400 14px var(--body); color: var(--fg); background: var(--surface); border: 1.5px solid var(--line-strong); padding: 8px 10px; min-width: 0; width: 100%; }
+.bar { height: 10px; background: var(--line); width: 100%; } .bar.s { width: 60%; } .bar.xs { width: 35%; }
+.card { border: 1.5px solid var(--line-strong); background: var(--surface); padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card.flat { border-color: var(--line); background: var(--surface-2); }
+.card h3 { font-size: 19px; }
+.card .sub { font-size: 13px; color: var(--muted); }
+.logo { font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: .06em; color: var(--accent); border: 2px solid var(--accent); padding: 0 8px; line-height: 1.2; }
+.nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-weight: 500; font-size: 14px; }
+.nav span { padding-block: 2px; border-bottom: 2px solid transparent; }
+.nav span.on { border-color: var(--accent); }
+.util { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; padding: 8px 18px; background: var(--fg); color: var(--bg); font-size: 12px; }
+.util select { font: 500 12px var(--body); background: transparent; color: inherit; border: 1px solid currentColor; padding: 2px 6px; }
+.util select option { color: #1a1d22; }
+.locked { position: relative; user-select: none; }
+.locked .dots { letter-spacing: .15em; color: var(--muted); }
+
+/* pines de anotación */
+.pin { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--pin); color: var(--pin-ink); font: 600 12px var(--mono); display: grid; place-items: center; font-style: normal; box-shadow: 0 0 0 2px var(--surface); z-index: 2; }
+.pin.in { position: static; flex: none; box-shadow: none; display: inline-grid; vertical-align: middle; }
+ol.notes { list-style: none; margin: 0; padding: 0; counter-reset: n; display: grid; gap: 10px 28px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+ol.notes li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; font-size: 14px; }
+ol.notes li::before { counter-increment: n; content: counter(n); width: 22px; height: 22px; border-radius: 50%; background: var(--pin); color: var(--pin-ink); font: 600 12px var(--mono); display: grid; place-items: center; margin-top: 1px; }
+ol.notes li b { display: block; font-weight: 600; }
+ol.notes li span { color: var(--muted); }
+.panel { background: var(--surface); border: 1.5px solid var(--line-strong); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.panel > h2 { border-bottom: 1.5px solid var(--line); padding-bottom: 8px; }
+
+/* tablas */
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1.5px solid var(--line-strong); white-space: nowrap; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.specs td:first-child { color: var(--muted); width: 42%; }
+
+/* arquitectura */
+.stack { display: grid; gap: 8px; }
+.layer { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: 14px; border: 1.5px solid var(--line-strong); background: var(--surface); padding: 12px 14px; align-items: start; }
+.layer b { font-family: var(--display); font-size: 20px; text-transform: uppercase; letter-spacing: .03em; line-height: 1.1; }
+.layer.core { border-color: var(--accent); }
+.layer p { font-size: 14px; color: var(--muted); }
+.layer p strong { color: var(--fg); font-weight: 600; }
+@media (max-width: 560px) { .layer { grid-template-columns: 1fr; gap: 4px; } }
+.tag-reco { font-family: var(--mono); font-size: 11px; background: var(--accent); color: var(--accent-ink); padding: 2px 8px; margin-left: 8px; vertical-align: middle; text-transform: uppercase; letter-spacing: .05em; }
+
+.seg { display: inline-flex; border: 1.5px solid var(--fg); }
+.seg button { font: 500 13px var(--body); padding: 6px 14px; border: 0; background: var(--surface); color: var(--fg); cursor: pointer; }
+.seg button + button { border-left: 1.5px solid var(--fg); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+.out { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.out small { font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--muted); display: block; margin-top: 4px; letter-spacing: 0; }
+.steps { display: grid; gap: 10px; counter-reset: s; }
+.steps div { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; }
+.steps div::before { counter-increment: s; content: counter(s); font-family: var(--display); font-weight: 700; font-size: 20px; width: 34px; height: 34px; border: 1.5px solid var(--fg); display: grid; place-items: center; }
+.steps b { font-weight: 600; display: block; } .steps span { font-size: 13px; color: var(--muted); }
+svg text { font-family: var(--mono); font-size: 9px; fill: var(--muted); }
+.theme-btn { font: 500 12px var(--mono); background: var(--surface); color: var(--fg); border: 1px solid var(--line-strong); padding: 4px 10px; cursor: pointer; }
+/* catálogo y pedido */
+.shop { display: grid; grid-template-columns: minmax(190px, 230px) 1fr; gap: 16px; align-items: start; }
+@media (max-width: 700px) { .shop { grid-template-columns: 1fr; } }
+.chk { display: flex; gap: 8px; align-items: center; font-size: 14px; justify-content: space-between; }
+.chk label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.chk input { accent-color: var(--accent); width: 16px; height: 16px; }
+.mini { font: 600 12px var(--body); padding: 5px 10px; border: 1.5px solid var(--fg); background: var(--surface); color: var(--fg); cursor: pointer; }
+.mini.on { background: var(--fg); color: var(--bg); }
+.qty { width: 90px; font: 400 14px var(--body); background: var(--surface); color: var(--fg); border: 1.5px solid var(--line-strong); padding: 4px 6px; text-align: right; }
+.done { border: 2px solid var(--ok); padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+/* más páginas */
+.sel { font: 400 13px var(--body); background: var(--surface); color: var(--fg); border: 1.5px solid var(--line-strong); padding: 4px 6px; }
+.lead { font-size: 15px; color: var(--muted); max-width: 62ch; }
+/* dónde estamos */
+.loc-list { display: flex; flex-direction: column; border: 1.5px solid var(--line-strong); max-height: 440px; overflow: auto; background: var(--surface); }
+.loc { display: grid; gap: 2px; text-align: left; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; font: 400 14px var(--body); }
+.loc b { font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.loc span { font-size: 13px; color: var(--muted); }
+.loc[aria-pressed="true"] { background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
+.map { position: relative; min-height: 380px; }
+.mp { position: absolute; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--fg); background: var(--surface); color: var(--fg); font: 600 11px var(--mono); display: grid; place-items: center; cursor: pointer; transform: translate(-50%, -50%); padding: 0; }
+.mp.fab { background: var(--fg); color: var(--bg); }
+.mp[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); z-index: 2; }
+.phone { width: min(300px, 100%); border: 2px solid var(--fg); background: var(--surface); margin: 0 auto; display: flex; flex-direction: column; }
+.phone > div { padding: 12px; border-bottom: 1px dashed var(--line); display: flex; flex-direction: column; gap: 8px; }
+.phone > div:last-child { border-bottom: 0; }
+.wa-preview { font-size: 13px; background: var(--surface-2); border: 1px dashed var(--line-strong); padding: 8px 10px; color: var(--muted); }
+.flag { font-family: var(--mono); font-size: 10px; color: var(--accent); border: 1px solid var(--accent); padding: 0 6px; white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) { .btn, nav.tabs a { transition: background .15s, color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="sheet-head">
+    <div>
+      <h1>Wireframes INCERPAZ</h1>
+      <p>Catorce pantallas para el refresh de incerpaz.com, más la plataforma sugerida. Es baja fidelidad: sirve para decidir estructura y flujo, no para aprobar colores ni fotos. Los precios, cantidades y textos de producto son de ejemplo.</p>
+    </div>
+    <div class="stamp">
+      <div><b>Lámina</b> 01 · borrador para revisión</div>
+      <div><b>Precios</b> solo con sesión iniciada</div>
+      <div><b>Ciudad</b> selector en el encabezado</div>
+      <button class="theme-btn" id="themeBtn" type="button">Tema: auto</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Pantallas">
+    <a href="#plataforma" data-tab="plataforma">Plataforma</a>
+    <a href="#home" data-tab="home">Home</a>
+    <a href="#ficha" data-tab="ficha">Ficha de producto</a>
+    <a href="#proyecto" data-tab="proyecto">Proyectos</a>
+    <a href="#pavic" data-tab="pavic">Portada PAVIC</a>
+    <a href="#techos" data-tab="techos">Categoría Techos</a>
+    <a href="#constructor" data-tab="constructor">Cuenta del constructor</a>
+    <a href="#donde" data-tab="donde">Dónde estamos</a>
+    <a href="#empresa" data-tab="empresa">Empresa</a>
+    <a href="#catalogo" data-tab="catalogo">Catálogo y búsqueda</a>
+    <a href="#pedido" data-tab="pedido">Presupuesto y pedido</a>
+    <a href="#paginas" data-tab="paginas">Más páginas</a>
+  </nav>
+
+  <!-- ============ PLATAFORMA ============ -->
+  <section class="view" id="v-plataforma" hidden>
+    <div class="panel">
+      <h2>PAVIC: portada de marca propia dentro de INCERPAZ</h2>
+      <div class="grid g3">
+        <div class="card flat"><h3>Lo que sé</h3><p class="sub">30 % de las ventas nacionales. Producto para proyectos grandes, privados y estatales. Solo se vende por canales INCERPAZ. Marca registrada, logo propio, certificados de calidad, ensayos e ISO.</p></div>
+        <div class="card flat"><h3>Dónde se hace y vende</h3><p class="sub">Dos fábricas independientes en Santa Cruz y Cochabamba, y producción en la planta de Oruro junto con los ladrillos. Punto de venta especializado en La Paz, abastecido desde Oruro.</p></div>
+        <div class="card flat"><h3>Recomendación</h3><p class="sub">Una portada dentro de incerpaz.com/pavic, con su logo y su tono. Comparte catálogo, cuenta, presupuesto y CRM con el resto. Un dominio corto puede redirigir a ella.</p></div>
+      </div>
+      <p>Como PAVIC vende a proyectos y no al público general, su portada habla distinto que la home: cotización por proyecto en lugar de carrito, documentación para licitaciones y proyectistas, obras de referencia y un ejecutivo de proyectos.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Quien compra para un proyecto necesita</th><th>La portada ofrece</th></tr></thead>
+          <tbody>
+            <tr><td>Saber cuánto material y cuántos camiones</td><td>Calculadora de volumen: m², merma, piezas, peso y camiones</td></tr>
+            <tr><td>Presentar el producto en una licitación o ante un auditor</td><td>Certificados de calidad, ensayos, ISO, fichas y manual, con descarga que pide datos de empresa</td></tr>
+            <tr><td>Diseñar y calcular el pavimento en el proyecto</td><td>Recursos para técnicos: guía de diseño, datos de ensayo, textos de especificación, detalles CAD y hoja de cuantificación</td></tr>
+            <tr><td>Ver que el producto ya se usó en obras como la suya</td><td>Obras de referencia, filtradas por privada o pública y por ciudad</td></tr>
+            <tr><td>Un precio de referencia y otro por volumen y plazo</td><td>Precio de lista con cuenta verificada, y formulario de proyecto (m², fecha de obra, tipo de entidad) que llega a un ejecutivo de proyectos</td></tr>
+            <tr><td>Ver y tocar el producto antes de decidir</td><td>Solicitud de muestras y puntos de venta PAVIC por ciudad</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">La portada se arma como plantilla de línea (hero, productos, herramienta, documentación, obras, dónde comprar, formulario). Si funciona, otras líneas la reutilizan sin diseñar de cero.</p>
+    </div>
+
+    <div class="panel">
+      <h2>TEJAS: por ahora, una categoría</h2>
+      <p>Tejas todavía no tiene marca, nombre ni logo propios, así que no justifica una portada aparte. Se queda como la categoría "Techos" del catálogo, con fichas y fotos bien hechas. La pestaña "Categoría Techos" muestra cómo se ve mientras tanto.</p>
+      <p class="muted">Cuando haya nombre y logo, al menos tres modelos con ficha y fotos, y una calculadora de tejas por m² y pendiente, se abre su portada con la misma plantilla de PAVIC. Definir esa marca es un trabajo aparte del sitio.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Cobertura real de ciudades</h2>
+      <p>El selector general ofrece Cochabamba, Santa Cruz, Oruro y Sucre. La Paz aparece solo con el punto de venta PAVIC, abastecido desde Oruro. Tarija no opera y no tiene comercializadores. Quien llega desde esas ciudades por otros productos ve un formulario de lista de espera, no una tienda.</p>
+      <p class="muted">Si luego se cotizan envíos desde otra planta a esas ciudades, la lista de espera sirve para medir demanda antes de invertir en distribuidores.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Qué copiamos de Toyota y Coca-Cola</h2>
+      <p class="muted">Lo que sigue sale de los menús y botones de coca-cola.com/us y toyota.com. Son sitios de marca que convierten con herramientas, no con catálogos.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Lo que hacen</th><th>Dónde lo vi</th><th>Equivalente en INCERPAZ</th></tr></thead>
+          <tbody>
+            <tr><td><b>Configurador</b> (Build &amp; Price) que termina en una cotización</td><td>Toyota: Build, Request a Quote, Payment Estimator</td><td>"Construye tu proyecto": eliges qué construir y los m², sale la lista de materiales y se pide presupuesto</td></tr>
+            <tr><td><b>Encuentra un distribuidor</b> con ofertas locales</td><td>Toyota: Find a Dealer, Local Specials</td><td>Dónde estamos: agencia de tu ciudad, ejecutivo de ventas y WhatsApp de esa agencia</td></tr>
+            <tr><td><b>Folletos y recursos del dueño</b></td><td>Toyota: Brochures, Owners Resources</td><td>Fichas técnicas y manuales por producto, descarga con correo (lead)</td></tr>
+            <tr><td><b>App con recompensas</b></td><td>Coca-Cola: +one App, Start Earning Today</td><td>Programa de constructores: puntos por compra, ofertas y promotor asignado</td></tr>
+            <tr><td><b>Dónde comprar</b> y seguimiento de pedido</td><td>Coca-Cola: Where to Buy, Order Status</td><td>Mismo bloque, más estado de pedido para clientes con cuenta</td></tr>
+            <tr><td><b>Promociones y marca</b> en la misma portada</td><td>Coca-Cola: Promos &amp; Offers, Play Now</td><td>Combos, promos por ciudad y el juego "La Gran Obra" como pieza de marca</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Plataforma recomendada <span class="tag-reco">Headless</span></h2>
+      <p class="muted">Un solo sitio para todas las ciudades, con las herramientas (calculadoras, configurador, presupuesto) hechas a medida. Cada capa se puede cambiar sin rehacer las demás.</p>
+      <div class="stack">
+        <div class="layer"><b>Sitio web</b><p><strong>Next.js.</strong> Páginas rápidas en celular, bien posicionadas en Google y con las calculadoras como componentes propios. Una PWA instalable para constructores sale de la misma base.</p></div>
+        <div class="layer"><b>Contenido</b><p><strong>CMS tipo Sanity o Strapi.</strong> Proyectos, manuales, fichas, blog, agencias y textos. El equipo de marketing edita sin tocar código.</p></div>
+        <div class="layer core"><b>Comercio y precios</b><p><strong>Medusa (open source), conectado al ERP propio.</strong> Una región por ciudad, listas de precios por tipo de cliente, cuentas B2B aprobadas, presupuestos y pedidos. Aquí vive la regla "precio solo con login".</p></div>
+        <div class="layer core"><b>Leads y CRM</b><p><strong>HubSpot, Zoho u Odoo CRM.</strong> Cada formulario, descarga y presupuesto crea un lead que se asigna al ejecutivo de la agencia de esa ciudad.</p></div>
+        <div class="layer"><b>WhatsApp</b><p><strong>WhatsApp Business API.</strong> Un número por ciudad, con mensaje prellenado que incluye el producto o proyecto que la persona estaba viendo.</p></div>
+        <div class="layer"><b>Pagos y envíos</b><p>QR, transferencia y tarjeta según lo que ya usan hoy, más integración con CDC para envíos. A validar con el banco y con logística.</p></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Alternativas</h2>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Opción</th><th>A favor</th><th>En contra</th></tr></thead>
+          <tbody>
+            <tr><td><b>Headless</b> (recomendada)</td><td>Máxima libertad para herramientas y diseño. Escala a nuevas ciudades y a exportación.</td><td>Necesita un equipo o agencia de desarrollo. Costo inicial mayor.</td></tr>
+            <tr><td><b>Odoo todo en uno</b></td><td>Inventario, facturación, CRM y tienda en un solo sistema. Buena si hoy no tienen ERP integrado.</td><td>Diseño y herramientas más rígidos. Hay que adaptarse a sus plantillas.</td></tr>
+            <tr><td><b>WordPress + WooCommerce</b> (hoy)</td><td>Ya lo usan y el equipo lo conoce.</td><td>Un sitio por ciudad, plugins sueltos, mantenimiento pesado. Hoy muestra errores técnicos públicos.</td></tr>
+            <tr><td><b>Shopify</b></td><td>Muy rápido de lanzar.</td><td>Precios por login, múltiples ciudades y pagos locales requieren planes altos o apps extra. No lo veo como el mejor ajuste aquí.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">Dato confirmado: la empresa tiene un ERP propio, así que se recomienda Medusa conectado a ese ERP y no Odoo, que duplicaría sus funciones.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Regla: precios solo con login</h2>
+      <div class="grid g3">
+        <div class="card"><h3>Visitante</h3><p class="sub">Ve producto, ficha, rendimiento y calculadora. En el precio ve "Ingresa para ver el precio" y puede pedir un presupuesto.</p></div>
+        <div class="card"><h3>Cuenta pendiente</h3><p class="sub">Se registró con nombre, ciudad y tipo (constructor, ferretería, dueño de casa). Un ejecutivo de esa ciudad la aprueba.</p></div>
+        <div class="card"><h3>Cliente verificado</h3><p class="sub">Ve precios de su ciudad, compra, repite pedidos y guarda presupuestos. El registro ya es un lead calificado.</p></div>
+      </div>
+      <p class="muted">Dos cuidados: los precios no deben viajar en el HTML a quien no inició sesión, y las páginas de producto deben seguir indexables para Google.</p>
+    </div>
+  </section>
+
+  <!-- ============ HOME ============ -->
+  <section class="view" id="v-home" hidden>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com</span></div>
+      <div class="canvas">
+        <div class="util">
+          <span>Compra telefónica y servicio al cliente 800-10-8810</span>
+          <span class="row" style="gap:10px">
+            <label for="citySel" class="mono">Tu ciudad</label>
+            <select id="citySel"><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option></select>
+            <span class="mono" id="cityWa">WhatsApp +591 7075 0963</span>
+          </span>
+          <i class="pin in">1</i>
+        </div>
+        <div class="blk row" style="justify-content:space-between">
+          <span class="logo">INCERPAZ</span>
+          <div class="nav"><span>Productos</span><span>Proyectos</span><span>Herramientas</span><span>Aprende</span><span>Dónde estamos</span><span>Empresa</span></div>
+          <div class="row"><span class="chip">Buscar</span><span class="chip">Presupuesto (0)</span><a class="btn primary" href="#home" onclick="return false">Ingresar</a></div>
+          <i class="pin">2</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <h2 style="font-size:clamp(34px,6vw,54px)">Construye con cerámica boliviana</h2>
+              <div class="bar"></div><div class="bar s"></div>
+              <div class="row"><a class="btn primary" href="#home" onclick="return false">Construye tu proyecto</a><a class="btn" href="#home" onclick="return false">Pedir presupuesto</a></div>
+              <span class="mono muted">Ladrillos, pisos, techos, revestimientos y refractarios. Desde Cochabamba.</span>
+            </div>
+            <div class="ph hero"><b>foto hero: obra terminada con enchape</b></div>
+          </div>
+          <i class="pin">3</i>
+        </div>
+        <div class="blk">
+          <div class="grid">
+            <div class="card flat"><h3>Calculadora</h3><span class="sub">Piezas por m²</span></div>
+            <div class="card flat"><h3>Presupuesto</h3><span class="sub">Lista y total</span></div>
+            <div class="card flat"><h3>Dónde comprar</h3><span class="sub">Agencia de tu ciudad</span></div>
+            <div class="card flat"><h3>WhatsApp</h3><span class="sub">Un asesor, ahora</span></div>
+          </div>
+          <i class="pin">4</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Productos</h3><small>6 categorías + combos</small></div>
+          <div class="grid">
+            <div class="card"><div class="ph"><b>muros</b></div><h3>Muros</h3></div>
+            <div class="card"><div class="ph"><b>piezas especiales</b></div><h3>Piezas especiales</h3></div>
+            <div class="card"><div class="ph"><b>pisos</b></div><h3>Pisos y pavimentos</h3></div>
+            <div class="card"><div class="ph"><b>techos</b></div><h3>Techos</h3></div>
+            <div class="card"><div class="ph"><b>revestimientos</b></div><h3>Revestimientos</h3></div>
+            <div class="card"><div class="ph"><b>refractarios</b></div><h3>Refractarios</h3></div>
+          </div>
+          <i class="pin">5</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Construye tu proyecto</h3><small>configurador, estilo "Build &amp; Price"</small></div>
+          <div class="grid g3">
+            <div class="card"><span class="mono muted">Paso 1</span><b>¿Qué vas a construir?</b><div class="row"><span class="chip on">Churrasquero</span><span class="chip">Mesón</span><span class="chip">Pared con enchape</span><span class="chip">Piso patio</span></div></div>
+            <div class="card"><span class="mono muted">Paso 2</span><b>Tamaño</b><div class="row"><span class="chip">Pequeño</span><span class="chip on">Mediano</span><span class="chip">Grande</span></div></div>
+            <div class="card"><span class="mono muted">Paso 3</span><b>Resultado</b><div class="bar"></div><div class="bar s"></div><a class="btn primary" href="#proyecto">Ver lista de materiales</a></div>
+          </div>
+          <i class="pin">6</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Proyectos para inspirarte</h3><small>carrusel</small></div>
+          <div class="grid g3">
+            <div class="card"><div class="ph"><b>churrasquero</b></div><b>Churrasquero de patio</b><span class="sub">Dificultad media · 2 días</span></div>
+            <div class="card"><div class="ph"><b>mesón</b></div><b>Mesón de cocina</b><span class="sub">Dificultad media · 3 días</span></div>
+            <div class="card"><div class="ph"><b>pared enchape</b></div><b>Pared con enchape</b><span class="sub">Dificultad baja · 1 día</span></div>
+          </div>
+          <i class="pin">7</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>¿Eres constructor o ferretero?</h3>
+              <span class="sub">Ingresa para ver precios de tu ciudad, repetir pedidos y tener un promotor asignado. Suma puntos en cada compra.</span>
+              <div class="row"><a class="btn primary" href="#home" onclick="return false">Crear cuenta</a><a class="btn" href="#home" onclick="return false">Ingresar</a></div>
+            </div>
+            <div class="grid"><div class="card"><b>Precios</b><span class="sub">de tu ciudad</span></div><div class="card"><b>Recompra</b><span class="sub">en 2 clics</span></div><div class="card"><b>Puntos <i class="pin in" title="Pendiente">!</i></b><span class="sub">por compra</span></div></div>
+          </div>
+          <i class="pin">8</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div class="ph tall"><b>mapa de agencias</b></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>Agencia más cercana</h3>
+              <div class="card"><b id="cityName">Cochabamba</b><span class="sub">Av. Circunvalación y Calle Miguel de Cervantes N° 181</span><span class="sub">Horario: por definir</span><a class="btn primary" href="#home" onclick="return false">Escribir por WhatsApp</a></div>
+              <span class="mono muted">10 puntos en Cochabamba. La lista completa vive en "Dónde estamos".</span>
+            </div>
+          </div>
+          <i class="pin">9</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Aprende</h3><small>contenido que atrae búsquedas</small></div>
+          <div class="grid g3">
+            <div class="card"><b>Manual de instalación</b><span class="sub">Por producto, con pasos y herramientas</span></div>
+            <div class="card"><b>Fichas técnicas</b><span class="sub">PDF, se piden con correo</span></div>
+            <div class="card"><b>Videos y revista digital</b><span class="sub">Obras reales y consejos</span></div>
+          </div>
+          <i class="pin">10</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="grid g3">
+            <div class="card"><b>PAVIC</b><span class="sub">Pavimentos para proyectos. <a href="#pavic">Ver portada</a></span></div>
+            <div class="card"><b>Exportaciones</b><span class="sub">Español e inglés</span></div>
+            <div class="card"><b>Juega "La Gran Obra"</b><span class="sub">Ladri y la tormenta. Pieza de marca.</span></div>
+          </div>
+          <i class="pin">11</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Pide tu presupuesto</h3><small>formulario corto</small></div>
+          <div class="grid">
+            <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+            <label class="field">Ciudad<select><option>Cochabamba</option></select></label>
+            <label class="field">Soy<select><option>Dueño de casa</option><option>Constructor</option><option>Ferretería</option></select></label>
+            <label class="field">Celular<input type="text" placeholder="7xxxxxxx"></label>
+          </div>
+          <div style="margin-top:12px"><a class="btn primary" href="#home" onclick="return false">Enviar</a></div>
+          <i class="pin">12</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="row" style="justify-content:space-between"><span class="logo">INCERPAZ</span><span class="mono muted">Mapa del sitio · Agencias · Redes · Servicio al cliente 800-10-8810 · Política de privacidad</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la home</h2>
+      <ol class="notes">
+        <li><div><b>Ciudad siempre visible</b><span>Reemplaza la portada actual que era solo un selector. Cambia WhatsApp, agencias y precios, y se recuerda en el navegador.</span></div></li>
+        <li><div><b>Presupuesto e Ingresar en el encabezado</b><span>Los dos botones que convierten están en todas las páginas.</span></div></li>
+        <li><div><b>Hero con dos salidas</b><span>Una para quien quiere inspirarse y otra para quien ya sabe qué necesita.</span></div></li>
+        <li><div><b>Cuatro herramientas arriba</b><span>Inspirado en el acceso rápido de Toyota: lo que la gente viene a hacer, a un clic.</span></div></li>
+        <li><div><b>Categorías actuales</b><span>Se mantienen las 6 del sitio de hoy más combos y promociones por ciudad.</span></div></li>
+        <li><div><b>Configurador</b><span>Tres pasos y llega a la lista de materiales. Es el equivalente de Build &amp; Price.</span></div></li>
+        <li><div><b>Proyectos</b><span>Cada tarjeta lleva a una página con materiales, planos y pasos.</span></div></li>
+        <li><div><b>Banda B2B</b><span>Invita a crear cuenta. Aprobar la cuenta es el primer filtro de lead.</span></div></li>
+        <li><div><b>Agencia más cercana</b><span>Usa la ciudad elegida. Hoy no hay mapa ni WhatsApp por agencia.</span></div></li>
+        <li><div><b>Aprende</b><span>Manuales y fichas hoy no existen. Las descargas piden correo.</span></div></li>
+        <li><div><b>Marca y exportación</b><span>Destaca PAVIC con enlace a su portada, une lo corporativo en un solo lugar y suma el juego como pieza simpática.</span></div></li>
+        <li><div><b>Formulario corto</b><span>Cuatro campos. Entra al CRM asignado al ejecutivo de la ciudad.</span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ FICHA ============ -->
+  <section class="view" id="v-ficha" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" class="asbtn" data-as="visit" id="asVisit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" id="asClient" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/productos/pisos-y-pavimentos/pavic-estandar</span></div>
+      <div class="canvas">
+        <div class="blk"><span class="mono muted">Inicio › Pisos y pavimentos › Pavic estándar</span></div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="ph tall"><b>foto principal</b></div>
+              <div class="grid" style="grid-template-columns:repeat(4,1fr)"><div class="ph" style="min-height:60px"><b>2</b></div><div class="ph" style="min-height:60px"><b>3</b></div><div class="ph" style="min-height:60px"><b>obra</b></div><div class="ph" style="min-height:60px"><b>video</b></div></div>
+              <i class="pin" style="top:-4px;right:-4px">1</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;position:relative">
+              <div class="row"><span class="chip">PVC STD</span><span class="chip">Línea PAVIC</span><span class="chip">Pisos y pavimentos</span></div>
+              <h2 style="font-size:38px">Pavic estándar</h2>
+              <p class="muted">Cerámica rectangular maciza, rústica en todos los lados y biselada en la cara superior.</p>
+              <div class="card flat" id="priceBox">
+                <div id="priceVisit" style="display:flex;flex-direction:column;gap:8px">
+                  <span class="chip lock" style="align-self:flex-start">Precio con sesión</span>
+                  <span class="sub">Ingresa para ver el precio en obra de Cochabamba.</span>
+                  <div class="row"><a class="btn primary" href="#ficha" onclick="return false">Ingresar</a><a class="btn" href="#ficha" onclick="return false">Crear cuenta</a></div>
+                </div>
+                <div id="priceClient" hidden style="display:flex;flex-direction:column;gap:6px">
+                  <span class="chip" style="align-self:flex-start;border-color:var(--ok);color:var(--ok)">Cliente verificado · Cochabamba</span>
+                  <span class="out">Bs 1,85 <small>por pieza, puesto en obra dentro del radio urbano · precio de ejemplo</small></span>
+                </div>
+                <i class="pin">2</i>
+              </div>
+              <div class="card" style="position:relative">
+                <h3>Calculadora de piezas</h3>
+                <div class="grid">
+                  <label class="field" for="calcM2">Superficie (m²)<input id="calcM2" type="number" min="0" step="0.5" value="12"></label>
+                  <label class="field" for="calcMerma">Merma<select id="calcMerma"><option value="0.05">5 %</option><option value="0.08" selected>8 %</option><option value="0.1">10 %</option></select></label>
+                </div>
+                <div class="grid">
+                  <div class="out" id="outPzas">0<small>piezas</small></div>
+                  <div class="out" id="outKg">0<small>kg aprox.</small></div>
+                </div>
+                <span class="mono muted">Rendimiento: 50 piezas por m². Peso: 2,65 kg por pieza.</span>
+                <i class="pin">3</i>
+              </div>
+              <div class="row">
+                <a class="btn primary" href="#ficha" onclick="return false">Añadir al presupuesto</a>
+                <a class="btn" href="#ficha" onclick="return false" id="btnBuy">Comprar</a>
+                <a class="btn" href="#ficha" onclick="return false">WhatsApp Cochabamba</a>
+              </div>
+              <span class="mono muted" id="buyNote">El botón Comprar se activa al ingresar. Presupuesto y WhatsApp funcionan sin cuenta.</span>
+            </div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="position:relative">
+              <div class="blk-title"><h3>Datos del producto</h3><small>del sitio actual</small></div>
+              <table class="specs"><tbody>
+                <tr><td>Código</td><td>PVC STD</td></tr>
+                <tr><td>Color</td><td>Naranja natural</td></tr>
+                <tr><td>Acabado</td><td>Textura rústica</td></tr>
+                <tr><td>Alto</td><td>6,6 cm</td></tr>
+                <tr><td>Largo</td><td>20 cm</td></tr>
+                <tr><td>Ancho</td><td>10 cm</td></tr>
+                <tr><td>Peso</td><td>2,65 kg</td></tr>
+                <tr><td>Rendimiento</td><td>50 piezas por m²</td></tr>
+              </tbody></table>
+              <i class="pin">4</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <div class="blk-title"><h3>Descargas y ayuda</h3></div>
+              <div class="card"><b>Ficha técnica (PDF)</b><span class="sub">Se envía al correo. Crea un lead.</span><span class="btn ghost" style="align-self:flex-start">Pedir ficha</span></div>
+              <div class="card"><b>Manual de instalación</b><span class="sub">Preparación, colocado, fraguado y limpieza.</span><span class="btn ghost" style="align-self:flex-start">Ver manual</span></div>
+              <div class="card"><b>Video de colocado</b><span class="sub">2 a 3 minutos, en obra.</span></div>
+              <i class="pin">5</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Proyectos donde se usa</h3><small>enlaza a Proyectos</small></div>
+          <div class="grid g3">
+            <div class="card"><div class="ph"><b>patio</b></div><b>Piso de patio</b></div>
+            <div class="card"><div class="ph"><b>churrasquero</b></div><b>Churrasquero de patio</b></div>
+            <div class="card"><div class="ph"><b>vereda</b></div><b>Vereda peatonal</b></div>
+          </div>
+          <i class="pin">6</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Productos relacionados</h3></div>
+          <div class="grid">
+            <div class="card"><div class="ph" style="min-height:80px"><b>Pavic con tetones</b></div></div>
+            <div class="card"><div class="ph" style="min-height:80px"><b>Pavic peatonal biselado</b></div></div>
+            <div class="card"><div class="ph" style="min-height:80px"><b>Brick estándar aligerado</b></div></div>
+            <div class="card"><div class="ph" style="min-height:80px"><b>Botaguas 1 caída</b></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la ficha</h2>
+      <ol class="notes">
+        <li><div><b>Galería con video</b><span>Hoy la ficha no muestra obras terminadas ni colocado.</span></div></li>
+        <li><div><b>Precio con sesión</b><span>Cambia el modo arriba para ver los dos estados. El visitante ve un botón claro en lugar de un hueco.</span></div></li>
+        <li><div><b>Calculadora en la ficha</b><span>Usa el rendimiento que ya existe en el catálogo. Pasa de "50 piezas por m²" a "cuántas compro".</span></div></li>
+        <li><div><b>Datos del catálogo actual</b><span>Se reutilizan sin cambios. Crecen con tonos, usos y certificaciones.</span></div></li>
+        <li><div><b>Descargas</b><span>La ficha técnica pide correo y celular. El manual es abierto para atraer búsquedas.</span></div></li>
+        <li><div><b>Proyectos relacionados</b><span>Cierra el ciclo: de producto a proyecto, de proyecto a presupuesto.</span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ PROYECTO ============ -->
+  <section class="view" id="v-proyecto" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Proyecto</span>
+      <div class="seg" role="group" aria-label="Proyecto">
+        <button type="button" data-proj="churrasquero" aria-pressed="true">Churrasquero</button>
+        <button type="button" data-proj="meson" aria-pressed="false">Mesón</button>
+        <button type="button" data-proj="pared" aria-pressed="false">Pared con enchape</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span id="pjUrl">incerpaz.com/proyectos/churrasquero-de-patio</span></div>
+      <div class="canvas">
+        <div class="blk"><span class="mono muted" id="pjCrumb">Inicio › Proyectos › Churrasquero de patio</span></div>
+        <div class="blk">
+          <div class="split">
+            <div class="ph hero"><b id="pjHero">foto: churrasquero terminado</b></div>
+            <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+              <h2 style="font-size:40px" id="pjTitle">Churrasquero de patio</h2>
+              <p class="muted" id="pjDesc">Cámara de cocción con refractario, base de piso cerámico y parrilla de hierro.</p>
+              <div class="row" id="pjChips"></div>
+              <div class="seg" role="group" aria-label="Tamaño" id="pjSizes"></div>
+              <span class="mono muted" id="dims">Medidas: 1,80 m de ancho × 0,60 m de fondo × 2,10 m de alto</span>
+              <div class="row"><a class="btn primary" href="#proyecto" onclick="return false">Añadir todo al presupuesto</a><a class="btn" href="#proyecto" onclick="return false">Hablar con un promotor</a></div>
+              <i class="pin">1</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Lista de materiales</h3><small>cantidades de ejemplo, se recalculan por tamaño</small></div>
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Material</th><th>Origen</th><th class="num">Cantidad</th><th class="num">Precio</th></tr></thead>
+              <tbody id="bom"></tbody>
+              <tfoot><tr><th colspan="3" style="text-align:right">Costo estimado, Cochabamba</th><th class="num" id="bomTotal"></th></tr></tfoot>
+            </table>
+          </div>
+          <div class="row" style="margin-top:12px"><span class="chip lock" id="bomChip">Precios con sesión</span><span class="muted" style="font-size:13px" id="bomNote">Ingresa para ver costos de tu ciudad. Las cantidades se ven siempre.</span></div>
+          <i class="pin">2</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="position:relative">
+              <div class="blk-title"><h3>Plano</h3><small>vista frontal, esquemática</small></div>
+              <div id="pjPlan"></div>
+              <div class="row" style="margin-top:8px"><span class="btn ghost">Planos PDF</span><span class="btn ghost">Archivo CAD</span></div>
+              <span class="mono muted">Descarga con correo y celular.</span>
+              <i class="pin">3</i>
+            </div>
+            <div style="position:relative">
+              <div class="blk-title"><h3>Paso a paso</h3><small>con video por paso</small></div>
+              <div class="steps" id="pjSteps"></div>
+              <i class="pin">4</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>¿Lo hacemos por ti?</h3>
+              <span class="sub">Pide un maestro recomendado de tu ciudad o un presupuesto con instalación.</span>
+              <div class="row"><a class="btn primary" href="#proyecto" onclick="return false">Pedir presupuesto con instalación</a></div>
+            </div>
+            <div class="grid"><div class="card"><b>Más proyectos</b><span class="sub">Mesón, pared con enchape, piso de patio</span></div><div class="card"><b>Productos usados</b><span class="sub">Cada fila de la lista enlaza a su ficha</span></div></div>
+          </div>
+          <i class="pin">5</i>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas del proyecto</h2>
+      <ol class="notes">
+        <li><div><b>Selector de tamaño</b><span>Cambia medidas, cantidades y costo al instante. Es la versión simple del configurador de la home.</span></div></li>
+        <li><div><b>Cantidades abiertas, precios con sesión</b><span>Cambia a "Cliente verificado" en la pestaña Ficha para ver la columna de precios. El presupuesto sale con o sin cuenta. Los materiales que no son de INCERPAZ se marcan como complemento.</span></div></li>
+        <li><div><b>Planos con captación</b><span>El plano se ve en pantalla. La descarga en PDF o CAD pide correo y celular.</span></div></li>
+        <li><div><b>Pasos con video</b><span>Cada paso puede llevar un video corto. Sirve a constructores y a dueños de casa.</span></div></li>
+        <li><div><b>Servicio</b><span>Para quien no quiere construirlo: presupuesto con instalación o un maestro de la zona. Abre una conversación de venta.</span></div></li>
+        <li><div><b>Una plantilla, muchos proyectos</b><span>Cambia entre churrasquero, mesón y pared con enchape arriba de la pantalla. La página es la misma: solo cambian los datos, el plano y los pasos. Cada proyecto nuevo cuesta el contenido, no el diseño.</span></div></li>
+      </ol>
+      <p class="muted">Las cantidades y medidas son de ejemplo para el wireframe. Antes de publicar, las valida el equipo técnico de INCERPAZ.</p>
+    </div>
+  </section>
+
+  <!-- ============ PORTADA PAVIC ============ -->
+  <section class="view" id="v-pavic" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" class="asbtn" data-as="visit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/pavic</span></div>
+      <div class="canvas">
+        <div class="util"><span>PAVIC es una marca de INCERPAZ</span><span class="mono">Ejecutivo de proyectos: por asignar por ciudad</span><i class="pin in">1</i></div>
+        <div class="blk row" style="justify-content:space-between">
+          <span class="row" style="gap:10px"><span class="logo" style="background:var(--fg);color:var(--bg);border-color:var(--fg)">PAVIC</span><span class="mono muted">logo y MR propios</span></span>
+          <div class="nav"><span>Productos</span><span>Obras</span><span>Documentación y recursos técnicos</span><span>Calculadora</span><span>Dónde comprar</span></div>
+          <a class="btn primary" href="#pavic" onclick="return false">Cotizar mi proyecto</a>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <h2 style="font-size:clamp(34px,6vw,54px)">Pavimento cerámico para proyectos grandes</h2>
+              <div class="bar"></div><div class="bar s"></div>
+              <div class="row"><a class="btn primary" href="#pavic" onclick="return false">Cotizar mi proyecto</a><a class="btn" href="#pavic" onclick="return false">Documentación técnica</a></div>
+              <div class="row"><span class="chip">Hecho en Bolivia</span><span class="chip">Plantas en Santa Cruz, Cochabamba y Oruro</span></div>
+            </div>
+            <div class="ph hero"><b>foto hero: plaza o vía peatonal terminada</b></div>
+          </div>
+          <i class="pin">2</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Para quién</h3><small>hipótesis, validar con ventas</small></div>
+          <div class="grid">
+            <div class="card"><b>Constructoras y obras privadas</b><span class="sub">Urbanizaciones, condominios, centros comerciales</span></div>
+            <div class="card"><b>Entidades públicas</b><span class="sub">Plazas, calles peatonales, parques</span></div>
+            <div class="card"><b>Arquitectos y proyectistas</b><span class="sub">Especificación y detalles</span></div>
+            <div class="card"><b>Dueños de casa</b><span class="sub">Patios y veredas, vía agencias</span></div>
+          </div>
+          <i class="pin">3</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Productos PAVIC</h3><small>del catálogo actual</small></div>
+          <div class="grid">
+            <div class="card"><div class="ph" style="min-height:90px"><b>foto</b></div><b>Pavic estándar</b><span class="sub">Rústico, biselado arriba</span></div>
+            <div class="card"><div class="ph" style="min-height:90px"><b>foto</b></div><b>Pavic con tetones</b><span class="sub">Con separadores</span></div>
+            <div class="card"><div class="ph" style="min-height:90px"><b>foto</b></div><b>Pavic peatonal natural</b><span class="sub">Uso peatonal</span></div>
+            <div class="card"><div class="ph" style="min-height:90px"><b>foto</b></div><b>Pavic peatonal biselado</b><span class="sub">Uso peatonal</span></div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Cada tarjeta lleva a la ficha de producto. Los usos por tipo de tráfico los confirma ingeniería.</span>
+          <i class="pin">4</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Calculadora de proyecto</h3><small>volumen, peso y camiones</small></div>
+          <div class="split">
+            <div class="grid">
+              <label class="field" for="pvM2">Superficie (m²)<input id="pvM2" type="number" min="0" step="100" value="2500"></label>
+              <label class="field" for="pvMerma">Merma<select id="pvMerma"><option value="0.05">5 %</option><option value="0.08" selected>8 %</option><option value="0.1">10 %</option></select></label>
+              <label class="field" for="pvCap">Kg por camión (ejemplo)<input id="pvCap" type="number" min="1000" step="1000" value="12000"></label>
+            </div>
+            <div class="grid">
+              <div class="out" id="pvPzas">0<small>piezas</small></div>
+              <div class="out" id="pvKg">0<small>kg aprox.</small></div>
+              <div class="out" id="pvCam">0<small>camiones</small></div>
+              <div class="out" id="pvCost">x<small>costo de lista, ejemplo</small></div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px"><a class="btn primary" href="#pavic" onclick="return false">Enviar estos datos a cotización</a><span class="mono muted">Calculado con Pavic estándar: 50 piezas por m², 2,65 kg por pieza. Para volumen, el precio final sale por cotización.</span></div>
+          <i class="pin">5</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Calidad y documentación</h3><small>descarga con nombre, empresa y correo</small></div>
+          <div class="grid g3">
+            <div class="card"><b>Certificados de calidad</b><span class="sub">Por producto y por lote, si aplica</span></div>
+            <div class="card"><b>Ensayos de laboratorio</b><span class="sub">Informes con resultados</span></div>
+            <div class="card"><b>Certificación ISO</b><span class="sub">Norma y alcance por indicar</span></div>
+            <div class="card"><b>Fichas técnicas</b><span class="sub">Por producto</span></div>
+            <div class="card"><b>Manual de colocado</b><span class="sub">Preparación, colocado, fraguado</span></div>
+            <div class="card"><b>Catálogo y carta de producto</b><span class="sub">PDF, para licitaciones</span></div>
+          </div>
+          <i class="pin">6</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Recursos para proyectistas y calculistas</h3><small>acceso con registro de técnico</small></div>
+          <div class="grid g3">
+            <div class="card"><b>Guía de diseño del pavimento</b><span class="sub">Base, sub-base, juntas, pendientes y drenaje</span></div>
+            <div class="card"><b>Resistencias y cargas</b><span class="sub">Datos de los ensayos por tipo de tráfico</span></div>
+            <div class="card"><b>Textos de especificación</b><span class="sub">Listos para pliegos y cómputos</span></div>
+            <div class="card"><b>Detalles constructivos</b><span class="sub">CAD y, más adelante, objetos BIM</span></div>
+            <div class="card"><b>Hoja de cuantificación</b><span class="sub">Cálculo de piezas, mortero y mano de obra</span></div>
+            <div class="card"><b>Consulta a un ingeniero</b><span class="sub">Formulario y WhatsApp técnico</span></div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Todo lo de esta lista se produce con el equipo técnico de INCERPAZ. Lo que ya existe se publica primero.</span>
+          <i class="pin">7</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Obras de referencia</h3>
+            <div class="seg" role="group" aria-label="Tipo de obra"><button type="button" data-kind="todas" aria-pressed="true">Todas</button><button type="button" data-kind="priv" aria-pressed="false">Privadas</button><button type="button" data-kind="pub" aria-pressed="false">Públicas</button></div>
+          </div>
+          <div class="grid g3" id="obras">
+            <div class="card" data-k="pub"><div class="ph"><b>foto</b></div><b>Plaza (ejemplo)</b><span class="sub">Pública · ciudad, año, m²</span></div>
+            <div class="card" data-k="priv"><div class="ph"><b>foto</b></div><b>Urbanización (ejemplo)</b><span class="sub">Privada · ciudad, año, m²</span></div>
+            <div class="card" data-k="pub"><div class="ph"><b>foto</b></div><b>Vía peatonal (ejemplo)</b><span class="sub">Pública · ciudad, año, m²</span></div>
+            <div class="card" data-k="priv"><div class="ph"><b>foto</b></div><b>Centro comercial (ejemplo)</b><span class="sub">Privada · ciudad, año, m²</span></div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Son marcadores. Los proyectos reales los aporta INCERPAZ.</span>
+          <i class="pin">8</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Cómo trabajamos un proyecto</h3><small>por validar con ventas</small></div>
+          <div class="steps">
+            <div><span><b>Consulta</b><span>Cuéntanos la obra, los m² y la fecha.</span></span></div>
+            <div><span><b>Cotización</b><span>Precio por volumen y plazo, por un ejecutivo de proyectos.</span></span></div>
+            <div><span><b>Muestras</b><span>Piezas para aprobar color y acabado.</span></span></div>
+            <div><span><b>Despacho</b><span>Entregas programadas desde la planta más cercana.</span></span></div>
+            <div><span><b>Asesoría en obra</b><span>Apoyo técnico durante el colocado.</span></span></div>
+          </div>
+          <i class="pin">9</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Dónde comprar PAVIC</h3><small>enlaza a Dónde estamos</small></div>
+          <div class="grid">
+            <div class="card"><b>Cochabamba</b><span class="sub">Planta PAVIC y agencias</span></div>
+            <div class="card"><b>Santa Cruz</b><span class="sub">Planta PAVIC y agencias</span></div>
+            <div class="card"><b>Oruro</b><span class="sub">Planta y agencias</span></div>
+            <div class="card"><b>La Paz</b><span class="sub">Punto de venta PAVIC</span></div>
+          </div>
+          <i class="pin">10</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Cotiza tu proyecto</h3><small>formulario para ejecutivo de proyectos</small></div>
+          <div class="grid">
+            <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+            <label class="field">Empresa o entidad<input type="text" placeholder="Razón social"></label>
+            <label class="field">Tipo<select><option>Privada</option><option>Estatal</option></select></label>
+            <label class="field">Ciudad de la obra<select><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>La Paz</option><option>Otra</option></select></label>
+            <label class="field">Superficie aproximada (m²)<input type="text" placeholder="2500"></label>
+            <label class="field">Inicio de obra<input type="text" placeholder="Mes y año"></label>
+            <label class="field">Celular<input type="text" placeholder="7xxxxxxx"></label>
+          </div>
+          <div style="margin-top:12px"><a class="btn primary" href="#pavic" onclick="return false">Enviar</a></div>
+          <i class="pin">11</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="row" style="justify-content:space-between"><span class="mono muted">PAVIC es una marca de INCERPAZ · Volver a incerpaz.com · Productos del catálogo general</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la portada PAVIC</h2>
+      <ol class="notes">
+        <li><div><b>Barra de marca madre</b><span>Deja claro que PAVIC es de INCERPAZ. El ejecutivo de proyectos se asigna por ciudad.</span></div></li>
+        <li><div><b>Hero para proyectos</b><span>El botón principal es cotizar, no comprar. La documentación técnica es la segunda salida.</span></div></li>
+        <li><div><b>Públicos</b><span>Los de proyectos van primero. El dueño de casa queda como cuarto público, atendido por agencias.</span></div></li>
+        <li><div><b>Productos</b><span>Los cuatro del catálogo actual. Cada uno usa la misma plantilla de ficha de producto.</span></div></li>
+        <li><div><b>Calculadora</b><span>Prueba el prototipo: cambia los m² y ve piezas, peso y camiones. El costo de lista solo aparece al cambiar a "Cliente verificado" arriba. La capacidad del camión es un dato de ejemplo.</span></div></li>
+        <li><div><b>Calidad y documentación</b><span>PAVIC tiene certificados de calidad, ensayos e ISO, y esta es la prueba que busca quien decide. Se descarga dejando empresa y correo, así que cada descarga es un lead calificado.</span></div></li>
+        <li><div><b>Recursos para técnicos</b><span>Material para quien diseña y calcula el proyecto: guía de diseño, datos de ensayo, textos de especificación y detalles. Quien especifica PAVIC en un plano lo pide después en la obra.</span></div></li>
+        <li><div><b>Obras de referencia</b><span>La prueba más fuerte para quien decide un proyecto. Filtra por tipo de obra.</span></div></li>
+        <li><div><b>Proceso</b><span>Dice qué pasa después de pedir cotización. Reduce la duda de quien nunca compró.</span></div></li>
+        <li><div><b>Dónde comprar</b><span>Incluye el punto de venta PAVIC de La Paz, abastecido desde Oruro.</span></div></li>
+        <li><div><b>Formulario de proyecto</b><span>Tipo de entidad y m² permiten priorizar. Entra al CRM del ejecutivo de esa ciudad.</span></div></li>
+      </ol>
+      <p class="muted">Precios: una cuenta verificada ve el precio de lista de referencia. Los proyectos de volumen se cotizan con un ejecutivo.</p>
+    </div>
+  </section>
+
+  <!-- ============ CATEGORÍA TECHOS ============ -->
+  <section class="view" id="v-techos" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" class="asbtn" data-as="visit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/productos/techos</span></div>
+      <div class="canvas">
+        <div class="blk"><span class="mono muted">Inicio › Productos › Techos y tejados</span></div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+              <h2 style="font-size:clamp(32px,5vw,46px)">Techos y tejados</h2>
+              <p class="muted">Tejas cerámicas para techos nuevos y para renovar. Calcula cuántas necesitas según la superficie y la pendiente.</p>
+              <div class="row"><a class="btn primary" href="#techos" onclick="return false">Pedir presupuesto</a><a class="btn" href="#techos" onclick="return false">WhatsApp de mi ciudad</a></div>
+              <i class="pin">1</i>
+            </div>
+            <div class="card flat" style="position:relative">
+              <span class="chip lock" style="align-self:flex-start">Marca en preparación</span>
+              <b>Una marca propia para las tejas <i class="pin in" title="Pendiente">!</i></b>
+              <span class="sub">Cuando exista nombre y logo, esta categoría pasa a una portada como la de PAVIC, con la misma plantilla.</span>
+              <i class="pin">2</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Modelos</h3><small>del catálogo actual</small></div>
+          <div class="grid">
+            <div class="card"><div class="ph" style="min-height:100px"><b>foto</b></div><b>Teja colonial 36</b><span class="chip lock" style="align-self:flex-start">Precio con sesión</span></div>
+            <div class="card"><div class="ph" style="min-height:100px"><b>foto</b></div><b>Teja andina</b><span class="chip lock" style="align-self:flex-start">Precio con sesión</span></div>
+            <div class="card"><div class="ph" style="min-height:100px"><b>foto</b></div><b>Otros modelos y accesorios</b><span class="sub">Hay 6 productos en la categoría actual</span></div>
+          </div>
+          <i class="pin">3</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Calculadora de tejas</h3><small>superficie real según la pendiente</small></div>
+          <div class="split">
+            <div class="grid">
+              <label class="field" for="tkArea">Área en planta (m²)<input id="tkArea" type="number" min="0" step="1" value="80"></label>
+              <label class="field" for="tkPend">Pendiente (%)<input id="tkPend" type="number" min="0" step="1" value="35"></label>
+              <label class="field" for="tkModel">Modelo<select id="tkModel"><option value="16">Teja colonial 36</option><option value="14">Teja andina</option></select></label>
+              <label class="field" for="tkMerma">Merma<select id="tkMerma"><option value="0.05">5 %</option><option value="0.08" selected>8 %</option><option value="0.1">10 %</option></select></label>
+            </div>
+            <div class="grid">
+              <div class="out" id="tkSup">0<small>m² de techo real</small></div>
+              <div class="out" id="tkPzas">0<small>tejas</small></div>
+              <div class="out" id="tkCost">x<small>costo de lista, ejemplo</small></div>
+            </div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">La superficie real es el área en planta por √(1 + pendiente²). Las tejas por m² (16 y 14) y el precio son de ejemplo. La pendiente mínima de cada modelo sale de su ficha técnica, por confirmar.</span>
+          <i class="pin">4</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="position:relative">
+              <div class="blk-title"><h3>Cómo instalar un techo</h3><small>guía con video, por producir</small></div>
+              <div class="steps">
+                <div><span><b>Estructura y pendiente</b><span>Verificar listones y caída antes de colocar.</span></span></div>
+                <div><span><b>Replanteo de hiladas</b><span>Marcar las líneas guía de abajo hacia arriba.</span></span></div>
+                <div><span><b>Colocado y traslape</b><span>Según el modelo y la pendiente.</span></span></div>
+                <div><span><b>Caballetes y remates</b><span>Cumbrera, limatesas y bordes.</span></span></div>
+                <div><span><b>Revisión y mantenimiento</b><span>Limpieza de canales y teja suelta.</span></span></div>
+              </div>
+              <i class="pin">5</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <div class="blk-title" style="margin:0"><h3>Descargas</h3></div>
+              <div class="card"><b>Fichas técnicas</b><span class="sub">Por modelo</span></div>
+              <div class="card"><b>Manual de instalación</b><span class="sub">PDF y video</span></div>
+              <div class="card"><b>Galería de techos</b><span class="sub">Obras terminadas por ciudad</span></div>
+              <i class="pin">6</i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la categoría Techos</h2>
+      <ol class="notes">
+        <li><div><b>Portada simple</b><span>Sin marca propia, la categoría usa la plantilla estándar de catálogo. Los dos botones de siempre: presupuesto y WhatsApp.</span></div></li>
+        <li><div><b>Espacio para la marca futura</b><span>El pin amarillo marca la decisión pendiente: nombre, logo y registro de la marca de tejas.</span></div></li>
+        <li><div><b>Modelos con precio con sesión</b><span>Colonial 36 y Andina salen del catálogo de Exportaciones. Los demás se completan con ventas.</span></div></li>
+        <li><div><b>Calculadora</b><span>Prueba el prototipo: cambia el área o la pendiente y ve la superficie real y las tejas. El costo aparece al cambiar a "Cliente verificado".</span></div></li>
+        <li><div><b>Guía de instalación</b><span>Atrae búsquedas ("cómo instalar tejas") y reduce reclamos por mala colocación.</span></div></li>
+        <li><div><b>Descargas</b><span>Las fichas piden correo, igual que en el resto del sitio.</span></div></li>
+      </ol>
+      <p class="muted">Los rendimientos, precios y pasos son de ejemplo. Los valida el equipo técnico de INCERPAZ.</p>
+    </div>
+  </section>
+
+  <!-- ============ CUENTA DEL CONSTRUCTOR ============ -->
+  <section class="view" id="v-constructor" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Estado de la cuenta</span>
+      <div class="seg" role="group" aria-label="Estado de la cuenta">
+        <button type="button" data-cn="reg" aria-pressed="false">Registro</button>
+        <button type="button" data-cn="pend" aria-pressed="false">Pendiente</button>
+        <button type="button" data-cn="ok" aria-pressed="true">Verificada</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span id="cnUrl">incerpaz.com/mi-cuenta</span></div>
+      <div class="canvas">
+
+        <div id="cnReg" hidden>
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+                <h2 style="font-size:clamp(32px,5vw,46px)">Crea tu cuenta</h2>
+                <p class="muted">Con una cuenta verificada ves los precios de tu ciudad, guardas presupuestos por obra, repites pedidos y, cuando exista el programa, sumas puntos.</p>
+                <div class="grid">
+                  <label class="field">Soy<select><option>Constructor independiente</option><option>Empresa constructora</option><option>Ferretería o distribuidor</option><option>Entidad pública</option><option>Proyectista o calculista</option><option>Dueño de casa</option></select></label>
+                  <label class="field">Nombre o razón social<input type="text" placeholder="Nombre o razón social"></label>
+                  <label class="field">NIT o CI<input type="text" placeholder="Número"></label>
+                  <label class="field">Ciudad<select><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option><option>Otra</option></select></label>
+                  <label class="field">Celular o WhatsApp<input type="text" placeholder="7xxxxxxx"></label>
+                  <label class="field">Correo<input type="text" placeholder="correo@ejemplo.com"></label>
+                </div>
+                <div><a class="btn primary" href="#constructor" onclick="return false">Crear cuenta</a></div>
+                <i class="pin">1</i>
+              </div>
+              <div class="card flat" style="position:relative">
+                <h3>Qué pasa después</h3>
+                <div class="steps">
+                  <div><span><b>Recibimos tus datos</b><span>Puedes ver el sitio y usar las calculadoras, sin precios.</span></span></div>
+                  <div><span><b>Un ejecutivo de tu ciudad te llama</b><span>Confirma tus datos y tu tipo de cliente.</span></span></div>
+                  <div><span><b>Tu cuenta se activa</b><span>Plazo por definir con ventas.</span></span></div>
+                </div>
+                <i class="pin">2</i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="cnPend" hidden>
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+                <span class="chip lock" style="align-self:flex-start">Cuenta en revisión</span>
+                <h2 style="font-size:clamp(30px,5vw,42px)">Estamos verificando tu cuenta</h2>
+                <p class="muted">Un ejecutivo de Cochabamba revisa tus datos. Mientras tanto puedes:</p>
+                <div class="row"><span class="btn">Armar presupuesto sin precios</span><span class="btn">Usar las calculadoras</span><span class="btn">Ver proyectos</span></div>
+                <div class="row"><span class="btn primary">Hablar con mi ejecutivo por WhatsApp</span></div>
+                <i class="pin">3</i>
+              </div>
+              <div class="card flat"><h3>Tus datos</h3><table class="specs"><tbody><tr><td>Tipo</td><td>Empresa constructora</td></tr><tr><td>Ciudad</td><td>Cochabamba</td></tr><tr><td>Enviada</td><td>hoy</td></tr></tbody></table><span class="btn ghost" style="align-self:flex-start">Corregir datos</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="cnOk">
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="row" style="justify-content:space-between;position:relative">
+              <div><span class="chip" style="border-color:var(--ok);color:var(--ok)">Cliente verificado</span><h2 style="font-size:34px;margin-top:6px">Constructora Ejemplo S.R.L.</h2><span class="mono muted">Cochabamba · cuenta de ejemplo</span></div>
+              <div class="grid" style="flex:1 1 320px;max-width:520px">
+                <div class="card"><b>Mi ejecutivo</b><span class="sub">Por asignar</span><span class="btn" style="align-self:flex-start">WhatsApp</span></div>
+                <div class="card"><b>Puntos <i class="pin in" title="Pendiente">!</i></b><span class="out" style="font-size:28px">1.240<small>programa por definir</small></span></div>
+              </div>
+              <i class="pin">4</i>
+            </div>
+          </div>
+
+          <div class="blk">
+            <div class="split" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+              <div style="position:relative">
+                <div class="blk-title"><h3>Presupuesto en curso</h3><small>precios de lista de Cochabamba, ejemplo</small></div>
+                <div class="scroll"><table>
+                  <thead><tr><th>Producto</th><th class="num">Precio</th><th class="num">Cantidad</th><th class="num">Subtotal</th></tr></thead>
+                  <tbody id="cnLines"></tbody>
+                  <tfoot><tr><th colspan="3" style="text-align:right">Total</th><th class="num" id="cnTotal"></th></tr></tfoot>
+                </table></div>
+                <div class="row" style="margin-top:10px">
+                  <label class="field" for="cnObra" style="flex:1 1 180px">Guardar en la obra<select id="cnObra"><option>Edificio Av. Ejemplo</option><option>Urbanización Los Pinos (ejemplo)</option><option>Nueva obra…</option></select></label>
+                </div>
+                <div class="row" style="margin-top:10px"><span class="btn">Guardar</span><span class="btn">Enviar a mi ejecutivo</span><span class="btn primary">Convertir en pedido</span></div>
+                <i class="pin">5</i>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+                <div class="blk-title" style="margin:0"><h3>Mis obras</h3><small>agrupan presupuestos y pedidos</small></div>
+                <div class="card"><b>Edificio Av. Ejemplo</b><span class="sub">2 presupuestos · 1 pedido en despacho</span></div>
+                <div class="card"><b>Urbanización Los Pinos (ejemplo)</b><span class="sub">1 presupuesto enviado</span></div>
+                <span class="btn ghost" style="align-self:flex-start">Nueva obra</span>
+                <i class="pin">6</i>
+              </div>
+            </div>
+          </div>
+
+          <div class="blk">
+            <div class="blk-title"><h3>Presupuestos y pedidos</h3><small>estados de ejemplo</small></div>
+            <div class="scroll"><table>
+              <thead><tr><th>N°</th><th>Obra</th><th>Fecha</th><th>Estado</th><th class="num">Total</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>P-0412</td><td>Edificio Av. Ejemplo</td><td>12 oct</td><td><span class="chip">Borrador</span></td><td class="num">Bs 18.400</td><td><span class="btn ghost">Abrir</span></td></tr>
+                <tr><td>P-0409</td><td>Edificio Av. Ejemplo</td><td>03 oct</td><td><span class="chip">Enviado</span></td><td class="num">Bs 7.250</td><td><span class="btn ghost">Abrir</span></td></tr>
+                <tr><td>PD-0187</td><td>Edificio Av. Ejemplo</td><td>28 sep</td><td><span class="chip on">En despacho</span></td><td class="num">Bs 31.900</td><td><span class="btn">Repetir</span></td></tr>
+                <tr><td>PD-0170</td><td>Urbanización Los Pinos</td><td>05 sep</td><td><span class="chip" style="border-color:var(--ok);color:var(--ok)">Entregado</span></td><td class="num">Bs 12.600</td><td><span class="btn">Repetir</span></td></tr>
+              </tbody>
+            </table></div>
+            <div class="steps" style="margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+              <div><span><b>Recibido</b><span>Pedido ingresado</span></span></div>
+              <div><span><b>Confirmado</b><span>Stock y precio</span></span></div>
+              <div><span><b>En despacho</b><span>Transporte en camino</span></span></div>
+              <div><span><b>Entregado</b><span>Recepción en obra</span></span></div>
+            </div>
+            <i class="pin">7</i>
+          </div>
+
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="grid g3">
+              <div class="card"><b>Precios de mi ciudad</b><span class="sub">Lista completa, descargable</span></div>
+              <div class="card"><b>Documentos favoritos</b><span class="sub">Fichas, certificados, manuales</span></div>
+              <div class="card"><b>Calculadoras</b><span class="sub">Piezas, muros, pavimentos</span></div>
+              <div class="card"><b>Puntos y premios <i class="pin in" title="Pendiente">!</i></b><span class="sub">Historial y canje. Programa pendiente</span></div>
+              <div class="card"><b>Mis facturas</b><span class="sub">Facturas de mis compras. Fase 2, requiere conectar el ERP</span></div>
+              <div class="card"><b>Mis datos</b><span class="sub">Contactos y direcciones de entrega</span></div>
+            </div>
+            <i class="pin">8</i>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la cuenta</h2>
+      <ol class="notes">
+        <li><div><b>Registro por tipo de cliente</b><span>Constructor, empresa, ferretería, entidad pública, proyectista o dueño de casa. El tipo define qué ve y quién lo atiende.</span></div></li>
+        <li><div><b>Verificación humana</b><span>Un ejecutivo de la ciudad llama. Es el filtro que protege los precios y convierte el registro en un lead calificado.</span></div></li>
+        <li><div><b>Cuenta pendiente útil</b><span>Quien espera puede usar calculadoras y armar presupuestos sin precios, y no abandona.</span></div></li>
+        <li><div><b>Resumen</b><span>Ejecutivo asignado y puntos arriba. Es la parte de "app con recompensas" tomada de Coca-Cola.</span></div></li>
+        <li><div><b>Presupuesto en curso</b><span>Prueba el prototipo: cambia cantidades y ve el total. Es la pieza central: del presupuesto sale el pedido o el envío al ejecutivo.</span></div></li>
+        <li><div><b>Obras</b><span>Un constructor trabaja por obra. Agrupar presupuestos y pedidos por obra evita rehacer listas.</span></div></li>
+        <li><div><b>Pedidos con estado y recompra</b><span>Repetir un pedido en un clic es lo que más ahorra tiempo en obras que se repiten.</span></div></li>
+        <li><div><b>Atajos</b><span>Las facturas dependen de conectar el ERP, así que van a una segunda fase. Sin línea de crédito, la cuenta no muestra saldos ni cupos.</span></div></li>
+      </ol>
+      <p class="muted">Precios, totales, puntos y nombres son de ejemplo. El programa de puntos está pendiente (pin amarillo "!"): falta decidir si existe, y con qué premios y niveles.</p>
+    </div>
+  </section>
+
+  <!-- ============ DÓNDE ESTAMOS ============ -->
+  <section class="view" id="v-donde" hidden>
+    <div class="panel">
+      <h2>Lo que encontré en la página actual</h2>
+      <ol class="notes" style="counter-reset:none">
+        <li><div><b>Dos tablas distintas en la misma página</b><span>Cada ciudad aparece dos veces, con ejecutivos y números que no coinciden. Por ejemplo, la agencia Central de Cochabamba tiene el WhatsApp 79723246 en una tabla y 70750963 en la otra.</span></div></li>
+        <li><div><b>Números repetidos o faltantes</b><span>En la tabla más nueva, Castillo repite el número de la fábrica de Cochabamba, y varias agencias de Santa Cruz no tienen teléfono fijo. Aquí marqué el repetido con "revisar dato".</span></div></li>
+        <li><div><b>No hay mapa, horarios ni búsqueda por zona</b><span>Hoy es solo una lista por ciudad.</span></div></li>
+        <li><div><b>Páginas que muestran ciudades sin operación</b><span>Las fábricas de La Paz y Tarija están paradas y no hay comercializadores, pero la página actual aún lista 7 y 1 puntos allá, y la portada todavía enlaza la tienda de Tarija. El wireframe muestra Cochabamba 10 puntos (9 más la fábrica PAVIC), Santa Cruz 9, Oruro 2, Sucre 1 y en La Paz solo el punto de venta PAVIC.</span></div></li>
+      </ol>
+      <p class="muted">Todo esto sale de la página de agencias de cbba.tienda.incerpaz.com. Los nombres de los ejecutivos no se muestran en el wireframe.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Pendientes de datos</h2>
+      <p class="muted">Los marqué con el pin amarillo "!" en la lista y en las fichas.</p>
+      <ol class="notes" style="counter-reset:none">
+        <li><div><b>Punto de venta PAVIC de La Paz</b><span>Dirección, teléfono, WhatsApp y horario. Se ve luego.</span></div></li>
+        <li><div><b>Fábricas PAVIC de Cochabamba y Santa Cruz</b><span>Dirección de cada una. Son independientes de las fábricas generales aunque cercanas.</span></div></li>
+        <li><div><b>Fábrica de Oruro</b><span>Confirmar la dirección tomada del sitio actual.</span></div></li>
+        <li><div><b>Agencia Castillo, Cochabamba</b><span>Su WhatsApp es igual al de la fábrica. Falta el número propio.</span></div></li>
+      </ol>
+    </div>
+
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/donde-estamos</span></div>
+      <div class="canvas">
+        <div class="blk">
+          <div style="position:relative;display:flex;flex-direction:column;gap:12px">
+            <h2 style="font-size:clamp(32px,5vw,46px)">Dónde estamos</h2>
+            <div class="row" id="cityTabs" role="group" aria-label="Ciudad"></div>
+            <div class="row">
+              <label class="field" for="locQ" style="flex:1 1 220px">Busca tu zona o avenida<input id="locQ" type="search" placeholder="Ej. Quillacollo, Plan 3000, Calacoto"></label>
+              <div class="seg" role="group" aria-label="Tipo de punto" style="align-self:end">
+                <button type="button" data-type="todas" aria-pressed="true">Todos</button>
+                <button type="button" data-type="ag" aria-pressed="false">Agencias</button>
+                <button type="button" data-type="fab" aria-pressed="false">Fábricas</button>
+              </div>
+              <span class="btn ghost" style="align-self:end">Usar mi ubicación</span>
+            </div>
+            <i class="pin" style="top:-4px;right:-4px">1</i>
+          </div>
+        </div>
+        <div class="blk">
+          <div class="split" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+            <div style="position:relative">
+              <div class="blk-title"><h3 id="locCount">Puntos</h3><small>lista sincronizada con el mapa</small></div>
+              <div class="loc-list" id="locList"></div>
+              <i class="pin" style="top:-4px;right:-4px">2</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+              <div class="ph map" id="locMap"><b>mapa de la ciudad (posiciones ilustrativas)</b></div>
+              <div class="card" id="locDetail"></div>
+              <i class="pin" style="top:-4px;right:-4px">3</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>¿Estás en Tarija u otra ciudad?</h3>
+              <span class="sub">Hoy no tenemos agencia ahí. Déjanos tu celular y te avisamos cuando abramos. En La Paz solo hay punto de venta PAVIC.</span>
+              <div class="grid">
+                <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+                <label class="field">Celular<input type="text" placeholder="7xxxxxxx"></label>
+              </div>
+              <div><a class="btn primary" href="#donde" onclick="return false">Que me llamen</a></div>
+            </div>
+            <div class="grid">
+              <div class="card"><b>Servicio al cliente</b><span class="sub">800-10-8810</span></div>
+              <div class="card"><b>Correo de ventas</b><span class="sub">ventas.cbba@incerpaz.com</span></div>
+              <div class="card"><b>Exportaciones</b><span class="sub">Sitio en español e inglés</span></div>
+            </div>
+          </div>
+          <i class="pin">4</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Nuestras fábricas</h3><small>las que operan hoy</small></div>
+          <div class="grid g3">
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cochabamba</b><span class="sub">Av. Villazón Km 7 1/2</span><div class="row"><span class="chip">Cerámica y ladrillos</span></div></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Santa Cruz</b><span class="sub">Carretera Warnes–Montero Km 37 1/2</span><div class="row"><span class="chip">Cerámica y ladrillos</span></div></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Oruro</b><span class="sub">Carretera Oruro–La Paz Km 31</span><div class="row"><span class="chip">Ladrillos</span><span class="chip lock">PAVIC</span></div></div>
+          </div>
+          <div class="blk-title" style="margin-top:14px"><h3>Fábricas PAVIC</h3><small>independientes de las anteriores</small></div>
+          <div class="grid g3">
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cochabamba</b><span class="sub">Dirección por confirmar <i class="pin in" title="Pendiente de datos">!</i></span><div class="row"><span class="chip lock">PAVIC</span></div></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Santa Cruz</b><span class="sub">Dirección por confirmar <i class="pin in" title="Pendiente de datos">!</i></span><div class="row"><span class="chip lock">PAVIC</span></div></div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Direcciones de las fábricas generales tomadas del sitio actual. Hay que confirmar la de Oruro.</span>
+          <i class="pin">5</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Distribuidores autorizados</h3><small>fase 2, como el buscador de distribuidor de Weber. Hoy sin datos.</small></div>
+          <div class="grid"><div class="card flat"><span class="sub">Ferreterías y corralones que venden INCERPAZ en ciudades sin agencia propia. Se activa cuando existan los primeros.</span></div></div>
+          <i class="pin">6</i>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Versión celular</h2>
+      <p class="muted">En el teléfono la lista va primero y el mapa se abre con un botón. El botón de WhatsApp queda fijo abajo.</p>
+      <div class="phone">
+        <div><span class="mono muted">incerpaz.com/donde-estamos</span><b style="font-family:var(--display);font-size:26px;text-transform:uppercase">Dónde estamos</b>
+          <div class="row" style="gap:6px"><span class="chip on">Cochabamba</span><span class="chip">Santa Cruz</span><span class="chip">Oruro</span><span class="chip">Sucre</span></div>
+          <div class="field">Busca tu zona<input type="search" placeholder="Zona o avenida" disabled></div>
+          <div class="seg" style="align-self:flex-start"><button type="button" aria-pressed="true">Lista</button><button type="button" aria-pressed="false">Mapa</button></div>
+        </div>
+        <div style="gap:0;padding:0">
+          <div class="loc" style="padding:10px 12px;border-bottom:1px solid var(--line);box-shadow:inset 4px 0 0 var(--accent);background:var(--surface-2)"><b>Central <span class="chip">Agencia</span></b><span>Av. Circunvalación y Calle Miguel de Cervantes N° 181</span></div>
+          <div class="loc" style="padding:10px 12px"><b>Quillacollo <span class="chip">Agencia</span></b><span>Av. Blanco Galindo Km 10 1/2</span></div>
+        </div>
+        <div><a class="btn primary wide" href="#donde" onclick="return false">Escribir por WhatsApp</a><a class="btn wide" href="#donde" onclick="return false">Cómo llegar</a></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Notas de la pantalla</h2>
+      <ol class="notes">
+        <li><div><b>Filtros</b><span>Ciudad, tipo de punto y búsqueda por zona. "Usar mi ubicación" ordena por cercanía cuando la persona lo permite.</span></div></li>
+        <li><div><b>Lista y mapa sincronizados</b><span>Elegir en uno marca el otro. Prueba el prototipo: cambia de ciudad y toca un punto. Los números del mapa son del orden de la lista, no coordenadas.</span></div></li>
+        <li><div><b>Ficha del punto</b><span>Dirección, teléfono, WhatsApp, horario y servicios. El mensaje de WhatsApp sale armado con el producto o proyecto que la persona venía viendo.</span></div></li>
+        <li><div><b>Ciudades sin cobertura</b><span>El formulario convierte las visitas de Tarija y otras ciudades en una lista de espera. Si se decide cotizar envíos desde otra planta, el mismo lead sirve.</span></div></li>
+        <li><div><b>Fábricas</b><span>Convierte las direcciones en una parte de la historia de la marca, con fotos y visitas si las hacen.</span></div></li>
+        <li><div><b>Distribuidores</b><span>Sería la salida para La Paz y Tarija en otros productos, ya que allá no hay comercializadores.</span></div></li>
+      </ol>
+      <p class="muted">Horarios y servicios por agencia no existen en el sitio actual, así que quedan "por definir" hasta que alguien los confirme. Una sola fuente de datos (el CMS) debe alimentar esta pantalla, la home y el pie de página.</p>
+    </div>
+  </section>
+
+  <!-- ============ EMPRESA ============ -->
+  <section class="view" id="v-empresa" hidden>
+    <div class="panel">
+      <h2>Lo que hay hoy en la página Empresa</h2>
+      <ol class="notes" style="counter-reset:none">
+        <li><div><b>Contenido mínimo</b><span>Solo misión, visión y valores, más un párrafo sobre el compromiso con los trabajadores. No hay fábricas, certificaciones, historia, equipo ni contacto.</span></div></li>
+        <li><div><b>Texto escrito hacia adentro</b><span>El párrafo sobre "que todos avancemos juntos" habla a los empleados, no a clientes. La visión habla de expandirse hacia Europa y necesita revisión.</span></div></li>
+        <li><div><b>Base útil</b><span>La frase "Somos INCERPAZ y queremos ayudarte a construir tu hogar" y el sistema integrado de gestión sirven de punto de partida.</span></div></li>
+      </ol>
+    </div>
+
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/empresa</span></div>
+      <div class="canvas">
+        <div class="blk row" style="gap:6px 16px">
+          <span class="chip on">Nosotros</span><span class="chip">Fábricas</span><span class="chip">Calidad</span><span class="chip">Marcas</span><span class="chip">Sostenibilidad</span><span class="chip">Historia</span><span class="chip">Trabaja con nosotros</span><span class="chip">Exportaciones</span><span class="chip">Contacto</span>
+          <i class="pin">1</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <h2 style="font-size:clamp(34px,6vw,54px)">Cerámica para construir tu hogar</h2>
+              <p class="muted">Somos INCERPAZ y queremos ayudarte a construir tu hogar. Trabajamos día a día comprometidos con la mejora continua a través del sistema integrado de gestión en todos nuestros procesos.</p>
+              <div class="row"><a class="btn primary" href="#empresa" onclick="return false">Ver nuestras fábricas</a><a class="btn" href="#empresa" onclick="return false">Hablar con un asesor</a></div>
+            </div>
+            <div class="ph hero"><b>foto: fábrica o equipo en planta</b></div>
+          </div>
+          <i class="pin">2</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Cifras de INCERPAZ</h3><small>por confirmar con gerencia <i class="pin in" title="Pendiente">!</i></small></div>
+          <div class="grid">
+            <div class="card"><span class="out">—<small>años de trayectoria</small></span></div>
+            <div class="card"><span class="out">—<small>fábricas en operación</small></span></div>
+            <div class="card"><span class="out">—<small>agencias y puntos de venta</small></span></div>
+            <div class="card"><span class="out">—<small>ciudades atendidas</small></span></div>
+          </div>
+          <i class="pin">3</i>
+        </div>
+        <div class="blk">
+          <div class="grid g3">
+            <div class="card"><h3>Misión</h3><span class="sub">Contribuir al desarrollo del país proveyendo productos cerámicos destinados al mercado de la construcción local e internacional, ofreciendo los mejores productos y servicios.</span></div>
+            <div class="card"><h3>Visión <i class="pin in" title="Pendiente">!</i></h3><span class="sub">Texto actual: expandir el mercado hacia Europa. Por revisar con gerencia antes de publicar.</span></div>
+            <div class="card"><h3>Valores</h3><div class="row"><span class="chip">Calidad</span><span class="chip">Amabilidad</span><span class="chip">Liderazgo</span><span class="chip">Innovación</span><span class="chip">Disciplina</span><span class="chip">Autonomía</span><span class="chip">Dedicación</span></div></div>
+          </div>
+          <i class="pin">4</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Nuestras fábricas</h3>
+            <div class="seg" role="group" aria-label="Tipo de fábrica"><button type="button" data-ek="todas" aria-pressed="true">Todas</button><button type="button" data-ek="gen" aria-pressed="false">Generales</button><button type="button" data-ek="pavic" aria-pressed="false">PAVIC</button></div>
+          </div>
+          <div class="grid g3" id="emFab">
+            <div class="card" data-k="gen"><div class="ph" style="min-height:80px"><b>foto</b></div><b>Cochabamba</b><span class="sub">Av. Villazón Km 7 1/2</span></div>
+            <div class="card" data-k="gen"><div class="ph" style="min-height:80px"><b>foto</b></div><b>Santa Cruz</b><span class="sub">Carretera Warnes–Montero Km 37 1/2</span></div>
+            <div class="card" data-k="gen pavic"><div class="ph" style="min-height:80px"><b>foto</b></div><b>Oruro</b><span class="sub">Carretera Oruro–La Paz Km 31 (por confirmar). Ladrillos y PAVIC</span></div>
+            <div class="card" data-k="pavic"><div class="ph" style="min-height:80px"><b>foto</b></div><b>PAVIC Cochabamba</b><span class="sub">Dirección por confirmar <i class="pin in" title="Pendiente">!</i></span></div>
+            <div class="card" data-k="pavic"><div class="ph" style="min-height:80px"><b>foto</b></div><b>PAVIC Santa Cruz</b><span class="sub">Dirección por confirmar <i class="pin in" title="Pendiente">!</i></span></div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Cada tarjeta enlaza a Dónde estamos. Una visita guiada a planta queda como idea, si la empresa la ofrece.</span>
+          <i class="pin">5</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Calidad y certificaciones</h3><small>toca una tarjeta de descarga</small></div>
+          <div class="grid">
+            <div class="card"><b>Sistema integrado de gestión</b><span class="sub">Cómo se controla cada proceso</span></div>
+            <div class="card"><b>Certificación ISO</b><span class="sub">Norma y alcance por indicar</span><button type="button" class="btn" data-gate="1" style="align-self:flex-start">Descargar</button></div>
+            <div class="card"><b>Ensayos de laboratorio</b><span class="sub">Informes de PAVIC</span><button type="button" class="btn" data-gate="1" style="align-self:flex-start">Descargar</button></div>
+            <div class="card"><b>Certificados de calidad</b><span class="sub">Por producto</span><button type="button" class="btn" data-gate="1" style="align-self:flex-start">Descargar</button></div>
+          </div>
+          <div class="card flat" id="emGate" hidden style="margin-top:12px">
+            <b>Para descargar, déjanos tus datos</b>
+            <div class="grid">
+              <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+              <label class="field">Empresa o entidad<input type="text" placeholder="Razón social"></label>
+              <label class="field">Correo<input type="text" placeholder="correo@ejemplo.com"></label>
+            </div>
+            <div><span class="btn primary">Enviar y descargar</span></div>
+            <span class="mono muted">Cada descarga entra al CRM como un lead, con el documento que pidió.</span>
+          </div>
+          <i class="pin">6</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="blk-title"><h3>Nuestras marcas y líneas</h3></div>
+          <div class="grid g3">
+            <div class="card"><b>INCERPAZ</b><span class="sub">Muros, piezas especiales, pisos, revestimientos y refractarios</span><a class="btn" href="#home" style="align-self:flex-start">Ver catálogo</a></div>
+            <div class="card"><b>PAVIC</b><span class="sub">Pavimentos para proyectos. Marca propia</span><a class="btn primary" href="#pavic" style="align-self:flex-start">Ir a PAVIC</a></div>
+            <div class="card"><b>Tejas <i class="pin in" title="Pendiente">!</i></b><span class="sub">Marca en preparación. Hoy es la categoría Techos</span><a class="btn" href="#techos" style="align-self:flex-start">Ver techos</a></div>
+          </div>
+          <i class="pin">7</i>
+        </div>
+        <div class="blk">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <h3>Sostenibilidad <i class="pin in" title="Pendiente">!</i></h3>
+              <span class="sub">El blog actual ya tiene una categoría "Construcción sostenible". Falta definir qué compromisos y cifras se pueden afirmar.</span>
+              <div class="grid"><div class="card flat"><b>Producción responsable</b><span class="sub">Por definir</span></div><div class="card flat"><b>Obra sostenible</b><span class="sub">Por definir</span></div></div>
+              <i class="pin">8</i>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <h3>Historia <i class="pin in" title="Pendiente">!</i></h3>
+              <span class="sub">Línea de tiempo con los hitos de la empresa. La galería actual guarda obras de 2011 a 2020.</span>
+              <div class="row" style="gap:6px;flex-wrap:nowrap;overflow-x:auto"><span class="chip">hito 1</span><span class="mono muted">—</span><span class="chip">hito 2</span><span class="mono muted">—</span><span class="chip">hito 3</span><span class="mono muted">—</span><span class="chip">hoy</span></div>
+              <i class="pin">9</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="grid g3">
+            <div class="card"><b>Trabaja con nosotros <i class="pin in" title="Pendiente">!</i></b><span class="sub">Vacantes por ciudad. Proceso por definir</span></div>
+            <div class="card"><b>Promotores</b><span class="sub">Acceso al portal actual de promotores</span></div>
+            <div class="card"><b>Exportaciones</b><span class="sub">Sitio en español e inglés</span><div class="row"><span class="chip on">ES</span><span class="chip">EN</span></div></div>
+          </div>
+          <i class="pin">10</i>
+        </div>
+        <div class="blk">
+          <div class="blk-title"><h3>Prensa y contenido</h3><small>blog, revista digital y redes</small></div>
+          <div class="grid g3">
+            <div class="card"><div class="ph" style="min-height:70px"><b>nota</b></div><b>Blog</b><span class="sub">Novedades de producto y obra</span></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>portada</b></div><b>Revista digital</b><span class="sub">Edición actual</span></div>
+            <div class="card"><div class="ph" style="min-height:70px"><b>feed</b></div><b>Instagram</b><span class="sub">@incerpaz_bolivia</span></div>
+          </div>
+          <i class="pin">11</i>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <h3>Contacto</h3>
+              <table class="specs"><tbody><tr><td>Servicio al cliente</td><td>800-10-8810</td></tr><tr><td>Correo de ventas</td><td>ventas.cbba@incerpaz.com</td></tr><tr><td>Redes</td><td>Facebook, Instagram y YouTube</td></tr><tr><td>Por ciudad</td><td><a href="#donde">Ver Dónde estamos</a></td></tr></tbody></table>
+            </div>
+            <div class="grid">
+              <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+              <label class="field">Motivo<select><option>Quiero comprar</option><option>Quiero cotizar un proyecto</option><option>Reclamo o sugerencia</option><option>Prensa</option><option>Trabajo</option></select></label>
+              <label class="field">Celular<input type="text" placeholder="7xxxxxxx"></label>
+              <label class="field">Ciudad<select><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option><option>Otra</option></select></label>
+            </div>
+          </div>
+          <div style="margin-top:12px"><a class="btn primary" href="#empresa" onclick="return false">Enviar</a></div>
+          <i class="pin">12</i>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas de la página Empresa</h2>
+      <ol class="notes">
+        <li><div><b>Submenú propio</b><span>Reúne en una página lo que hoy está disperso: fábricas, calidad, marcas, empleo y exportaciones.</span></div></li>
+        <li><div><b>Hero con la frase de marca</b><span>Usa el texto que ya existe en el sitio, con dos salidas: conocer las fábricas o hablar con un asesor.</span></div></li>
+        <li><div><b>Cifras</b><span>Años, fábricas, agencias y ciudades dan peso a la marca. Son marcadores hasta que gerencia las confirme.</span></div></li>
+        <li><div><b>Misión, visión y valores</b><span>La misión y los valores son los actuales. La visión hay que reescribirla pensando en clientes y proyectos.</span></div></li>
+        <li><div><b>Fábricas</b><span>Prueba el prototipo: el filtro separa fábricas generales y PAVIC. Oruro cuenta para las dos. Enlaza a Dónde estamos.</span></div></li>
+        <li><div><b>Calidad con descarga</b><span>Prueba el prototipo: tocar Descargar abre el formulario. Los certificados, ISO y ensayos son un imán de leads, sobre todo para PAVIC.</span></div></li>
+        <li><div><b>Marcas</b><span>Presenta INCERPAZ, PAVIC y la futura marca de tejas bajo un mismo paraguas, con enlace a cada una.</span></div></li>
+        <li><div><b>Sostenibilidad</b><span>Solo se publica lo que la empresa pueda sostener con datos. Hasta entonces queda como pendiente.</span></div></li>
+        <li><div><b>Historia</b><span>Una línea de tiempo corta humaniza la marca. Los hitos los aporta la empresa.</span></div></li>
+        <li><div><b>Empleo, promotores y exportaciones</b><span>Tres accesos para públicos que hoy no encuentran dónde ir.</span></div></li>
+        <li><div><b>Prensa y contenido</b><span>Da un hogar al blog, la revista digital y las redes.</span></div></li>
+        <li><div><b>Contacto con motivo</b><span>El motivo del mensaje decide a quién llega: ventas, proyectos, reclamos, prensa o empleo. Reclamos y sugerencias es una idea mía.</span></div></li>
+      </ol>
+      <p class="muted">Cifras, historia, sostenibilidad y empleo no existen en el sitio actual y quedan con pin amarillo "!" hasta que la empresa aporte los datos.</p>
+    </div>
+  </section>
+
+  <!-- ============ CATÁLOGO Y BÚSQUEDA ============ -->
+  <section class="view" id="v-catalogo" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" class="asbtn" data-as="visit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/productos</span></div>
+      <div class="canvas">
+        <div class="blk row" style="justify-content:space-between">
+          <span class="logo">INCERPAZ</span>
+          <label class="field" for="shopQ" style="flex:1 1 280px;max-width:560px;position:relative">Buscar en el catálogo<input id="shopQ" type="search" placeholder="Ej. 6 huecos, enchape, Pavic, botaguas" autocomplete="off"></label>
+          <span class="chip" id="shopBudget">Presupuesto (0)</span>
+          <i class="pin">1</i>
+        </div>
+        <div class="blk"><span class="mono muted">Inicio › Productos</span></div>
+        <div class="blk">
+          <div class="shop">
+            <aside style="display:flex;flex-direction:column;gap:14px;position:relative">
+              <h3>Filtros</h3>
+              <div style="display:flex;flex-direction:column;gap:8px" id="shopCats"></div>
+              <div class="chk"><label><input type="checkbox" id="shopStock" disabled> Solo con stock en mi ciudad</label></div>
+              <span class="mono muted">El stock viene del ERP. Se activa al conectarlo. <i class="pin in" title="Pendiente">!</i></span>
+              <label class="field" for="shopSort">Ordenar<select id="shopSort"><option value="az">Nombre A a Z</option><option value="cat">Categoría</option></select></label>
+              <i class="pin" style="top:-4px;right:-4px">2</i>
+            </aside>
+            <div style="position:relative">
+              <div class="blk-title"><h3 id="shopCount">Productos</h3><small>nombres de la tienda de Cochabamba</small></div>
+              <div class="grid" id="shopGrid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))"></div>
+              <i class="pin" style="top:-4px;right:-4px">3</i>
+            </div>
+          </div>
+        </div>
+        <div class="blk" style="background:var(--surface-2)">
+          <div class="split">
+            <div class="card"><b>¿No encuentras lo que buscas?</b><span class="sub">Escríbenos por WhatsApp con el nombre o una foto del producto.</span><span class="btn primary" style="align-self:flex-start">WhatsApp de mi ciudad</span></div>
+            <div class="card"><b>Combos y promociones</b><span class="sub">Paquetes de producto con regalos. En Santa Cruz hay 47 hoy.</span><span class="btn" style="align-self:flex-start">Ver combos</span></div>
+          </div>
+          <i class="pin">4</i>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas del catálogo y la búsqueda</h2>
+      <ol class="notes">
+        <li><div><b>Búsqueda en el encabezado</b><span>Prueba el prototipo: escribe "huecos", "Pavic" o "enchape" y la lista se filtra. Busca por nombre; por código y uso vendrán con las fichas del ERP.</span></div></li>
+        <li><div><b>Filtros por categoría</b><span>Las seis categorías actuales con su conteo. El filtro de stock espera la conexión con el ERP.</span></div></li>
+        <li><div><b>Tarjetas con acción</b><span>Cada producto se puede añadir al presupuesto sin entrar a la ficha. Cambia a "Cliente verificado" arriba para ver cómo aparece el precio.</span></div></li>
+        <li><div><b>Salidas</b><span>WhatsApp para lo que no se encuentra y acceso a combos, que hoy son una palanca fuerte de venta.</span></div></li>
+      </ol>
+      <p class="muted">La lista usa los nombres de la tienda de Cochabamba, tomados de las direcciones de sus productos, y conviene revisarlos. Fotos, dimensiones y precios son marcadores. Cada ciudad vende un catálogo distinto, así que la lista cambiaría según la ciudad elegida.</p>
+    </div>
+  </section>
+
+  <!-- ============ PRESUPUESTO Y PEDIDO ============ -->
+  <section class="view" id="v-pedido" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Ver como</span>
+      <div class="seg" role="group" aria-label="Estado de sesión">
+        <button type="button" class="asbtn" data-as="visit" aria-pressed="true">Visitante</button>
+        <button type="button" class="asbtn" data-as="client" aria-pressed="false">Cliente verificado</button>
+      </div>
+    </div>
+    <div class="wf">
+      <div class="chrome"><i></i><i></i><i></i><span id="ppUrl">incerpaz.com/presupuesto</span></div>
+      <div class="canvas">
+        <div class="blk" style="position:relative">
+          <div class="seg" role="group" aria-label="Pasos">
+            <button type="button" data-pp="1" aria-pressed="true">1. Mi presupuesto</button>
+            <button type="button" data-pp="2" aria-pressed="false">2. Entrega</button>
+            <button type="button" data-pp="3" aria-pressed="false">3. Datos</button>
+            <button type="button" data-pp="4" aria-pressed="false">4. Resumen</button>
+          </div>
+          <i class="pin">1</i>
+        </div>
+
+        <div class="blk" id="pp1">
+          <div class="blk-title"><h3>Mi presupuesto</h3><small>cantidades editables</small></div>
+          <div class="scroll"><table>
+            <thead><tr><th>Producto</th><th class="num">Precio</th><th class="num">Cantidad</th><th class="num">Subtotal</th></tr></thead>
+            <tbody id="ppLines"></tbody>
+            <tfoot><tr><th colspan="3" style="text-align:right">Total</th><th class="num" id="ppTotal"></th></tr></tfoot>
+          </table></div>
+          <div class="grid" style="margin-top:12px">
+            <label class="field" for="ppObra">Obra<select id="ppObra"><option>Sin obra</option><option>Edificio Av. Ejemplo</option><option>Nueva obra…</option></select></label>
+            <label class="field" for="ppNote">Notas para el ejecutivo<input id="ppNote" type="text" placeholder="Plazos, medidas, dudas"></label>
+          </div>
+          <span class="mono muted" id="ppPriceNote" style="display:block;margin-top:10px"></span>
+          <i class="pin">2</i>
+        </div>
+
+        <div class="blk" id="pp2" hidden>
+          <div class="blk-title"><h3>Entrega</h3><small>retiro o envío</small></div>
+          <div class="seg" role="group" aria-label="Modalidad" style="margin-bottom:12px">
+            <button type="button" data-ent="ret" aria-pressed="true">Retiro en agencia</button>
+            <button type="button" data-ent="env" aria-pressed="false">Envío a obra</button>
+          </div>
+          <div class="grid">
+            <label class="field" for="ppCiudad">Ciudad<select id="ppCiudad"></select></label>
+            <label class="field" for="ppAg" id="ppAgW">Agencia de retiro<select id="ppAg"></select></label>
+            <label class="field" for="ppDir" id="ppDirW" hidden>Dirección de la obra<input id="ppDir" type="text" placeholder="Avenida, zona, referencia"></label>
+            <label class="field" for="ppFecha">Fecha deseada<input id="ppFecha" type="text" placeholder="Día y mes"></label>
+          </div>
+          <span class="mono muted" id="ppEntNote" style="display:block;margin-top:10px"></span>
+          <i class="pin">3</i>
+        </div>
+
+        <div class="blk" id="pp3" hidden>
+          <div class="blk-title"><h3>Datos</h3><small id="ppDatosSub"></small></div>
+          <div class="grid" id="ppDatosV">
+            <label class="field">Nombre<input type="text" placeholder="Nombre y apellido"></label>
+            <label class="field">Celular o WhatsApp<input type="text" placeholder="7xxxxxxx"></label>
+            <label class="field">Correo<input type="text" placeholder="correo@ejemplo.com"></label>
+          </div>
+          <div id="ppDatosC" hidden>
+            <div class="grid">
+              <label class="field">NIT<input type="text" value="1234567012" readonly></label>
+              <label class="field">Razón social<input type="text" value="Constructora Ejemplo S.R.L." readonly></label>
+              <label class="field">Nombre comercial<input type="text" value="Constructora Ejemplo" readonly></label>
+            </div>
+            <div style="margin-top:12px">
+              <div class="mono muted" style="margin-bottom:6px">Forma de pago</div>
+              <div class="seg" role="group" aria-label="Forma de pago"><button type="button" aria-pressed="true">Transferencia</button><button type="button" aria-pressed="false">QR</button><button type="button" aria-pressed="false">En agencia</button></div>
+            </div>
+          </div>
+          <span class="mono muted" style="display:block;margin-top:10px">Los datos de facturación (NIT, razón social, nombre comercial) salen de la ficha del cliente en el ERP. Se paga al contado por transferencia, QR o en agencia. No hay línea de crédito.</span>
+          <i class="pin">4</i>
+        </div>
+
+        <div class="blk" id="pp4" hidden>
+          <div class="blk-title"><h3>Resumen</h3><small id="ppResSub"></small></div>
+          <table class="specs"><tbody>
+            <tr><td>Productos</td><td id="ppResN"></td></tr>
+            <tr><td>Total</td><td id="ppResT"></td></tr>
+            <tr><td>Entrega</td><td id="ppResE"></td></tr>
+          </tbody></table>
+          <div class="row" style="margin-top:12px"><button type="button" class="btn primary" id="ppSend">Enviar</button><span class="mono muted" id="ppSendNote"></span></div>
+          <div class="done" id="ppDone" hidden style="margin-top:12px">
+            <b id="ppDoneT"></b>
+            <span class="sub" id="ppDoneS"></span>
+            <div class="row"><span class="chip on">Recibido</span><span class="chip">Confirmado</span><span class="chip">En despacho</span><span class="chip">Entregado</span></div>
+          </div>
+          <i class="pin">5</i>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Notas del presupuesto y el pedido</h2>
+      <ol class="notes">
+        <li><div><b>Cuatro pasos</b><span>Prueba el prototipo: navega por los pasos y mira cómo cambian los botones según la sesión. El carrito actual se reemplaza por este flujo.</span></div></li>
+        <li><div><b>Presupuesto editable</b><span>Cantidades, obra y notas. El visitante ve cantidades sin precios. El cliente verificado ve precios y total de las tarifas del ERP.</span></div></li>
+        <li><div><b>Entrega</b><span>Retiro en una agencia de la ciudad elegida o envío a obra. Cada ciudad tiene sus propios montos y políticas de envío: se cargan a mano en el CMS por ciudad y se muestran según la ciudad elegida (cambia la ciudad y mira el texto).</span></div></li>
+        <li><div><b>Datos</b><span>El visitante deja nombre y celular: es un lead. El cliente verificado trae sus datos de facturación del ERP y elige cómo paga.</span></div></li>
+        <li><div><b>Resumen y envío</b><span>El visitante solicita una cotización que llega al ejecutivo de la ciudad. El cliente envía un pedido que baja al ERP y puede seguir por estado.</span></div></li>
+      </ol>
+      <p class="muted">Los pasos son una propuesta mía. Las formas de pago (transferencia, QR y en agencia) están confirmadas. Los montos y las políticas de envío de cada ciudad los carga INCERPAZ a mano en el CMS. Precios y NIT son de ejemplo.</p>
+    </div>
+  </section>
+
+  <!-- ============ MÁS PÁGINAS ============ -->
+  <section class="view" id="v-paginas" hidden>
+    <div class="toolbar">
+      <span class="mono muted">Página</span>
+      <div class="seg" role="group" aria-label="Página">
+        <button type="button" data-mp="proy" aria-pressed="true">Proyectos</button>
+        <button type="button" data-mp="exp" aria-pressed="false">Exportaciones</button>
+        <button type="button" data-mp="blog" aria-pressed="false">Blog y revista</button>
+        <button type="button" data-mp="prom" aria-pressed="false">Promotores</button>
+      </div>
+    </div>
+
+    <div id="mp-proy" style="display:flex;flex-direction:column;gap:22px">
+      <div class="wf">
+        <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/proyectos</span></div>
+        <div class="canvas">
+          <div class="blk">
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <h2 style="font-size:clamp(32px,5vw,46px)">Proyectos para construir</h2>
+              <p class="lead">Cada proyecto trae su lista de materiales, el costo estimado, los planos y los pasos. Agrégalo al presupuesto con un clic.</p>
+              <div class="row"><span class="mono muted">Dificultad</span>
+                <div class="seg" role="group" aria-label="Dificultad"><button type="button" data-dif="todas" aria-pressed="true">Todas</button><button type="button" data-dif="baja" aria-pressed="false">Baja</button><button type="button" data-dif="media" aria-pressed="false">Media</button></div></div>
+              <i class="pin" style="top:-4px;right:-4px">1</i>
+            </div>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="grid g3" id="mpProyGrid">
+              <div class="card" data-d="media"><div class="ph"><b>foto</b></div><b>Churrasquero de patio</b><span class="sub">Dificultad media · 2 días · exterior</span><a class="btn" href="#proyecto" style="align-self:flex-start">Ver proyecto</a></div>
+              <div class="card" data-d="media"><div class="ph"><b>foto</b></div><b>Mesón de cocina</b><span class="sub">Dificultad media · 3 días · interior o exterior</span><a class="btn" href="#proyecto" style="align-self:flex-start">Ver proyecto</a></div>
+              <div class="card" data-d="baja"><div class="ph"><b>foto</b></div><b>Pared con enchape</b><span class="sub">Dificultad baja · 1 a 2 días · interior o exterior</span><a class="btn" href="#proyecto" style="align-self:flex-start">Ver proyecto</a></div>
+              <div class="card" data-d="baja"><div class="ph"><b>foto</b></div><b>Piso de patio</b><span class="sub">Con PAVIC. Por producir <i class="pin in" title="Pendiente">!</i></span></div>
+              <div class="card" data-d="baja"><div class="ph"><b>foto</b></div><b>Vereda peatonal</b><span class="sub">Con PAVIC. Por producir <i class="pin in" title="Pendiente">!</i></span></div>
+              <div class="card" data-d="media"><div class="ph"><b>foto</b></div><b>Kit churrasquero en combo</b><span class="sub">Hoy se vende como combo en Santa Cruz</span><span class="btn ghost" style="align-self:flex-start">Ver combo</span></div>
+            </div>
+            <i class="pin">2</i>
+          </div>
+          <div class="blk">
+            <div class="split">
+              <div class="card"><b>¿Quieres un proyecto que no está?</b><span class="sub">Cuéntanos qué quieres construir y un asesor de tu ciudad te orienta.</span><span class="btn primary" style="align-self:flex-start">Escribir por WhatsApp</span></div>
+              <div class="card"><b>¿Prefieres que lo hagamos?</b><span class="sub">Presupuesto con instalación o un maestro recomendado de tu ciudad.</span><span class="btn" style="align-self:flex-start">Pedir presupuesto</span></div>
+            </div>
+            <i class="pin">3</i>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Notas del listado de proyectos</h2>
+        <ol class="notes">
+          <li><div><b>Filtro por dificultad</b><span>Prueba el prototipo: separa los proyectos fáciles de los medios. Más adelante se suman filtros por lugar (interior o exterior) y por producto.</span></div></li>
+          <li><div><b>Tarjetas</b><span>Los tres primeros ya tienen wireframe completo en la pestaña Proyectos. Piso de patio y vereda se arman con PAVIC y quedan por producir. El kit churrasquero ya se vende como combo en Santa Cruz.</span></div></li>
+          <li><div><b>Salidas de venta</b><span>Quien no encuentra su proyecto escribe por WhatsApp, y quien no quiere construir pide presupuesto con instalación.</span></div></li>
+        </ol>
+      </div>
+    </div>
+
+    <div id="mp-exp" hidden style="flex-direction:column;gap:22px">
+      <div class="wf">
+        <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/exportaciones</span></div>
+        <div class="canvas">
+          <div class="blk row" style="justify-content:space-between">
+            <span class="logo">INCERPAZ</span>
+            <div class="seg" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+            <i class="pin">1</i>
+          </div>
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <h2 style="font-size:clamp(32px,5vw,50px)" data-es="Cerámica boliviana para tu mercado" data-en="Bolivian ceramics for your market">Cerámica boliviana para tu mercado</h2>
+                <p class="lead" data-es="Ladrillos, pisos, techos y revestimientos cerámicos fabricados en Bolivia. Cotizamos por volumen y exportamos a tu país." data-en="Ceramic bricks, flooring, roofing and cladding made in Bolivia. We quote by volume and export to your country.">Ladrillos, pisos, techos y revestimientos cerámicos fabricados en Bolivia. Cotizamos por volumen y exportamos a tu país.</p>
+                <div class="row"><span class="btn primary" data-es="Pedir cotización" data-en="Request a quote">Pedir cotización</span><span class="btn" data-es="Descargar catálogo" data-en="Download catalog">Descargar catálogo</span></div>
+              </div>
+              <div class="ph hero"><b>foto: despacho o contenedor</b></div>
+            </div>
+            <i class="pin">2</i>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="blk-title"><h3 data-es="Líneas de producto" data-en="Product lines">Líneas de producto</h3><small data-es="productos hoy en el sitio de exportaciones" data-en="products today on the export site">productos hoy en el sitio de exportaciones</small></div>
+            <div class="grid">
+              <div class="card"><b data-es="Muros" data-en="Walls">Muros</b><span class="sub">11</span></div>
+              <div class="card"><b data-es="Piezas especiales" data-en="Special pieces">Piezas especiales</b><span class="sub">9</span></div>
+              <div class="card"><b data-es="Techos y tejados" data-en="Roofing">Techos y tejados</b><span class="sub">6</span></div>
+              <div class="card"><b data-es="Pavimentos y pisos" data-en="Paving and flooring">Pavimentos y pisos</b><span class="sub">2</span></div>
+              <div class="card"><b data-es="Revestimientos" data-en="Cladding">Revestimientos</b><span class="sub">2</span></div>
+              <div class="card"><b data-es="Refractarios" data-en="Refractory">Refractarios</b><span class="sub">1</span></div>
+            </div>
+            <i class="pin">3</i>
+          </div>
+          <div class="blk">
+            <div class="blk-title"><h3 data-es="Cómo exportamos" data-en="How we export">Cómo exportamos</h3><small>por validar con exportaciones</small></div>
+            <div class="steps">
+              <div><span><b data-es="Consulta" data-en="Inquiry">Consulta</b><span data-es="Nos cuentas producto, volumen y destino." data-en="Tell us the product, volume and destination.">Nos cuentas producto, volumen y destino.</span></span></div>
+              <div><span><b data-es="Cotización" data-en="Quote">Cotización</b><span data-es="Precio por volumen y condiciones de entrega." data-en="Price by volume and delivery terms.">Precio por volumen y condiciones de entrega.</span></span></div>
+              <div><span><b data-es="Muestras" data-en="Samples">Muestras</b><span data-es="Piezas para aprobar color y calidad." data-en="Pieces to approve color and quality.">Piezas para aprobar color y calidad.</span></span></div>
+              <div><span><b data-es="Embarque y documentos" data-en="Shipping and documents">Embarque y documentos</b><span data-es="Condiciones y puertos por definir." data-en="Terms and ports to be defined.">Condiciones y puertos por definir.</span></span></div>
+            </div>
+            <span class="mono muted" style="display:block;margin-top:8px">Incoterms y puertos por definir <i class="pin in" title="Pendiente">!</i></span>
+            <i class="pin">4</i>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="blk-title"><h3 data-es="Calidad" data-en="Quality">Calidad</h3></div>
+            <div class="row"><span class="chip">ISO (norma por indicar)</span><span class="chip" data-es="Ensayos de laboratorio" data-en="Lab tests">Ensayos de laboratorio</span><span class="chip" data-es="Certificados de calidad" data-en="Quality certificates">Certificados de calidad</span></div>
+            <i class="pin">5</i>
+          </div>
+          <div class="blk">
+            <div class="blk-title"><h3 data-es="Cotiza tu pedido" data-en="Quote your order">Cotiza tu pedido</h3></div>
+            <div class="grid">
+              <label class="field"><span data-es="Empresa" data-en="Company">Empresa</span><input type="text"></label>
+              <label class="field"><span data-es="País" data-en="Country">País</span><input type="text"></label>
+              <label class="field"><span data-es="Producto" data-en="Product">Producto</span><select><option>Muros</option><option>Techos y tejados</option><option>Pavimentos y pisos</option><option>Otro</option></select></label>
+              <label class="field"><span data-es="Volumen aproximado" data-en="Approximate volume">Volumen aproximado</span><input type="text"></label>
+              <label class="field"><span data-es="Correo" data-en="Email">Correo</span><input type="text"></label>
+            </div>
+            <div class="row" style="margin-top:12px"><span class="btn primary" data-es="Enviar" data-en="Send">Enviar</span><span class="mono muted">WhatsApp de exportaciones: +591 70619526</span></div>
+            <i class="pin">6</i>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Notas de Exportaciones</h2>
+        <ol class="notes">
+          <li><div><b>Español e inglés</b><span>Prueba el prototipo: el botón ES / EN cambia los textos. Hoy el sitio de exportaciones mezcla idiomas y muestra errores técnicos públicos.</span></div></li>
+          <li><div><b>Hero para importadores</b><span>Habla a un comprador de volumen, con la cotización como salida principal.</span></div></li>
+          <li><div><b>Líneas de producto</b><span>Los conteos salen del sitio actual. En exportación se cotiza, no se vende por carrito.</span></div></li>
+          <li><div><b>Cómo exportamos</b><span>Propuesta mía, por validar con quien exporta. Incoterms y puertos quedan pendientes.</span></div></li>
+          <li><div><b>Calidad</b><span>La misma base de ISO, ensayos y certificados de PAVIC y de la empresa.</span></div></li>
+          <li><div><b>Formulario</b><span>Empresa, país, producto y volumen permiten priorizar. Va al CRM del responsable de exportaciones.</span></div></li>
+        </ol>
+      </div>
+    </div>
+
+    <div id="mp-blog" hidden style="flex-direction:column;gap:22px">
+      <div class="wf">
+        <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/blog</span></div>
+        <div class="canvas">
+          <div class="blk">
+            <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+              <h2 style="font-size:clamp(32px,5vw,46px)">Blog y revista</h2>
+              <div class="row" id="mpBlogChips"><button type="button" class="mini on" data-bc="todas">Todo</button><button type="button" class="mini" data-bc="obra">Historias de obra</button><button type="button" class="mini" data-bc="guia">Guías de instalación</button><button type="button" class="mini" data-bc="producto">Producto</button><button type="button" class="mini" data-bc="sost">Sostenibilidad</button></div>
+              <i class="pin" style="top:-4px;right:-4px">1</i>
+            </div>
+          </div>
+          <div class="blk">
+            <div class="split">
+              <div class="ph hero"><b>foto del artículo destacado</b></div>
+              <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+                <span class="chip" style="align-self:flex-start">Destacado</span>
+                <h3 style="font-size:28px">Título del artículo destacado (ejemplo)</h3>
+                <div class="bar"></div><div class="bar s"></div>
+                <span class="btn" style="align-self:flex-start">Leer</span>
+                <i class="pin">2</i>
+              </div>
+            </div>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="grid g3" id="mpBlogGrid">
+              <div class="card" data-c="guia"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cómo colocar enchape de ladrillo (ejemplo)</b><span class="sub">Guía de instalación</span></div>
+              <div class="card" data-c="obra"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Un patio con PAVIC (ejemplo)</b><span class="sub">Historia de obra</span></div>
+              <div class="card" data-c="producto"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Diferencias entre ladrillos de 6 y 18 huecos (ejemplo)</b><span class="sub">Producto</span></div>
+              <div class="card" data-c="sost"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Construcción sostenible (ejemplo)</b><span class="sub">Sostenibilidad. Hoy hay un artículo de 2021 en esta categoría</span></div>
+              <div class="card" data-c="guia"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Cómo instalar un techo de teja (ejemplo)</b><span class="sub">Guía de instalación</span></div>
+              <div class="card" data-c="obra"><div class="ph" style="min-height:70px"><b>foto</b></div><b>Obra de una plaza con PAVIC (ejemplo)</b><span class="sub">Historia de obra</span></div>
+            </div>
+            <i class="pin">3</i>
+          </div>
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+                <h3>Revista digital</h3>
+                <div class="ph" style="min-height:160px"><b>portada de la edición actual</b></div>
+                <span class="btn" style="align-self:flex-start">Leer la edición</span>
+                <i class="pin">4</i>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+                <h3>Recibe novedades y promociones</h3>
+                <span class="sub">Hoy el sitio ya tiene una suscripción para promociones.</span>
+                <div class="grid"><label class="field">Correo<input type="text" placeholder="correo@ejemplo.com"></label><label class="field">Ciudad<select><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option></select></label></div>
+                <span class="btn primary" style="align-self:flex-start">Suscribirme</span>
+                <i class="pin">5</i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Notas del blog y la revista</h2>
+        <ol class="notes">
+          <li><div><b>Temas editoriales</b><span>Prueba el prototipo: los chips filtran los artículos. Las categorías actuales son genéricas (construcción, tecnología, mobiliario). Propongo cuatro que venden: obra, guías, producto y sostenibilidad.</span></div></li>
+          <li><div><b>Artículo destacado</b><span>Un espacio para lo más importante de la semana o del mes.</span></div></li>
+          <li><div><b>Tarjetas</b><span>Los títulos son ejemplos. Las guías de instalación atraen búsquedas y se enlazan desde las fichas.</span></div></li>
+          <li><div><b>Revista digital</b><span>Ya existe en el sitio actual. Pasa a tener su propio espacio.</span></div></li>
+          <li><div><b>Suscripción</b><span>Capta correo y ciudad, para enviar promociones por ciudad.</span></div></li>
+        </ol>
+        <p class="muted">Las notas actuales del blog son de 2021 y tratan temas generales. Conviene archivarlas y empezar con contenido de producto y de obra.</p>
+      </div>
+    </div>
+
+    <div id="mp-prom" hidden style="flex-direction:column;gap:22px">
+      <div class="wf">
+        <div class="chrome"><i></i><i></i><i></i><span>incerpaz.com/promotores</span></div>
+        <div class="canvas">
+          <div class="blk">
+            <div class="split">
+              <div style="display:flex;flex-direction:column;gap:10px;position:relative">
+                <h2 style="font-size:clamp(32px,5vw,46px)">Promotores INCERPAZ</h2>
+                <p class="lead">Acceso al portal de prospección para el equipo de promotores.</p>
+                <div class="grid"><label class="field">Usuario<input type="text"></label><label class="field">Contraseña<input type="password"></label></div>
+                <span class="btn primary" style="align-self:flex-start">Ingresar</span>
+                <i class="pin">1</i>
+              </div>
+              <div class="card flat" style="position:relative">
+                <h3>¿Quieres ser promotor? <i class="pin in" title="Pendiente">!</i></h3>
+                <span class="sub">Beneficios y requisitos por definir con ventas.</span>
+                <div class="grid"><label class="field">Nombre<input type="text"></label><label class="field">Ciudad<select><option>Cochabamba</option><option>Santa Cruz</option><option>Oruro</option><option>Sucre</option></select></label><label class="field">Celular<input type="text"></label></div>
+                <span class="btn" style="align-self:flex-start">Enviar</span>
+                <i class="pin">2</i>
+              </div>
+            </div>
+          </div>
+          <div class="blk" style="background:var(--surface-2)">
+            <div class="blk-title"><h3>Mis leads</h3><small>vista del promotor, datos de ejemplo</small></div>
+            <div class="row" style="margin-bottom:10px" id="mpLeadSum"></div>
+            <div class="scroll"><table>
+              <thead><tr><th>Cliente</th><th>Qué pidió</th><th>Ciudad</th><th>Origen</th><th>Estado</th></tr></thead>
+              <tbody id="mpLeads"></tbody>
+            </table></div>
+            <i class="pin">3</i>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Notas de Promotores</h2>
+        <ol class="notes">
+          <li><div><b>Acceso al portal</b><span>Hoy el portal de prospección es una dirección aparte con inicio de sesión. Aquí se enlaza desde la página principal.</span></div></li>
+          <li><div><b>Captación de promotores</b><span>Un formulario corto para sumar promotores. Los beneficios y requisitos quedan pendientes con pin.</span></div></li>
+          <li><div><b>Mis leads</b><span>Prueba el prototipo: cambia el estado de un lead y mira el resumen. Es la propuesta para cerrar el ciclo: los formularios, descargas y presupuestos del sitio llegan al promotor o ejecutivo de la ciudad, con su origen.</span></div></li>
+        </ol>
+        <p class="muted">No tengo visibilidad de lo que hace el portal actual, así que esta vista es una propuesta basada en el CRM del plan y los nombres son de ejemplo. Hay que revisarla con quienes lo usan.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var tabs = ['plataforma', 'home', 'ficha', 'proyecto', 'pavic', 'techos', 'constructor', 'donde', 'empresa', 'catalogo', 'pedido', 'paginas'];
+  function show() {
+    var h = (location.hash || '').replace('#', '');
+    if (tabs.indexOf(h) < 0) h = 'plataforma';
+    tabs.forEach(function (t) {
+      document.getElementById('v-' + t).hidden = t !== h;
+      var a = document.querySelector('[data-tab="' + t + '"]');
+      if (t === h) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+  }
+  window.addEventListener('hashchange', show);
+  show();
+
+  /* ciudad */
+  var wa = { 'Cochabamba': '+591 7075 0963' };
+  var sel = document.getElementById('citySel');
+  sel.addEventListener('change', function () {
+    document.getElementById('cityWa').textContent = 'WhatsApp ' + (wa[sel.value] || '+591 ··· por asignar');
+    document.getElementById('cityName').textContent = sel.value;
+  });
+
+  /* calculadora */
+  var m2 = document.getElementById('calcM2'), merma = document.getElementById('calcMerma');
+  function calc() {
+    var a = Math.max(0, parseFloat(m2.value) || 0);
+    var p = Math.ceil(a * 50 * (1 + parseFloat(merma.value)));
+    document.getElementById('outPzas').firstChild.nodeValue = p.toLocaleString('es-BO');
+    document.getElementById('outKg').firstChild.nodeValue = Math.round(p * 2.65).toLocaleString('es-BO');
+  }
+  m2.addEventListener('input', calc); merma.addEventListener('change', calc); calc();
+
+  /* sesión */
+  var client = false;
+  function setClient(v) {
+    client = v;
+    document.querySelectorAll('.asbtn').forEach(function (b) { b.setAttribute('aria-pressed', String((b.getAttribute('data-as') === 'client') === v)); });
+    document.getElementById('priceVisit').hidden = v;
+    document.getElementById('priceClient').hidden = !v;
+    document.getElementById('buyNote').textContent = v ? 'Cliente verificado: Comprar está activo.' : 'El botón Comprar se activa al ingresar. Presupuesto y WhatsApp funcionan sin cuenta.';
+    document.getElementById('btnBuy').style.opacity = v ? '1' : '.5';
+    renderBom();
+    if (typeof refreshClient === 'function') refreshClient();
+  }
+  document.querySelectorAll('.asbtn').forEach(function (b) {
+    b.addEventListener('click', function () { setClient(b.getAttribute('data-as') === 'client'); });
+  });
+
+  /* proyectos: una plantilla, tres proyectos */
+  function fmt(n) { return n.toFixed(2).replace('.', ','); }
+  function lines(rows) { return rows.map(function (r) { return '<line x1="' + r[0] + '" y1="' + r[1] + '" x2="' + r[2] + '" y2="' + r[3] + '" stroke="currentColor" stroke-width="' + (r[4] || 1.5) + '"' + (r[5] ? ' stroke-dasharray="4 3"' : '') + '/>'; }).join(''); }
+  function box(x, y, w, h) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="none" stroke="currentColor" stroke-width="1.5"/>'; }
+  var P = {
+    churrasquero: {
+      url: 'incerpaz.com/proyectos/churrasquero-de-patio', crumb: 'Churrasquero de patio', hero: 'foto: churrasquero terminado',
+      title: 'Churrasquero de patio', desc: 'Cámara de cocción con refractario, base de piso cerámico y parrilla de hierro.',
+      chips: ['Dificultad media', '2 días', '2 personas', 'Exterior'],
+      sizes: [['Pequeño', .7], ['Mediano', 1], ['Grande', 1.4]],
+      dims: function (k) { return 'Medidas: ' + fmt(1.8 * k) + ' m de ancho × ' + fmt(.6 * Math.max(k, .9)) + ' m de fondo × ' + fmt(2.1 * (k === 1.4 ? 1.1 : k === .7 ? .9 : 1)) + ' m de alto'; },
+      svg: function (k) {
+        return '<svg viewBox="0 0 320 210" width="100%" role="img" aria-label="Plano esquemático frontal del churrasquero con medidas">' + box(20, 170, 200, 22) + box(34, 80, 172, 90) +
+          '<path d="M62 170 V110 Q62 92 80 92 H160 Q178 92 178 110 V170" fill="none" stroke="currentColor" stroke-width="1.5"/>' + lines([[62, 132, 178, 132, 1.5, 1], [20, 204, 220, 204, 1], [238, 20, 238, 192, 1]]) + box(94, 20, 52, 60) +
+          '<text x="104" y="201">' + fmt(1.8 * k) + ' m</text><text x="244" y="108">' + fmt(2.1 * (k === 1.4 ? 1.1 : k === .7 ? .9 : 1)) + ' m</text><text x="108" y="128">cámara</text><text x="100" y="146">parrilla</text><text x="100" y="52">chimenea</text></svg>';
+      },
+      steps: [['Base y nivelado', 'Replantear, compactar y colocar el piso Pavic.'], ['Muros laterales', 'Ladrillo 6 huecos con mortero, hiladas a nivel.'], ['Cámara refractaria', 'Refractario y mortero refractario en el interior.'], ['Parrilla y soportes', 'Altura de cocción regulable.'], ['Chimenea', 'Tiro, remate y revisión de humo.'], ['Acabado y curado', 'Enchape o pintura y secado antes del primer fuego.']],
+      items: [
+        ['Ladrillo 6 huecos económico rayado', 'INCERPAZ', 380, 'pzas', 0, 1.2], ['Refractario para cámara', 'INCERPAZ', 90, 'pzas', 0, 4.5], ['Pavic estándar (base)', 'INCERPAZ', 60, 'pzas', 0, 1.85],
+        ['Mortero refractario 25 kg', 'Complemento', 4, 'sacos', 0, 85], ['Cemento 50 kg', 'Complemento', 6, 'sacos', 0, 62], ['Arena fina', 'Complemento', 0.8, 'm³', 1, 150], ['Parrilla de hierro', 'Complemento', 1, 'un.', 0, 320]]
+    },
+    meson: {
+      url: 'incerpaz.com/proyectos/meson-de-cocina', crumb: 'Mesón de cocina', hero: 'foto: mesón terminado',
+      title: 'Mesón de cocina con base de ladrillo', desc: 'Base de ladrillo, frente con enchape y tope sobre losa. Sirve para cocina interior o para un parrillero exterior.',
+      chips: ['Dificultad media', '3 días', '2 personas', 'Interior o exterior'],
+      sizes: [['Pequeño', .7], ['Mediano', 1], ['Grande', 1.4]],
+      dims: function (k) { return 'Medidas: ' + fmt(1.8 * k) + ' m de largo × 0,60 m de fondo × 0,90 m de alto'; },
+      svg: function (k) {
+        return '<svg viewBox="0 0 320 210" width="100%" role="img" aria-label="Plano esquemático frontal del mesón con medidas">' + box(20, 60, 240, 14) + box(34, 74, 46, 108) + box(200, 74, 46, 108) + box(20, 182, 240, 8) +
+          lines([[80, 130, 200, 130, 1.5, 1], [20, 204, 260, 204, 1], [282, 60, 282, 190, 1]]) +
+          '<text x="108" y="54">tope sobre losa</text><text x="116" y="126">repisa</text><text x="37" y="132">enchape</text><text x="203" y="132">enchape</text><text x="124" y="201">' + fmt(1.8 * k) + ' m</text><text x="288" y="130">0,90 m</text></svg>';
+      },
+      steps: [['Replanteo y base', 'Marcar el trazado y preparar el contrapiso.'], ['Muros de soporte', 'Ladrillo 6 huecos con mortero, a plomo y nivel.'], ['Losa de tope', 'Encofrado, fierro y vaciado de la losa.'], ['Enchape del frente', 'Adhesivo y colocado del Brick enchape.'], ['Fraguado y limpieza', 'Juntas parejas y limpieza antes de que seque.'], ['Sellado', 'Sellador hidrorrepelente en el enchape.']],
+      items: [
+        ['Ladrillo 6 huecos económico rayado', 'INCERPAZ', 220, 'pzas', 0, 1.2], ['Brick enchape ancho (frente)', 'INCERPAZ', 90, 'pzas', 0, 2.2],
+        ['Cemento 50 kg', 'Complemento', 4, 'sacos', 0, 62], ['Arena fina', 'Complemento', 0.6, 'm³', 1, 150], ['Adhesivo cerámico 25 kg', 'Complemento', 3, 'sacos', 0, 70],
+        ['Fragua 5 kg', 'Complemento', 2, 'bolsas', 0, 35], ['Fierro de 8 mm', 'Complemento', 8, 'barras', 0, 38], ['Losa de tope', 'Complemento', 1, 'un.', 0, 450]]
+    },
+    pared: {
+      url: 'incerpaz.com/proyectos/pared-con-enchape', crumb: 'Pared con enchape', hero: 'foto: pared enchapada',
+      title: 'Pared con enchape de ladrillo', desc: 'Revestimiento de ladrillo visto sobre una pared existente, con esquineros y sellado.',
+      chips: ['Dificultad baja', '1 a 2 días', '1 a 2 personas', 'Interior o exterior'],
+      sizes: [['5 m²', .5], ['10 m²', 1], ['20 m²', 2]],
+      dims: function (k) { return 'Superficie: ' + (10 * k) + ' m² (ejemplo: ' + fmt(4 * k) + ' m de largo × 2,50 m de alto)'; },
+      svg: function (k) {
+        var w = 240, h = 150, rows = '', r, x, off;
+        for (r = 0; r < h / 12; r++) { off = r % 2 ? 18 : 0; for (x = -off; x < w; x += 36) { var x0 = Math.max(0, x), x1 = Math.min(w, x + 36); rows += '<rect x="' + (20 + x0) + '" y="' + (20 + r * 12) + '" width="' + (x1 - x0) + '" height="12" fill="none" stroke="currentColor" stroke-width=".6" opacity=".55"/>'; } }
+        return '<svg viewBox="0 0 320 210" width="100%" role="img" aria-label="Plano esquemático de la pared enchapada con medidas">' + rows + box(20, 20, w, 12 * Math.floor(h / 12)) +
+          lines([[20, 196, 260, 196, 1], [280, 20, 280, 164, 1]]) + '<text x="118" y="206">' + fmt(4 * k) + ' m</text><text x="286" y="96">2,50 m</text></svg>';
+      },
+      steps: [['Preparar la superficie', 'Limpiar, reparar y dejar la pared firme y seca.'], ['Trazar niveles', 'Línea guía horizontal para la primera hilada.'], ['Aplicar el adhesivo', 'Por paños pequeños con llana dentada.'], ['Colocar el enchape', 'Desde abajo, con esquineros en las esquinas.'], ['Fraguar las juntas', 'Relleno parejo y limpieza.'], ['Sellar', 'Sellador hidrorrepelente para exteriores.']],
+      items: [
+        ['Brick enchape ancho', 'INCERPAZ', 450, 'pzas', 0, 2.2], ['Esquineros (piezas especiales)', 'INCERPAZ', 12, 'pzas', 0, 3.5],
+        ['Adhesivo cerámico 25 kg', 'Complemento', 3, 'sacos', 0, 70], ['Fragua 5 kg', 'Complemento', 2, 'bolsas', 0, 35], ['Sellador hidrorrepelente', 'Complemento', 2, 'galones', 0, 120]]
+    }
+  };
+  var proj = 'churrasquero', scale = 1, items = P.churrasquero.items;
+  function renderBom() {
+    var total = 0, html = '';
+    items.forEach(function (r) {
+      var q = r[4] ? Math.round(r[2] * scale * 10) / 10 : Math.ceil(r[2] * scale);
+      var cost = q * r[5]; total += cost;
+      html += '<tr><td>' + r[0] + '</td><td><span class="chip">' + r[1] + '</span></td><td class="num">' + q.toString().replace('.', ',') + ' ' + r[3] + '</td><td class="num">' +
+        (client ? 'Bs ' + Math.round(cost).toLocaleString('es-BO') : '<span class="dots">Bs ••••</span>') + '</td></tr>';
+    });
+    document.getElementById('bom').innerHTML = html;
+    document.getElementById('bomTotal').innerHTML = client ? 'Bs ' + Math.round(total).toLocaleString('es-BO') : '<span class="dots">Bs ••••••</span>';
+    document.getElementById('bomChip').textContent = client ? 'Cliente verificado' : 'Precios con sesión';
+    document.getElementById('bomNote').textContent = client ? 'Precios de ejemplo para Cochabamba.' : 'Ingresa para ver costos de tu ciudad. Las cantidades se ven siempre.';
+  }
+  function drawProj() {
+    var d = P[proj];
+    document.getElementById('dims').textContent = d.dims(scale);
+    document.getElementById('pjPlan').innerHTML = d.svg(scale);
+    renderBom();
+  }
+  function loadProj(k) {
+    proj = k; var d = P[k]; items = d.items; scale = 1;
+    document.getElementById('pjUrl').textContent = d.url;
+    document.getElementById('pjCrumb').textContent = 'Inicio › Proyectos › ' + d.crumb;
+    document.getElementById('pjHero').textContent = d.hero;
+    document.getElementById('pjTitle').textContent = d.title;
+    document.getElementById('pjDesc').textContent = d.desc;
+    document.getElementById('pjChips').innerHTML = d.chips.map(function (c) { return '<span class="chip">' + c + '</span>'; }).join('');
+    document.getElementById('pjSizes').innerHTML = d.sizes.map(function (z) { return '<button type="button" data-size="' + z[1] + '" aria-pressed="' + (z[1] === 1) + '">' + z[0] + '</button>'; }).join('');
+    document.getElementById('pjSteps').innerHTML = d.steps.map(function (t) { return '<div><span><b>' + t[0] + '</b><span>' + t[1] + '</span></span></div>'; }).join('');
+    document.querySelectorAll('[data-proj]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-proj') === k)); });
+    drawProj();
+  }
+  document.querySelectorAll('[data-proj]').forEach(function (b) { b.addEventListener('click', function () { loadProj(b.getAttribute('data-proj')); }); });
+  document.getElementById('pjSizes').addEventListener('click', function (e) {
+    var z = e.target.getAttribute && e.target.getAttribute('data-size');
+    if (z === null || z === undefined) return;
+    scale = parseFloat(z);
+    document.querySelectorAll('#pjSizes button').forEach(function (o) { o.setAttribute('aria-pressed', String(o === e.target)); });
+    drawProj();
+  });
+  loadProj('churrasquero');
+  setClient(false);
+
+  /* dónde estamos: [nombre, tipo, dirección, teléfono, whatsapp, revisar] */
+  var AG = {
+    'Cochabamba': [
+      ['Fábrica', 'fab', 'Av. Villazón Km 7 1/2, zona Esmeralda Sud', '4 4271684 / 4 4271685', '70305319'],
+      ['Planta PAVIC', 'fab', 'Dirección por confirmar. Fábrica independiente, cercana a la fábrica general.', '', '', 'por completar', 'pavic'],
+      ['Central, oficina central', 'ag', 'Av. Circunvalación y Calle Miguel de Cervantes N° 181, de Semapa una cuadra al este', '4 4287067 / 4 4669420', '70750963'],
+      ['Quillacollo', 'ag', 'Av. Blanco Galindo Km 10 1/2', '4 4265309', '70349291'],
+      ['Petrolera', 'ag', 'Av. Petrolera Km 2 1/2, calle Coronel Juan L. Muñoz, lado surtidor Ticti', '4 4216286', '70787648'],
+      ['Sacaba', 'ag', 'Av. Barrientos Km 12 acera norte, camino a Santa Cruz, zona Ulincate', '4 4709201', '70348697'],
+      ['Vinto', 'ag', 'Av. Albina Patiño Km 16 acera norte, zona Las Manzanas, frente a la Alcaldía', '4 4536895', '70719774'],
+      ['Tiquipaya', 'ag', 'Av. Simón López casi esq. calle Nisedo Rodríguez N° 1823, zona Colquiri Sud', '4 4012445', '70719312'],
+      ['Beijing', 'ag', 'Av. Beijing N° 177, frente al parque Demetrio Canelas', '4 4424445', '65350059'],
+      ['Castillo', 'ag', 'Av. Villazón Km 3.5 N° 04259, lado empresa Virmegraf', '4 4724248', '70305319', 'número repetido']
+    ],
+    'La Paz': [
+      ['Punto de venta PAVIC', 'ag', 'Dirección por confirmar. Abastecido desde la planta de Oruro.', '', '', 'por completar', 'pavic']
+    ],
+    'Santa Cruz': [
+      ['Fábrica', 'fab', 'Carretera Warnes–Montero Km 37 1/2', '', '70818053'],
+      ['Planta PAVIC', 'fab', 'Dirección por confirmar. Fábrica independiente, cercana a la fábrica general.', '', '', 'por completar', 'pavic'],
+      ['Banzer', 'ag', 'Av. Banzer, 3er anillo externo, frente al surtidor Genex', '3 441918', '70009021'],
+      ['Cotoca', 'ag', 'Av. Virgen de Cotoca y 4to anillo', '3 490279', '70816205'],
+      ['Satélite', 'ag', 'Av. Principal de Satélite esq. coliseo Ignacio Warnes', '', '70885302'],
+      ['Patio', 'ag', 'Av. Doble vía La Guardia esq. 6to anillo, diagonal a Unitel', '3 544088', '70818060'],
+      ['Santos Dumont', 'ag', 'Av. Santos Dumont entre 5to y 6to anillo, casi esq. Av. 16 de Noviembre', '', '60802416'],
+      ['Plan 3000', 'ag', 'Av. Principal Plan 3000, calle Toro Toro, lado Banco Económico', '3 700257', '70930384'],
+      ['Montecristo', 'ag', 'Av. Virgen de Cotoca Km 4 1/2 entre 7mo y 8vo anillo', '', '70053778']
+    ],
+    'Oruro': [
+      ['Patio', 'ag', 'Av. Circunvalación entre Av. del Valle y Casco del Minero, urb. Milenium', '2 5252523 / 2 5233080', '60400608'],
+      ['Tacna', 'ag', 'Calle Tacna N° 600 entre Caro y Av. del Ejército', '2 5272237', '70415110']
+    ],
+    'Sucre': [
+      ['Terminal', 'ag', 'Av. Ostria Gutiérrez N° 525, zona Terminal de Buses', '6444344', '70213846']
+    ]
+  };
+  var loc = { city: 'Cochabamba', type: 'todas', q: '', sel: 0 };
+  function visible() {
+    return AG[loc.city].map(function (a, i) { return { a: a, i: i }; }).filter(function (o) {
+      return (loc.type === 'todas' || o.a[1] === loc.type) && (o.a[0] + ' ' + o.a[2]).toLowerCase().indexOf(loc.q.toLowerCase()) >= 0;
+    });
+  }
+  function renderLoc() {
+    var tabsEl = document.getElementById('cityTabs');
+    tabsEl.innerHTML = Object.keys(AG).map(function (c) {
+      return '<button type="button" class="chip' + (c === loc.city ? ' on' : '') + '" data-city="' + c + '" style="cursor:pointer;font-size:13px;padding:5px 12px">' + c + ' (' + AG[c].length + ')</button>';
+    }).join('');
+    var vis = visible();
+    if (!vis.some(function (o) { return o.i === loc.sel; })) loc.sel = vis.length ? vis[0].i : -1;
+    document.getElementById('locCount').textContent = vis.length + (vis.length === 1 ? ' punto en ' : ' puntos en ') + loc.city;
+    document.getElementById('locList').innerHTML = vis.length ? vis.map(function (o, n) {
+      var a = o.a;
+      return '<button type="button" class="loc" data-i="' + o.i + '" aria-pressed="' + (o.i === loc.sel) + '"><b>' + (n + 1) + '. ' + a[0] +
+        ' <span class="chip">' + (a[1] === 'fab' ? 'Fábrica' : 'Agencia') + '</span>' + (a[6] ? ' <span class="chip lock">Solo PAVIC</span>' : '') + (a[5] === 'número repetido' ? ' <span class="flag">revisar dato</span>' : '') + (a[5] === 'por completar' ? ' <i class="pin in" title="Pendiente de datos">!</i>' : '') + '</b><span>' + a[2] + '</span></button>';
+    }).join('') : '<div style="padding:14px" class="muted">Sin resultados. Prueba otra zona o deja tu celular abajo.</div>';
+    var map = document.getElementById('locMap');
+    map.querySelectorAll('.mp').forEach(function (p) { p.remove(); });
+    vis.forEach(function (o, n) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'mp' + (o.a[1] === 'fab' ? ' fab' : ''); b.textContent = n + 1;
+      b.style.left = (12 + ((n * 37 + 11) % 76)) + '%'; b.style.top = (14 + ((n * 53 + 7) % 68)) + '%';
+      b.setAttribute('data-i', o.i); b.setAttribute('aria-pressed', String(o.i === loc.sel));
+      b.setAttribute('aria-label', o.a[0]);
+      map.appendChild(b);
+    });
+    var d = document.getElementById('locDetail');
+    if (loc.sel < 0) { d.innerHTML = '<span class="sub">Elige un punto para ver el detalle.</span>'; return; }
+    var s = AG[loc.city][loc.sel];
+    d.innerHTML = '<div class="blk-title" style="margin:0"><h3>' + s[0] + ', ' + loc.city + '</h3><span class="chip">' + (s[1] === 'fab' ? 'Fábrica' : 'Agencia') + '</span>' + (s[6] ? ' <span class="chip lock">Solo PAVIC</span>' : '') + (s[5] === 'por completar' ? ' <i class="pin in" title="Pendiente de datos">!</i>' : '') + '</div>' +
+      '<span class="sub">' + s[2] + '</span>' +
+      '<table class="specs"><tbody><tr><td>Teléfono</td><td>' + (s[3] || '<span class="flag">por completar</span>') + '</td></tr>' +
+      '<tr><td>WhatsApp</td><td>' + (s[4] ? '+591 ' + s[4] + ' <button type="button" class="chip" id="copyWa" style="cursor:pointer">copiar</button>' : '<span class="flag">por completar</span>') + '</td></tr>' +
+      '<tr><td>Horario</td><td class="muted">por definir</td></tr>' +
+      '<tr><td>Servicios</td><td><span class="chip">retiro de pedido</span> <span class="chip">entrega a obra</span> <span class="chip">asesoría técnica</span> <span class="muted" style="font-size:12px">por confirmar</span></td></tr></tbody></table>' +
+      '<div class="wa-preview">Mensaje de WhatsApp: "' + (s[6] ? 'Hola, vi PAVIC en incerpaz.com y quiero cotizar un proyecto con el punto de venta de ' + loc.city + '.' : 'Hola, vi Pavic estándar en incerpaz.com y quiero cotizar en la agencia ' + s[0] + ' de ' + loc.city + '.') + '"</div>' +
+      '<div class="row"><span class="btn primary">Escribir por WhatsApp</span><span class="btn">Cómo llegar</span><span class="btn">Llamar</span></div>';
+    var cp = document.getElementById('copyWa');
+    if (cp) cp.addEventListener('click', function () {
+      var t = '+591 ' + s[4];
+      try { navigator.clipboard.writeText(t).then(function () { cp.textContent = 'copiado'; }, function () { cp.textContent = t; }); } catch (e) { cp.textContent = t; }
+    });
+  }
+  document.getElementById('cityTabs').addEventListener('click', function (e) {
+    var c = e.target.getAttribute && e.target.getAttribute('data-city');
+    if (c) { loc.city = c; loc.sel = 0; renderLoc(); }
+  });
+  function pick(e) {
+    var t = e.target.closest ? e.target.closest('[data-i]') : null;
+    if (t) { loc.sel = parseInt(t.getAttribute('data-i'), 10); renderLoc(); }
+  }
+  document.getElementById('locList').addEventListener('click', pick);
+  document.getElementById('locMap').addEventListener('click', pick);
+  document.getElementById('locQ').addEventListener('input', function (e) { loc.q = e.target.value; renderLoc(); });
+  document.querySelectorAll('[data-type]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      loc.type = b.getAttribute('data-type');
+      document.querySelectorAll('[data-type]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      renderLoc();
+    });
+  });
+  renderLoc();
+
+  /* pavic */
+  var pm = document.getElementById('pvM2'), pg = document.getElementById('pvMerma'), pc = document.getElementById('pvCap');
+  function pcalc() {
+    var a = Math.max(0, parseFloat(pm.value) || 0), cap = Math.max(1, parseFloat(pc.value) || 1);
+    var p = Math.ceil(a * 50 * (1 + parseFloat(pg.value))), kg = p * 2.65;
+    document.getElementById('pvPzas').firstChild.nodeValue = p.toLocaleString('es-BO');
+    document.getElementById('pvKg').firstChild.nodeValue = Math.round(kg).toLocaleString('es-BO');
+    document.getElementById('pvCam').firstChild.nodeValue = Math.ceil(kg / cap).toLocaleString('es-BO');
+    var c = document.getElementById('pvCost');
+    c.firstChild.nodeValue = client ? 'Bs ' + Math.round(p * 1.85).toLocaleString('es-BO') : 'Con sesión';
+  }
+  [pm, pc].forEach(function (e) { e.addEventListener('input', pcalc); }); pg.addEventListener('change', pcalc); pcalc();
+  document.querySelectorAll('[data-kind]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-kind');
+      document.querySelectorAll('[data-kind]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.querySelectorAll('#obras [data-k]').forEach(function (c) { c.hidden = k !== 'todas' && c.getAttribute('data-k') !== k; });
+    });
+  });
+
+  /* sesión: pavic y constructor */
+  function refreshClient() {
+    var pz = document.getElementById('pvCost');
+    if (pz && pm) pcalc();
+    if (typeof tkA !== 'undefined' && tkA) tcalc();
+    if (typeof ppEl !== 'undefined' && ppEl) { renderPed(); renderShop(); }
+  }
+  var cnItems = [['Pavic estándar', 1.85, 4000], ['Ladrillo 6 huecos económico rayado', 1.2, 3000], ['Refractario para cámara', 4.5, 120]];
+  var cnQ = cnItems.map(function (r) { return r[2]; });
+  function cnRender() {
+    var t = 0, h = '';
+    cnItems.forEach(function (r, i) {
+      var sub = r[1] * cnQ[i]; t += sub;
+      h += '<tr><td>' + r[0] + '</td><td class="num">Bs ' + r[1].toFixed(2).replace('.', ',') + '</td><td class="num"><input type="number" min="0" step="10" value="' + cnQ[i] + '" data-q="' + i + '" aria-label="Cantidad de ' + r[0] + '" style="width:90px;font:400 14px var(--body);background:var(--surface);color:var(--fg);border:1.5px solid var(--line-strong);padding:4px 6px;text-align:right"></td><td class="num">Bs ' + Math.round(sub).toLocaleString('es-BO') + '</td></tr>';
+    });
+    document.getElementById('cnLines').innerHTML = h;
+    document.getElementById('cnTotal').textContent = 'Bs ' + Math.round(t).toLocaleString('es-BO');
+  }
+  document.getElementById('cnLines').addEventListener('change', function (e) {
+    var i = e.target.getAttribute('data-q');
+    if (i !== null) { cnQ[+i] = Math.max(0, parseFloat(e.target.value) || 0); cnRender(); }
+  });
+  cnRender();
+  document.querySelectorAll('[data-cn]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-cn');
+      document.querySelectorAll('[data-cn]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.getElementById('cnReg').hidden = k !== 'reg';
+      document.getElementById('cnPend').hidden = k !== 'pend';
+      document.getElementById('cnOk').hidden = k !== 'ok';
+      document.getElementById('cnUrl').textContent = k === 'reg' ? 'incerpaz.com/registro' : 'incerpaz.com/mi-cuenta';
+    });
+  });
+
+  /* techos */
+  var tkA = document.getElementById('tkArea'), tkP = document.getElementById('tkPend'), tkM = document.getElementById('tkModel'), tkMe = document.getElementById('tkMerma');
+  function tcalc() {
+    var a = Math.max(0, parseFloat(tkA.value) || 0), pd = Math.max(0, parseFloat(tkP.value) || 0) / 100;
+    var sup = a * Math.sqrt(1 + pd * pd), n = Math.ceil(sup * parseFloat(tkM.value) * (1 + parseFloat(tkMe.value)));
+    document.getElementById('tkSup').firstChild.nodeValue = (Math.round(sup * 10) / 10).toLocaleString('es-BO');
+    document.getElementById('tkPzas').firstChild.nodeValue = n.toLocaleString('es-BO');
+    document.getElementById('tkCost').firstChild.nodeValue = client ? 'Bs ' + Math.round(n * 3.1).toLocaleString('es-BO') : 'Con sesión';
+  }
+  [tkA, tkP].forEach(function (e) { e.addEventListener('input', tcalc); }); [tkM, tkMe].forEach(function (e) { e.addEventListener('change', tcalc); }); tcalc();
+
+  /* empresa */
+  document.querySelectorAll('[data-ek]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-ek');
+      document.querySelectorAll('[data-ek]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.querySelectorAll('#emFab [data-k]').forEach(function (c) { c.hidden = k !== 'todas' && (' ' + c.getAttribute('data-k') + ' ').indexOf(' ' + k + ' ') < 0; });
+    });
+  });
+  document.querySelectorAll('[data-gate]').forEach(function (b) {
+    b.addEventListener('click', function () { var g = document.getElementById('emGate'); g.hidden = false; });
+  });
+
+  /* catálogo */
+  var CATS = { muros: 'Muros', piezas: 'Piezas especiales', pisos: 'Pisos y pavimentos', ref: 'Refractarios', rev: 'Revestimientos y decorativos', combos: 'Combos y promociones' };
+  var PRODS = [
+    ['18 huecos', 'muros'], ['18 huecos 1/2', 'muros'], ['18 huecos Luis XV', 'muros,piezas,rev'], ['3 huecos económico rayado', 'muros'], ['3 huecos económico rayado mitad', 'muros'],
+    ['6 huecos big rayado', 'muros'], ['6 huecos big rayado mitad', 'muros'], ['6 huecos redondo', 'muros'], ['6 huecos redondo medios', 'muros'], ['8 huecos económico rayado', 'muros'],
+    ['8 huecos económico rayado constructor', 'muros'], ['8 huecos económico rayado constructor medios', 'muros'], ['8 huecos económico rayado medios', 'muros'], ['9 huecos económico rayado', 'muros'], ['9 huecos económico rayado medios', 'muros'],
+    ['Biscocho', 'ref,rev'], ['Biscocho 213', 'ref,rev'], ['Bloque cerámico 9 cm', 'piezas'], ['Botaguas de 1 caída', 'piezas'], ['Botaguas de 2 caídas', 'piezas'],
+    ['Brick cornisa punta bosel', 'muros,rev'], ['Brick enchape ancho', 'rev'], ['Brick enchape corto', 'rev'], ['Brick estándar', 'muros,rev'], ['Brick estándar aligerado', 'muros,pisos,rev'],
+    ['Brick gambote rústico 22', 'muros,rev'], ['Brick gambote rústico 18', 'muros,rev'], ['Brick terminación grada', 'muros,rev'], ['Celosía', 'muros,piezas,rev'],
+    ['Pavic estándar', 'pisos'], ['Pavic peatonal', 'pisos'], ['Pavic estándar con tetones', 'pisos'], ['Combo 18H visto', 'combos'], ['Combo 6H redondo', 'combos']
+  ];
+  var shopQ = document.getElementById('shopQ'), shopOn = {}, shopBudget = 0;
+  Object.keys(CATS).forEach(function (k) { shopOn[k] = true; });
+  function shopMatch(p) { return p[0].toLowerCase().indexOf(shopQ.value.toLowerCase()) >= 0; }
+  function renderShop() {
+    var list = PRODS.filter(shopMatch);
+    document.getElementById('shopCats').innerHTML = Object.keys(CATS).map(function (k) {
+      var n = list.filter(function (p) { return p[1].split(',').indexOf(k) >= 0; }).length;
+      return '<div class="chk"><label><input type="checkbox" data-cat="' + k + '"' + (shopOn[k] ? ' checked' : '') + '> ' + CATS[k] + '</label><span class="mono muted">' + n + '</span></div>';
+    }).join('');
+    var shown = list.filter(function (p) { return p[1].split(',').some(function (c) { return shopOn[c]; }); });
+    if (document.getElementById('shopSort').value === 'cat') shown = shown.slice().sort(function (a, b) { return a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]); });
+    else shown = shown.slice().sort(function (a, b) { return a[0].localeCompare(b[0], 'es'); });
+    document.getElementById('shopCount').textContent = shown.length + (shown.length === 1 ? ' producto' : ' productos');
+    document.getElementById('shopGrid').innerHTML = shown.length ? shown.map(function (p) {
+      var first = p[1].split(',')[0];
+      return '<div class="card"><div class="ph" style="min-height:70px"><b>foto</b></div><b>' + p[0] + '</b><span class="chip" style="align-self:flex-start">' + CATS[first] + '</span>' +
+        (client ? '<span class="sub">Bs 0,00 <span class="muted">(precio del ERP)</span></span>' : '<span class="chip lock" style="align-self:flex-start">Precio con sesión</span>') +
+        '<button type="button" class="mini" data-add="1">Añadir al presupuesto</button></div>';
+    }).join('') : '<div class="card flat"><span class="sub">Sin resultados. Prueba otra palabra o escríbenos por WhatsApp.</span></div>';
+  }
+  shopQ.addEventListener('input', renderShop);
+  document.getElementById('shopSort').addEventListener('change', renderShop);
+  document.getElementById('shopCats').addEventListener('change', function (e) { var k = e.target.getAttribute('data-cat'); if (k) { shopOn[k] = e.target.checked; renderShop(); } });
+  document.getElementById('shopGrid').addEventListener('click', function (e) {
+    if (e.target.getAttribute && e.target.getAttribute('data-add')) { shopBudget++; document.getElementById('shopBudget').textContent = 'Presupuesto (' + shopBudget + ')'; e.target.textContent = 'Añadido'; }
+  });
+  renderShop();
+
+  /* presupuesto y pedido */
+  var PP = [['Pavic estándar', 1.85, 2000], ['6 huecos económico rayado', 1.2, 3000], ['Brick enchape ancho', 2.2, 450]];
+  var ppQ = PP.map(function (r) { return r[2]; }), ppEnt = 'ret', ppEl = document.getElementById('ppLines');
+  function ppTotal() { return PP.reduce(function (t, r, i) { return t + r[1] * ppQ[i]; }, 0); }
+  function renderPed() {
+    ppEl.innerHTML = PP.map(function (r, i) {
+      return '<tr><td>' + r[0] + '</td><td class="num">' + (client ? 'Bs ' + r[1].toFixed(2).replace('.', ',') : '<span class="dots">Bs ••••</span>') + '</td><td class="num"><input class="qty" type="number" min="0" step="10" value="' + ppQ[i] + '" data-q="' + i + '" aria-label="Cantidad de ' + r[0] + '"></td><td class="num">' + (client ? 'Bs ' + Math.round(r[1] * ppQ[i]).toLocaleString('es-BO') : '<span class="dots">Bs ••••</span>') + '</td></tr>';
+    }).join('');
+    document.getElementById('ppTotal').innerHTML = client ? 'Bs ' + Math.round(ppTotal()).toLocaleString('es-BO') : '<span class="dots">Bs ••••••</span>';
+    document.getElementById('ppPriceNote').textContent = client ? 'Precios de lista de Cochabamba, de ejemplo. Del ERP al conectarlo.' : 'Ingresa para ver precios. Puedes pedir una cotización sin cuenta.';
+    document.getElementById('ppDatosV').hidden = client; document.getElementById('ppDatosC').hidden = !client;
+    document.getElementById('ppDatosSub').textContent = client ? 'datos de facturación de tu cuenta' : 'para que un ejecutivo te contacte';
+    document.getElementById('ppResSub').textContent = client ? 'pedido' : 'solicitud de cotización';
+    document.getElementById('ppSend').textContent = client ? 'Enviar pedido' : 'Solicitar cotización';
+    document.getElementById('ppSendNote').textContent = client ? 'El pedido baja al ERP.' : 'Llega al ejecutivo de tu ciudad.';
+    document.getElementById('ppUrl').textContent = client ? 'incerpaz.com/mi-cuenta/pedido' : 'incerpaz.com/presupuesto';
+    document.getElementById('ppResN').textContent = PP.length + ' productos, ' + ppQ.reduce(function (a, b) { return a + b; }, 0).toLocaleString('es-BO') + ' piezas';
+    document.getElementById('ppResT').textContent = client ? 'Bs ' + Math.round(ppTotal()).toLocaleString('es-BO') + ' (de ejemplo)' : 'Se informa en la cotización';
+    document.getElementById('ppResE').textContent = (ppEnt === 'ret' ? 'Retiro en ' + (document.getElementById('ppAg').value || 'agencia') : 'Envío a obra') + ', ' + document.getElementById('ppCiudad').value;
+    document.getElementById('ppDone').hidden = true;
+  }
+  function fillAg() {
+    var c = document.getElementById('ppCiudad').value;
+    document.getElementById('ppAg').innerHTML = (AG[c] || []).filter(function (a) { return a[1] === 'ag'; }).map(function (a) { return '<option>' + a[0] + '</option>'; }).join('');
+  }
+  document.getElementById('ppCiudad').innerHTML = ['Cochabamba', 'Santa Cruz', 'Oruro', 'Sucre'].map(function (c) { return '<option>' + c + '</option>'; }).join('');
+  document.getElementById('ppCiudad').addEventListener('change', function () { fillAg(); updEnt(); renderPed(); });
+  document.getElementById('ppAg').addEventListener('change', renderPed);
+  fillAg();
+  ppEl.addEventListener('change', function (e) { var i = e.target.getAttribute('data-q'); if (i !== null) { ppQ[+i] = Math.max(0, parseFloat(e.target.value) || 0); renderPed(); } });
+  document.querySelectorAll('[data-ent]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      ppEnt = b.getAttribute('data-ent');
+      document.querySelectorAll('[data-ent]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.getElementById('ppAgW').hidden = ppEnt !== 'ret'; document.getElementById('ppDirW').hidden = ppEnt !== 'env';
+      updEnt();
+      renderPed();
+    });
+  });
+  function updEnt() {
+    var c = document.getElementById('ppCiudad').value;
+    document.getElementById('ppEntNote').textContent = ppEnt === 'ret' ? 'Retiro en agencia. Cada agencia confirma cuándo está listo.' : 'El monto y las condiciones del envío son los de la política de ' + c + '.';
+  }
+  updEnt();
+  document.querySelectorAll('[data-pp]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-pp');
+      document.querySelectorAll('[data-pp]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      [1, 2, 3, 4].forEach(function (n) { document.getElementById('pp' + n).hidden = String(n) !== k; });
+      renderPed();
+    });
+  });
+  document.getElementById('ppSend').addEventListener('click', function () {
+    document.getElementById('ppDone').hidden = false;
+    document.getElementById('ppDoneT').textContent = client ? 'Pedido PD-0188 recibido (número de ejemplo)' : 'Recibimos tu solicitud de cotización';
+    document.getElementById('ppDoneS').textContent = client ? 'Tu ejecutivo lo confirma y puedes seguir su estado en Mi cuenta.' : 'Un ejecutivo de ' + document.getElementById('ppCiudad').value + ' te contactará por WhatsApp.';
+  });
+  renderPed();
+
+  /* más páginas */
+  document.querySelectorAll('[data-mp]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-mp');
+      document.querySelectorAll('[data-mp]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      ['proy', 'exp', 'blog', 'prom'].forEach(function (n) { var e = document.getElementById('mp-' + n); e.hidden = n !== k; e.style.display = n === k ? 'flex' : 'none'; });
+    });
+  });
+  document.querySelectorAll('[data-dif]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-dif');
+      document.querySelectorAll('[data-dif]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.querySelectorAll('#mpProyGrid [data-d]').forEach(function (c) { c.hidden = k !== 'todas' && c.getAttribute('data-d') !== k; });
+    });
+  });
+  document.querySelectorAll('[data-lang]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var l = b.getAttribute('data-lang');
+      document.querySelectorAll('[data-lang]').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.querySelectorAll('#mp-exp [data-es]').forEach(function (e) { e.textContent = e.getAttribute('data-' + l); });
+    });
+  });
+  document.getElementById('mpBlogChips').addEventListener('click', function (e) {
+    var k = e.target.getAttribute && e.target.getAttribute('data-bc');
+    if (!k) return;
+    document.querySelectorAll('#mpBlogChips .mini').forEach(function (o) { o.classList.toggle('on', o === e.target); });
+    document.querySelectorAll('#mpBlogGrid [data-c]').forEach(function (c) { c.hidden = k !== 'todas' && c.getAttribute('data-c') !== k; });
+  });
+  var LEADS = [['Constructora Ejemplo', 'Cotizar 2.500 m² de PAVIC', 'Santa Cruz', 'Portada PAVIC', 0], ['María (ejemplo)', 'Churrasquero mediano', 'Cochabamba', 'Proyecto', 0], ['Ferretería Ejemplo', 'Lista de precios de muros', 'Oruro', 'Registro de cuenta', 1], ['Entidad pública (ejemplo)', 'Ficha técnica de PAVIC', 'Cochabamba', 'Descarga con datos', 2]];
+  var ESTADOS = ['Nuevo', 'Contactado', 'Cotizado', 'Pedido'];
+  function renderLeads() {
+    document.getElementById('mpLeads').innerHTML = LEADS.map(function (r, i) {
+      return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td><span class="chip">' + r[3] + '</span></td><td><select class="sel" data-l="' + i + '" aria-label="Estado de ' + r[0] + '">' + ESTADOS.map(function (e, j) { return '<option value="' + j + '"' + (j === r[4] ? ' selected' : '') + '>' + e + '</option>'; }).join('') + '</select></td></tr>';
+    }).join('');
+    document.getElementById('mpLeadSum').innerHTML = ESTADOS.map(function (e, j) { return '<span class="chip' + (j === 0 ? ' on' : '') + '">' + e + ': ' + LEADS.filter(function (r) { return r[4] === j; }).length + '</span>'; }).join('');
+  }
+  document.getElementById('mpLeads').addEventListener('change', function (e) { var i = e.target.getAttribute('data-l'); if (i !== null) { LEADS[+i][4] = parseInt(e.target.value, 10); renderLeads(); } });
+  renderLeads();
+
+  /* tema */
+  var modes = ['auto', 'light', 'dark'], mi = 0, tb = document.getElementById('themeBtn');
+  tb.addEventListener('click', function () {
+    mi = (mi + 1) % 3;
+    var r = document.documentElement;
+    if (modes[mi] === 'auto') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', modes[mi]);
+    tb.textContent = 'Tema: ' + modes[mi];
+  });
+})();
+</script>

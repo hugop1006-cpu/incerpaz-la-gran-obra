@@ -1,0 +1,7 @@
+# HTTPS automático. DOMINIO = www.incerpaz.com ; DOMINIO_RAIZ = incerpaz.com (se redirige al anterior)
+{$DOMINIO} {
+	reverse_proxy app:8080
+}
+{$DOMINIO_RAIZ:localhost.invalid} {
+	redir https://{$DOMINIO}{uri} permanent
+}

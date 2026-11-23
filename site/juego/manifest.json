@@ -1,0 +1,17 @@
+{
+  "name": "INCERPAZ: La Gran Obra",
+  "short_name": "La Gran Obra",
+  "description": "Juego de plataformas de INCERPAZ: ayuda a Ladri a terminar la casa antes de la tormenta.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "portrait",
+  "background_color": "#2b1a12",
+  "theme_color": "#f0c928",
+  "lang": "es",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
