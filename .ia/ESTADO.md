@@ -2,6 +2,10 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-23 · Codex
+**Hecho**
+- Se agregó a los pendientes de Catálogo la identificación de los productos nuevos y su fecha de vigencia.
+
 ## 2026-11-23 · Claude Code
 **Hecho** (wireframes, tanda 6: la última)
 - Catálogo: selector «Ordenar» (orden del catálogo, nombre de la A a la Z, categoría); los combos van siempre primero.
