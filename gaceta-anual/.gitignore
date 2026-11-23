@@ -1,0 +1,4 @@
+# PDF descargados de la Gaceta (varios MB cada uno); en GitHub Actions se guardan como artefacto de la ejecución
+archivo/
+__pycache__/
+*.tmp

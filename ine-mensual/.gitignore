@@ -1,0 +1,4 @@
+# copias crudas de cada descarga (decenas de MB); en GitHub Actions se guardan como artefacto de la ejecución
+archivo/
+__pycache__/
+*.tmp

@@ -291,6 +291,12 @@
   });
 
   var cmpApp = $('#cmpApp'), cmpDatos = null, soloDif = false;
+  /* «Volver al catálogo»: si se llegó desde el catálogo se regresa a él tal cual (con sus filtros); si no, se abre el catálogo de los productos elegidos */
+  var volverCmp = $('[data-cmp-volver]');
+  if (volverCmp) volverCmp.addEventListener('click', function (e) {
+    var ref = document.referrer || '';
+    if (ref.indexOf(location.origin) === 0 && /catalogo\.html/.test(ref) && window.history.length > 1) { e.preventDefault(); window.history.back(); }
+  });
   if (cmpApp && $('#datos-comparar')) {
     cmpDatos = JSON.parse($('#datos-comparar').textContent);
     var porId = {}; cmpDatos.productos.forEach(function (p) { porId[p.id] = p; });
@@ -312,6 +318,7 @@
     if (!cmpApp || !cmpDatos) return;
     var l = leerCmp().map(function (x) { return porId[x.id]; }).filter(Boolean);
     if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + (l.length ? '?p=' + l.map(function (p) { return p.id; }).join(',') : ''));
+    var volver = $('[data-cmp-volver]'); if (volver && l.length) volver.setAttribute('href', 'catalogo.html?ciudad=' + l[0].catalogo);
     if (!l.length) {
       cmpApp.innerHTML = '<div class="empty"><b>Todavía no elegiste productos.</b><p class="muted" style="margin-top:6px">En el catálogo, marca «Comparar» en hasta ' + CMP_MAX + ' productos del mismo catálogo.</p><div class="btn-row" style="margin-top:14px"><a class="btn btn--red" href="catalogo.html">Ir al catálogo</a></div></div>';
       return;
@@ -338,7 +345,7 @@
       var dif = l.length > 1 && vals.some(function (v) { return v !== vals[0]; });
       return '<tr' + (dif ? ' class="difiere"' : '') + '><th scope="row">' + f[0] + '</th>' + vals.map(function (v) { return '<td>' + (v ? escH(v) : '<span class="muted">Sin dato</span>') + '</td>'; }).join('') + '</tr>';
     }).join('');
-    if (cmpDatos.comercio) cuerpo += '<tr class="cmp-precio"><th scope="row">Precio</th>' + l.map(function (p) { return '<td><span class="precio" data-precio data-ciudad="' + escH(p.catalogo) + '" data-slug="' + escH(p.slug) + '">Precio con sesión</span></td>'; }).join('') + '</tr>';
+    if (cmpDatos.comercio) cuerpo += '<tr class="cmp-precio"><th scope="row">Precio</th>' + l.map(function (p) { return '<td><span class="precio" data-precio data-ciudad="' + escH(p.catalogo) + '" data-slug="' + escH(p.slug) + '"><a href="ingresar.html">Ingresa para ver precios</a></span></td>'; }).join('') + '</tr>';
     var nombres = l.map(function (p) { return p.nombre; });
     var lista = nombres.length > 1 ? nombres.slice(0, -1).join(', ') + ' y ' + nombres[nombres.length - 1] : nombres[0];
     cmpApp.innerHTML =

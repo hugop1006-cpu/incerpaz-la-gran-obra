@@ -1,0 +1,104 @@
+name: Memorias del rubro (Gaceta SEPREC)
+
+# Las sociedades anónimas publican su memoria anual en la Gaceta Electrónica de Comercio del SEPREC. Las que cierran el ejercicio el 31 de marzo
+# lo hacen entre junio y octubre. Esta tarea corre una vez al mes de junio a diciembre, descarga las memorias nuevas de las empresas del rubro,
+# lee sus estados financieros y guarda las cifras en gaceta-anual/datos. Si no hay nada nuevo, no cambia nada.
+# También se puede lanzar a mano desde la pestaña Actions («Run workflow»).
+on:
+  schedule:
+    - cron: '23 11 15 6-12 *'   # día 15 de junio a diciembre, 11:23 UTC (07:23 en Bolivia)
+  workflow_dispatch:
+    inputs:
+      solo:
+        description: 'Ids de empresas separados por coma (vacío = todas las que se siguen)'
+        required: false
+        default: ''
+      sin_descubrir:
+        description: 'No buscar empresas nuevas del rubro'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # para guardar las cifras nuevas en el repositorio
+  issues: write     # para abrir un aviso cuando hay memorias nuevas, cifras por revisar, atrasos o errores
+
+concurrency:
+  group: gaceta-anual
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar lectura de PDF y reconocimiento de texto
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-spa
+
+      - name: Pruebas
+        run: python -I -m unittest discover -s gaceta-anual/tests
+
+      - name: Buscar memorias nuevas, descargar y leer
+        id: gaceta
+        env:
+          SOLO: ${{ inputs.solo }}
+          SIN_DESCUBRIR: ${{ inputs.sin_descubrir }}
+        run: |
+          set +e
+          args=()
+          if [ -n "$SOLO" ]; then args+=(--solo "$SOLO"); fi
+          if [ "$SIN_DESCUBRIR" = "true" ]; then args+=(--sin-descubrir); fi
+          python -I gaceta-anual/gaceta_anual.py actualizar "${args[@]}"
+          echo "codigo=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Resumen en la página de la ejecución
+        if: always()
+        run: |
+          if [ -f gaceta-anual/datos/ultimo_informe.md ]; then cat gaceta-anual/datos/ultimo_informe.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Guardar los PDF descargados (90 días)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: archivo-gaceta-${{ github.run_id }}
+          path: gaceta-anual/archivo/
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Guardar las cifras en el repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gaceta-anual/datos
+          if git diff --cached --quiet; then
+            echo "Sin cambios en los datos."
+          else
+            git commit -m "Memorias del rubro: $(date -u +%F)"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+
+      - name: Avisar con un issue si hay memorias nuevas, cifras por revisar, atrasos, errores o empresas nuevas
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          f=gaceta-anual/datos/ultimo_resumen.json
+          [ -f "$f" ] || exit 0
+          nuevas=$(jq '.con_memorias_nuevas | length' "$f"); revisar=$(jq '.por_revisar | length' "$f"); atrasadas=$(jq '.atrasadas | length' "$f")
+          errores=$(jq '.errores | length' "$f"); descubiertas=$(jq '.descubiertas | length' "$f")
+          if [ "$nuevas" != "0" ] || [ "$revisar" != "0" ] || [ "$atrasadas" != "0" ] || [ "$errores" != "0" ] || [ "$descubiertas" != "0" ]; then
+            gh issue create --title "Memorias del rubro $(date -u +%F): $nuevas nuevas, $revisar por revisar, $atrasadas atrasadas, $errores con error, $descubiertas empresas nuevas" \
+              --body-file gaceta-anual/datos/ultimo_informe.md
+          fi
+
+      - name: Marcar la ejecución como fallida si hubo errores
+        if: steps.gaceta.outputs.codigo != '0'
+        run: exit 1

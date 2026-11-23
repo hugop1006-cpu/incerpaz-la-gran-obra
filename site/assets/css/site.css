@@ -528,3 +528,7 @@ label.check a { color: var(--red); font-weight: 600; }
 @media (min-width: 861px) { .quick:has(> a:nth-child(5)) { grid-template-columns: repeat(6, 1fr); } .quick:has(> a:nth-child(5)) a { grid-column: span 2; } .quick:has(> a:nth-child(5)) a:nth-child(n+4) { grid-column: span 3; } .quick:has(> a:nth-child(6)) a:nth-child(n+4) { grid-column: span 2; } }
 @media (max-width: 860px) { .quick { grid-template-columns: 1fr 1fr; } .quick a:last-child:nth-child(odd) { grid-column: 1 / -1; } }
 @media (max-width: 420px) { .quick { grid-template-columns: 1fr; } }
+
+/* botón «Volver» (comparador y otras páginas de herramienta) */
+.volver { display: flex; width: fit-content; align-items: center; gap: 8px; min-height: 44px; margin: 4px 0 18px; padding: 8px 16px 8px 12px; border: 1.5px solid var(--ink); background: var(--white); color: var(--ink); font: 700 16px var(--display); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
+.volver:hover { background: var(--ink); color: #fff; }
