@@ -2,6 +2,12 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-23 · Codex
+**Regla de trabajo vigente**
+- Luna (Codex en la nube) implementa las tareas nuevas del sitio con ENCARGO y REPORTE del protocolo común.
+- Claude, en chat o en Claude Code, diseña, redacta el ENCARGO y revisa el PR. Solo implementa si Hugo lo indica para esa tarea.
+- Hugo sigue autorizando cada tarea, cada merge y cada deploy.
+
 ## 2026-11-23 (noche) · Claude Code
 **Hecho**
 - Comparador: botón «← Volver al catálogo» arriba de la página. Si se llegó desde el catálogo regresa a él tal cual (con ciudad y filtro); si se abrió directo, lleva al catálogo de los productos elegidos. También se cambió «Precio con sesión» por «Ingresa para ver precios» en la fila de precio de la tabla.
