@@ -2,6 +2,12 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-23 · Codex
+**Regla de trabajo vigente**
+- Luna (Codex en la nube) implementa las tareas nuevas del sitio con ENCARGO y REPORTE del protocolo común.
+- Claude, en chat o en Claude Code, diseña, redacta el ENCARGO y revisa el PR. Solo implementa si Hugo lo indica para esa tarea.
+- Hugo sigue autorizando cada tarea, cada merge y cada deploy.
+
 ## 2026-11-23 (tarde) · Claude Code
 **Hecho** (revisión UX, prioridad 2, aprobada por Hugo)
 - Nombres consistentes: el menú, los títulos y el buscador dicen «Productos» y «Dónde comprar» (antes «Catálogo» y «Dónde estamos»). Las direcciones (`catalogo.html`, `donde-estamos.html`) no cambian.
