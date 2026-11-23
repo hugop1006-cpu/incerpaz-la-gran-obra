@@ -122,6 +122,31 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok((await bn.locator('#contacto select[name="soy"]').count()) === 1, 'el formulario de la página de ciudad también pregunta «Soy»');
   await bn.context().close();
 
+  /* catálogo: ordenar por nombre y por categoría */
+  const od = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); od.on('pageerror', (e) => errores.push(e.message));
+  await od.goto(BASE + 'catalogo.html?ciudad=cochabamba');
+  const nombres = async () => od.locator('#grid .pcard:visible:not(.pcard--combo)').evaluateAll((l) => l.map((x) => x.getAttribute('data-nombre')));
+  const original = await nombres();
+  await od.selectOption('#orden', 'nombre');
+  const porNombre = await nombres();
+  ok(porNombre.length === original.length && JSON.stringify(porNombre) === JSON.stringify([...porNombre].sort((a, c) => a.localeCompare(c, 'es', { sensitivity: 'base', numeric: true }))), 'ordenar por nombre deja el catálogo de la A a la Z');
+  await od.selectOption('#orden', 'categoria');
+  const cats = await od.locator('#grid .pcard:visible:not(.pcard--combo)').evaluateAll((l) => l.map((x) => +x.getAttribute('data-orden-cat')));
+  ok(cats.every((c, i) => i === 0 || cats[i - 1] <= c), 'ordenar por categoría agrupa los productos por categoría');
+  await od.selectOption('#orden', '');
+  ok(JSON.stringify(await nombres()) === JSON.stringify(original), '«Orden del catálogo» vuelve al orden original');
+  await od.context().close();
+
+  /* empresa: nuestras marcas y el juego */
+  const em = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); em.on('pageerror', (e) => errores.push(e.message));
+  await em.goto(BASE + 'empresa.html');
+  ok((await em.locator('#marcas .marca').count()) === 4 && /Marca en preparación/.test(await em.textContent('#marcas')), 'Empresa presenta sus marcas: INCERPAZ, PAVIC, tejas (en preparación) y el juego');
+  await em.click('#marcas a[href="juego/index.html"]'); await em.waitForSelector('canvas#game', { state: 'attached' });
+  ok(/La Gran Obra/.test(await em.title()), 'el enlace «Jugar» abre el juego dentro del sitio');
+  await em.goto(BASE + 'index.html');
+  ok((await em.locator('.site-footer a[href$="juego/index.html"]').count()) === 1, 'el pie de página enlaza al juego');
+  await em.context().close();
+
   /* calculadora de tejas por pendiente */
   const tj = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage(); tj.on('pageerror', (e) => errores.push(e.message));
   await tj.goto(BASE + 'techos.html');

@@ -11,7 +11,7 @@ const fs = require('node:fs');
 
 const RAIZ = path.join(__dirname, '..'), SITIO = path.join(RAIZ, 'site');
 const DOMINIO = JSON.parse(fs.readFileSync(path.join(RAIZ, 'site-src/data/sitio.json'), 'utf8')).dominio;
-const PRIVADAS = new Set(['ingresar.html', 'registro.html', 'presupuesto.html', 'mi-cuenta.html', 'equipo.html', 'admin.html', '404.html', 'comparar.html', 'buscar.html']); /* comparar: herramienta sin contenido propio, fuera de buscadores */
+const PRIVADAS = new Set(['ingresar.html', 'registro.html', 'presupuesto.html', 'mi-cuenta.html', 'equipo.html', 'admin.html', '404.html', 'comparar.html', 'buscar.html', 'juego/index.html']); /* comparar: herramienta sin contenido propio, fuera de buscadores */
 let fallos = 0;
 const ok = (c, m, detalle) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m + (!c && detalle ? '\n       ' + [].concat(detalle).slice(0, 6).join('\n       ') : '')); if (!c) fallos++; };
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -105,6 +105,8 @@ async function levantar(puerto, extra) {
     await pg.goto(BASE + 'catalogo.html'); await pg.waitForSelector('.pcard:not([hidden])');
     await pg.goto(BASE + 'proyectos/churrasquero.html'); await pg.waitForSelector('#proy-lista table');
     await pg.goto(BASE + 'pavic-recursos.html'); await pg.waitForSelector('#pv-resultado table');
+    await pg.goto(BASE + 'juego/index.html'); await pg.waitForSelector('canvas#game', { state: 'attached' }); await pg.waitForTimeout(800);
+    ok((await pg.title()).includes('La Gran Obra'), 'el juego «La Gran Obra» carga desde el sitio con la política de seguridad activa');
     await pg.goto(BASE + 'guias/cuantos-ladrillos-por-metro-cuadrado.html');
     await pg.fill('.form-box [name="nombre"]', 'Prueba'); await pg.fill('.form-box [name="celular"]', '70011122'); await pg.click('.form-box button[type="submit"]'); await pg.waitForSelector('.form-msg:not([hidden])');
     ok(/Recibimos/.test(await pg.textContent('.form-msg')), 'los formularios siguen enviando con la política activa');

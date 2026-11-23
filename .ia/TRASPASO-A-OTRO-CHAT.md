@@ -2,7 +2,7 @@
 
 Pega este archivo al empezar un chat nuevo (Claude, ChatGPT, Claude Code o Codex). Dice qué es el proyecto, qué se hizo, qué sigue y las reglas de trabajo. Para el detalle técnico completo lee también `PROYECTO-INCERPAZ.md` y `AGENTS.md` del repositorio.
 
-Actualizado: 21 de noviembre de 2026.
+Actualizado: 23 de noviembre de 2026.
 
 ---
 
@@ -14,7 +14,7 @@ Estamos construyendo **un sitio nuevo preliminar e interno** que reemplazará a 
 
 - Repositorio: `github.com/hugop1006-cpu/incerpaz-la-gran-obra`
 - Rama de trabajo: `claude/awesome-curie-ehi971` (sin pull request; no se ha fusionado a la rama principal)
-- Último commit al escribir esto: `ceab44d` («Sitio: página de techos con calculadora de tejas por pendiente»)
+- Las 6 tandas de los wireframes ya están hechas; el último commit está en la rama (ver `git log`)
 
 ## 2. Qué NO se hace todavía (importante)
 
@@ -55,7 +55,7 @@ python3 -m http.server 8080 --bind 127.0.0.1 &   # solo para tools/probar-sitio.
 for t in sitio comercio admin proyectos pavic leads publico promos; do node tools/probar-$t.js; done
 ```
 
-Todas deben pasar antes de subir (hoy: 12 de API y 8 de navegador en verde). Se sube también el sitio generado. Los textos de la interfaz, la documentación y los commits van **en español**. Al terminar una tarea se actualiza `.ia/ESTADO.md`, `.ia/TAREAS.md`, `.ia/DECISIONES.md` si hubo decisiones, y se deja un archivo en `.ia/traspasos/`.
+Todas deben pasar antes de subir (hoy: 12 de API y 8 de navegador en verde; el servidor no sirve carpetas sin archivo, el juego se abre en `juego/index.html`). Se sube también el sitio generado. Los textos de la interfaz, la documentación y los commits van **en español**. Al terminar una tarea se actualiza `.ia/ESTADO.md`, `.ia/TAREAS.md`, `.ia/DECISIONES.md` si hubo decisiones, y se deja un archivo en `.ia/traspasos/`.
 
 ## 6. Lo que ya está construido
 
@@ -75,15 +75,15 @@ Todas deben pasar antes de subir (hoy: 12 de API y 8 de navegador en verde). Se 
   3. Banda «¿Construyes o vendes materiales?» y campo «Soy» en los formularios cortos.
   4. PAVIC: camiones en la calculadora, «Cómo trabajamos un proyecto» y pedido de muestras.
   5. Calculadora de tejas por pendiente (`techos.html`).
+  6. Ordenar el catálogo, «Nuestras marcas» en Empresa y el juego «La Gran Obra» dentro del sitio (`site/juego/`, copiado por el generador).
 
 **Documentos creados en Claude** (privados; ChatGPT y Codex no los abren por enlace): presentación del directorio (20 diapositivas, incluye «Lo que pidió la reunión»), demo navegable, wireframes, resumen de una página, pendientes por área, validación exportadora, plantilla de campaña mensual, revisión técnica, mensajes por responsable, descripciones de producto, revisión del prototipo de Fergie.
 
 ## 7. Qué sigue
 
 **Con Hugo, en este orden:**
-1. **Tanda 6 de los wireframes** (espera su visto bueno): ordenar el catálogo por nombre o categoría, sección «Nuestras marcas» en Empresa (INCERPAZ, PAVIC y tejas en preparación) y enlace al juego «La Gran Obra» como pieza de marca.
-2. **Revisión UX prioridades 2 y 3** (propuestas, no aprobadas): presupuesto y cuenta más visibles, tarjetas del catálogo más limpias, nombres consistentes («Dónde comprar» frente a «Dónde estamos», «Productos» frente a «Catálogo»), fotos de producto uniformes, señales de confianza.
-3. **Comparar los pedidos de la reunión que dependen de otras áreas:** transporte según producto y ubicación, seguimiento real de la entrega, testimonios, ficha técnica PAVIC, cursos reales, más proyectos «Construye tú mismo».
+1. **Revisión UX prioridades 2 y 3** (propuestas, no aprobadas): presupuesto y cuenta más visibles, tarjetas del catálogo más limpias, nombres consistentes («Dónde comprar» frente a «Dónde estamos», «Productos» frente a «Catálogo»), fotos de producto uniformes, señales de confianza.
+2. **Cerrar los pedidos de la reunión que dependen de otras áreas:** transporte según producto y ubicación, seguimiento real de la entrega, testimonios, ficha técnica PAVIC, cursos reales, más proyectos «Construye tú mismo».
 
 **Pendientes que dependen de otras personas** (hay mensajes listos para cada área):
 - **Sistemas:** API y ambiente de pruebas de Seasoft, códigos de producto por ciudad.
@@ -110,4 +110,4 @@ Todas deben pasar antes de subir (hoy: 12 de API y 8 de navegador en verde). Se 
 
 ## 9. Primer mensaje sugerido para el chat nuevo
 
-> Soy Hugo. Estoy trabajando en el sitio nuevo de INCERPAZ (repositorio y rama arriba). Lee `AGENTS.md`, `.ia/ESTADO.md`, `.ia/TAREAS.md` y este traspaso. No publiques ni toques el sitio actual, y pídeme permiso antes de cambiar la web. Hoy quiero: **[escribe aquí lo que sigue, por ejemplo «la tanda 6 de los wireframes»]**.
+> Soy Hugo. Estoy trabajando en el sitio nuevo de INCERPAZ (repositorio y rama arriba). Lee `AGENTS.md`, `.ia/ESTADO.md`, `.ia/TAREAS.md` y este traspaso. No publiques ni toques el sitio actual, y pídeme permiso antes de cambiar la web. Hoy quiero: **[escribe aquí lo que sigue, por ejemplo «la revisión UX prioridad 2»]**.

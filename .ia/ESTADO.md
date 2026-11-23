@@ -2,6 +2,22 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-23 · Claude Code
+**Hecho** (wireframes, tanda 6: la última)
+- Catálogo: selector «Ordenar» (orden del catálogo, nombre de la A a la Z, categoría); los combos van siempre primero.
+- Empresa: sección «Nuestras marcas» con INCERPAZ, PAVIC, tejas (marca en preparación, hoy la categoría Techos) y «La Gran Obra». Se quitó el bloque «Marcas» chico que había dentro de Calidad.
+- Juego «La Gran Obra»: `site-src/build.js` copia el juego de la raíz del repositorio a `site/juego/` (con `noindex`) para que el sitio y el servidor lo sirvan. Enlazado desde Empresa («Jugar»), el pie de página y el buscador.
+- Pruebas nuevas (probar-sitio 86, probar-publico 29). 12 de API y 8 de navegador en verde.
+- Con esto quedan hechas las 6 tandas de los wireframes que no dependían de otras áreas.
+
+**Nota técnica**
+- El servidor no sirve carpetas sin nombre de archivo: el juego se abre en `juego/index.html` (no en `/juego/`).
+- Si se edita el juego en la raíz, hay que regenerar el sitio para que `site/juego/` se actualice.
+
+**Sigue**
+- Revisión UX prioridades 2 y 3 (propuesta no aprobada).
+- Pedidos de la reunión que dependen de otras áreas (ver `.ia/TAREAS.md`).
+
 ## 2026-11-21 (tarde) · Claude Code
 **Hecho** (wireframes, tanda 5: tejas)
 - Página nueva `techos.html` («Techos y tejas»): calculadora de tejas por pendiente (superficie real = área en planta × √(1 + pendiente²); tejas = superficie real × tejas por m² × (1 + merma); peso aproximado), WhatsApp con el techo calculado, «Añadir al presupuesto» con cuenta, y las tejas del catálogo.

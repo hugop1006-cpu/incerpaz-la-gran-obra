@@ -206,6 +206,23 @@
     var enCatalogo = function (slug) { return slug === 'santa-cruz' ? 'santa-cruz' : 'cochabamba'; };
     var catCity = mc ? decodeURIComponent(mc[1]) : enCatalogo(currentCity().slug);
     function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+    /* ordenar: «Orden del catálogo» (el original), por nombre o por categoría; los combos van siempre primero */
+    var ordenSel = $('#orden'), original = cards.slice();
+    function ordenar() {
+      var modo = ordenSel ? ordenSel.value : '';
+      var lista = original.slice();
+      if (modo) {
+        var porNombre = function (a, b) { return (a.getAttribute('data-nombre') || '').localeCompare(b.getAttribute('data-nombre') || '', 'es', { sensitivity: 'base', numeric: true }); };
+        lista.sort(function (a, b) {
+          var ca = a.hasAttribute('data-fin') ? 0 : 1, cb = b.hasAttribute('data-fin') ? 0 : 1;
+          if (ca !== cb) return ca - cb;
+          if (modo === 'categoria') { var d = (+a.getAttribute('data-orden-cat') || 0) - (+b.getAttribute('data-orden-cat') || 0); if (d) return d; }
+          return porNombre(a, b);
+        });
+      }
+      lista.forEach(function (c) { grid.appendChild(c); });
+    }
+    if (ordenSel) ordenSel.addEventListener('change', function () { ordenar(); });
     function apply() {
       var term = norm(q.value.trim()), n = 0, hoy = hoyLocal(), ciudadSel = currentCity().slug;
       cards.forEach(function (c) {

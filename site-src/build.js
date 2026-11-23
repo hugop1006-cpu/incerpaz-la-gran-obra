@@ -186,7 +186,8 @@ ${body}
     <div><h4>Síguenos</h4><ul>
       <li><a href="${sitio.redes.facebook}" rel="noopener">Facebook</a></li>
       <li><a href="${sitio.redes.instagram}" rel="noopener">Instagram</a></li>
-      <li><a href="${sitio.redes.youtube}" rel="noopener">YouTube</a></li></ul></div>
+      <li><a href="${sitio.redes.youtube}" rel="noopener">YouTube</a></li>
+      <li><a href="${base}juego/index.html">Juega «La Gran Obra»</a></li></ul></div>
   </div>
   <div class="legal"><span>© ${new Date().getFullYear()} INCERPAZ. Todos los derechos reservados. · <a href="${base}privacidad.html">Privacidad y cookies</a></span><span>Bolivia</span></div>
 </div></footer>
@@ -241,7 +242,7 @@ const idComparar = (p) => `${p.ciudad}:${p.slug}`;
 const botonComparar = (p, cls = 'btn') => `<button class="${cls}" type="button" data-comparar="${idComparar(p)}" data-nombre="${esc(p.nombre)}" aria-pressed="false">Comparar</button>`;
 function productCard(p, base = '') {
   const im = p.imagenes[0];
-  return `<article class="pcard" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat, esNuevo(p) ? ['nuevos'] : []).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}"${esNuevo(p) ? ` data-nuevo-hasta="${p.nuevo_hasta}"` : ''}>
+  return `<article class="pcard" data-ciudad="${p.ciudad}" data-cats="${p.todas.concat(p.cat, esNuevo(p) ? ['nuevos'] : []).join(' ')}" data-name="${esc(p.nombre + ' ' + (p.codigo || ''))}" data-nombre="${esc(p.nombre)}" data-orden-cat="${Math.max(0, sitio.categorias.findIndex((c) => c.slug === p.cat))}"${esNuevo(p) ? ` data-nuevo-hasta="${p.nuevo_hasta}"` : ''}>
   ${botonComparar(p, 'pcard-cmp')}
   <a class="pcard-link" href="${purl(p, base)}">
   <div class="img">${im ? `<img src="${base}${im}" alt="${esc(p.nombre)}" loading="lazy" width="400" height="400">` : `<img src="${base}assets/img/logo-icono.png" alt="" style="width:40%;opacity:.25">`}</div>
@@ -417,6 +418,7 @@ write('catalogo.html', layout({
     <div><span class="mono-label">Catálogo de</span><div class="chips" role="group" aria-label="Catálogo por ciudad">${Object.entries(CIUDAD_CATALOGO).map(([s, n]) => `<button class="chip" data-catalogo="${s}" type="button" aria-pressed="false">${n}</button>`).join('')}</div></div>
     <div style="flex:1 1 100%"><span class="mono-label">Categoría</span><div class="chips" role="group" aria-label="Categorías"><button class="chip" data-cat="todas" type="button" aria-pressed="true">Todas</button>${productos.some(esNuevo) ? '<button class="chip" data-cat="nuevos" type="button" aria-pressed="false">Nuevos</button>' : ''}${combos.length ? '<button class="chip" data-cat="combos" type="button" aria-pressed="false">Combos del mes</button>' : ''}${sitio.categorias.map((c) => `<button class="chip" data-cat="${c.slug}" type="button" aria-pressed="false">${esc(c.nombre)}</button>`).join('')}</div></div>
     <label class="search">Buscar<input id="q" type="search" placeholder="Ej. 6 huecos, enchape, teja" autocomplete="off"></label>
+    <label class="orden">Ordenar<select id="orden"><option value="">Orden del catálogo</option><option value="nombre">Nombre, de la A a la Z</option><option value="categoria">Categoría</option></select></label>
     <span id="count" class="muted" aria-live="polite"></span>
   </div>
   <p class="price-note" id="catNota" hidden></p>
@@ -816,12 +818,20 @@ write('empresa.html', layout({
   <div class="agencies">${fabricas.map(([c, f]) => `<article class="agency"><span class="tag">Fábrica</span><h3>${c.nombre}</h3><address>${esc(f.direccion)}</address><div class="btn-row" style="margin-top:auto"><a class="btn btn--sm" href="donde-estamos.html#${c.slug}">Ver agencias de ${c.nombre}</a></div></article>`).join('')}</div>
 </div></section>
 
-<section class="section dark"><div class="wrap split">
+<section class="section dark"><div class="wrap">
   <div><span class="eyebrow">Calidad</span><h2 style="margin-block:12px 18px">Calidad con respaldo técnico</h2>
     <p class="lead">Trabajamos con un sistema integrado de gestión en todos nuestros procesos. PAVIC cuenta con certificados de calidad, ensayos de laboratorio y certificación ISO.</p>
     <div class="btn-row" style="margin-top:24px"><a class="btn btn--red" href="pavic.html#calidad">Solicitar documentación</a></div></div>
-  <div><span class="eyebrow">Marcas</span>
-    <div class="three" style="grid-template-columns:1fr 1fr;margin-top:16px"><div style="background:#2a2725;border-color:#3a3633;color:#fff"><h3 style="color:#fff">INCERPAZ</h3><p style="color:#cfc9c2">Ladrillos, techos, revestimientos y piezas especiales.</p><a class="btn btn--sm btn--ghost" style="color:#fff" href="catalogo.html">Ver productos</a></div><div style="background:#2a2725;border-color:#3a3633;color:#fff"><h3 style="color:#fff">PAVIC</h3><p style="color:#cfc9c2">Pavimento cerámico para proyectos.</p><a class="btn btn--sm btn--ghost" style="color:#fff" href="pavic.html">Ir a PAVIC</a></div></div></div>
+</div></section>
+
+<section class="section" id="marcas"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Nuestras marcas</span><h2>Una empresa, varias líneas</h2><p class="lead">INCERPAZ agrupa sus líneas de producto bajo un mismo respaldo de fábrica.</p></div>
+  <div class="marcas">
+    <article class="marca"><h3>INCERPAZ</h3><p>Muros, piezas especiales, pisos, revestimientos y refractarios.</p><a class="btn btn--sm" href="catalogo.html">Ver el catálogo</a></article>
+    <article class="marca"><span class="tag">Marca propia</span><h3>PAVIC</h3><p>Pavimento cerámico para calles, plazas, veredas y urbanizaciones.</p><a class="btn btn--sm" href="pavic.html">Ir a PAVIC</a></article>
+    <article class="marca"><span class="tag tag--nuevo">Marca en preparación</span><h3>Tejas</h3><p>Hoy son la categoría «Techos» del catálogo, con calculadora por pendiente.</p><a class="btn btn--sm" href="techos.html">Ver techos y tejas</a></article>
+    <article class="marca marca--juego"><span class="tag">Pieza de marca</span><h3>La Gran Obra</h3><p>Ladri, un ladrillo con casco, levanta una casa antes de la tormenta. Un juego para el celular y la computadora.</p><a class="btn btn--sm btn--red" href="juego/index.html">Jugar</a></article>
+  </div>
 </div></section>
 
 <section class="section"><div class="wrap split">
@@ -1093,7 +1103,8 @@ const paginasBuscables = [
   ['PAVIC', 'Pavimento cerámico para calles, plazas y urbanizaciones', 'pavic.html', 'pavimento adoquin vereda plaza calle'],
   ['Recursos PAVIC para proyectistas', 'Calculadora de obra, texto para pliegos y DXF', 'pavic-recursos.html', 'proyectista calculista pliego licitacion dxf cad'],
   ['Dónde estamos', 'Agencias y fábricas por ciudad, con WhatsApp', 'donde-estamos.html', 'agencias direccion telefono whatsapp fabrica como llegar'],
-  ['Empresa', 'Quiénes somos, misión, valores y contacto', 'empresa.html', 'nosotros mision vision contacto reclamo trabajo'],
+  ['Empresa', 'Quiénes somos, misión, valores y contacto', 'empresa.html', 'nosotros mision vision contacto reclamo trabajo marcas'],
+  ['La Gran Obra, el juego de INCERPAZ', 'Ayuda a Ladri a levantar una casa antes de la tormenta', 'juego/index.html', 'juego jugar ladri videojuego'],
   ['Exportaciones', 'Consulta para importadores, en español e inglés', 'exportaciones.html', 'export importar internacional'],
   ['Privacidad y cookies', 'Cómo usamos tus datos', 'privacidad.html', 'datos personales'],
   ...sitio.ciudades.map((c) => [`INCERPAZ en ${c.nombre}`, `Agencias, promociones y WhatsApp de ${c.nombre}`, `${c.slug}.html`, `${c.nombre} agencia`]),
@@ -1122,6 +1133,15 @@ write('buscar.html', layout({
   <noscript><p>Para buscar activa JavaScript, o recorre el <a href="catalogo.html">catálogo</a>.</p></noscript>
 </section><script type="application/json" id="datos-buscar">${JSON.stringify(indiceBusqueda).replace(/</g, '\\u003c')}</script>`
 }));
+
+/* ============================ EL JUEGO «LA GRAN OBRA» ============================ */
+/* El juego vive en la raíz del repositorio; se copia a juego/ para que el sitio (y el servidor) lo sirvan. Sin indexar. */
+const JUEGO_OUT = path.join(OUT, 'juego');
+fs.rmSync(JUEGO_OUT, { recursive: true, force: true });
+fs.mkdirSync(JUEGO_OUT, { recursive: true });
+for (const f of ['style.css', 'config.js', 'levels.js', 'manifest.json']) fs.copyFileSync(path.join(ROOT, f), path.join(JUEGO_OUT, f));
+for (const d of ['js', 'icons']) fs.cpSync(path.join(ROOT, d), path.join(JUEGO_OUT, d), { recursive: true });
+fs.writeFileSync(path.join(JUEGO_OUT, 'index.html'), fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').replace('<title>', '<meta name="robots" content="noindex">\n  <title>'));
 
 /* ============================ 404, sitemap, robots ============================ */
 write('404.html', layout({
