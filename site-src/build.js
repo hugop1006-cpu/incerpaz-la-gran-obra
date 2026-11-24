@@ -91,6 +91,15 @@ productos = productos.map((p) => {
 fs.mkdirSync(path.dirname(CATALOGO_OUT), { recursive: true });
 /* ---- promociones: novedades (concursos, sorteos, eventos, cursos…) y combos por ciudad ---- */
 const promoRaw = fs.existsSync(path.join(DATA, 'promociones.json')) ? JSON.parse(fs.readFileSync(path.join(DATA, 'promociones.json'), 'utf8')) : { novedades: [], combos: [] };
+/* Pruebas de confianza (site-src/data/confianza.json): solo se muestra lo que está confirmado. Una lista vacía no genera sección. */
+const confianzaArchivo = [path.join(DATA, 'confianza.json'), path.join(__dirname, 'data/confianza.json')].find((f) => fs.existsSync(f));
+const confianzaRaw = confianzaArchivo ? JSON.parse(fs.readFileSync(confianzaArchivo, 'utf8')) : {};
+const pruebas = {
+  desde: Number.isInteger(confianzaRaw.desde) && confianzaRaw.desde > 1800 ? confianzaRaw.desde : null,
+  certificaciones: (confianzaRaw.certificaciones || []).filter((c) => c && c.nombre),
+  obras: (confianzaRaw.obras || []).filter((o) => o && o.titulo && o.ciudad && o.imagen),
+  testimonios: (confianzaRaw.testimonios || []).filter((t) => t && t.nombre && t.texto && t.autorizacion_escrita === true)
+};
 /* los contenidos de ejemplo solo se ven en el sitio interno: al publicar no salen */
 const publicable = (x) => x.estado === 'publicada' && !(x.ejemplo && !config.interno);
 const novedades = (promoRaw.novedades || []).filter(publicable);
@@ -317,6 +326,25 @@ fs.rmSync(path.join(OUT, 'combos'), { recursive: true, force: true });
 /* ============================ HOME ============================ */
 const mosaico = ['18-h', 'brick-enchape-corto', '9-huecos-economico-rayado', 'brick-estandar', 'pavic-peatonal', 'biscocho']
   .map((s) => `assets/img/productos/${s}-2.jpg`);
+/* Obras, testimonios y certificaciones: secciones que aparecen solas cuando hay datos confirmados. */
+function seccionPruebas({ solo = null, base = '' } = {}) {
+  const obras = pruebas.obras.filter((o) => solo !== 'pavic' || o.pavic);
+  const trozos = [];
+  if (obras.length) trozos.push(`<section class="section${solo ? '' : ' section--grey'}" id="obras"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Obras</span><h2>${solo === 'pavic' ? 'Obras de referencia PAVIC' : 'Obras con INCERPAZ'}</h2></div>
+  <div class="obras">${obras.map((o) => `<figure class="obra"><img src="${base}${esc(o.imagen)}" alt="${esc(o.titulo)}" loading="lazy" width="600" height="450"><figcaption><b>${esc(o.titulo)}</b><span>${esc([o.ciudad, o.anio, o.superficie_m2 ? `${num(o.superficie_m2)} m²` : ''].filter(Boolean).join(' · '))}</span></figcaption></figure>`).join('')}</div>
+</div></section>`);
+  if (!solo && pruebas.testimonios.length) trozos.push(`<section class="section" id="testimonios"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Clientes</span><h2>Lo que dicen quienes construyen con nosotros</h2></div>
+  <div class="testis">${pruebas.testimonios.map((t) => `<blockquote class="testi"><p>«${esc(t.texto)}»</p><footer><b>${esc(t.nombre)}</b>${t.empresa ? `, ${esc(t.empresa)}` : ''}${t.ciudad ? ` · ${esc(t.ciudad)}` : ''}</footer></blockquote>`).join('')}</div>
+</div></section>`);
+  if (!solo && pruebas.certificaciones.length) trozos.push(`<section class="section section--grey" id="certificaciones"><div class="wrap">
+  <div class="section-head"><span class="eyebrow">Calidad</span><h2>Certificaciones</h2></div>
+  <ul class="certs">${pruebas.certificaciones.map((c) => `<li><b>${c.archivo ? `<a href="${base}${esc(c.archivo)}" rel="noopener">${esc(c.nombre)}</a>` : esc(c.nombre)}</b>${c.detalle ? `<span>${esc(c.detalle)}</span>` : ''}</li>`).join('')}</ul>
+</div></section>`);
+  return trozos.join('\n');
+}
+
 /* Señales de confianza: solo datos que ya están en el sitio (agencias, fábricas, ciudades); no se inventan cifras. */
 function franjaConfianza() {
   const todas = Object.values(sitio.agencias).flat();
@@ -325,6 +353,7 @@ function franjaConfianza() {
     [`${sitio.ciudades.length} ciudades`, 'Cochabamba, Santa Cruz, Oruro y Sucre'],
     [`${nAg} agencias y ${nFab} ${nFab === 1 ? 'fábrica' : 'fábricas'}`, 'Atención directa, cerca de tu obra'],
     ['Fabricado en Bolivia', 'Cerámica INCERPAZ y pavimento PAVIC'],
+    ...(pruebas.desde ? [[`Desde ${pruebas.desde}`, 'Fabricando cerámica en Bolivia']] : []),
     [config.comercio ? 'Precios con cuenta verificada' : 'Cotiza por WhatsApp', config.comercio ? 'Un ejecutivo de tu ciudad la verifica' : 'La agencia de tu ciudad te responde']
   ];
   return `<section class="wrap" aria-label="Por qué INCERPAZ"><ul class="confianza">${items.map(([t, d]) => `<li><b>${esc(t)}</b><span>${esc(d)}</span></li>`).join('')}</ul></section>`;
@@ -402,6 +431,8 @@ ${config.comercio ? `<section class="section dark banda-b2b" id="constructores">
   <ul class="b2b-lista"><li><b>Precios de tu ciudad</b><span>Según tu tipo de cliente</span></li><li><b>Presupuestos y pedidos</b><span>Con seguimiento del estado</span></li><li><b>Recompra</b><span>Repite un pedido en un clic</span></li></ul>
   <div class="btn-row"><a class="btn btn--red" href="registro.html">Crear cuenta</a><a class="btn btn--ghost" href="ingresar.html">Ingresar</a></div>
 </div></section>` : ''}
+
+${seccionPruebas()}
 
 <section class="section" id="contacto"><div class="wrap split">
   <div><span class="eyebrow">Contacto</span><h2 style="margin-block:12px 18px">Hablemos de tu proyecto</h2>
@@ -516,6 +547,7 @@ write('comparar.html', layout({
   body: `
 <section class="section" style="padding-bottom:24px"><div class="wrap">
   <nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="catalogo.html">Productos</a> › Comparar</nav>
+  <a class="volver" href="catalogo.html" data-cmp-volver>← Volver al catálogo</a>
   <span class="eyebrow">Productos</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Comparar productos</h1>
   <p class="lead">Hasta 4 productos del mismo catálogo, lado a lado. Las filas resaltadas son las que cambian entre ellos.</p>
 </div></section>
@@ -535,7 +567,8 @@ write('techos.html', layout({
   desc: 'Calcula cuántas tejas cerámicas necesitas según el área en planta y la pendiente del techo. Catálogo de tejas de INCERPAZ.',
   jsonld: migas([['Inicio', ''], ['Productos', 'catalogo.html'], ['Techos y tejas', 'techos.html']]),
   body: `
-<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="catalogo.html">Productos</a> › Techos y tejas</nav></div>
+<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="catalogo.html">Productos</a> › Techos y tejas</nav>
+<a class="volver" href="catalogo.html" data-volver>← Volver a los productos</a></div>
 <section class="section" style="padding-top:12px;padding-bottom:24px"><div class="wrap">
   <span class="eyebrow">Techos y tejados</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 14px">Techos y tejas</h1>
   <p class="lead">Tejas cerámicas para techos nuevos y para renovar. Calcula cuántas necesitas según el área del techo en planta y su pendiente.</p>
@@ -625,6 +658,8 @@ write('pavic.html', layout({
     <li><b>Asesoría en obra</b><span>Apoyo técnico durante el colocado.</span></li>
   </ol>
 </div></section>
+
+${seccionPruebas({ solo: 'pavic' })}
 
 <section class="section dark" id="muestras"><div class="wrap split">
   <div><span class="eyebrow">Muestras</span><h2 style="margin-block:12px 18px">Aprueba color y acabado antes de decidir</h2>
@@ -1139,6 +1174,7 @@ write('buscar.html', layout({
   desc: 'Busca productos, proyectos, guías, promociones y páginas de INCERPAZ.',
   body: `
 <section class="section" style="padding-bottom:16px"><div class="wrap">
+  <a class="volver" href="index.html" data-volver>← Volver</a>
   <span class="eyebrow">Buscar</span><h1 style="font-size:clamp(40px,6vw,72px);margin-block:12px 18px">¿Qué buscas?</h1>
   <form class="buscar-pag" action="buscar.html" method="get" role="search" aria-label="Buscar en el sitio">
     <label class="sr" for="bq">Buscar en el sitio</label><input id="bq" type="search" name="q" placeholder="Ej. 18 huecos, enchape, churrasquero, PAVIC" autocomplete="off" maxlength="80">

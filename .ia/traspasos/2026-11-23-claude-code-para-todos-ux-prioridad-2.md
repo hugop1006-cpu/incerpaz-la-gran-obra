@@ -20,6 +20,6 @@
 **Falta o queda abierto:**
 - Fotos uniformes de producto (necesita fotos nuevas de Marketing).
 - Prioridad 3 de la revisión UX (no aprobada).
-- La demo publicada en Claude no incluye estos cambios hasta republicarla.
+- La demo privada en Claude (Demo del sitio INCERPAZ) se republicó el 2026-11-23 con las tandas 1 a 6 y la prioridad 2.
 
 **Rama y commit:** `claude/awesome-curie-ehi971`.

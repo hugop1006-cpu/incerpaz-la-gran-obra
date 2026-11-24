@@ -528,3 +528,26 @@ label.check a { color: var(--red); font-weight: 600; }
 @media (min-width: 861px) { .quick:has(> a:nth-child(5)) { grid-template-columns: repeat(6, 1fr); } .quick:has(> a:nth-child(5)) a { grid-column: span 2; } .quick:has(> a:nth-child(5)) a:nth-child(n+4) { grid-column: span 3; } .quick:has(> a:nth-child(6)) a:nth-child(n+4) { grid-column: span 2; } }
 @media (max-width: 860px) { .quick { grid-template-columns: 1fr 1fr; } .quick a:last-child:nth-child(odd) { grid-column: 1 / -1; } }
 @media (max-width: 420px) { .quick { grid-template-columns: 1fr; } }
+
+/* botón «Volver» (comparador y otras páginas de herramienta) */
+.volver { display: flex; width: fit-content; align-items: center; gap: 8px; min-height: 44px; margin: 4px 0 18px; padding: 8px 16px 8px 12px; border: 1.5px solid var(--ink); background: var(--white); color: var(--ink); font: 700 16px var(--display); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
+.volver:hover { background: var(--ink); color: #fff; }
+
+/* ---- prueba de confianza: obras, testimonios y certificaciones (aparecen solo con datos) ---- */
+.obras { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.obra { margin: 0; background: var(--white); border: 1px solid var(--line); }
+.obra img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.obra figcaption { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px 14px; }
+.obra figcaption b { font: 700 20px var(--display); letter-spacing: .02em; text-transform: uppercase; }
+.obra figcaption span { font-size: 15px; color: var(--ink-2); }
+.testis { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+.testi { margin: 0; padding: 20px 22px; background: var(--white); border-left: 4px solid var(--red); }
+.testi p { margin: 0 0 12px; font-size: 18px; }
+.testi footer { font-size: 15px; color: var(--ink-2); }
+.certs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.certs li { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; background: var(--white); border: 1px solid var(--line); }
+.certs b { font: 700 20px var(--display); letter-spacing: .02em; text-transform: uppercase; }
+.certs span { font-size: 15px; color: var(--ink-2); }
+/* la franja de confianza admite un quinto dato */
+.confianza { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+@media (max-width: 900px) { .confianza { grid-template-columns: 1fr 1fr; } .confianza li:last-child:nth-child(odd) { grid-column: 1 / -1; } }

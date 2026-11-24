@@ -4,6 +4,8 @@ Una línea por decisión: fecha, decisión, quién decidió. Lo más reciente ar
 
 | Fecha | Decisión | Decidió |
 |---|---|---|
+| 2026-11-24 | Obras, testimonios, certificaciones y año de inicio solo se muestran si están confirmados en `confianza.json`; los testimonios exigen autorización escrita | Claude Code (propuesto a Hugo en la prioridad 3) |
+| 2026-11-23 | Decisión de Hugo: las tareas nuevas del sitio las implementa Luna (Codex en la nube) con ENCARGO y REPORTE del protocolo común. Claude, en chat o en Claude Code, diseña, escribe el ENCARGO y revisa el PR; no implementa tareas nuevas del sitio salvo que Hugo indique otra cosa para una tarea concreta. Motivo: usar Claude de forma más eficiente. Hugo sigue autorizando cada tarea, cada merge y cada deploy. | Hugo |
 | 2026-11-23 | El sitio usa «Productos» (no «Catálogo») y «Dónde comprar» (no «Dónde estamos») para nombrar esas secciones; «Catálogo de Cochabamba/Santa Cruz» queda solo para la lista de cada ciudad | Hugo (aprobó la prioridad 2) |
 | 2026-11-23 | Señales de confianza solo con datos que ya están en el sitio (ciudades, agencias, fábricas); sin cifras de la empresa hasta que Marketing las confirme | Claude Code |
 | 2026-11-18 | Direcciones cortas solo para las 4 ciudades con datos (Cochabamba, Santa Cruz, Oruro, Sucre); son páginas propias indexables. Oruro y Sucre muestran el catálogo de Cochabamba | Claude Code |

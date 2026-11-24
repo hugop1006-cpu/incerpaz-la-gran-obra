@@ -94,3 +94,12 @@ Se dejó el plan de validación y las primeras cifras de importación (UN Comtra
 - Intento del 5 nov 2026: la API del Census (importaciones a 10 dígitos) exige la clave como parámetro `key=` en la dirección, y el proxy de la sesión solo la inyecta como encabezado, así que no funcionó. USITC DataWeb pide cuenta con Login.gov.
 - Para retomar: exportar desde DataWeb un CSV de importaciones de 6907.23.10 (HTS a 10 dígitos, todos los países, 2020–2024, valor aduanero y primera unidad de cantidad) y pasarlo. Con él se calcula tamaño del mercado, orígenes, precio por m² y la parte de baldosa pequeña (lado de 30 cm o menos).
 - Los sufijos estadísticos de 6907.23.10 y los aranceles vigentes (recargos incluidos) no están confirmados: verificarlos en USITC y CBP, no en sitios de terceros.
+
+## Pruebas de confianza (revisión UX, prioridad 3)
+El sitio ya está listo para mostrarlas, pero **no hay datos confirmados**: las secciones no aparecen hasta que se carguen en `site-src/data/confianza.json` (ver `site-src/GUIA-FOTOS.md`). Falta que Marketing, Calidad y Legal entreguen:
+- **Año de inicio** de la empresa (para «Desde AAAA»).
+- **Certificaciones y certificados** vigentes, con su alcance y el PDF si se quiere publicar.
+- **Obras reales** con foto, ciudad y, si se confirman, año y superficie; en especial obras PAVIC de referencia.
+- **Testimonios** con autorización escrita de cada persona o empresa (sin ese permiso no se publican).
+- **Fotos de producto uniformes** (fondo blanco, cuadradas, misma escala), según la guía de fotos.
+- **Promociones reales** para reemplazar los ejemplos (se cargan en el panel de administración).

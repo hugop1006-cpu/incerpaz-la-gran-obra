@@ -1,0 +1,7 @@
+{
+  "_ayuda": "Pruebas de confianza del sitio. Mientras una lista esté vacía, esa sección NO se muestra. Solo se publica lo confirmado: años, obras reales con foto, certificados vigentes y testimonios con autorización escrita del cliente (autorizacion_escrita en true). Ver site-src/CONTENIDO-PENDIENTE.md.",
+  "desde": null,
+  "certificaciones": [],
+  "obras": [],
+  "testimonios": []
+}

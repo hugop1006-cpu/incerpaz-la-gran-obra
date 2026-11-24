@@ -48,6 +48,7 @@ PROYECTO-INCERPAZ.md       contexto completo del proyecto
 
 ## 5. Cómo se trabaja
 
+- Decisión de Hugo: las tareas nuevas del sitio las implementa Luna (Codex en la nube) con ENCARGO y REPORTE del protocolo común. Claude, en chat o en Claude Code, diseña, escribe el ENCARGO y revisa el PR; no implementa tareas nuevas del sitio salvo que Hugo indique otra cosa para una tarea concreta. Motivo: usar Claude de forma más eficiente. Hugo sigue autorizando cada tarea, cada merge y cada deploy.
 ```sh
 node site-src/build.js                 # regenera site/ y server/data/catalogo.json
 node --test server/test/api.test.js    # 12 pruebas de la API
@@ -83,7 +84,7 @@ Todas deben pasar antes de subir (hoy: 12 de API y 8 de navegador en verde; el s
 ## 7. Qué sigue
 
 **Con Hugo, en este orden:**
-1. **Revisión UX prioridad 3** (propuesta, no aprobada). La prioridad 2 ya está hecha: nombres consistentes («Productos», «Dónde comprar»), tarjetas con una línea de precio, ícono de cuenta y presupuesto marcado, franja de confianza. Las fotos de producto uniformes dependen de Marketing.
+1. **Datos de confianza** (la prioridad 3 era de contenido): el sitio ya tiene secciones de obras, testimonios y certificaciones que se llenan desde `site-src/data/confianza.json` y no aparecen hasta que haya datos confirmados (ver `site-src/GUIA-FOTOS.md`). La prioridad 2 ya estaba hecha: nombres consistentes («Productos», «Dónde comprar»), tarjetas con una línea de precio, ícono de cuenta y presupuesto marcado, franja de confianza. Las fotos de producto uniformes dependen de Marketing.
 2. **Cerrar los pedidos de la reunión que dependen de otras áreas:** transporte según producto y ubicación, seguimiento real de la entrega, testimonios, ficha técnica PAVIC, cursos reales, más proyectos «Construye tú mismo».
 
 **Pendientes que dependen de otras personas** (hay mensajes listos para cada área):
