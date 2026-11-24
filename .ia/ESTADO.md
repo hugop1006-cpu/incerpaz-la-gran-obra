@@ -2,6 +2,14 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-24 · Luna (Codex)
+**Hecho**
+- Pestaña «Confianza» para administrar el año de inicio, las certificaciones, las obras y los testimonios. El guardado regenera el sitio y respalda los datos anteriores en Historial.
+- Los testimonios sin autorización escrita quedan como borradores. Se conserva la semilla vacía.
+
+**Sigue**
+- Revisión de Claude. Marketing, Calidad y Legal deben confirmar los datos antes de cargarlos desde el panel.
+
 ## 2026-11-24 · Claude Code
 **Hecho** (cierre de la rama y revisión UX, prioridad 3)
 - Nota sobre la regla de Luna: Hugo pidió estas tareas (botón «Volver», PR a `main`, demo y prioridad 3) directamente a Claude en el chat, que es la excepción que prevé la regla para una tarea concreta.
