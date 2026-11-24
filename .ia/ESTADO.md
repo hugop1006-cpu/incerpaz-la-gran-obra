@@ -2,6 +2,17 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-24 · Claude Code
+**Hecho** (cierre de la rama y revisión UX, prioridad 3)
+- Botón «Volver» también en «Calcula tus tejas» (a los productos) y en «Buscar» (al inicio). Si se llegó desde otra página del sitio, regresa a ella con sus filtros; si se abrió directo, vale el enlace.
+- Prioridad 3 era de contenido, no de código. Lo que sí se pudo hacer sin inventar datos: el sitio ya tiene las secciones **Obras** (inicio y PAVIC), **Testimonios** y **Certificaciones**, y el dato «Desde AAAA» en la franja de confianza. Se llenan desde `site-src/data/confianza.json` y **no aparecen mientras la lista esté vacía** (hoy todas lo están). Los testimonios solo salen con `autorizacion_escrita: true`; las obras exigen título, ciudad y foto.
+- Guía de fotos para Marketing (`site-src/GUIA-FOTOS.md`) y lista de lo que falta en `site-src/CONTENIDO-PENDIENTE.md`.
+- Prueba nueva `tools/probar-confianza.js` (8 comprobaciones, sin navegador). probar-sitio 94. 12 de API y 9 herramientas de prueba en verde.
+
+**Sigue**
+- Marketing, Calidad y Legal: año de inicio, certificados, obras con foto, testimonios autorizados, fotos de producto uniformes y promociones reales.
+- Pedidos de la reunión que dependen de otras áreas (ver `.ia/TAREAS.md`).
+
 ## 2026-11-23 (noche) · Claude Code
 **Hecho**
 - Comparador: botón «← Volver al catálogo» arriba de la página. Si se llegó desde el catálogo regresa a él tal cual (con ciudad y filtro); si se abrió directo, lleva al catálogo de los productos elegidos. También se cambió «Precio con sesión» por «Ingresa para ver precios» en la fila de precio de la tabla.

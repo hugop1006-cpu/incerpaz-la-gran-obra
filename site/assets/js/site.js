@@ -291,6 +291,14 @@
   });
 
   var cmpApp = $('#cmpApp'), cmpDatos = null, soloDif = false;
+  /* «Volver» genérico: si se llegó desde otra página del sitio se regresa a ella (con sus filtros y su posición); si no, vale el enlace */
+  $$('a[data-volver]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var ref = document.referrer || '';
+      var sinParams = function (u) { return u.split('#')[0].split('?')[0]; };
+      if (ref.indexOf(location.origin) === 0 && sinParams(ref) !== sinParams(location.href) && window.history.length > 1) { e.preventDefault(); window.history.back(); }
+    });
+  });
   /* «Volver al catálogo»: si se llegó desde el catálogo se regresa a él tal cual (con sus filtros); si no, se abre el catálogo de los productos elegidos */
   var volverCmp = $('[data-cmp-volver]');
   if (volverCmp) volverCmp.addEventListener('click', function (e) {

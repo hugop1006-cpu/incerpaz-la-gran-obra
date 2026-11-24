@@ -241,6 +241,11 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok(/ciudad=santa-cruz/.test(vol.url()) && /cat=pisos-y-pavimentos/.test(vol.url()), '«Volver» regresa al catálogo con la ciudad y el filtro que tenía');
   await vol.goto(BASE + 'comparar.html?p=santa-cruz:pavic-peatonal'); await vol.waitForSelector('.cmp-tabla');
   ok((await vol.getAttribute('[data-cmp-volver]', 'href')) === 'catalogo.html?ciudad=santa-cruz', 'abierto directo, «Volver» lleva al catálogo de los productos elegidos');
+  await vol.goto(BASE + 'catalogo.html?ciudad=cochabamba'); await vol.click('main a[href="techos.html"]'); await vol.waitForURL('**/techos.html');
+  await vol.click('[data-volver]'); await vol.waitForURL('**/catalogo.html**');
+  ok(/ciudad=cochabamba/.test(vol.url()), 'en «Calcula tus tejas», «Volver a los productos» regresa a la página de donde se llegó');
+  await vol.goto(BASE + 'buscar.html?q=teja'); await vol.waitForSelector('.bres');
+  ok((await vol.getAttribute('[data-volver]', 'href')) === 'index.html', 'abierto directo, el «Volver» de Buscar lleva al inicio');
   const ajena = await (await visitante(b, { viewport: { width: 1280, height: 900 } })).newPage();
   await ajena.goto(BASE + 'comparar.html?p=cochabamba:18-h,santa-cruz:pavic-peatonal,cochabamba:inventado');
   ok((await ajena.locator('.cmp-tabla thead th').count()) === 2, 'un enlace con productos de otro catálogo o inexistentes solo muestra los válidos');
