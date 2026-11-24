@@ -2,6 +2,15 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-24 (tarde) · Claude Code
+**Hecho**
+- Se redactó el ENCARGO para Luna: panel de administración para cargar año de inicio, certificaciones, obras y testimonios (`.ia/traspasos/2026-11-24-claude-para-luna-panel-confianza.md`). Riesgo medio. Hugo eligió esta tarea.
+- Regla de Luna leída y aplicada: no hay nada en curso del lado de Claude; el sitio está fusionado en `main` (PR #15) y la demo republicada. A partir de ahora las tareas nuevas del sitio pasan por Luna con ENCARGO y REPORTE; Claude revisa el PR.
+
+**Sigue**
+- Enviar el ENCARGO a Luna (`codex queue`, hilo `INCERPAZ · Luna · panel de confianza`) y esperar su PR para revisarlo.
+- Duda para Hugo: el protocolo dice que los PR van a la rama por defecto del repositorio (`claude/gracious-wright-mkglyk`) pero el sitio se fusiona en `main`; el ENCARGO pide `main`.
+
 ## 2026-11-24 · Claude Code
 **Hecho** (cierre de la rama y revisión UX, prioridad 3)
 - Nota sobre la regla de Luna: Hugo pidió estas tareas (botón «Volver», PR a `main`, demo y prioridad 3) directamente a Claude en el chat, que es la excepción que prevé la regla para una tarea concreta.
