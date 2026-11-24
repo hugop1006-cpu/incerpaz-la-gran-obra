@@ -2,6 +2,12 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-24 (noche, 3) · Claude Code
+**Revisión del REPORTE de arranque de Luna**
+- Cumplió el protocolo: leyó los archivos (incluido `.ia/PROTOCOLO.md` desde su rama), no cambió nada, no abrió PR y no inventó resultados de pruebas (marcó cada check como no ejecutado).
+- Entorno NO listo: trabaja en la app local de Codex sobre otra carpeta (`INHOUSE`, no es un clon de INCERPAZ); Node 24.20.0 (se requiere 22); Python 3.9.6 y Git bien; sin Playwright/Chromium. Por eso no corrió ninguna prueba.
+- Pasos para dejarlo listo (a cargo de Hugo): clonar el repositorio como carpeta de trabajo de Luna, instalar Node 22 y Playwright con Chromium fuera del repositorio (no se agregan dependencias al proyecto) y repetir el arranque. Hasta que pase, no se envían los ENCARGOS.
+
 ## 2026-11-24 (noche, 2) · Claude Code
 **Hecho**
 - Spec de arranque para que Luna cree su hilo y verifique su entorno antes de recibir ENCARGOS: `.ia/traspasos/2026-11-24-claude-para-luna-arranque.md`. No cambia archivos del repositorio; pide un REPORTE de arranque con versión de Node, Playwright y el resultado de todas las pruebas.
