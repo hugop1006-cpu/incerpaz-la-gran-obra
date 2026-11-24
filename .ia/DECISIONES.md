@@ -4,6 +4,7 @@ Una línea por decisión: fecha, decisión, quién decidió. Lo más reciente ar
 
 | Fecha | Decisión | Decidió |
 |---|---|---|
+| 2026-11-24 | Claude y Luna se comunican por GitHub: ENCARGO como issue (etiquetas `encargo` y `luna`), REPORTE como descripción del PR, revisión de Claude como comentario del PR. Hugo no copia mensajes entre ellos | Hugo |
 | 2026-11-24 | Obras, testimonios, certificaciones y año de inicio solo se muestran si están confirmados en `confianza.json`; los testimonios exigen autorización escrita | Claude Code (propuesto a Hugo en la prioridad 3) |
 | 2026-11-23 | Decisión de Hugo: las tareas nuevas del sitio las implementa Luna (Codex en la nube) con ENCARGO y REPORTE del protocolo común. Claude, en chat o en Claude Code, diseña, escribe el ENCARGO y revisa el PR; no implementa tareas nuevas del sitio salvo que Hugo indique otra cosa para una tarea concreta. Motivo: usar Claude de forma más eficiente. Hugo sigue autorizando cada tarea, cada merge y cada deploy. | Hugo |
 | 2026-11-23 | El sitio usa «Productos» (no «Catálogo») y «Dónde comprar» (no «Dónde estamos») para nombrar esas secciones; «Catálogo de Cochabamba/Santa Cruz» queda solo para la lista de cada ciudad | Hugo (aprobó la prioridad 2) |

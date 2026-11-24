@@ -2,6 +2,16 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-24 (noche, 4) · Claude Code
+**Hecho**
+- Comunicación Claude ↔ Luna por GitHub (decisión de Hugo, «GitHub como buzón»): ENCARGO = issue con etiquetas `encargo` y `luna`; REPORTE = descripción del PR; Claude revisa en GitHub. Ver `.ia/COMUNICACION.md`.
+- Luna ya abrió los dos PR: #16 (botón «Volver») y #18 (panel de confianza). Los revisé: ambos aprobados contra el ENCARGO, con las pruebas en verde en mi entorno (el ✗ de `sitio` que reporta Luna es de su entorno, por el bloqueo de `wa.me`). Veredictos publicados en cada PR.
+- Issue #19: ENCARGO de seguimiento (acotar empresa y ciudad de los testimonios; riesgo bajo). Issue #17 cerrado por duplicado.
+
+**Sigue**
+- Hugo autoriza el merge de #16 y luego de #18. Al fusionar el segundo hay que actualizarlo con `main` y regenerar el sitio (ambos cambian `site.css`).
+- Luna toma el issue #19 después del merge de #18.
+
 ## 2026-11-24 (noche, 3) · Claude Code
 **Revisión del REPORTE de arranque de Luna**
 - Cumplió el protocolo: leyó los archivos (incluido `.ia/PROTOCOLO.md` desde su rama), no cambió nada, no abrió PR y no inventó resultados de pruebas (marcó cada check como no ejecutado).
