@@ -2,6 +2,14 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-24 (noche) · Claude Code
+**Hecho**
+- Se redactó el segundo ENCARGO para Luna: botón «Volver» consistente en las páginas de detalle (ficha, combo, promoción, proyecto, guía y recursos PAVIC), `.ia/traspasos/2026-11-24-claude-para-luna-navegacion.md`. Riesgo bajo. Es independiente del ENCARGO del panel de confianza.
+
+**Sigue**
+- Hugo envía los dos ENCARGOS a Luna y confirma la rama de destino de los PR (`main` o la rama por defecto del protocolo).
+- Claude revisa los PR de Luna contra los criterios de cada ENCARGO.
+
 ## 2026-11-24 (tarde) · Claude Code
 **Hecho**
 - Se redactó el ENCARGO para Luna: panel de administración para cargar año de inicio, certificaciones, obras y testimonios (`.ia/traspasos/2026-11-24-claude-para-luna-panel-confianza.md`). Riesgo medio. Hugo eligió esta tarea.
