@@ -48,6 +48,7 @@ PROYECTO-INCERPAZ.md       contexto completo del proyecto
 
 ## 5. Cómo se trabaja
 
+- Decisión de Hugo: las tareas nuevas del sitio las implementa Luna (Codex en la nube) con ENCARGO y REPORTE del protocolo común. Claude, en chat o en Claude Code, diseña, escribe el ENCARGO y revisa el PR; no implementa tareas nuevas del sitio salvo que Hugo indique otra cosa para una tarea concreta. Motivo: usar Claude de forma más eficiente. Hugo sigue autorizando cada tarea, cada merge y cada deploy.
 ```sh
 node site-src/build.js                 # regenera site/ y server/data/catalogo.json
 node --test server/test/api.test.js    # 12 pruebas de la API

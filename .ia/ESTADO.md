@@ -4,6 +4,7 @@ Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente a
 
 ## 2026-11-24 · Claude Code
 **Hecho** (cierre de la rama y revisión UX, prioridad 3)
+- Nota sobre la regla de Luna: Hugo pidió estas tareas (botón «Volver», PR a `main`, demo y prioridad 3) directamente a Claude en el chat, que es la excepción que prevé la regla para una tarea concreta.
 - Botón «Volver» también en «Calcula tus tejas» (a los productos) y en «Buscar» (al inicio). Si se llegó desde otra página del sitio, regresa a ella con sus filtros; si se abrió directo, vale el enlace.
 - Prioridad 3 era de contenido, no de código. Lo que sí se pudo hacer sin inventar datos: el sitio ya tiene las secciones **Obras** (inicio y PAVIC), **Testimonios** y **Certificaciones**, y el dato «Desde AAAA» en la franja de confianza. Se llenan desde `site-src/data/confianza.json` y **no aparecen mientras la lista esté vacía** (hoy todas lo están). Los testimonios solo salen con `autorizacion_escrita: true`; las obras exigen título, ciudad y foto.
 - Guía de fotos para Marketing (`site-src/GUIA-FOTOS.md`) y lista de lo que falta en `site-src/CONTENIDO-PENDIENTE.md`.
@@ -12,6 +13,12 @@ Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente a
 **Sigue**
 - Marketing, Calidad y Legal: año de inicio, certificados, obras con foto, testimonios autorizados, fotos de producto uniformes y promociones reales.
 - Pedidos de la reunión que dependen de otras áreas (ver `.ia/TAREAS.md`).
+
+## 2026-11-23 · Codex
+**Regla de trabajo vigente**
+- Luna (Codex en la nube) implementa las tareas nuevas del sitio con ENCARGO y REPORTE del protocolo común.
+- Claude, en chat o en Claude Code, diseña, redacta el ENCARGO y revisa el PR. Solo implementa si Hugo lo indica para esa tarea.
+- Hugo sigue autorizando cada tarea, cada merge y cada deploy.
 
 ## 2026-11-23 (noche) · Claude Code
 **Hecho**
