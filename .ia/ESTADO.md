@@ -2,6 +2,14 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-24 · Luna (Codex)
+**Hecho**
+- «Volver» debajo de las migas en las fichas de producto, combos, promociones y cursos, proyectos, guías y recursos PAVIC. Reutiliza el manejo del historial y ofrece el enlace de la sección al entrar directo.
+- Verificación en celular a 390 px en los seis tipos y a 360 px en la ficha de producto. El contenido baja 56 px. Las capturas de ficha, proyecto y guía están en el traspaso.
+
+**Sigue**
+- Revisión del PR contra `main`. La suite sitio registró fallos en comprobaciones existentes de WhatsApp y del selector de ciudad al cerrar con Escape. Pasaron las comprobaciones nuevas y el resto de las suites.
+
 ## 2026-11-24 · Claude Code
 **Hecho** (cierre de la rama y revisión UX, prioridad 3)
 - Nota sobre la regla de Luna: Hugo pidió estas tareas (botón «Volver», PR a `main`, demo y prioridad 3) directamente a Claude en el chat, que es la excepción que prevé la regla para una tarea concreta.
