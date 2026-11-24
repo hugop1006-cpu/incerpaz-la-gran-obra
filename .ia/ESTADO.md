@@ -2,6 +2,13 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-24 (noche, 2) · Claude Code
+**Hecho**
+- Spec de arranque para que Luna cree su hilo y verifique su entorno antes de recibir ENCARGOS: `.ia/traspasos/2026-11-24-claude-para-luna-arranque.md`. No cambia archivos del repositorio; pide un REPORTE de arranque con versión de Node, Playwright y el resultado de todas las pruebas.
+
+**Sigue**
+- Hugo crea el hilo `INCERPAZ · Luna · arranque`, pega el spec y pasa el REPORTE a Claude. Luego envía los dos ENCARGOS.
+
 ## 2026-11-24 (noche) · Claude Code
 **Hecho**
 - Se redactó el segundo ENCARGO para Luna: botón «Volver» consistente en las páginas de detalle (ficha, combo, promoción, proyecto, guía y recursos PAVIC), `.ia/traspasos/2026-11-24-claude-para-luna-navegacion.md`. Riesgo bajo. Es independiente del ENCARGO del panel de confianza.
