@@ -138,6 +138,10 @@ const recortar = (t, max) => (t.length <= max ? t : t.slice(0, max - 1).replace(
 fs.mkdirSync(path.join(OUT, 'assets/js'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'assets/js/config.js'), `window.INCERPAZ=${JSON.stringify({ ciudades: sitio.ciudades.map((c) => ({ slug: c.slug, nombre: c.nombre, whatsapp: c.whatsapp })), leadEndpoint: config.leadEndpoint || (config.comercio ? '/api/leads' : ''), demo: DEMO })};\n`);
 
+function volverDetalle(destino, texto) {
+  return `<a class="volver volver--detalle" href="${esc(destino)}" data-volver>← Volver a ${texto}</a>`;
+}
+
 function layout({ file, base = '', title: titulo, desc: descripcion, body, og = 'assets/img/productos/pavic-tabaco-2.jpg', jsonld = '', pagina = '', wa = WA_GENERAL, ciudadFija = '' }) {
   const title = recortar(titulo, 62), desc = recortar(descripcion, 158);
   const url = `${sitio.dominio}/${file === 'index.html' ? '' : file}`;
@@ -494,7 +498,8 @@ for (const p of productos) {
     wa: `Hola, tengo una consulta sobre ${p.nombre}${p.codigo ? ` (código ${p.codigo})` : ''} en {ciudad}.`,
     og: imgs[0] || 'assets/img/logo-header.png', jsonld: ld + migas([['Inicio', ''], ['Productos', `catalogo.html?ciudad=${p.ciudad}`], [p.nombre, `productos/${p.ciudad}/${p.slug}.html`]]),
     body: `
-<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="${base}index.html">Inicio</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}">Productos</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}&amp;cat=${p.cat}">${esc(CAT_NOMBRE[p.cat] || '')}</a> › ${esc(p.nombre)}</nav></div>
+<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="${base}index.html">Inicio</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}">Productos</a> › <a href="${base}catalogo.html?ciudad=${p.ciudad}&amp;cat=${p.cat}">${esc(CAT_NOMBRE[p.cat] || '')}</a> › ${esc(p.nombre)}</nav>
+${volverDetalle(`${base}catalogo.html?ciudad=${p.ciudad}`, 'los productos')}</div>
 <section class="wrap" style="padding-bottom:64px"><div class="prod">
   <div class="gallery">
     <div class="main">${imgs[0] ? `<img id="mainImg" src="${base}${imgs[0]}" alt="${esc(p.nombre)}" width="800" height="800">` : `<img id="mainImg" src="${base}assets/img/logo-icono.png" alt="" style="width:30%;opacity:.25">`}</div>
@@ -701,7 +706,8 @@ write('pavic-recursos.html', layout({
   file: 'pavic-recursos.html', pagina: 'pavic-recursos', wa: 'Hola, soy proyectista y tengo una consulta técnica sobre PAVIC en {ciudad}.', title: 'Recursos técnicos PAVIC para proyectistas | INCERPAZ',
   desc: 'Calculadora de obra, detalle en sección, texto para pliegos, DXF y documentación técnica del pavimento cerámico PAVIC para proyectistas, constructoras y entidades.',
   og: 'assets/img/productos/pavic-peatonal-2.jpg', jsonld: migas([['Inicio', ''], ['PAVIC', 'pavic.html'], ['Recursos técnicos', 'pavic-recursos.html']]),
-  body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="pavic.html">PAVIC</a> › Recursos técnicos</nav></div>
+  body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="index.html">Inicio</a> › <a href="pavic.html">PAVIC</a> › Recursos técnicos</nav>
+${volverDetalle('pavic.html', 'PAVIC')}</div>
 <section class="section" style="padding-top:12px"><div class="wrap">
   <span class="eyebrow">PAVIC · Para proyectistas</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 12px">Recursos técnicos</h1>
   <p class="lead">Herramientas y documentación para especificar, calcular y licitar obras con pavimento cerámico PAVIC. Cada fábrica (Santa Cruz y Cochabamba) tiene sus propias medidas: elige la tuya.</p>
@@ -972,7 +978,8 @@ for (const pr of proyectosData.proyectos) {
   write(`proyectos/${pr.slug}.html`, layout({
     file: `proyectos/${pr.slug}.html`, base: '../', pagina: 'proyecto', wa: `Hola, quiero hacer el proyecto «${pr.titulo}» y tengo una consulta en {ciudad}.`, title: `${pr.titulo}: materiales y pasos | INCERPAZ`, desc: `${pr.resumen} Calcula la lista de materiales y sigue los pasos.`,
     og: pr.imagen, jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>` + migas([['Inicio', ''], ['Proyectos', 'proyectos.html'], [pr.titulo, `proyectos/${pr.slug}.html`]]),
-    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../proyectos.html">Proyectos</a> › ${esc(pr.titulo)}</nav></div>
+    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../proyectos.html">Proyectos</a> › ${esc(pr.titulo)}</nav>
+${volverDetalle('../proyectos.html', 'los proyectos')}</div>
 <section class="section" style="padding-top:12px"><div class="wrap">
   <span class="eyebrow">Proyecto</span><h1 style="font-size:clamp(36px,5vw,60px);margin-block:12px 12px">${esc(pr.titulo)}</h1>
   <p class="lead">${esc(pr.resumen)}</p>
@@ -1019,7 +1026,8 @@ for (const g of guiasData) {
   write(`guias/${g.slug}.html`, layout({
     file: `guias/${g.slug}.html`, base: b, pagina: 'guia', wa: `Hola, leí la guía «${g.titulo}» y tengo una consulta en {ciudad}.`, title: `${g.titulo} | INCERPAZ`, desc: g.resumen, og: g.imagen,
     jsonld: `<script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>` + migas([['Inicio', ''], ['Guías', 'guias.html'], [g.titulo, `guias/${g.slug}.html`]]),
-    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../guias.html">Guías</a> › ${esc(g.titulo)}</nav></div>
+    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../guias.html">Guías</a> › ${esc(g.titulo)}</nav>
+${volverDetalle('../guias.html', 'las guías')}</div>
 <article class="section" style="padding-top:12px"><div class="wrap">
   <span class="eyebrow">Guía · ${g.minutos} min de lectura</span><h1 style="font-size:clamp(34px,5vw,56px);margin-block:12px 12px">${esc(g.titulo)}</h1>
   <p class="lead">${esc(g.resumen)}</p><p class="muted" style="margin:10px 0 24px">Equipo INCERPAZ · ${fechaLarga(g.fecha)}</p>
@@ -1097,7 +1105,8 @@ for (const n of novedades) {
   write(`promociones/${n.id}.html`, layout({
     file: `promociones/${n.id}.html`, base: '../', pagina: 'promocion', wa: `Hola, quisiera información sobre «${n.titulo}» en {ciudad}.`, title: `${n.titulo} | INCERPAZ`, desc: n.resumen, og: n.imagen || 'assets/img/productos/pavic-tabaco-2.jpg',
     jsonld: ld + migas([['Inicio', ''], ['Promociones', 'promociones.html'], [n.titulo, `promociones/${n.id}.html`]]),
-    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../promociones.html">Promociones</a> › ${esc(n.titulo)}</nav></div>
+    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../index.html">Inicio</a> › <a href="../promociones.html">Promociones</a> › ${esc(n.titulo)}</nav>
+${volverDetalle('../promociones.html', 'las promociones')}</div>
 <section class="section" style="padding-top:12px"><div class="wrap split">
   <div>
     <span class="tag${''}">${TIPO_NOMBRE[n.tipo]}</span>
@@ -1120,7 +1129,8 @@ for (const c of combos) {
   write(`combos/${c.catalogo}/${c.id}.html`, layout({
     file: `combos/${c.catalogo}/${c.id}.html`, base: '../../', pagina: 'combo', wa: `Hola, quiero el combo «${c.titulo}» en {ciudad}.`, title: `${c.titulo} | INCERPAZ`, desc: c.descripcion || `Combo con ${c.componentes.length} componentes. Vigente hasta el ${fechaCorta(c.fin)}.`, og: im || 'assets/img/productos/pavic-tabaco-2.jpg',
     jsonld: migas([['Inicio', ''], ['Promociones', 'promociones.html'], [c.titulo, `combos/${c.catalogo}/${c.id}.html`]]),
-    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../../index.html">Inicio</a> › <a href="../../promociones.html">Promociones</a> › ${esc(c.titulo)}</nav></div>
+    body: `<div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="../../index.html">Inicio</a> › <a href="../../promociones.html">Promociones</a> › ${esc(c.titulo)}</nav>
+${volverDetalle('../../promociones.html', 'las promociones')}</div>
 <section class="wrap" style="padding-bottom:48px"><div class="prod">
   <div class="gallery"><div class="main">${im ? `<img src="../../${im}" alt="${esc(c.titulo)}" width="800" height="800">` : `<img src="../../assets/img/logo-icono.png" alt="" style="width:30%;opacity:.25">`}</div></div>
   <div>
