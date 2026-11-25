@@ -532,6 +532,7 @@ label.check a { color: var(--red); font-weight: 600; }
 /* botón «Volver» (comparador y otras páginas de herramienta) */
 .volver { display: flex; width: fit-content; align-items: center; gap: 8px; min-height: 44px; margin: 4px 0 18px; padding: 8px 16px 8px 12px; border: 1.5px solid var(--ink); background: var(--white); color: var(--ink); font: 700 16px var(--display); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
 .volver:hover { background: var(--ink); color: #fff; }
+@media (max-width: 860px) { .volver.volver--detalle { margin-bottom: 8px; } }
 
 /* ---- prueba de confianza: obras, testimonios y certificaciones (aparecen solo con datos) ---- */
 .obras { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
