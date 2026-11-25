@@ -253,6 +253,59 @@ const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) f
   ok((await ajena.evaluate(() => document.documentElement.scrollWidth)) <= 390, 'la comparación no desborda la página en celular');
   await ajena.context().close(); await cctx.close();
 
+  /* «Volver» en las páginas de detalle */
+  const detalles = [
+    ['productos/santa-cruz/pavic-peatonal.html', 'los productos', 'catalogo.html?ciudad=santa-cruz'],
+    ['combos/cochabamba/ejemplo-combo-parrillero.html', 'las promociones', 'promociones.html'],
+    ['promociones/ejemplo-curso-enchape.html', 'las promociones', 'promociones.html'],
+    ['proyectos/churrasquero.html', 'los proyectos', 'proyectos.html'],
+    ['guias/cuantos-ladrillos-por-metro-cuadrado.html', 'las guías', 'guias.html'],
+    ['pavic-recursos.html', 'PAVIC', 'pavic.html']
+  ];
+  const detalleCtx = await visitante(b, { viewport: { width: 390, height: 844 } });
+  const dp = await detalleCtx.newPage();
+  dp.on('pageerror', (e) => errores.push(e.message));
+  const volver = dp.locator('.crumbs + a.volver[data-volver]');
+  for (const [ruta, texto, destino] of detalles) {
+    await dp.goto(BASE + ruta);
+    ok(await volver.isVisible() && await volver.textContent() === `← Volver a ${texto}` &&
+      await volver.evaluate((a) => a.href) === new URL(destino, BASE).href, `${ruta}: texto y destino de «Volver» justo debajo de las migas`);
+    ok(await dp.evaluate(() => document.documentElement.scrollWidth <= 390), `${ruta}: sin desborde a 390 px`);
+    await volver.click();
+    await dp.waitForURL(new URL(destino, BASE).href);
+  }
+  for (const ancho of [390, 360]) {
+    await dp.setViewportSize({ width: ancho, height: 844 });
+    await dp.goto(BASE + detalles[0][0]);
+    const boton = await volver.boundingBox();
+    const barra = await dp.locator('.barra-compra').boundingBox();
+    ok(boton && barra && boton.y + boton.height <= barra.y && await dp.isHidden('.wa-float') &&
+      await dp.evaluate((w) => document.documentElement.scrollWidth <= w, ancho), `ficha a ${ancho} px: «Volver» queda por encima de la barra de cotizar y sin desborde`);
+  }
+  await dp.setViewportSize({ width: 1280, height: 900 });
+  for (const [origen, enlace] of [
+    ['catalogo.html?ciudad=santa-cruz&cat=pisos-y-pavimentos', '#grid .pcard:visible a'],
+    ['buscar.html?q=pavic', '.bres a'],
+    ['comparar.html?p=santa-cruz:pavic-peatonal', '.cmp-prod a']
+  ]) {
+    await dp.goto(BASE + origen);
+    await dp.locator(`${enlace}[href^="productos/"]`).first().click();
+    await dp.waitForURL('**/productos/**/*.html');
+    await volver.click();
+    await dp.waitForURL(new URL(origen, BASE).href);
+    ok(!origen.startsWith('catalogo.html') ||
+      await dp.getAttribute('[data-cat="pisos-y-pavimentos"]', 'aria-pressed') === 'true', `desde una ficha, «Volver» regresa a ${origen}`);
+  }
+
+  for (const ruta of [
+    'index', 'catalogo', 'promociones', 'proyectos', 'guias', 'pavic', 'donde-estamos', 'empresa',
+    'exportaciones', 'privacidad', 'cochabamba', 'santa-cruz', 'oruro', 'sucre', '404'
+  ]) {
+    await dp.goto(BASE + ruta + '.html');
+    ok(await dp.locator('[data-volver]').count() === 0, `${ruta}.html: sin botón «Volver»`);
+  }
+  await detalleCtx.close();
+
   ok(errores.length === 0, 'sin errores de JavaScript' + (errores.length ? ': ' + errores[0] : ''));
   await b.close();
   console.log(fallos ? `\n${fallos} fallos` : '\nTodo bien');
