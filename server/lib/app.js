@@ -395,6 +395,17 @@ function crearApp({ db, erp, contenido, catalogoRuta, seguro = process.env.COOKI
     await publicar();
     return { ok: true };
   });
+  ruta('GET', '/api/admin/confianza', async ({ usuario }) => {
+    requerirAdmin(usuario);
+    return contenido.leerConfianza();
+  });
+  ruta('PUT', '/api/admin/confianza', async ({ usuario, body }) => {
+    requerirAdmin(usuario);
+    contenido.guardarConfianza(body);
+    registrar(usuario, 'confianza', 'Actualizó los datos de confianza');
+    await publicar();
+    return { ok: true };
+  });
   ruta('POST', '/api/admin/productos', async ({ usuario, body }) => {
     requerirAdmin(usuario);
     const p = contenido.crearProducto(body);

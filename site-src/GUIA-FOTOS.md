@@ -16,12 +16,9 @@ Para que el catálogo se vea uniforme. Es una recomendación de trabajo para Mar
 - Solo obras de las que INCERPAZ pueda mostrar la foto. Si aparecen personas, deben haber autorizado.
 
 ## Cómo entran al sitio
-1. Las fotos de producto van en `site/assets/img/productos/` y se enlazan en los datos del producto.
-2. Las obras, certificados y testimonios se cargan en `site-src/data/confianza.json` (ver abajo). Mientras una lista esté vacía, esa sección no se muestra.
-3. Hay que regenerar el sitio con `node site-src/build.js`.
 
-## `confianza.json`
-- `desde`: año de inicio de la empresa (número). Aparece como «Desde AAAA» en la franja de confianza.
-- `certificaciones`: `{ nombre, detalle, archivo }`. `archivo` es opcional (ruta del PDF dentro del sitio).
-- `obras`: `{ titulo, ciudad, anio, superficie_m2, imagen, pavic }`. Obligatorios: título, ciudad e imagen. `pavic: true` la muestra también en la página de PAVIC.
-- `testimonios`: `{ nombre, empresa, ciudad, texto, autorizacion_escrita }`. **Solo se publican con `autorizacion_escrita: true`**, es decir, cuando existe autorización escrita de la persona o empresa.
+1. Las fotos de producto van en `site/assets/img/productos/` y se enlazan en los datos del producto.
+2. En el panel de administración (`admin.html`), abre «Confianza». Ahí puedes cargar el año de inicio, las certificaciones, las obras y los testimonios.
+3. Para cada obra, usa «Subir imagen» y completa el título y la ciudad. Marca «Mostrar también en PAVIC» para incluirla en esa página.
+4. El enlace al certificado es opcional y debe empezar con `https://`. Marca la casilla de autorización de un testimonio solo si tienes autorización escrita de la persona o empresa.
+5. Pulsa «Guardar y publicar» para regenerar el sitio. Las listas vacías no generan secciones y los testimonios sin autorización quedan como borradores.

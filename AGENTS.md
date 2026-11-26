@@ -20,7 +20,7 @@ Este archivo es la fuente única de reglas del proyecto. Codex lo lee directamen
 ## Antes de entregar
 ```sh
 node site-src/build.js                 # regenera site/ y server/data/catalogo.json
-node --test server/test/api.test.js    # 12 pruebas de la API
+node --test server/test/api.test.js    # 15 pruebas de la API
 python3 -m http.server 8080 &          # solo para probar-sitio.js
 for t in sitio comercio admin proyectos pavic leads publico promos confianza; do node tools/probar-$t.js; done
 ```

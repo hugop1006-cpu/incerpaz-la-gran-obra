@@ -4,6 +4,12 @@ Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente a
 
 ## 2026-11-24 · Luna (Codex)
 **Hecho**
+- Pestaña «Confianza» para administrar el año de inicio, las certificaciones, las obras y los testimonios. El guardado regenera el sitio y respalda los datos anteriores en Historial.
+- Los testimonios sin autorización escrita quedan como borradores. Se conserva la semilla vacía.
+
+**Sigue**
+- Revisión de Claude. Marketing, Calidad y Legal deben confirmar los datos antes de cargarlos desde el panel.
+
 - «Volver» debajo de las migas en las fichas de producto, combos, promociones y cursos, proyectos, guías y recursos PAVIC. Reutiliza el manejo del historial y ofrece el enlace de la sección al entrar directo.
 - Verificación en celular a 390 px en los seis tipos y a 360 px en la ficha de producto. El contenido baja 56 px. Las capturas de ficha, proyecto y guía están en el traspaso.
 

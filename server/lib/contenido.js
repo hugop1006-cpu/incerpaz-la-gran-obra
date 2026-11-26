@@ -26,12 +26,17 @@ const url = (v, nombre) => { const s = cad(v, 300, nombre, false); if (s && !/^h
 
 function crearContenido({ dir = process.env.CONTENT_DIR || path.join(RAIZ, 'server', 'data', 'contenido'), construir = true } = {}) {
   fs.mkdirSync(path.join(dir, 'historial'), { recursive: true });
-  for (const f of ['sitio.json', 'productos.json', 'promociones.json']) if (!fs.existsSync(path.join(dir, f))) fs.copyFileSync(path.join(SEMILLA, f), path.join(dir, f));
+  for (const f of ['sitio.json', 'productos.json', 'promociones.json', 'confianza.json']) if (!fs.existsSync(path.join(dir, f))) fs.copyFileSync(path.join(SEMILLA, f), path.join(dir, f));
   const leer = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
   function escribir(f, datos) {
     const destino = path.join(dir, f);
-    const marca = new Date().toISOString().replace(/[:.]/g, '-');
-    fs.copyFileSync(destino, path.join(dir, 'historial', `${marca}-${f}`));
+    let instante = Date.now();
+    let copia;
+    do {
+      const marca = new Date(instante++).toISOString().replace(/[:.]/g, '-');
+      copia = path.join(dir, 'historial', `${marca}-${f}`);
+    } while (fs.existsSync(copia));
+    fs.copyFileSync(destino, copia);
     const viejos = fs.readdirSync(path.join(dir, 'historial')).filter((n) => n.endsWith(`-${f}`)).sort();
     viejos.slice(0, Math.max(0, viejos.length - 40)).forEach((n) => fs.rmSync(path.join(dir, 'historial', n)));
     const tmp = destino + '.tmp';
@@ -163,8 +168,64 @@ function crearContenido({ dir = process.env.CONTENT_DIR || path.join(RAIZ, 'serv
     p[lista] = n; escribir('promociones.json', p);
   }
 
+  function leerConfianza() {
+    const { desde, certificaciones, obras, testimonios } = leer('confianza.json');
+    return { desde: desde ?? null, certificaciones: certificaciones ?? [], obras: obras ?? [], testimonios: testimonios ?? [] };
+  }
+
+  function guardarConfianza(datos) {
+    const objeto = (v) => {
+      if (!v || typeof v !== 'object' || Array.isArray(v)) falla(400, 'Datos de confianza inválidos');
+      return v;
+    };
+    const lista = (v, max, nombre, normalizar) => {
+      if (!Array.isArray(v) || v.length > max) falla(400, `Lista de ${nombre} inválida (máximo ${max})`);
+      return v.map((item) => normalizar(objeto(item)));
+    };
+    const texto = (v, max, nombre, obligatorio = true) => {
+      if (v != null && typeof v !== 'string') falla(400, `Valor inválido para ${nombre}`);
+      return cad(v, max, nombre, obligatorio);
+    };
+    const anio = (v, min, max, nombre) => {
+      if (!Number.isInteger(v) || v < min || v > max) falla(400, `${nombre} debe ser un entero entre ${min} y ${max}`);
+      return v;
+    };
+    const booleano = (v, nombre) => {
+      if (typeof v !== 'boolean') falla(400, `Valor inválido para ${nombre}`);
+      return v;
+    };
+    const actual = new Date().getFullYear();
+    const { desde, certificaciones, obras, testimonios } = objeto(datos);
+    escribir('confianza.json', {
+      desde: desde === null ? null : anio(desde, 1850, actual, 'El año de inicio'),
+      certificaciones: lista(certificaciones, 20, 'certificaciones', (c) => {
+        const archivo = c.archivo == null ? '' : c.archivo;
+        if (typeof archivo !== 'string' || (archivo && (!/^https:\/\/[^\s]+$/.test(archivo) || !URL.canParse(archivo)))) {
+          falla(400, 'La dirección del certificado debe empezar con https://');
+        }
+        return { nombre: texto(c.nombre, 120, 'el nombre del certificado'), detalle: texto(c.detalle, 200, 'el detalle', false), archivo };
+      }),
+      obras: lista(obras, 24, 'obras', (o) => {
+        const superficie = o.superficie_m2 ?? null;
+        if (superficie !== null && (!Number.isFinite(superficie) || superficie <= 0)) falla(400, 'La superficie debe ser un número mayor que cero');
+        if (typeof o.imagen !== 'string' || !RE_IMAGEN.test(o.imagen)) falla(400, 'La imagen de la obra es obligatoria y debe ser válida');
+        return {
+          titulo: texto(o.titulo, 100, 'el título de la obra'), ciudad: texto(o.ciudad, 40, 'la ciudad de la obra'),
+          anio: o.anio == null ? null : anio(o.anio, 1950, actual + 1, 'El año de la obra'), superficie_m2: superficie,
+          pavic: booleano(o.pavic, 'PAVIC'), imagen: o.imagen
+        };
+      }),
+      testimonios: lista(testimonios, 12, 'testimonios', (t) => ({
+        nombre: texto(t.nombre, 80, 'el nombre del testimonio'),
+        empresa: texto(t.empresa, Infinity, 'la empresa', false), ciudad: texto(t.ciudad, Infinity, 'la ciudad', false),
+        texto: texto(t.texto, 400, 'el texto del testimonio'),
+        autorizacion_escrita: booleano(t.autorizacion_escrita, 'la autorización escrita')
+      }))
+    });
+  }
+
   return {
-    dir, reconstruir, leerPromos, guardarPromo, borrarPromo,
+    dir, reconstruir, leerPromos, guardarPromo, borrarPromo, leerConfianza, guardarConfianza,
     leer: () => ({ sitio: leer('sitio.json'), productos: leer('productos.json') }),
     guardarSitio(parcial) {
       const s = leer('sitio.json');
@@ -198,10 +259,10 @@ function crearContenido({ dir = process.env.CONTENT_DIR || path.join(RAIZ, 'serv
     },
     historial: () => fs.readdirSync(path.join(dir, 'historial')).sort().reverse().slice(0, 60),
     restaurar(nombre) {
-      if (!/^[\w.-]+-(sitio|productos|promociones)\.json$/.test(nombre)) falla(400, 'Versión inválida');
+      const version = /^[\w.-]+-(sitio|productos|promociones|confianza)\.json$/.exec(nombre);
+      if (!version) falla(400, 'Versión inválida');
       const origen = path.join(dir, 'historial', nombre); if (!fs.existsSync(origen)) falla(404, 'No existe esa versión');
-      const f = nombre.endsWith('-sitio.json') ? 'sitio.json' : nombre.endsWith('-promociones.json') ? 'promociones.json' : 'productos.json';
-      JSON.parse(fs.readFileSync(origen, 'utf8')); escribir(f, JSON.parse(fs.readFileSync(origen, 'utf8')));
+      escribir(version[1] + '.json', JSON.parse(fs.readFileSync(origen, 'utf8')));
     }
   };
 }
