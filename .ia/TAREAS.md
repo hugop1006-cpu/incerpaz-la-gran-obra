@@ -5,6 +5,7 @@ Estado: `pendiente` · `en curso` · `bloqueada` · `hecha`.
 
 | Tarea | Responsable | Estado | Notas |
 |---|---|---|---|
+| Botón «Volver» en las páginas de detalle | codex | hecha (2026-11-24) | Fichas, combos, promociones y cursos, proyectos, guías y recursos PAVIC. Pendiente de revisión del PR |
 | Comparador de productos | claude-code | hecha (2026-11-18) | Pedido de la reunión. Marcar 3 o 4 productos de la misma ciudad y verlos lado a lado; precio solo con cuenta |
 | Productos nuevos destacados | claude-code | hecha (2026-11-18) | Pedido de la reunión. Etiqueta «Nuevo» en catálogo y portada, con fecha de vencimiento |
 | Direcciones cortas por ciudad (incerpaz.com/cochabamba) | claude-code | hecha (2026-11-18) | Pedido de la reunión. Confirmado por Hugo: son direcciones cortas por ciudad |
@@ -29,10 +30,11 @@ Estado: `pendiente` · `en curso` · `bloqueada` · `hecha`.
 | Wireframes tanda 4: PAVIC con camiones, proceso y muestras | claude-code | hecha (2026-11-21) | Capacidad del camión (20 t) es de ejemplo; proceso por validar con ventas |
 | Revisión UX prioridad 2: nombres, tarjetas, cuenta y presupuesto visibles, confianza | claude-code | hecha (2026-11-23) | Fotos uniformes quedan con Marketing |
 | Revisión UX prioridad 3: secciones de obras, testimonios y certificaciones listas para llenarse | claude-code | hecha (2026-11-24) | Sin datos: no se muestran hasta que existan |
-| Crear el hilo de Luna y verificar su entorno (arranque) | humano (Hugo) | pendiente | Spec: `.ia/traspasos/2026-11-24-claude-para-luna-arranque.md`. Antes de enviar los ENCARGOS |
-| Panel de administración para cargar los datos de confianza | luna | pendiente | ENCARGO redactado por Claude (riesgo medio): `.ia/traspasos/2026-11-24-claude-para-luna-panel-confianza.md`. Claude revisa el PR; Hugo autoriza merge y deploy |
-| Botón «Volver» consistente en las páginas de detalle | luna | pendiente | ENCARGO redactado por Claude (riesgo bajo): `.ia/traspasos/2026-11-24-claude-para-luna-navegacion.md`. Claude revisa el PR; Hugo autoriza merge y deploy |
-| Datos de confianza: año de inicio, certificados, obras con foto, testimonios autorizados, fotos uniformes, promociones reales | humano (Marketing, Calidad y Legal) | pendiente | Se cargan en `site-src/data/confianza.json`; ver `site-src/GUIA-FOTOS.md` |
+| Crear el hilo de Luna y verificar su entorno (arranque) | humano (Hugo) | hecha (2026-11-25) | Spec: `.ia/traspasos/2026-11-24-claude-para-luna-arranque.md`. Antes de enviar los ENCARGOS |
+| Botón «Volver» consistente en las páginas de detalle | luna | hecha (2026-11-25) | PR #16 fusionado. Revisado por Claude |
+| Panel de administración para los datos de confianza | luna | hecha (2026-11-26) | PR #18 fusionado. Revisado por Claude |
+| Acotar «empresa» y «ciudad» de los testimonios | luna | pendiente | Issue #19 (riesgo bajo) |
+| Datos de confianza: año de inicio, certificados, obras con foto, testimonios autorizados, fotos uniformes, promociones reales | humano (Marketing, Calidad y Legal) | pendiente | Año, certificados, obras y testimonios se cargan desde «Confianza» en el panel. Ver `site-src/GUIA-FOTOS.md` |
 | Wireframes tanda 5: calculadora de tejas por pendiente | claude-code | hecha (2026-11-21) | Pendiente mínima y ficha de la teja canal por confirmar |
 | Wireframes tanda 6: ordenar catálogo, «Nuestras marcas», enlace al juego | claude-code | hecha (2026-11-23) | Falta decidir la marca propia de tejas |
 | Marcar los productos nuevos reales | humano (Marketing) | pendiente | Desde el panel: «Destacar como nuevo hasta». Hoy ningún producto está marcado |

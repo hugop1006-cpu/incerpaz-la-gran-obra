@@ -348,3 +348,114 @@ test('promociones: combos con productos fuera del catálogo y flujo borrador, re
   assert.equal((await cli.post('/api/admin/imagenes', { datos: img })).status, 403);
   cerrar(servidor);
 });
+
+test('confianza: acceso exclusivo del administrador', async (t) => {
+  const { db, base, datos } = await levantarConfianza(t);
+  const ruta = '/api/admin/confianza';
+  const sesion = cliente(base);
+  assert.equal((await sesion.get(ruta)).status, 401);
+  assert.equal((await sesion.put(ruta, datos)).status, 401);
+  for (const rol of ['cliente', 'ejecutivo', 'admin']) {
+    const cuenta = await entrarConfianza(db, base, rol);
+    const lectura = await cuenta.get(ruta);
+    assert.equal(lectura.status, rol === 'admin' ? 200 : 403, rol);
+    if (rol === 'admin') assert.deepEqual(lectura.json, datos);
+    else assert.equal((await cuenta.put(ruta, datos)).status, 403, rol);
+  }
+});
+
+test('confianza: el servidor rechaza datos inválidos antes de guardar', async (t) => {
+  const { db, base, datos } = await levantarConfianza(t);
+  const adm = await entrarConfianza(db, base, 'admin');
+  const ruta = '/api/admin/confianza';
+  const actual = new Date().getFullYear();
+  const cert = { nombre: 'Certificado de prueba' };
+  const obra = { titulo: 'Obra de prueba', ciudad: 'Ciudad de prueba', pavic: true, imagen: 'assets/img/productos/prueba.jpg' };
+  const testimonio = { nombre: 'Prueba', texto: 'Texto de prueba', autorizacion_escrita: false };
+  const invalidos = [
+    ...[undefined, 1849, actual + 1, 2000.5, '2000'].map((desde) => ({ desde })),
+    { certificaciones: null }, { obras: {} }, { testimonios: 'texto' },
+    { certificaciones: Array(21).fill(cert) }, { obras: Array(25).fill(obra) }, { testimonios: Array(13).fill(testimonio) },
+    { certificaciones: [null] }, { obras: [false] }, { testimonios: [[]] },
+    ...[{ nombre: '' }, { nombre: 'a'.repeat(121) }, { nombre: 42 }, { detalle: 'a'.repeat(201) },
+      { archivo: 'http://example.com/a.pdf' }, { archivo: 'certificado.pdf' }, { archivo: 'https://' }]
+      .map((cambio) => ({ certificaciones: [{ ...cert, ...cambio }] })),
+    ...[{ titulo: '' }, { titulo: 'a'.repeat(101) }, { ciudad: ' ' }, { ciudad: 'a'.repeat(41) },
+      { anio: 1949 }, { anio: actual + 2 }, { anio: 2000.5 }, { anio: '2000' },
+      { superficie_m2: 0 }, { superficie_m2: -1 }, { superficie_m2: '2' }, { pavic: 'true' }, { pavic: undefined },
+      { imagen: '' }, { imagen: 'https://example.com/a.jpg' }, { imagen: 'assets/img/subidas/../a.jpg' }, { imagen: 'assets/img/subidas/a.svg' }]
+      .map((cambio) => ({ obras: [{ ...obra, ...cambio }] })),
+    ...[{ nombre: '' }, { nombre: 'a'.repeat(81) }, { texto: '' }, { texto: 'a'.repeat(401) },
+      { empresa: {} }, { ciudad: 5 }, { autorizacion_escrita: 'true' }, { autorizacion_escrita: undefined }]
+      .map((cambio) => ({ testimonios: [{ ...testimonio, ...cambio }] }))
+  ];
+  for (const cambio of invalidos) {
+    const r = await adm.put(ruta, { ...datos, ...cambio });
+    assert.equal(r.status, 400, JSON.stringify(cambio));
+    assert.ok(r.json.error);
+  }
+  assert.deepEqual((await adm.get(ruta)).json, datos);
+  assert.deepEqual((await adm.get('/api/admin/historial')).json.versiones, []);
+});
+
+test('confianza: guarda, regenera y restaura una copia del historial', async (t) => {
+  const { db, base, datos, tmp } = await levantarConfianza(t, true);
+  const adm = await entrarConfianza(db, base, 'admin');
+  const ruta = '/api/admin/confianza';
+  const pagina = () => fs.readFileSync(path.join(tmp, 'site', 'index.html'), 'utf8');
+  const aprobado = { nombre: 'Prueba pública', texto: 'Mensaje autorizado de prueba', empresa: '', ciudad: '', autorizacion_escrita: true };
+  const borrador = { ...aprobado, texto: 'Mensaje sin autorización de prueba', autorizacion_escrita: false };
+  const obra = { titulo: 'Obra de prueba', ciudad: 'Ciudad de prueba', anio: 1950, superficie_m2: 12.5, pavic: true, imagen: 'assets/img/productos/prueba.jpg' };
+  const nuevos = { ...datos, desde: 1850, obras: [obra], testimonios: [aprobado, borrador],
+    certificaciones: [{ nombre: 'Certificado de prueba', detalle: '', archivo: 'https://example.com/certificado.pdf' }] };
+  assert.equal((await adm.put(ruta, nuevos)).status, 200);
+  assert.deepEqual((await adm.get(ruta)).json, nuevos);
+  const versiones = (await adm.get('/api/admin/historial')).json.versiones;
+  assert.equal(versiones.length, 1);
+  assert.match(versiones[0], /-confianza\.json$/);
+  assert.match(pagina(), /Mensaje autorizado de prueba/);
+  assert.doesNotMatch(pagina(), /Mensaje sin autorización de prueba/);
+  assert.match(pagina(), /href="https:\/\/example\.com\/certificado\.pdf"/);
+  assert.match(pagina(), /Desde 1850/);
+  assert.match(pagina(), /Obra de prueba/);
+  assert.match(fs.readFileSync(path.join(tmp, 'site', 'pavic.html'), 'utf8'), /Obra de prueba/);
+  assert.equal((await adm.post('/api/admin/restaurar', { version: versiones[0] })).status, 200);
+  assert.deepEqual((await adm.get(ruta)).json, datos);
+  assert.doesNotMatch(pagina(), /Mensaje autorizado de prueba|Desde 1850|Certificado de prueba|Obra de prueba/);
+});
+
+async function levantarConfianza(t, construir = false) {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'inc-confianza-'));
+  const db = abrir(':memory:');
+  const catalogoRuta = path.join(tmp, 'catalogo.json');
+  fs.copyFileSync(path.join(__dirname, '../data/catalogo.json'), catalogoRuta);
+  const entorno = { SITE_OUT: path.join(tmp, 'site'), CATALOGO_OUT: catalogoRuta };
+  const previo = Object.fromEntries(Object.keys(entorno).map((clave) => [clave, process.env[clave]]));
+  if (construir) Object.assign(process.env, entorno);
+  const contenido = crearContenido({ dir: path.join(tmp, 'contenido'), construir });
+  const servidor = http.createServer(crearApp({ db, erp: erpMock, contenido, catalogoRuta }));
+  t.after(() => {
+    cerrar(servidor);
+    db.close();
+    if (construir) {
+      for (const [clave, valor] of Object.entries(previo)) {
+        if (valor === undefined) delete process.env[clave];
+        else process.env[clave] = valor;
+      }
+    }
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+  await new Promise((ok) => servidor.listen(0, '127.0.0.1', ok));
+  return { db, tmp, base: `http://127.0.0.1:${servidor.address().port}`,
+    datos: { desde: null, certificaciones: [], obras: [], testimonios: [] } };
+}
+
+async function entrarConfianza(db, base, rol) {
+  const correo = `${rol}@incerpaz.test`;
+  const password = require('node:crypto').randomUUID();
+  db.prepare("INSERT INTO usuarios (rol, estado, tipo, nombre, ciudad, celular, correo, pass_hash) VALUES (?, 'verificado','empresa','Prueba','cochabamba','00000000',?,?)")
+    .run(rol, correo, hashPassword(password));
+  const cuenta = cliente(base);
+  assert.equal((await cuenta.post('/api/login', { correo, password })).status, 200);
+  return cuenta;
+}

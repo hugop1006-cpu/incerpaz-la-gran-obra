@@ -96,7 +96,7 @@ Se dejó el plan de validación y las primeras cifras de importación (UN Comtra
 - Los sufijos estadísticos de 6907.23.10 y los aranceles vigentes (recargos incluidos) no están confirmados: verificarlos en USITC y CBP, no en sitios de terceros.
 
 ## Pruebas de confianza (revisión UX, prioridad 3)
-El sitio ya está listo para mostrarlas, pero **no hay datos confirmados**: las secciones no aparecen hasta que se carguen en `site-src/data/confianza.json` (ver `site-src/GUIA-FOTOS.md`). Falta que Marketing, Calidad y Legal entreguen:
+El sitio ya está listo para mostrarlas, pero **no hay datos confirmados**: las secciones no aparecen hasta que se carguen desde la pestaña «Confianza» del panel de administración (ver `site-src/GUIA-FOTOS.md`). Falta que Marketing, Calidad y Legal entreguen:
 - **Año de inicio** de la empresa (para «Desde AAAA»).
 - **Certificaciones y certificados** vigentes, con su alcance y el PDF si se quiere publicar.
 - **Obras reales** con foto, ciudad y, si se confirman, año y superficie; en especial obras PAVIC de referencia.

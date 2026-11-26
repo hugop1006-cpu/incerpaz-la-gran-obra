@@ -2,6 +2,15 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-26 · Claude Code
+**Hecho**
+- Hugo autorizó y se fusionaron los PR de Luna: #16 (botón «Volver») y #18 (panel de confianza), este último actualizado con `main` y con el sitio regenerado. `main` verificado: sitio regenerado sin cambios, API 15 de 15 y las 9 suites de navegador en verde.
+- Este PR de documentación lleva a `main` los ENCARGOS, el spec de arranque de Luna y `.ia/COMUNICACION.md` (canal por GitHub).
+
+**Sigue**
+- Luna toma el issue #19 (acotar «empresa» y «ciudad» de los testimonios).
+- Datos de confianza y demás pendientes de otras áreas (ver `.ia/TAREAS.md`).
+
 ## 2026-11-24 (noche, 4) · Claude Code
 **Hecho**
 - Comunicación Claude ↔ Luna por GitHub (decisión de Hugo, «GitHub como buzón»): ENCARGO = issue con etiquetas `encargo` y `luna`; REPORTE = descripción del PR; Claude revisa en GitHub. Ver `.ia/COMUNICACION.md`.
@@ -41,6 +50,20 @@ Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente a
 **Sigue**
 - Enviar el ENCARGO a Luna (`codex queue`, hilo `INCERPAZ · Luna · panel de confianza`) y esperar su PR para revisarlo.
 - Duda para Hugo: el protocolo dice que los PR van a la rama por defecto del repositorio (`claude/gracious-wright-mkglyk`) pero el sitio se fusiona en `main`; el ENCARGO pide `main`.
+
+## 2026-11-24 · Luna (Codex)
+**Hecho**
+- Pestaña «Confianza» para administrar el año de inicio, las certificaciones, las obras y los testimonios. El guardado regenera el sitio y respalda los datos anteriores en Historial.
+- Los testimonios sin autorización escrita quedan como borradores. Se conserva la semilla vacía.
+
+**Sigue**
+- Revisión de Claude. Marketing, Calidad y Legal deben confirmar los datos antes de cargarlos desde el panel.
+
+- «Volver» debajo de las migas en las fichas de producto, combos, promociones y cursos, proyectos, guías y recursos PAVIC. Reutiliza el manejo del historial y ofrece el enlace de la sección al entrar directo.
+- Verificación en celular a 390 px en los seis tipos y a 360 px en la ficha de producto. El contenido baja 56 px. Las capturas de ficha, proyecto y guía están en el traspaso.
+
+**Sigue**
+- Revisión del PR contra `main`. La suite sitio registró fallos en comprobaciones existentes de WhatsApp y del selector de ciudad al cerrar con Escape. Pasaron las comprobaciones nuevas y el resto de las suites.
 
 ## 2026-11-24 · Claude Code
 **Hecho** (cierre de la rama y revisión UX, prioridad 3)

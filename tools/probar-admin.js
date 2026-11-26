@@ -12,11 +12,11 @@ const fs = require('node:fs');
 const PUERTO = process.env.PUERTO || '8098';
 const BASE = `http://127.0.0.1:${PUERTO}/`;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'incerpaz-adm-'));
-const ENTORNO = Object.assign({}, process.env, { DB_PATH: path.join(TMP, 'p.db'), CONTENT_DIR: path.join(TMP, 'contenido'), PORT: PUERTO, ADMIN_PASSWORD: 'admin-clave-123', SEMBRAR_DEMO: '1' });
+const ENTORNO = Object.assign({}, process.env, { DB_PATH: path.join(TMP, 'p.db'), CONTENT_DIR: path.join(TMP, 'contenido'), PORT: PUERTO, ADMIN_CORREO: 'admin@incerpaz.test', ADMIN_NOMBRE: 'Administración', ADMIN_PASSWORD: 'admin-clave-123', SEMBRAR_DEMO: '1' });
 let fallos = 0;
 const ok = (c, m) => { console.log((c ? 'OK   ' : 'FALLA') + ' ' + m); if (!c) fallos++; };
 /* espera el aviso nuevo (primero deja que desaparezca el anterior) */
-let pagAviso; const aviso = async (accion, texto) => { await pagAviso.waitForSelector('#toast:not(.on)', { state: 'attached' }).catch(() => {}); await accion(); await pagAviso.waitForFunction((t) => { const e = document.getElementById('toast'); return e && e.classList.contains('on') && e.textContent.indexOf(t) >= 0; }, texto); };
+let pagAviso; const aviso = async (accion, texto) => { await pagAviso.locator('#toast.on').waitFor({ state: 'hidden' }); await accion(); await pagAviso.waitForFunction((t) => { const e = document.getElementById('toast'); return e && e.classList.contains('on') && e.textContent.indexOf(t) >= 0; }, texto); };
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
 (async () => {
@@ -33,9 +33,10 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await ej.click('#form-ingreso button[type="submit"]'); await ej.waitForURL('**/equipo.html');
     await ej.goto(BASE + 'admin.html'); await ej.waitForSelector('[data-tab="promos"]');
     ok((await ej.locator('[data-tab]').count()) === 1, 'el ejecutivo solo ve las promociones de su ciudad, no el resto del panel');
+    ok((await ej.locator('[data-tab="confianza"]').count()) === 0, 'el ejecutivo no ve la pestaña Confianza');
 
     await p.goto(BASE + 'admin.html'); await p.waitForSelector('text=Ingresa con tu cuenta');
-    await p.goto(BASE + 'ingresar.html?volver=admin.html'); await p.fill('[name="correo"]', 'hugop1006@gmail.com'); await p.fill('[name="password"]', 'admin-clave-123');
+    await p.goto(BASE + 'ingresar.html?volver=admin.html'); await p.fill('[name="correo"]', ENTORNO.ADMIN_CORREO); await p.fill('[name="password"]', 'admin-clave-123');
     await p.click('#form-ingreso button[type="submit"]'); await p.waitForURL('**/admin.html'); await p.waitForSelector('table.tabla');
     ok((await p.locator('tbody tr').count()) === 32, 'el panel lista los 32 productos de Cochabamba');
 
@@ -77,6 +78,62 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     await p.click('[data-tab="agencias"]'); await p.waitForSelector('[data-del="oruro:2"], [data-lista="oruro"] [data-del]');
     await p.locator('[data-lista="oruro"] [data-del]').last().click(); await aviso(() => p.click('#guardar'), 'Cambios publicados');
     ok(!(await (await fetch(BASE + 'donde-estamos.html')).text()).includes('Agencia Prueba'), 'quitar la agencia la saca del sitio');
+
+    await p.click('[data-tab="confianza"]');
+    const confianza = p.locator('.admin-confianza');
+    await confianza.waitFor();
+    ok((await confianza.locator('h2').allTextContents()).join(', ') === 'Año de inicio, Certificaciones, Obras, Testimonios', 'la pestaña Confianza carga los cuatro bloques');
+    const capturas = process.env.CAPTURAS_CONFIANZA;
+    if (capturas) {
+      for (const nombre of ['Agregar certificación', 'Agregar obra', 'Agregar testimonio']) {
+        await confianza.getByRole('button', { name: nombre }).click();
+      }
+      await p.locator('#toast.on').waitFor({ state: 'hidden' });
+      await p.evaluate(() => document.activeElement.blur());
+      const panel = p.locator('main');
+      const estilo = '.site-header, .wa-float, #toast { visibility: hidden !important; }';
+      await panel.screenshot({ path: path.join(capturas, 'confianza-escritorio.png'), style: estilo });
+      await p.setViewportSize({ width: 390, height: 800 });
+      await panel.screenshot({ path: path.join(capturas, 'confianza-celular.png'), style: estilo });
+      await p.setViewportSize({ width: 1280, height: 900 });
+      await p.reload();
+      await p.click('[data-tab="confianza"]');
+    }
+    await confianza.getByRole('button', { name: 'Agregar obra' }).click();
+    const obra = confianza.locator('[data-confianza="obras"] [data-ficha-confianza]');
+    await obra.locator('[name="titulo"]').fill('Obra de prueba del panel');
+    await obra.locator('[name="ciudad"]').fill('Ciudad de prueba');
+    const fotos = path.join(__dirname, '../site/assets/img/productos');
+    const foto = fs.readdirSync(fotos).find((f) => /\.jpe?g$/i.test(f));
+    await obra.locator('input[type=file]').setInputFiles(path.join(fotos, foto));
+    await obra.locator('img').waitFor();
+    for (const autorizado of [true, false]) {
+      await confianza.getByRole('button', { name: 'Agregar testimonio' }).click();
+      const t = confianza.locator('[data-confianza="testimonios"] [data-ficha-confianza]').last();
+      await t.locator('[name="nombre"]').fill('Nombre de prueba');
+      await t.locator('[name="texto"]').fill(autorizado ? 'Testimonio autorizado del panel' : 'Testimonio sin autorización del panel');
+      if (autorizado) await t.getByLabel('Tengo autorización escrita de esta persona o empresa').check();
+    }
+    await aviso(() => confianza.getByRole('button', { name: 'Guardar y publicar' }).click(), 'Cambios publicados');
+    const portada = await (await fetch(BASE + 'index.html')).text();
+    const imagen = await obra.locator('[name="imagen"]').inputValue();
+    ok(portada.includes('Obra de prueba del panel') && portada.includes(imagen) && (await fetch(BASE + imagen)).ok, 'la obra y su foto subida aparecen en la portada');
+    ok(portada.includes('Testimonio autorizado del panel'), 'el testimonio autorizado aparece en la portada');
+    ok(!portada.includes('Testimonio sin autorización del panel'), 'el testimonio sin autorización no se publica');
+    await p.reload();
+    await p.click('[data-tab="confianza"]');
+    const borrador = confianza.locator('[data-confianza="testimonios"] [data-ficha-confianza]').last();
+    ok(await borrador.locator('[name="texto"]').inputValue() === 'Testimonio sin autorización del panel', 'el borrador se conserva al volver al panel');
+    await p.setViewportSize({ width: 390, height: 800 });
+    ok((await p.evaluate(() => document.documentElement.scrollWidth)) <= 390, 'Confianza no desborda la página a 390 px');
+
+    await obra.locator('[name="titulo"]').fill('Obra editada en el panel');
+    await borrador.getByRole('button', { name: 'Quitar' }).click();
+    await aviso(() => confianza.getByRole('button', { name: 'Guardar y publicar' }).click(), 'Cambios publicados');
+    const editada = await (await fetch(BASE + 'index.html')).text();
+    ok(editada.includes('Obra editada en el panel') && !editada.includes('Obra de prueba del panel'), 'editar una obra actualiza la portada');
+    const guardado = await p.evaluate(async () => (await fetch('/api/admin/confianza')).json());
+    ok(guardado.testimonios.length === 1, 'quitar un testimonio lo elimina de los datos guardados');
 
     await p.setViewportSize({ width: 390, height: 800 }); await p.click('[data-tab="productos"]'); await p.waitForSelector('table.tabla');
     ok((await p.evaluate(() => document.documentElement.scrollWidth)) <= 390, 'el panel no desborda la página en celular');

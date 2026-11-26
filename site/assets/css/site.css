@@ -532,6 +532,7 @@ label.check a { color: var(--red); font-weight: 600; }
 /* botón «Volver» (comparador y otras páginas de herramienta) */
 .volver { display: flex; width: fit-content; align-items: center; gap: 8px; min-height: 44px; margin: 4px 0 18px; padding: 8px 16px 8px 12px; border: 1.5px solid var(--ink); background: var(--white); color: var(--ink); font: 700 16px var(--display); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; }
 .volver:hover { background: var(--ink); color: #fff; }
+@media (max-width: 860px) { .volver.volver--detalle { margin-bottom: 8px; } }
 
 /* ---- prueba de confianza: obras, testimonios y certificaciones (aparecen solo con datos) ---- */
 .obras { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
@@ -551,3 +552,20 @@ label.check a { color: var(--red); font-weight: 600; }
 /* la franja de confianza admite un quinto dato */
 .confianza { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
 @media (max-width: 900px) { .confianza { grid-template-columns: 1fr 1fr; } .confianza li:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+
+/* Administración de los datos de confianza */
+.admin-confianza fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.admin-confianza section { margin-bottom: 28px; }
+.admin-confianza h2 { font-size: 28px; margin-bottom: 8px; }
+.admin-confianza [name="desde"] { max-width: 240px; }
+.admin-confianza .form-box { max-width: 760px; margin-bottom: 12px; }
+.admin-confianza .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.admin-confianza .confianza-casilla { flex-direction: row; align-items: flex-start; gap: 8px; }
+.admin-confianza .confianza-casilla input { width: auto; min-height: 0; padding: 0; margin: 4px 0 0; }
+.admin-confianza .confianza-foto { margin: 8px 0; }
+.admin-confianza .confianza-foto img { object-fit: cover; }
+.admin-confianza .confianza-subir { position: relative; }
+.admin-confianza .confianza-subir input { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; opacity: 0; cursor: pointer; }
+.admin-confianza .confianza-subir:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; }
+.admin-confianza [data-quitar-confianza] { margin-top: 12px; }
+@media (max-width: 640px) { .admin-confianza .form-grid { grid-template-columns: minmax(0, 1fr); } }

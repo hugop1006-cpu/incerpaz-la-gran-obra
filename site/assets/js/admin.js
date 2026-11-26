@@ -1,5 +1,5 @@
 /* INCERPAZ — panel de administración del contenido (solo administradores).
-   Productos, precios, agencias y contacto, equipo e historial. Habla con /api/admin/*. */
+   Productos, precios, agencias y contacto, confianza, equipo e historial. Habla con /api/admin/*. */
 (function () {
   'use strict';
   var BASE = document.body.getAttribute('data-base') || '';
@@ -27,7 +27,7 @@
   function recargar() { return api('GET', '/api/admin/contenido').then(function (d) { est.datos = d; }); }
 
   /* ---------- estructura ---------- */
-  var TABS_ADMIN = [['productos', 'Productos'], ['precios', 'Precios'], ['promos', 'Promociones'], ['agencias', 'Agencias y contacto'], ['equipo', 'Equipo'], ['historial', 'Historial']];
+  var TABS_ADMIN = [['productos', 'Productos'], ['precios', 'Precios'], ['promos', 'Promociones'], ['agencias', 'Agencias y contacto'], ['confianza', 'Confianza'], ['equipo', 'Equipo'], ['historial', 'Historial']];
   var TABS_EJECUTIVO = [['promos', 'Promociones de tu ciudad']];
   function marco(contenido) {
     var TABS = est.rol === 'admin' ? TABS_ADMIN : TABS_EJECUTIVO;
@@ -39,10 +39,25 @@
     if (est.tab === 'precios') return vistaPrecios();
     if (est.tab === 'promos') return vistaPromos();
     if (est.tab === 'agencias') return vistaAgencias();
+    if (est.tab === 'confianza') return vistaConfianza();
     if (est.tab === 'equipo') return vistaEquipo();
     return vistaHistorial();
   }
   var campo = function (etq, nombre, valor, extra) { return '<label>' + etq + '<input name="' + nombre + '" value="' + esc(valor) + '" ' + (extra || '') + '></label>'; };
+
+  function botonImagen(id) {
+    return '<label class="btn btn--sm' + (id ? '' : ' confianza-subir') + '" style="cursor:pointer;display:inline-block">Subir imagen<input ' +
+      (id ? 'id="' + id + '" hidden ' : '') + 'type="file" accept="image/jpeg,image/png,image/webp"></label>';
+  }
+  function subirImagen(archivo) {
+    if (archivo.size > 3_000_000) return Promise.reject(new Error('La imagen debe pesar menos de 3 MB'));
+    return new Promise(function (resolve, reject) {
+      var lector = new FileReader();
+      lector.onerror = function () { reject(new Error('No se pudo leer la imagen')); };
+      lector.onload = function () { resolve(String(lector.result).split(',')[1]); };
+      lector.readAsDataURL(archivo);
+    }).then(function (datos) { return api('POST', '/api/admin/imagenes', { datos: datos }); });
+  }
 
   /* ---------- productos ---------- */
   function listaProductos() {
@@ -77,7 +92,7 @@
       '<p class="muted" style="font-size:15px;align-self:end">Con fecha, el producto lleva la etiqueta «Nuevo» y aparece en la portada hasta ese día. Déjala vacía para no destacarlo.</p></div>' +
       '<h3 style="margin:22px 0 8px">Categorías</h3><div class="chips">' + d.categorias.map(function (c) { return '<label class="chip" style="display:inline-flex;flex-direction:row;gap:8px;align-items:center"><input type="checkbox" data-cat="' + c.slug + '"' + (p.categorias.indexOf(c.slug) >= 0 ? ' checked' : '') + ' style="width:auto"> ' + esc(c.nombre) + '</label>'; }).join('') + '</div>' +
       '<h3 style="margin:22px 0 8px">Medidas</h3><datalist id="medidas">' + MEDIDAS.map(function (m) { return '<option value="' + m + '">'; }).join('') + '</datalist><div id="medidas-box">' + medidasHtml() + '</div><button type="button" class="btn btn--sm" id="addm">Agregar medida</button>' +
-      '<h3 style="margin:22px 0 8px">Imágenes <span class="muted" style="font-weight:400;font-size:15px">(la primera es la principal)</span></h3><div id="imgs">' + imgsHtml() + '</div><label class="btn btn--sm" style="cursor:pointer;display:inline-block">Subir imagen<input id="subir" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>' +
+      '<h3 style="margin:22px 0 8px">Imágenes <span class="muted" style="font-weight:400;font-size:15px">(la primera es la principal)</span></h3><div id="imgs">' + imgsHtml() + '</div>' + botonImagen('subir') +
       '<div class="btn-row" style="margin-top:28px"><button class="btn btn--red" type="submit">' + (e.nuevo ? 'Crear producto' : 'Guardar cambios') + '</button><button class="btn" type="button" id="cancelar">Cancelar</button>' + (e.nuevo ? '' : '<button class="btn btn--ghost" type="button" id="borrar">Eliminar producto</button>') + '</div></form>');
     function leerForm() {
       var f = $('#f'), r = Object.assign({}, p);
@@ -94,10 +109,7 @@
     $$('[data-up]').forEach(function (b) { b.addEventListener('click', function () { var i = +b.getAttribute('data-up'); p.imagenes.splice(i - 1, 0, p.imagenes.splice(i, 1)[0]); redibujar(); }); });
     $('#subir').addEventListener('change', function (ev) {
       var a = ev.target.files[0]; if (!a) return;
-      if (a.size > 3_000_000) return aviso('La imagen debe pesar menos de 3 MB');
-      var lector = new FileReader();
-      lector.onload = function () { api('POST', '/api/admin/imagenes', { datos: String(lector.result).split(',')[1] }).then(function (r) { p.imagenes.push(r.ruta); redibujar(); aviso('Imagen subida'); }).catch(function (x) { aviso(x.message); }); };
-      lector.readAsDataURL(a);
+      subirImagen(a).then(function (r) { p.imagenes.push(r.ruta); redibujar(); aviso('Imagen subida'); }).catch(function (x) { aviso(x.message); });
     });
     $('#cancelar').addEventListener('click', function () { est.editando = null; pintar(); });
     if ($('#borrar')) $('#borrar').addEventListener('click', function () {
@@ -189,6 +201,114 @@
       '<label class="full">Dirección<input name="direccion" value="' + esc(a.direccion) + '" maxlength="200"></label>' +
       campo('Teléfonos (separados por coma)', 'telefonos', a.telefonos.join(', '), 'placeholder="4-4271684, 4-4271685"') + campo('WhatsApp (8 dígitos)', 'whatsapp', a.whatsapp, 'inputmode="numeric" maxlength="8"') +
       '</div><button class="btn btn--sm btn--ghost" type="button" data-del="' + c + ':' + i + '" style="margin-top:12px">Quitar</button></div>';
+  }
+
+  /* ---------- confianza ---------- */
+  var BLOQUES_CONFIANZA = [
+    { clave: 'certificaciones', titulo: 'Certificaciones', agregar: 'Agregar certificación', max: 20 },
+    { clave: 'obras', titulo: 'Obras', agregar: 'Agregar obra', max: 24 },
+    { clave: 'testimonios', titulo: 'Testimonios', agregar: 'Agregar testimonio', max: 12 }
+  ];
+  function tarjetaConfianza(clave, dato, actual) {
+    var campos;
+    if (clave === 'certificaciones') {
+      campos = campo('Nombre', 'nombre', dato.nombre, 'required maxlength="120"') +
+        campo('Detalle (opcional)', 'detalle', dato.detalle, 'maxlength="200"') +
+        campo('Enlace HTTPS al certificado (opcional)', 'archivo', dato.archivo, 'type="url"');
+    } else if (clave === 'obras') {
+      campos = campo('Título', 'titulo', dato.titulo, 'required maxlength="100"') +
+        campo('Ciudad', 'ciudad', dato.ciudad, 'required maxlength="40"') +
+        campo('Año (opcional)', 'anio', dato.anio, 'type="number" min="1950" max="' + (actual + 1) + '"') +
+        campo('Superficie en m² (opcional)', 'superficie_m2', dato.superficie_m2, 'type="number" min="0" step="any"') +
+        '<label class="confianza-casilla full"><input type="checkbox" name="pavic"' + (dato.pavic ? ' checked' : '') + '> Mostrar también en PAVIC</label>' +
+        '<div class="full"><b>Imagen de la obra</b><div class="confianza-foto">' +
+        (dato.imagen ? '<img src="/' + esc(dato.imagen) + '" alt="Imagen de la obra" width="120" height="90">' : 'Falta subir una imagen') +
+        '</div><input type="hidden" name="imagen" value="' + esc(dato.imagen) + '">' + botonImagen() + '</div>';
+    } else {
+      campos = campo('Nombre', 'nombre', dato.nombre, 'required maxlength="80"') +
+        campo('Empresa (opcional)', 'empresa', dato.empresa) + campo('Ciudad (opcional)', 'ciudad', dato.ciudad) +
+        '<label class="full">Testimonio<textarea name="texto" required maxlength="400" rows="3">' + esc(dato.texto) + '</textarea></label>' +
+        '<label class="confianza-casilla full"><input type="checkbox" name="autorizacion_escrita"' +
+        (dato.autorizacion_escrita ? ' checked' : '') + '> Tengo autorización escrita de esta persona o empresa</label>';
+    }
+    return '<div class="form-box" data-ficha-confianza><div class="form-grid">' + campos +
+      '</div><button class="btn btn--sm btn--ghost" type="button" data-quitar-confianza>Quitar</button></div>';
+  }
+  function vistaConfianza() {
+    marco('<p class="muted">Cargando…</p>');
+    var vista = $('#vista', raiz);
+    api('GET', '/api/admin/confianza').then(function (datos) {
+      if (vista.isConnected) formConfianza(vista, datos);
+    }).catch(function (e) {
+      if (vista.isConnected) { vista.textContent = e.message; aviso(e.message); }
+    });
+  }
+  function formConfianza(vista, datos) {
+    var actual = new Date().getFullYear();
+    vista.innerHTML = '<form class="admin-confianza"><fieldset><section><h2>Año de inicio</h2>' +
+      campo('Año de inicio (opcional)', 'desde', datos.desde, 'type="number" min="1850" max="' + actual + '"') +
+      '</section>' + BLOQUES_CONFIANZA.map(function (bloque) {
+        var lista = datos[bloque.clave];
+        return '<section data-confianza="' + bloque.clave + '"><h2>' + bloque.titulo + '</h2>' +
+          (bloque.clave === 'testimonios' ? '<p class="muted">Los testimonios sin autorización se guardan como borradores.</p>' : '') +
+          lista.map(function (dato) { return tarjetaConfianza(bloque.clave, dato, actual); }).join('') +
+          '<button class="btn btn--sm" type="button" data-agregar-confianza' + (lista.length >= bloque.max ? ' disabled' : '') + '>' + bloque.agregar + '</button></section>';
+      }).join('') + '<button class="btn btn--red" type="submit">Guardar y publicar</button></fieldset></form>';
+    var form = $('.admin-confianza', vista);
+    var campos = $('fieldset', form);
+    function leerCampo(i) {
+      if (i.type === 'checkbox') return i.checked;
+      if (i.type === 'number') return i.value === '' ? null : i.valueAsNumber;
+      return i.value.trim();
+    }
+    function leer() {
+      var salida = { desde: leerCampo(form.elements.desde) };
+      BLOQUES_CONFIANZA.forEach(function (bloque) {
+        salida[bloque.clave] = $$('[data-confianza="' + bloque.clave + '"] [data-ficha-confianza]', form).map(function (tarjeta) {
+          var item = {};
+          $$('[name]', tarjeta).forEach(function (i) { item[i.name] = leerCampo(i); });
+          return item;
+        });
+      });
+      return salida;
+    }
+    BLOQUES_CONFIANZA.forEach(function (bloque) {
+      var seccion = $('[data-confianza="' + bloque.clave + '"]', form);
+      $('[data-agregar-confianza]', seccion).addEventListener('click', function () {
+        var cambios = leer();
+        cambios[bloque.clave].push({});
+        formConfianza(vista, cambios);
+        $('[data-confianza="' + bloque.clave + '"] [data-ficha-confianza]:last-of-type input', vista).focus();
+      });
+      $$('[data-ficha-confianza]', seccion).forEach(function (tarjeta, indice) {
+        $('[data-quitar-confianza]', tarjeta).addEventListener('click', function () {
+          if (!confirm('¿Quitar este elemento?')) return;
+          var cambios = leer();
+          cambios[bloque.clave].splice(indice, 1);
+          formConfianza(vista, cambios);
+        });
+        var subida = $('input[type=file]', tarjeta);
+        if (!subida) return;
+        subida.addEventListener('change', function () {
+          var archivo = subida.files[0]; if (!archivo) return;
+          campos.disabled = true;
+          subirImagen(archivo).then(function (r) {
+            $('[name=imagen]', tarjeta).value = r.ruta;
+            formConfianza(vista, leer());
+            aviso('Imagen subida');
+          }).catch(function (e) { subida.value = ''; aviso(e.message); })
+            .finally(function () { campos.disabled = false; });
+        });
+      });
+    });
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var cambios = leer();
+      campos.disabled = true;
+      guardando($('[type=submit]', form), api('PUT', '/api/admin/confianza', cambios), 'Cambios publicados en el sitio')
+        .catch(function () { /* El aviso ya muestra el error. */ })
+        .finally(function () { campos.disabled = false; });
+    });
   }
 
   /* ---------- equipo ---------- */
