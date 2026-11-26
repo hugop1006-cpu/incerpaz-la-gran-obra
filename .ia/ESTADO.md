@@ -2,6 +2,55 @@
 
 Lo actualiza el asistente o la persona que termina una tarea. Lo más reciente arriba.
 
+## 2026-11-26 · Claude Code
+**Hecho**
+- Hugo autorizó y se fusionaron los PR de Luna: #16 (botón «Volver») y #18 (panel de confianza), este último actualizado con `main` y con el sitio regenerado. `main` verificado: sitio regenerado sin cambios, API 15 de 15 y las 9 suites de navegador en verde.
+- Este PR de documentación lleva a `main` los ENCARGOS, el spec de arranque de Luna y `.ia/COMUNICACION.md` (canal por GitHub).
+
+**Sigue**
+- Luna toma el issue #19 (acotar «empresa» y «ciudad» de los testimonios).
+- Datos de confianza y demás pendientes de otras áreas (ver `.ia/TAREAS.md`).
+
+## 2026-11-24 (noche, 4) · Claude Code
+**Hecho**
+- Comunicación Claude ↔ Luna por GitHub (decisión de Hugo, «GitHub como buzón»): ENCARGO = issue con etiquetas `encargo` y `luna`; REPORTE = descripción del PR; Claude revisa en GitHub. Ver `.ia/COMUNICACION.md`.
+- Luna ya abrió los dos PR: #16 (botón «Volver») y #18 (panel de confianza). Los revisé: ambos aprobados contra el ENCARGO, con las pruebas en verde en mi entorno (el ✗ de `sitio` que reporta Luna es de su entorno, por el bloqueo de `wa.me`). Veredictos publicados en cada PR.
+- Issue #19: ENCARGO de seguimiento (acotar empresa y ciudad de los testimonios; riesgo bajo). Issue #17 cerrado por duplicado.
+
+**Sigue**
+- Hugo autoriza el merge de #16 y luego de #18. Al fusionar el segundo hay que actualizarlo con `main` y regenerar el sitio (ambos cambian `site.css`).
+- Luna toma el issue #19 después del merge de #18.
+
+## 2026-11-24 (noche, 3) · Claude Code
+**Revisión del REPORTE de arranque de Luna**
+- Cumplió el protocolo: leyó los archivos (incluido `.ia/PROTOCOLO.md` desde su rama), no cambió nada, no abrió PR y no inventó resultados de pruebas (marcó cada check como no ejecutado).
+- Entorno NO listo: trabaja en la app local de Codex sobre otra carpeta (`INHOUSE`, no es un clon de INCERPAZ); Node 24.20.0 (se requiere 22); Python 3.9.6 y Git bien; sin Playwright/Chromium. Por eso no corrió ninguna prueba.
+- Pasos para dejarlo listo (a cargo de Hugo): clonar el repositorio como carpeta de trabajo de Luna, instalar Node 22 y Playwright con Chromium fuera del repositorio (no se agregan dependencias al proyecto) y repetir el arranque. Hasta que pase, no se envían los ENCARGOS.
+
+## 2026-11-24 (noche, 2) · Claude Code
+**Hecho**
+- Spec de arranque para que Luna cree su hilo y verifique su entorno antes de recibir ENCARGOS: `.ia/traspasos/2026-11-24-claude-para-luna-arranque.md`. No cambia archivos del repositorio; pide un REPORTE de arranque con versión de Node, Playwright y el resultado de todas las pruebas.
+
+**Sigue**
+- Hugo crea el hilo `INCERPAZ · Luna · arranque`, pega el spec y pasa el REPORTE a Claude. Luego envía los dos ENCARGOS.
+
+## 2026-11-24 (noche) · Claude Code
+**Hecho**
+- Se redactó el segundo ENCARGO para Luna: botón «Volver» consistente en las páginas de detalle (ficha, combo, promoción, proyecto, guía y recursos PAVIC), `.ia/traspasos/2026-11-24-claude-para-luna-navegacion.md`. Riesgo bajo. Es independiente del ENCARGO del panel de confianza.
+
+**Sigue**
+- Hugo envía los dos ENCARGOS a Luna y confirma la rama de destino de los PR (`main` o la rama por defecto del protocolo).
+- Claude revisa los PR de Luna contra los criterios de cada ENCARGO.
+
+## 2026-11-24 (tarde) · Claude Code
+**Hecho**
+- Se redactó el ENCARGO para Luna: panel de administración para cargar año de inicio, certificaciones, obras y testimonios (`.ia/traspasos/2026-11-24-claude-para-luna-panel-confianza.md`). Riesgo medio. Hugo eligió esta tarea.
+- Regla de Luna leída y aplicada: no hay nada en curso del lado de Claude; el sitio está fusionado en `main` (PR #15) y la demo republicada. A partir de ahora las tareas nuevas del sitio pasan por Luna con ENCARGO y REPORTE; Claude revisa el PR.
+
+**Sigue**
+- Enviar el ENCARGO a Luna (`codex queue`, hilo `INCERPAZ · Luna · panel de confianza`) y esperar su PR para revisarlo.
+- Duda para Hugo: el protocolo dice que los PR van a la rama por defecto del repositorio (`claude/gracious-wright-mkglyk`) pero el sitio se fusiona en `main`; el ENCARGO pide `main`.
+
 ## 2026-11-24 · Luna (Codex)
 **Hecho**
 - Pestaña «Confianza» para administrar el año de inicio, las certificaciones, las obras y los testimonios. El guardado regenera el sitio y respalda los datos anteriores en Historial.

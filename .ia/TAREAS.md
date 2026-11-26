@@ -30,7 +30,10 @@ Estado: `pendiente` · `en curso` · `bloqueada` · `hecha`.
 | Wireframes tanda 4: PAVIC con camiones, proceso y muestras | claude-code | hecha (2026-11-21) | Capacidad del camión (20 t) es de ejemplo; proceso por validar con ventas |
 | Revisión UX prioridad 2: nombres, tarjetas, cuenta y presupuesto visibles, confianza | claude-code | hecha (2026-11-23) | Fotos uniformes quedan con Marketing |
 | Revisión UX prioridad 3: secciones de obras, testimonios y certificaciones listas para llenarse | claude-code | hecha (2026-11-24) | Sin datos: no se muestran hasta que existan |
-| Panel de administración para los datos de confianza | codex | hecha (2026-11-24) | Pendiente de revisión de Claude |
+| Crear el hilo de Luna y verificar su entorno (arranque) | humano (Hugo) | hecha (2026-11-25) | Spec: `.ia/traspasos/2026-11-24-claude-para-luna-arranque.md`. Antes de enviar los ENCARGOS |
+| Botón «Volver» consistente en las páginas de detalle | luna | hecha (2026-11-25) | PR #16 fusionado. Revisado por Claude |
+| Panel de administración para los datos de confianza | luna | hecha (2026-11-26) | PR #18 fusionado. Revisado por Claude |
+| Acotar «empresa» y «ciudad» de los testimonios | luna | pendiente | Issue #19 (riesgo bajo) |
 | Datos de confianza: año de inicio, certificados, obras con foto, testimonios autorizados, fotos uniformes, promociones reales | humano (Marketing, Calidad y Legal) | pendiente | Año, certificados, obras y testimonios se cargan desde «Confianza» en el panel. Ver `site-src/GUIA-FOTOS.md` |
 | Wireframes tanda 5: calculadora de tejas por pendiente | claude-code | hecha (2026-11-21) | Pendiente mínima y ficha de la teja canal por confirmar |
 | Wireframes tanda 6: ordenar catálogo, «Nuestras marcas», enlace al juego | claude-code | hecha (2026-11-23) | Falta decidir la marca propia de tejas |
